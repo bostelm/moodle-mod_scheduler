@@ -288,7 +288,7 @@ if ($canappoint){
         if (count($mygroups) == 1){
             $groups = array_values($mygroups);
             echo ' <input type="checkbox" name="appointgroup" value="'.$groups[0]->id.'" /> '.get_string('appointformygroup', 'scheduler').': '.$groups[0]->name;                    
-            echo $OUTPUT->help_icon('appointagroup', get_string('appointagroup', 'scheduler'), 'scheduler');
+            echo $OUTPUT->help_icon('appointagroup', 'scheduler');
         }
         if (count($mygroups) > 1){
             print_string('appointfor', 'scheduler');
@@ -297,7 +297,7 @@ if ($canappoint){
                 $groupchoice[$group->id] = $group->name;
             }
             echo html_writer::select($groupchoice, 'appointgroup', '', '');
-            echo $OUTPUT->help_icon('appointagroup', get_string('appointagroup', 'scheduler'), 'scheduler');
+            echo $OUTPUT->help_icon('appointagroup', 'scheduler');
         }
     }
 }

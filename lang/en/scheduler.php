@@ -271,6 +271,8 @@ $string['appointmentmode_help']='<p>You may choose here some variants in the way
 </ul>
 </p>';
 
+$string['appointagroup_help'] = 'Choose whether you want to make the appointment only for yourself, or for an entire group.';
+
 $string['bookwithteacher_help']='Choose a teacher for the appointment.';
 
 $string['choosingslotstart_help']='Change (or choose) the appointement start time. If this appointement collides with some other slots, you\'ll be asked
