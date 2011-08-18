@@ -1,0 +1,91 @@
+
+<table>
+    <tr>
+        <td colspan="2">
+            <?php echo $OUTPUT->heading(get_string('add'),3) ?>
+        </td>
+<?php
+if ($displaydeletebuttons){
+    $deletespan = (has_capability('mod/scheduler:manageallappointments', $context)) ? 4 : 2 ;
+?>
+        <td colspan="<?php echo $deletespan; ?>" class="r1">
+            <?php echo $OUTPUT->heading(get_string('delete'),3) ?>
+        </td>
+<?php
+}
+?>
+    <tr>
+        <td>
+            <form action="view.php" method="post" name="addsessionform">
+                <input type="hidden" name="what" value="addsession" />
+                <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+                <input type="hidden" name="page" value="<?php p($page) ?>" />
+                <input type="submit" name="go_btn" value="<?php echo $straddsession ?>" />
+            </form>
+         </td>
+         <td>
+            <form action="view.php" method="post" name="addsingleform">
+                <input type="hidden" name="what" value="addslot" />
+                <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+                <input type="hidden" name="page" value="<?php p($page) ?>" />
+                <input type="submit" name="go_btn" value="<?php echo $straddsingleslot ?>" />
+            </form>
+         </td>
+<?php
+if ($displaydeletebuttons){
+    if (has_capability('mod/scheduler:manageallappointments', $context)){
+?>
+         <td>
+            <form action="view.php" method="post" name="deleteallform">
+                <script type="text/javascript">
+                    function confirmdeletionall(){
+                        if (confirm('<?php print_string('confirmdelete', 'scheduler') ?>')){
+                             document.forms['deleteallform'].submit();
+                        }
+                    }
+                </script>
+                <input type="hidden" name="what" value="deleteall" />
+                <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+                <input type="hidden" name="page" value="<?php p($page) ?>" />
+                <input type="button" name="go_btn" value="<?php echo $strdeleteallslots ?>" onclick="confirmdeletionall()" />
+            </form>
+         </td>
+         <td>
+            <form action="view.php" method="post" name="deleteallunusedform">
+                <script type="text/javascript">
+                    function confirmdeletionallunused(){
+                        if (confirm('<?php print_string('confirmdelete', 'scheduler') ?>')){
+                             document.forms['deleteallunusedform'].submit();
+                        }
+                    }
+                </script>
+                <input type="hidden" name="what" value="deleteallunused" />
+                <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+                <input type="hidden" name="page" value="<?php p($page) ?>" />
+                <input type="button" name="go_btn" value="<?php echo $strdeleteallunusedslots ?>" onclick="confirmdeletionallunused()" />
+            </form>
+         </td>
+<?php
+    }
+?>
+         <td>
+            <form action="view.php" method="post" name="deleteunusedform">
+                <input type="hidden" name="what" value="deleteunused" />
+                <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+                <input type="hidden" name="page" value="<?php p($page) ?>" />
+                <input type="submit" name="go_btn" value="<?php echo $strdeleteunusedslots ?>" />
+            </form>
+         </td>
+         <td>
+            <form action="view.php" method="post" name="deletemineform">
+                <input type="hidden" name="what" value="deleteonlymine" />
+                <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+                <input type="hidden" name="page" value="<?php p($page) ?>" />
+                <input type="submit" name="go_btn" value="<?php echo $strdeletemyslots ?>" />
+            </form>
+         </td>
+<?php
+}
+?>
+     </tr>
+</table>
