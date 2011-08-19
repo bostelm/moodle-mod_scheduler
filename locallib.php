@@ -90,42 +90,25 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
     
     switch ($others){
         case SCHEDULER_SELF:
-            $schedulerScope = " schedulerid = '{$schedulerid}' AND ";
+            $schedulerScope = "s.schedulerid = {$schedulerid} AND ";
             break;
         case SCHEDULER_OTHERS:
-            $schedulerScope = " schedulerid != '{$schedulerid}' AND ";
+            $schedulerScope = "s.schedulerid != {$schedulerid} AND ";
             break;
         default:
             $schedulerScope = '';
     }
-    $teacherScope = ($teacher != 0) ? " s.teacherid = '{$teacher}' AND " : '' ;
-    $studentScope = ($student != 0) ? " a.studentid = '{$student}' AND " : '' ;
-    $exclusiveClause = ($careexclusive) ? " exclusivity != 0 AND " : '' ;
-    $sql = "
-        SELECT
-        concat(s.id,a.id) as uniqueid,
-        s.*,
-        a.studentid,
-        a.id as appointmentid
-        FROM
-        {scheduler_slots} s
-        LEFT JOIN
-        {scheduler_appointment} a
-        ON
-        a.slotid = s.id
-        WHERE
-        {$schedulerScope}
-        {$teacherScope}
-        {$studentScope}
-        {$exclusiveClause}
-        ( (s.starttime <= {$starttime} AND
-        s.starttime + s.duration * 60 > {$starttime}) OR
-        (s.starttime < {$endtime} AND
-        s.starttime + s.duration * 60 >= {$endtime}) OR
-        (s.starttime >= {$starttime} AND
-        s.starttime + s.duration * 60 <= {$endtime}) )
-        ";
-    $conflicting = $DB->get_records_sql($sql, NULL);
+    $teacherScope = ($teacher != 0) ? "s.teacherid = {$teacher} AND " : '' ;
+    $studentScope = ($student != 0) ? "EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.slotid = s.id and a.studentid = {$student}) AND " : '' ;
+    $exclusiveClause = ($careexclusive) ? "exclusivity != 0 AND " : '' ;
+	$timeClause = "( (s.starttime <= {$starttime} AND s.starttime + s.duration * 60 > {$starttime}) OR ".
+        		  "  (s.starttime < {$endtime} AND s.starttime + s.duration * 60 >= {$endtime}) OR ".
+        		  "  (s.starttime >= {$starttime} AND s.starttime + s.duration * 60 <= {$endtime}) ) ";
+
+    $sql = 'SELECT s.* from {scheduler_slots} s WHERE '.
+    		 $schedulerScope.$teacherScope.$studentScope.$exclusiveClause.$timeClause;
+        
+    $conflicting = $DB->get_records_sql($sql);
     
     return $conflicting;
 }
