@@ -79,8 +79,11 @@ function get_session_data(&$form){
 // load group restrictions
 $modinfo = get_fast_modinfo($course);
 
-$groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
-$usergroups = array_keys($groups);
+$usergroups = '';
+if ($cm->groupmode > 0) {
+	$groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
+	$usergroups = array_keys($groups);
+}	
 
 
 if ($action){
