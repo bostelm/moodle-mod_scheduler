@@ -215,7 +215,7 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
                 $collegues = "<div style=\"visibility:hidden; display:none\" id=\"collegues{$aSlot->id}\"><br/>";
                 foreach($appointments as $appstudent){
                     $student = $DB->get_record('user', array('id'=>$appstudent->studentid));
-                    $picture = print_user_picture($appstudent->studentid, $course->id, $student->picture, 0, true, true);
+                    $picture = $OUTPUT->user_picture($student, array('courseid'=>$course->id));
                     $name = "<a href=\"view.php?what=viewstudent&amp;id={$cm->id}&amp;studentid={$student->id}&amp;course={$scheduler->course}&amp;order=DESC\">".fullname($student).'</a>';
                     $collegues .= " $picture $name<br/>";
                 }
