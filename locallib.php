@@ -101,14 +101,14 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
             $schedulerScope = '';
     }
     $teacherScope = ($teacher != 0) ? "s.teacherid = {$teacher} AND " : '' ;
-    $studentScope = ($student != 0) ? "EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.slotid = s.id and a.studentid = {$student}) AND " : '' ;
+    $studentJoin = ($student != 0) ? "JOIN {scheduler_appointment} a ON a.slotid = s.id AND a.studentid = {$student} " : '' ;
     $exclusiveClause = ($careexclusive) ? "exclusivity != 0 AND " : '' ;
 	$timeClause = "( (s.starttime <= {$starttime} AND s.starttime + s.duration * 60 > {$starttime}) OR ".
         		  "  (s.starttime < {$endtime} AND s.starttime + s.duration * 60 >= {$endtime}) OR ".
         		  "  (s.starttime >= {$starttime} AND s.starttime + s.duration * 60 <= {$endtime}) ) ";
 
-    $sql = 'SELECT s.* from {scheduler_slots} s WHERE '.
-    		 $schedulerScope.$teacherScope.$studentScope.$exclusiveClause.$timeClause;
+    $sql = 'SELECT s.* from {scheduler_slots} s '.$studentJoin.' WHERE '.
+    		 $schedulerScope.$teacherScope.$exclusiveClause.$timeClause;
         
     $conflicting = $DB->get_records_sql($sql);
     
