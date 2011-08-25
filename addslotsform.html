@@ -85,7 +85,7 @@ if (!has_capability('mod/scheduler:canscheduletootherteachers', $context)){
 if (has_capability('mod/scheduler:canscheduletootherteachers', $context)){
 ?>
     <tr valign="top">
-        <td align="right"><b><?php echo format_string($scheduler->staffrolename) ?>:</b></td>
+        <td align="right"><b><?php echo scheduler_get_teacher_name($scheduler); ?>:</b></td>
         <td align="left" <?php print_error_class(@$errors, 'teacherid') ?> >
             <?php
                 $attendants = scheduler_get_attendants($cm->id);
