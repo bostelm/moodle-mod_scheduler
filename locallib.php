@@ -62,14 +62,16 @@ function scheduler_get_attendants($cmid){
 
 /**
  * get list of possible attendees (i.e., users that can make an appointment)
- * @param int $cmid the course module
+ * @param int $cm the course module
  * @param $groups - single group or array of groups - only return
  *                  users who are in one of these group(s).
  * @return array of moodle user records
  */
-function scheduler_get_possible_attendees($cmid,$groups=''){
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
-    $attendees = get_users_by_capability($context, 'mod/scheduler:appoint', '', 'lastname, firstname', '', '', $groups, '', false, false, false); 
+function scheduler_get_possible_attendees($cm, $groups=''){
+		
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $attendees = get_users_by_capability($context, 'mod/scheduler:appoint', '', 'lastname, firstname', '', '', $groups, '', false, false, false);
+    
     return $attendees;
 }
 

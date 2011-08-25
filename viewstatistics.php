@@ -39,7 +39,7 @@ print_tabs($tabrows, get_string($page, 'scheduler'));
 
 //display correct type of statistics by request
 
-$attendees = scheduler_get_possible_attendees ($cm->id, $usergroups); // BUGFIX
+$attendees = scheduler_get_possible_attendees ($cm, $usergroups); 
 
 switch ($page) {
     case 'overall':

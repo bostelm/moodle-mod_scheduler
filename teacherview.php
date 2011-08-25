@@ -757,7 +757,7 @@ echo '<br /><center>' . get_string('markseen', 'scheduler') . '</center>';
 <?php
 echo $OUTPUT->heading(get_string('schedulestudents', 'scheduler'));
 
-$students = scheduler_get_possible_attendees($cm->id, $usergroups); 
+$students = scheduler_get_possible_attendees($cm, $usergroups); 
 if (!$students) {
     $nostudentstr = get_string('noexistingstudents','scheduler');
     if ($COURSE->id == SITEID){

@@ -34,7 +34,7 @@ if ($form->what == 'updateslot' || $form->what == 'schedule'){
     <td align="right"><b><?php print_string('student', 'scheduler') ?>:</b></td>
     <td align="left">
 <?php
-        $students = scheduler_get_possible_attendees($cm->id,$usergroups);
+        $students = scheduler_get_possible_attendees($cm, $usergroups);
         if ($students){
             $studentsmenu = array();
             foreach ($students as $aStudent) {
