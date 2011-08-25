@@ -569,13 +569,11 @@ function scheduler_add_update_calendar_events($slot, $course) {
  * Will delete calendar events for a given scheduler slot, and not complain if the record does not exist.
  * The only argument this function requires is the complete database record of a scheduler slot.
  * @param object $slot the slot instance
- * @uses $CFG 
- * @uses $USER
- * @uses $COURSE
+ * @uses $DB 
  * @return boolean true if success, false otherwise
  */
 function scheduler_delete_calendar_events($slot) {
-    global $CFG, $SITE, $COURSE, $DB;
+    global $DB;
     
     $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
     

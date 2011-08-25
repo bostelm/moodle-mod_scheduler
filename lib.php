@@ -383,18 +383,9 @@ function scheduler_scale_used($cmid, $scaleid) {
 
 
 
-/**
- * Course resetting API
- * Called by course/reset.php
- * // OBSOLETE WAY
- */
 /*
- function scheduler_reset_course_form($course) {
- echo get_string('resetschedulers', 'scheduler'); echo ':<br />';
- print_checkbox('reset_appointments', 1, true, get_string('appointments','scheduler'), '', '');  echo '<br />';
- print_checkbox('reset_slots', 1, true, get_string('slots','scheduler'), '', '');  echo '<br />';
- echo '</p>';
- }
+ * Course resetting API
+ *
  */
 
 /**
@@ -406,14 +397,21 @@ function scheduler_reset_course_form_definition(&$mform) {
     
     $mform->addElement('header', 'schedulerheader', get_string('modulenameplural', 'scheduler'));
     
-    if(!$schedulers = $DB->get_records('scheduler', array('course'=>$COURSE->id))){
-        return;
+    if($DB->record_exists('scheduler', array('course'=>$COURSE->id))){
+        
+        $mform->addElement('checkbox', 'reset_scheduler_slots', get_string('resetslots', 'scheduler'));
+        $mform->addElement('checkbox', 'reset_scheduler_appointments', get_string('resetappointments', 'scheduler'));
+        $mform->disabledIf('reset_scheduler_appointments', 'reset_scheduler_slots', 'checked');
     }
-    
-    $mform->addElement('static', 'hint', get_string('resetschedulers', 'scheduler'));
-    $mform->addElement('checkbox', 'reset_slots', get_string('resetting_slots', 'scheduler'));
-    $mform->addElement('checkbox', 'reset_apointments', get_string('resetting_appointments', 'scheduler'));
 }
+
+/**
+ * Default values for the reset form
+ */
+function scheduler_reset_course_form_defaults($course) {
+    return array('reset_scheduler_slots'=>1, 'reset_scheduler_appointments'=>1);
+}
+
 
 /**
  * This function is used by the remove_course_userdata function in moodlelib.
@@ -422,56 +420,47 @@ function scheduler_reset_course_form_definition(&$mform) {
  * @param data the reset options
  * @return void
  */
-// TODO check: is this really used?
 function scheduler_reset_userdata($data) {
-    global $CFG;
+    global $CFG, $DB;
     
     $status = array();
     $componentstr = get_string('modulenameplural', 'scheduler');
     
-    $sql_appointments = "
-        DELETE FROM 
-        {scheduler_appointment}
-        WHERE 
-        slotid 
-        IN ( SELECT 
-        s.id 
-        FROM 
-        {$CFG->prefix}scheduler_slots s,
-        {$CFG->prefix}scheduler sc
-        WHERE 
-        sc.id = s.schedulerid AND
-        sc.course = {$data->courseid} 
-        )
-        ";
-    
-    $sql_slots = "
-        DELETE FROM 
-        {$CFG->prefix}scheduler_slots
-        WHERE 
-        schedulerid 
-        IN ( SELECT 
-        sc.id 
-        FROM 
-        {$CFG->prefix}scheduler sc
-        WHERE 
-        sc.course = {$data->courseid} 
-        )
-        ";
+    $sqlfromslots = 'FROM {scheduler_slots} WHERE schedulerid IN '.
+                '(SELECT sc.id FROM {scheduler} sc '.
+                ' WHERE sc.course = :course)';
+        
+    $params = array('course'=>$data->courseid);
     
     $strreset = get_string('reset');
     
-    if (!empty($data->reset_appointments) || !empty($data->reset_slots)) {
-        if (execute_sql($sql_appointments, false)) {
-            $status[] = array('component' => $componentstr, 'item' => get_string('resetting_appointments','scheduler'), 'error' => false);
-            notify($strreset.': '.get_string('appointments','scheduler'), 'notifysuccess');
+    
+    if (!empty($data->reset_scheduler_appointments) || !empty($data->reset_scheduler_slots)) {
+    	
+    	$slots = $DB->get_recordset_sql('SELECT * '.$sqlfromslots, $params);
+    	$success = true;
+    	foreach ($slots as $slot) {
+    		// delete calendar events
+    		$success = $success && scheduler_delete_calendar_events($slot);
+
+			// delete appointments
+			$success = $success && $DB->delete_records('scheduler_appointment', array('slotid'=>$slot->id));			    		    	
+    	}
+    	$slots->close();
+    	
+    	// reset gradebook
+    	$schedulers = $DB->get_records('scheduler', $params);
+    	foreach ($schedulers as $scheduler){
+    	    scheduler_grade_item_update($scheduler, 'reset');
+    	}
+    	
+    	$status[] = array('component' => $componentstr, 'item' => get_string('resetappointments','scheduler'), 'error' => !$success);
+    }
+    if (!empty($data->reset_scheduler_slots)) {
+        if ($DB->execute('DELETE '.$sqlfromslots, $params)) {
+            $status[] = array('component' => $componentstr, 'item' => get_string('resetslots','scheduler'), 'error' => false);
         }
     }
-    if (!empty($data->reset_slots)) {
-        $status[] = array('component' => $componentstr, 'item' => get_string('resetting_slots','scheduler'), 'error' => false);
-        execute_sql($sql_slots, false);
-    }
-    
     return $status;
 }
 
