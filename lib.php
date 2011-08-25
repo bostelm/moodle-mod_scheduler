@@ -9,6 +9,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /// Library of functions and constants for module scheduler
 include_once $CFG->dirroot.'/mod/scheduler/locallib.php';
 include_once $CFG->dirroot.'/mod/scheduler/mailtemplatelib.php';
@@ -154,42 +156,29 @@ function scheduler_cron () {
     $date = make_timestamp(date('Y'), date('m'), date('d'), date('H'), date('i'));
     
     // for every appointment in all schedulers
-    $select = "
-        emaildate > 0 AND  
-        emaildate <= $date AND
-        starttime > $date
-        ";
-    $slots = $DB->get_records_select('scheduler_slots', $select, array($date), 'starttime');
+    $select = 'emaildate > 0 AND emaildate <= ? AND starttime > ?';
+    $slots = $DB->get_records_select('scheduler_slots', $select, array($date, $date), 'starttime');
     
-    
-    if ($slots){
-        foreach ($slots as $slot) {
-            // get teacher
-            $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-            
-            
-            // get course
-            $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
-            $course =  $DB->get_record('course', array('id'=> $scheduler->course));
-            
-            // get appointed student list
-            $select = "
-                slotid = {$slot->id}
-                ";
-            $appointments = $DB->get_records_select('scheduler_appointment', $select, null, '', 'id, studentid');
-            
-            //if no email previously sent and one is required
-            if ($appointments){
-                foreach($appointments as $appointed){
-                    $student = $DB->get_record('user', array('id'=>$appointed->studentid));
-                    $vars = scheduler_get_mail_variables ($scheduler, $slot, $teacher, $student);
-                    send_email_from_template ($student,$teacher,$course,'remindtitle','reminder',$vars,'scheduler');                
-                }
-            }
-            // mark as sent
-            $slot->emaildate = -1;
-            $DB->update_record('scheduler_slots', $slot);
+    foreach ($slots as $slot) {
+        // get teacher
+        $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
+                
+        // get course
+        $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
+        $course = $DB->get_record('course', array('id'=>$scheduler->course));
+        
+        // get appointed student list
+        $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id), '', 'id, studentid');
+        
+        //if no email previously sent and one is required
+        foreach ($appointments as $appointment) {
+            $student = $DB->get_record('user', array('id'=>$appointment->studentid));
+            $vars = scheduler_get_mail_variables ($scheduler, $slot, $teacher, $student);
+            send_email_from_template ($student, $teacher, $course, 'remindtitle', 'reminder', $vars, 'scheduler');                
         }
+        // mark as sent
+        $slot->emaildate = -1;
+        $DB->update_record('scheduler_slots', $slot);
     }
     return true;
 }
