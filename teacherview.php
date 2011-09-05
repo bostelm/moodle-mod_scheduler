@@ -517,8 +517,10 @@ print_tabs($tabrows, $currenttab);
 echo $OUTPUT->heading($scheduler->name);
 
 /// print page
-if ($scheduler->intro) {
-    echo $OUTPUT->box(format_text($scheduler->intro), 'center');
+if (trim(strip_tags($scheduler->intro))) {
+    echo $OUTPUT->box_start('mod_introbox');
+    echo format_module_intro('scheduler', $scheduler, $cm->id);
+    echo $OUTPUT->box_end();
 }
 
 if ($page == 'allappointments'){

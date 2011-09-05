@@ -18,8 +18,10 @@ $mygroups = groups_get_all_groups($course->id, $USER->id, $cm->groupingid, 'g.id
 /// printing head information
 
 echo $OUTPUT->heading($scheduler->name);
-if (!empty($scheduler->description)){
-    $OUTPUT->box($scheduler->description, 'center', '80%');
+if (trim(strip_tags($scheduler->intro))) {
+    echo $OUTPUT->box_start('mod_introbox');
+    echo format_module_intro('scheduler', $scheduler, $cm->id);
+    echo $OUTPUT->box_end();
 }
 
 $OUTPUT->box_start('center', '80%');
