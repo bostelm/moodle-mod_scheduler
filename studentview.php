@@ -122,7 +122,7 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         
         $table = new html_table();
         
-        $table->head  = array ($strdate, format_string($scheduler->staffrolename), $strnote, $strgrade);
+        $table->head  = array ($strdate, s(scheduler_get_teacher_name($scheduler)), $strnote, $strgrade);
         $table->align = array ('LEFT', 'CENTER', 'LEFT', 'LEFT');
         $table->size = array ('', '', '40%', '150');
         $table->width = '90%'; 
@@ -193,7 +193,7 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
     echo $OUTPUT->heading(get_string('slots' ,'scheduler'));
     
     $table = new html_table;
-    $table->head  = array ($strdate, $strstart, $strend, get_string('choice', 'scheduler'), format_string($scheduler->staffrolename), get_string('groupsession', 'scheduler'));
+    $table->head  = array ($strdate, $strstart, $strend, get_string('choice', 'scheduler'), s(scheduler_get_teacher_name($scheduler)), get_string('groupsession', 'scheduler'));
     $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT');
     $table->data = array();
     $previousdate = '';

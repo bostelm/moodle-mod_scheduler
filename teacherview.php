@@ -573,7 +573,7 @@ if ($slots){
         $table->head  = array ('', $strdate, $strstart, $strend, $strstudents, $straction);
         $table->align = array ('CENTER', 'LEFT', 'LEFT', 'CENTER', 'CENTER', 'CENTER', 'LEFT', 'CENTER');
     } else {
-        $table->head  = array ('', $strdate, $strstart, $strend, $strstudents, format_string($scheduler->staffrolename), $straction);
+        $table->head  = array ('', $strdate, $strstart, $strend, $strstudents, s(scheduler_get_teacher_name($scheduler)), $straction);
         $table->align = array ('CENTER', 'LEFT', 'LEFT', 'CENTER', 'CENTER', 'CENTER', 'LEFT', 'LEFT', 'CENTER');
     }
     $table->width = '90%';

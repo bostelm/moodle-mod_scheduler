@@ -747,7 +747,7 @@ function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee)
     
     if ($scheduler) {
         $vars['MODULE']     = $scheduler->name;
-        $vars['STAFFROLE']  = format_string($scheduler->staffrolename);
+        $vars['STAFFROLE']  = scheduler_get_teacher_name($scheduler);
     }
     if ($slot) {
         $vars ['DATE']     = userdate($slot->starttime,get_string('strftimedate'));

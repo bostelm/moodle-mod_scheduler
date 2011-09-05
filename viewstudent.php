@@ -74,7 +74,7 @@ if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order
     /// print page header and prepare table headers
     if ($page == 'appointments'){
         echo $OUTPUT->heading(get_string('slots' ,'scheduler'));
-        $table->head  = array ($strdate, $strstart, $strend, $strseen, $strnote, $strgrade, format_string($scheduler->staffrolename));
+        $table->head  = array ($strdate, $strstart, $strend, $strseen, $strnote, $strgrade, s(scheduler_get_teacher_name($scheduler)));
         $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT', 'CENTER', 'CENTER');
         $table->width = '80%';
     } else {

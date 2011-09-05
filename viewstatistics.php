@@ -176,7 +176,7 @@ switch ($page) {
         if ($statrecords = $DB->get_records_sql($sql, array($scheduler->id))) {
         	$table = new html_table();
             $table->width = '70%';
-            $table->head  = array (format_string($scheduler->staffrolename), get_string('cumulatedduration', 'scheduler'));
+            $table->head  = array (s(scheduler_get_teacher_name($scheduler)), get_string('cumulatedduration', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER');
             foreach($statrecords as $aRecord){
                 $aTeacher = $DB->get_record('user', array('id'=>$aRecord->teacherid));

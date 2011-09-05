@@ -96,7 +96,7 @@ if (has_capability('mod/scheduler:canscheduletootherteachers', $context)){
                     }
                     echo html_writer::select($attendantsmenu, 'teacherid', $form->teacherid);
                 } else {
-                   print_string('noteachershere', 'scheduler', format_string($scheduler->staffrolename));
+                   print_string('noteachershere', 'scheduler', s(scheduler_get_teacher_name($scheduler)));
                 }
                 echo $OUTPUT->help_icon('bookwithteacher', 'scheduler'); 
             ?>
