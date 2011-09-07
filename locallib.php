@@ -309,9 +309,10 @@ function scheduler_get_appointed($slotid){
 /**
  * fully deletes a slot with all dependancies
  * @param int slotid
+ * @param stdClass $scheduler (optional)
  * @uses $DB
  */
-function scheduler_delete_slot($slotid){
+function scheduler_delete_slot($slotid, $scheduler=null){
     global $DB;
     
     if ($slot = $DB->get_record('scheduler_slots', array('id' => $slotid))) {
@@ -319,6 +320,14 @@ function scheduler_delete_slot($slotid){
     }
     $DB->delete_records('scheduler_slots', array('id' => $slotid));
     $DB->delete_records('scheduler_appointment', array('slotid' => $slotid));
+    
+    if ($slot) {
+    	if (!$scheduler){ // fetch optimization
+	        $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
+    	}
+    	scheduler_update_grades($scheduler); // generous, but works
+    }
+    
 }
 
 
@@ -358,12 +367,12 @@ function scheduler_delete_appointment($appointmentid, $slot=null, $scheduler=nul
         if (!$DB->delete_records('scheduler_appointment', array('id' => $appointmentid))) {
             print_error('Couldn\'t delete old choice from database');
         }
-        
+        if (!$scheduler){ // fetch optimization
+            $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
+        }
+        scheduler_update_grades($scheduler, $oldrecord->studentid);        
         // not reusable slot. Delete it if slot is too near and has no more appointments.
         if ($slot->reuse == 0) {
-            if (!$scheduler){ // fetch optimization
-                $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
-            }
             $consumed = scheduler_get_consumed($slot->schedulerid, $slot->starttime, $slot->starttime + $slot->duration * 60);
             if (!$consumed){
                 if (time() > 0 ) { //  ULPGC ecastro, volatiles are deleted always   $slot->starttime - $scheduler->reuseguardtime * 3600){
@@ -663,8 +672,8 @@ function scheduler_get_student_event($slot, $studentid) {
  * a utility function for formatting grades for display
  * @param reference $scheduler
  * @param string $grade the grade to be displayed
- * @param boolean $short formats the grade in short form (rsult empty if grading is
- * not used, or no grade is available; parantheses are put arounf the grade if it is present)
+ * @param boolean $short formats the grade in short form (result empty if grading is
+ * not used, or no grade is available; parantheses are put around the grade if it is present)
  * @return string the formatted grade
  */
 function scheduler_format_grade(&$scheduler, $grade, $short=false){
@@ -672,8 +681,8 @@ function scheduler_format_grade(&$scheduler, $grade, $short=false){
     global $DB;
     
     $result = '';
-    if ($scheduler->scale == 0){
-        // no grading in this scheduler
+    if ($scheduler->scale == 0 || is_null($grade) ){
+        // scheduler doesn't allow grading, or no grade entered
         if (!$short) {
             $result = get_string('nograde');
         }

@@ -823,7 +823,7 @@ if (!$students) {
             $appointment->studentid = $student->id;
             $appointment->appointmentnote = '';
             $appointment->attended = 1;
-            $appointment->grade = '';
+            $appointment->grade = null;
             $appointment->notes = '';
             $appointment->timecreated = time();
             $appointment->timemodified = time();

@@ -103,7 +103,8 @@ $string['forcourses'] = 'Choose students in courses';
 $string['friday'] = 'Friday';
 $string['generalconfig'] = 'General configuration';
 $string['gradingstrategy'] = 'Grading strategy';
-$string['gradingstrategy_help'] = '(to be added)'; // TODO
+$string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated. '.
+	'The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
 $string['groupbreakdown'] = 'By group size'; 
 $string['groupsession'] = 'Group Session';

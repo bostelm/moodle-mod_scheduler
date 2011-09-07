@@ -57,16 +57,16 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addElement('modgrade', 'scale', get_string('grade'));
         $mform->setDefault('scale', 0);
 
-        $yesno[0] = get_string('no');
-        $yesno[1] = get_string('yes');
-	    $mform->addElement('select', 'allownotifications', get_string('notifications', 'scheduler'), $yesno);
-	    $mform->addHelpButton('allownotifications', 'notifications', 'scheduler');
-
         $gradingstrategy[MEAN_GRADE] = get_string('meangrade', 'scheduler');
         $gradingstrategy[MAX_GRADE] = get_string('maxgrade', 'scheduler');
 	    $mform->addElement('select', 'gradingstrategy', get_string('gradingstrategy', 'scheduler'), $gradingstrategy);
 	    $mform->addHelpButton('gradingstrategy', 'gradingstrategy', 'scheduler');
         $mform->disabledIf('gradingstrategy', 'scale', 'eq', 0);
+
+        $yesno[0] = get_string('no');
+        $yesno[1] = get_string('yes');
+	    $mform->addElement('select', 'allownotifications', get_string('notifications', 'scheduler'), $yesno);
+	    $mform->addHelpButton('allownotifications', 'notifications', 'scheduler');
 
 		// Legacy. This field is still in the DB but is meaningless, meanwhile.
 	    $mform->addElement('hidden', 'teacher');

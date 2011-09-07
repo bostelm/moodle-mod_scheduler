@@ -185,6 +185,7 @@ switch ($action) {
             foreach ($appointments as $appointment){ // insert updated
                 $appointment->slotid = $slot->id; // now we know !!
                 $DB->insert_record('scheduler_appointment', $appointment);
+		        scheduler_update_grades($scheduler, $appointment->studentid);
             }
         }
         
@@ -363,7 +364,7 @@ switch ($action) {
     case 'deleteslot': {
         $slotid = required_param('slotid', PARAM_INT);
         
-        scheduler_delete_slot($slotid);
+        scheduler_delete_slot($slotid, $scheduler);
         break;
     }
     /************************************ Deleting multiple slots ***********************************************/
@@ -371,7 +372,7 @@ switch ($action) {
         $slotids = required_param('items', PARAM_RAW);
         $slots = explode(",", $slotids);
         foreach($slots as $aSlotId){
-            scheduler_delete_slot($aSlotId);
+            scheduler_delete_slot($aSlotId, $scheduler);
         }
         break;
     }
@@ -482,6 +483,7 @@ switch ($action) {
             $DB->delete_records_select('scheduler_appointment', " slotid $usql ", $params);
             $DB->delete_records('scheduler_slots', array('schedulerid' => $cm->instance));
             unset($slots);
+            scheduler_update_grades($scheduler);            
         }       
         break;
     }
@@ -525,6 +527,7 @@ switch ($action) {
             $slotList = implode(',', array_keys($slots));
             $DB->delete_records_select('scheduler_appointment', "slotid IN ($slotList)");
             unset($slots);
+            scheduler_update_grades($scheduler);
         }
         break;
     }
