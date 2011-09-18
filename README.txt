@@ -10,7 +10,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details:
 
-http:www.gnu.org/copyleft/gpl.html
+http://www.gnu.org/copyleft/gpl.html
 
 
 === Description ===
@@ -28,7 +28,11 @@ For further information, please see:
 
 === Installation instructions ===
 
-For installation instructions please see:
+Place the code of the module into the mod/scheduler directory of your Moodle
+directory root. That is, the present file should be located at:
+mod/scheduler/README.txt
+
+For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
 This module is intended for Moodle 2.0 and above.
