@@ -1,18 +1,17 @@
 <?php
-
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 
 /* ***** Capabilities ****** */
-$string['scheduler:appoint'] = 'Appoint'; 
-$string['scheduler:attend'] = 'Attend students'; 
-$string['scheduler:canscheduletootherteachers'] = 'Schedule appointments for other staff members'; 
-$string['scheduler:canseeotherteachersbooking'] = 'See and browse other teachers booking'; 
-$string['scheduler:disengage'] = 'Drop all appointments (students)'; 
-$string['scheduler:manage'] = 'Manage your slots and appointments'; 
-$string['scheduler:manageallappointments'] = 'Manage all scheduler data'; 
-$string['scheduler:seeotherstudentsbooking'] = 'See other student booking on the slot'; 
-$string['scheduler:seeotherstudentsresults'] = 'See other slot student\'s result'; 
+$string['scheduler:appoint'] = 'Appoint';
+$string['scheduler:attend'] = 'Attend students';
+$string['scheduler:canscheduletootherteachers'] = 'Schedule appointments for other staff members';
+$string['scheduler:canseeotherteachersbooking'] = 'See and browse other teachers booking';
+$string['scheduler:disengage'] = 'Drop all appointments (students)';
+$string['scheduler:manage'] = 'Manage your slots and appointments';
+$string['scheduler:manageallappointments'] = 'Manage all scheduler data';
+$string['scheduler:seeotherstudentsbooking'] = 'See other student booking on the slot';
+$string['scheduler:seeotherstudentsresults'] = 'See other slot student\'s result';
 
 /* ***** Interface strings ****** */
 
@@ -105,12 +104,12 @@ $string['friday'] = 'Friday';
 $string['generalconfig'] = 'General configuration';
 $string['gradingstrategy'] = 'Grading strategy';
 $string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated. '.
-	'The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
+    'The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
-$string['groupbreakdown'] = 'By group size'; 
+$string['groupbreakdown'] = 'By group size';
 $string['groupscheduling'] = 'Enable group scheduling';
 $string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once. ' .
-		'(Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
+         '(Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
 $string['groupsession'] = 'Group Session';
 $string['groupsize'] = 'Group size';
 $string['guestscantdoanything'] = 'Guests can\'t do anything here.';
@@ -120,7 +119,7 @@ $string['introduction'] = 'Introduction';
 $string['invitation'] = 'Invitation';
 $string['invitationtext'] = 'Please choose a time-slot for an appointment at ';
 $string['isnonexclusive'] = 'Non-exclusive';
-$string['lengthbreakdown'] = 'By slot duration'; 
+$string['lengthbreakdown'] = 'By slot duration';
 $string['limited'] = 'Limited ({$a} left)';
 $string['location'] = 'Location';
 $string['markseen'] = 'After you have had an appointment with a student please mark them as "Seen" by clicking the appropriate checkbox in the table above.';
@@ -196,7 +195,7 @@ $string['scheduler'] = 'Scheduler';
 $string['schedulestudents'] = 'Schedule by student';
 $string['showemailplain'] = 'Show e-mail addresses in plain text';
 $string['showemailplain_desc'] = 'In the teacher\'s view of the scheduler, '.
-	'show the e-mail addresses of students needing an appointment in plain text, in addition to mailto: links.';
+    'show the e-mail addresses of students needing an appointment in plain text, in addition to mailto: links.';
 $string['seen'] = 'Seen';
 $string['setreused'] = 'Set reusable';
 $string['setunreused'] = 'Set volatile';
@@ -206,7 +205,7 @@ $string['slotsadded'] = '{$a} slots have been added';
 $string['slottype'] = 'Slot type';
 $string['slotupdated'] = '1 slot updated';
 $string['slotwarning'] = '<b>Warning: </b>Moving this slot to the selected time will require that the following slot(s) are removed...';
-$string['staffbreakdown'] = 'By {$a}'; 
+$string['staffbreakdown'] = 'By {$a}';
 $string['staffmember'] = 'Member of Staff';
 $string['staffrolename'] = 'Role name of the teacher';
 $string['start'] = 'Start';
@@ -220,7 +219,7 @@ $string['strdownloadexcelteachers'] = 'Excel export by {$a}';
 $string['strdownloadodssingle'] = 'OpenDoc export as one sheet';
 $string['strdownloadodsteachers'] = 'OpenDoc export by {$a}';
 $string['student'] = 'Student';
-$string['studentbreakdown'] = 'By student'; 
+$string['studentbreakdown'] = 'By student';
 $string['studentcomments'] = 'Student\'s notes';
 $string['studentdetails'] = 'Student details';
 $string['studentnotes'] = 'Your notes about the appointment ';
@@ -386,5 +385,3 @@ with the {$a->staffrole} <b><a href="{$a->attendant_url}">{$a->attendant}</a></b
 <p>in the scheduler "<i>{$a->module}</i>" on the website: <b><a href="{$a->site_url}">{$a->site}</a></b></p>
 
 <p><b><span style="color : red">has been cancelled</span></b>. Please apply for a new slot.</p>';
-
-?>
