@@ -1,4 +1,4 @@
-<?php // $Id: teacherview.php,v 1.2.2.11 2009-06-24 23:02:59 diml Exp $
+<?php
 
 /**
  * Contains various sub-screens that a teacher can see.

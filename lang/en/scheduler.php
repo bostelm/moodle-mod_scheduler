@@ -1,4 +1,5 @@
-<?PHP // $Id:
+<?php
+
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 
