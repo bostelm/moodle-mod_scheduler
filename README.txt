@@ -54,6 +54,13 @@ With further contributions taken from:
 * Various authors of the core Moodle code
 
 
+=== Release notes ===
+
+--- Version 2.0 --- 
+
+No major functional changes over 1.9; bug fixes and API migration only. Requires 1.9 for database upgrades.  
+
+
 === Technical notes ===
 
 The code of this module is rather old, much of it predates even Moodle 1.9.
