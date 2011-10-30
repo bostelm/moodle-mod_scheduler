@@ -1,4 +1,4 @@
-<?PHP // $Id: version.php,v 1.4.10.9 2009-06-24 23:04:21 diml Exp $
+<?PHP 
 
 /**
  * Version information for mod/scheduler
@@ -9,8 +9,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2011081901;  // The current module version (Date: YYYYMMDDXX)
+/**
+ * This is the development branch (master) of the scheduler module.
+ */
+
+$module->version  = 2011103000;  // The current module version (Date: YYYYMMDDXX)
 $module->requires = 2011033000;  // Requires Moodle 2.0
 $module->cron     = 60;          // Period for cron to check this module (secs)
 

@@ -107,6 +107,9 @@ $string['gradingstrategy_help'] = 'In a scheduler where students can have severa
 	'The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
 $string['groupbreakdown'] = 'By group size'; 
+$string['groupscheduling'] = 'Enable group scheduling';
+$string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once. ' .
+		'(Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
 $string['groupsession'] = 'Group Session';
 $string['groupsize'] = 'Group size';
 $string['guestscantdoanything'] = 'Guests can\'t do anything here.';

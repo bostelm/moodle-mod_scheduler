@@ -286,7 +286,7 @@ if ($canappoint){
      echo ' :</b></td><td valign="top" align="left"><textarea name="notes" cols="60" rows="20"></textarea></td></tr></table>';
      */
     echo '<br /><input type="submit" value="'.get_string('savechoice', 'scheduler').'" /> ';
-    if ($groupmode){
+    if (scheduler_group_scheduling_enabled($course, $cm)){
         if (count($mygroups) == 1){
             $groups = array_values($mygroups);
             echo ' <input type="checkbox" name="appointgroup" value="'.$groups[0]->id.'" /> '.get_string('appointformygroup', 'scheduler').': '.$groups[0]->name;                    

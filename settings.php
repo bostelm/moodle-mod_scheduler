@@ -18,4 +18,7 @@ $settings->add(new admin_setting_configcheckbox('scheduler_allteachersgrading', 
 $settings->add(new admin_setting_configcheckbox('scheduler_showemailplain', get_string('showemailplain', 'scheduler'),
     get_string('showemailplain_desc', 'scheduler'), 0));
 
+$settings->add(new admin_setting_configcheckbox('scheduler_groupscheduling', get_string('groupscheduling', 'scheduler'),
+    get_string('groupscheduling_desc', 'scheduler'), 1));
+
 ?>

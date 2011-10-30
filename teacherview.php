@@ -80,7 +80,7 @@ function get_session_data(&$form){
 $modinfo = get_fast_modinfo($course);
 
 $usergroups = '';
-if ($cm->groupmode > 0) {
+if (scheduler_group_scheduling_enabled($course, $cm)) {
 	$groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
 	$usergroups = array_keys($groups);
 }	
@@ -900,7 +900,7 @@ if (!$students) {
 ?>
         </td>
 <?php
-if ($groupmode){
+if (scheduler_group_scheduling_enabled($course, $cm)){
     ?>
         <td width="50%">
 <?php
