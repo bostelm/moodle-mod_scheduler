@@ -12,7 +12,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This is the development branch (master) of the scheduler module.
+ * This is the 2.0 branch (MOODLE_20_STABLE) of the scheduler module.
+ * It is intended for use with Moodle 2.0 and 2.1.
  */
 
 $module->version  = 2011103000;  // The current module version (Date: YYYYMMDDXX)
