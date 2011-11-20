@@ -79,12 +79,8 @@ function get_session_data(&$form){
 // load group restrictions
 $modinfo = get_fast_modinfo($course);
 
-$usergroups = '';
-if (scheduler_group_scheduling_enabled($course, $cm)) {
-	$groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
-	$usergroups = array_keys($groups);
-}	
-
+$groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
+$usergroups = array_keys($groups);
 
 if ($action){
     include($CFG->dirroot.'/mod/scheduler/teacherview.controller.php');
