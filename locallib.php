@@ -701,7 +701,7 @@ function scheduler_format_grade(&$scheduler, $grade, $short=false){
                 $scaleid = - ($scheduler->scale);
                 if ($scale = $DB->get_record('scale', array('id'=>$scaleid))) {
                     $levels = explode(',',$scale->scale);
-                    if ($grade < count($levels)) {
+                    if ($grade <= count($levels)) {
                     	$result .= $levels[$grade-1];
                     }
                 }
