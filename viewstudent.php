@@ -114,8 +114,7 @@ if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order
                 $distributecheck = "<input type=\"checkbox\" name=\"distribute\" value=\"1\" /> ".get_string('distributetoslot', 'scheduler')."\n";
             }
             //display notes
-            $onsubmitcall = ($usehtmleditor) ? "javascript:document.forms['updatenote{$slot->id}'].onsubmit();" : '' ;
-            $actions = "<a href=\"{$onsubmitcall}document.forms['updatenote{$slot->id}'].submit()\">".get_string('savecomment', 'scheduler').'</a>';
+            $actions = "<a href=\"javascript:document.forms['updatenote{$slot->id}'].submit()\">".get_string('savecomment', 'scheduler').'</a>';
             $commenteditor = "<form name=\"updatenote{$slot->id}\" action=\"view.php\" method=\"post\">\n";
             $commenteditor .= "<input type=\"hidden\" name=\"what\" value=\"viewstudent\" />\n";
             $commenteditor .= "<input type=\"hidden\" name=\"subaction\" value=\"updatenote\" />\n";
