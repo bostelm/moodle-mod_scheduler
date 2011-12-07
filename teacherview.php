@@ -608,8 +608,10 @@ if ($slots){
             $studentArray[] = "<input type=\"hidden\" name=\"page\" value=\"".$page."\" />";
             foreach($appointedstudents as $appstudent){
                 $student = $DB->get_record('user', array('id'=>$appstudent->studentid));
-                $picture = $OUTPUT->user_picture($student);
-                $name = "<a href=\"view.php?what=viewstudent&amp;id={$cm->id}&amp;studentid={$student->id}&amp;course={$scheduler->course}&amp;order=DESC\">".fullname($student).'</a>';
+                if ($student) {
+                    $picture = $OUTPUT->user_picture($student);
+                    $name = "<a href=\"view.php?what=viewstudent&amp;id={$cm->id}&amp;studentid={$student->id}&amp;course={$scheduler->course}&amp;order=DESC\">".fullname($student).'</a>';
+                }
                 
                 
                 /// formatting grade

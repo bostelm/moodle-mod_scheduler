@@ -511,9 +511,9 @@ function scheduler_get_user_grades($scheduler, $userid=0) {
         if ($scale = $DB->get_record('scale', array('id' => $scaleid))) {
             $scalegrades = make_menu_from_list($scale->scale);
             foreach ($grades as $aGrade) {
-                $gradesums[$aGrade->studentid]->sum = @$gradesums[$aGrade->studentid]->sum + $scalegrades[$aGgrade->grade];
+                $gradesums[$aGrade->studentid]->sum = @$gradesums[$aGrade->studentid]->sum + $aGrade->grade;
                 $gradesums[$aGrade->studentid]->count = @$gradesums[$aGrade->studentid]->count + 1;
-                $gradesums[$aGrade->studentid]->max = (@$gradesums[$aGrade->studentid]->max < $aGrade) ? $scalegrades[$aGgrade->grade] : @$gradesums[$aGrade->studentid]->max ;
+                $gradesums[$aGrade->studentid]->max = (@$gradesums[$aGrade->studentid]->max < $aGrade) ? $aGrade->grade : @$gradesums[$aGrade->studentid]->max ;
             }
             $maxgrade = $scale->name;
         }
