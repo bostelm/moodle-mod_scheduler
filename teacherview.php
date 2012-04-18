@@ -94,7 +94,15 @@ if ($action){
 if ($action == 'addslot'){
     echo $OUTPUT->heading(get_string('addsingleslot', 'scheduler'));
     
-    if (empty($subaction)){
+    if (!empty($errors)) {
+        get_slot_data($form);
+        $form->what = 'doaddupdateslot';
+        $form->appointments = $appointments;
+    } elseif($subaction == 'cancel') {
+        get_slot_data($form);
+        $form->what = 'doaddupdateslot';
+        $form->appointments = unserialize(stripslashes(required_param('appointmentssaved', PARAM_RAW)));
+    } elseif (empty($subaction)){
         $form->what = 'doaddupdateslot';
         // blank appointment data
         if (empty($form->appointments)) $form->appointments = array();
@@ -106,10 +114,6 @@ if ($action == 'addslot'){
         $form->notes = '';
         $form->teacherid = $USER->id;
         $form->appointmentlocation = scheduler_get_last_location($scheduler);
-    } elseif($subaction == 'cancel') {
-        get_slot_data($form);
-        $form->what = 'doaddupdateslot';
-        $form->appointments = unserialize(stripslashes(required_param('appointmentssaved', PARAM_RAW)));
     } else {
         $retcode = include "teacherview.subcontroller.php";
         if ($retcode == -1) return -1;
@@ -121,7 +125,7 @@ if ($action == 'addslot'){
         foreach($errors as $anError){
             $errorstr .= $anError->message;
         }
-        echo $OUTPUT->box($errorstr, 'center', '70%', '', 5, 'errorbox');
+        echo $OUTPUT->box($errorstr);
     }
     
     /// print form
