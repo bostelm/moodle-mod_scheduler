@@ -152,7 +152,10 @@ if ($action == 'savechoice') {
 }
 // *********************************** Disengage alone from the slot ******************************/
 if ($action == 'disengage') {
-    $appointments = $DB->get_records_select('scheduler_appointment', "studentid = $USER->id AND attended = 0");
+    $where = 'studentid = :studentid AND attended = 0 AND ' .
+             'EXISTS(SELECT 1 FROM {scheduler_slots} sl WHERE sl.id = slotid AND sl.schedulerid = :scheduler )';
+    $params = array('scheduler'=>$scheduler->id, 'studentid'=>$USER->id);
+    $appointments = $DB->get_records_select('scheduler_appointment', $where, $params);
     if ($appointments){
         foreach($appointments as $appointment){
             $oldslot = $DB->get_record('scheduler_slots', array('id' => $appointment->slotid));
