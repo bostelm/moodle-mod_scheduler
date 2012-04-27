@@ -3,6 +3,7 @@ $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 
 /* ***** Capabilities ****** */
+$string['scheduler:addinstance'] = 'Add a new scheduler';
 $string['scheduler:appoint'] = 'Appoint';
 $string['scheduler:attend'] = 'Attend students';
 $string['scheduler:canscheduletootherteachers'] = 'Schedule appointments for other staff members';
