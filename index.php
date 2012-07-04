@@ -1,9 +1,9 @@
-<?PHP 
+<?PHP
 
 /**
  * Main file of the scheduler package.
  * It lists all the instances of scheduler in a particular course.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -34,7 +34,7 @@ $strscheduler  = get_string('modulename', 'scheduler');
 /// Print the header
 
 $navlinks = array();
-$navlinks[] = array('name' => $strscheduler, 'link' => '', 'type' => 'title');    
+$navlinks[] = array('name' => $strscheduler, 'link' => '', 'type' => 'title');
 $navigation = build_navigation($navlinks);
 print_header_simple($strschedulers, '', $navigation, '', '', true, '', navmenu($course));
 
@@ -44,7 +44,7 @@ if (!$schedulers = get_all_instances_in_course('scheduler', $course)) {
     print_error('noschedulers', 'scheduler', "../../course/view.php?id=$course->id");
 }
 
-/// Print the list of instances 
+/// Print the list of instances
 
 $timenow = time();
 $strname  = get_string('name');
@@ -72,7 +72,7 @@ foreach ($schedulers as $scheduler) {
         //Show normal if the mod is visible
         $link = "<a href=\"view.php?id={$scheduler->coursemodule}\">$scheduler->name</a>";
     }
-    if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $context)) {
+    if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $coursecontext)) {
         if ($course->format == 'weeks' or $course->format == 'topics') {
             $table->data[] = array ($scheduler->section, $link);
         } else {
