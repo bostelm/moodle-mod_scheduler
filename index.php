@@ -72,7 +72,7 @@ foreach ($schedulers as $scheduler) {
         //Show normal if the mod is visible
         $link = "<a href=\"view.php?id={$scheduler->coursemodule}\">$scheduler->name</a>";
     }
-    if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $context)) {
+    if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $coursecontext)) {
         if ($course->format == 'weeks' or $course->format == 'topics') {
             $table->data[] = array ($scheduler->section, $link);
         } else {
