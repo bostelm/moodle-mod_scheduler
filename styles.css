@@ -1,29 +1,29 @@
-.errorbox{
+.path-mod-scheduler .errorbox{
    margin-height : 10px;
    color : #D00000 ;
    border : 1px solid #FF0000;
    text-align : center;
 }
 
-.formerror{
+.path-mod-scheduler .formerror{
    border : red 1px solid;
    background-color : #FDD9D9;
 }
 
-.unvalidformdata{
+.path-mod-scheduler .unvalidformdata{
    border : 1px solid #FF0000;
 }
 
-.timelabel{
+.path-mod-scheduler .timelabel{
    font-size : 0.8em;
    color : #808080;
 }
 
-.attended{
+.path-mod-scheduler .attended{
    color : green;
 }
 
-DIV .slotnotes{
+div .path-mod-scheduler .slotnotes{
    background-color : #E8E9EE;
    border : solid 1px #A7ABBE;
    font-size : 0.9em;
@@ -31,7 +31,7 @@ DIV .slotnotes{
    margin : 1px;
 }
 
-DIV .appointmentnote{
+div .path-mod-scheduler .appointmentnote{
    background-color : #E7EFE7;
    border : solid 1px #A0C5A4;
    font-size : 0.9em;
