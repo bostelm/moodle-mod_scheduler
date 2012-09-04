@@ -383,7 +383,7 @@ switch ($action) {
     case 'saveseen':{
         // get required param
         $slotid = required_param('slotid', PARAM_INT);
-        $seen = optional_param('seen', array(), PARAM_RAW);
+        $seen = optional_param_array('seen', array(), PARAM_INT);
         
         $appointments = scheduler_get_appointments($slotid);
         if (is_array($seen)){
