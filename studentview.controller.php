@@ -116,7 +116,7 @@ if ($action == 'savechoice') {
             
             // notify teacher
             if ($scheduler->allownotifications){
-                send_email_from_template($teacher, $student, $course, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
+                scheduler_send_email_from_template($teacher, $student, $course, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
             }
             
             // delete all calendar events for that slot
@@ -146,7 +146,7 @@ if ($action == 'savechoice') {
             $student = $DB->get_record('user', array('id' => $appointment->studentid));
             $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
             $vars = scheduler_get_mail_variables($scheduler,$newslot,$teacher,$student);
-            send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
+            scheduler_send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
         }
     }
 }
@@ -166,7 +166,7 @@ if ($action == 'disengage') {
                 $student = $DB->get_record('user', array('id' => $USER->id));
                 $teacher = $DB->get_record('user', array('id' => $oldslot->teacherid));
                 $vars = scheduler_get_mail_variables($scheduler,$oldslot,$teacher,$student);
-                send_email_from_template($teacher, $student, $COURSE, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
+                scheduler_send_email_from_template($teacher, $student, $COURSE, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
             }                    
         }
         

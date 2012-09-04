@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
 * @param infomap a hash containing pairs of parm => data to replace in template
 * @return a fully resolved template where all data has been injected
 */
-function compile_mail_template($template, $format, $infomap, $module = 'scheduler') {
+function scheduler_compile_mail_template($template, $format, $infomap, $module = 'scheduler') {
 	$params = array();
 	foreach ($infomap as $key=>$value) {
 	    $params[strtolower($key)] = $value;
@@ -51,7 +51,7 @@ function compile_mail_template($template, $format, $infomap, $module = 'schedule
  * @return bool|string Returns "true" if mail was sent OK, "emailstop" if email
  *         was blocked by user and "false" if there was another sort of error.
  */
-function send_email_from_template($recipient, $sender, $course, $title, $template, $infomap, $modulename , $lang = '') {
+function scheduler_send_email_from_template($recipient, $sender, $course, $title, $template, $infomap, $modulename , $lang = '') {
     
     global $CFG;
     global $SITE;
@@ -74,9 +74,9 @@ function send_email_from_template($recipient, $sender, $course, $title, $templat
     
     $vars = array_merge($defaultvars,$infomap);
     
-    $subject = compile_mail_template($template, 'subject', $vars, $modulename);    
-    $plainMail = compile_mail_template($template, 'plain', $vars, $modulename);
-    $htmlMail = compile_mail_template($template, 'html', $vars, $modulename);
+    $subject = scheduler_compile_mail_template($template, 'subject', $vars, $modulename);    
+    $plainMail = scheduler_compile_mail_template($template, 'plain', $vars, $modulename);
+    $htmlMail = scheduler_compile_mail_template($template, 'html', $vars, $modulename);
     
     $res = email_to_user ($recipient, $sender, $subject, $plainMail, $htmlMail); 
     return $res;
