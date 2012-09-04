@@ -233,6 +233,7 @@ switch ($action) {
         
         
         /// make a base slot for generating
+        $slot = new stdClass();
         $slot->appointmentlocation = $data->appointmentlocation;
         $slot->exclusivity = $data->exclusivity;
         $slot->reuse = $data->reuse;

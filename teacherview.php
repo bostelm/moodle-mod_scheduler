@@ -14,6 +14,8 @@ defined('MOODLE_INTERNAL') || die();
 
 
 function get_slot_data(&$form){
+	global $USER;
+	$form = new stdClass();
     if (!$form->hideuntil = optional_param('hideuntil', '', PARAM_INT)){
         $form->displayyear = required_param('displayyear', PARAM_INT);
         $form->displaymonth = required_param('displaymonth', PARAM_INT);
@@ -32,7 +34,8 @@ function get_slot_data(&$form){
     $form->reuse = required_param('reuse', PARAM_INT);
     $form->duration = required_param('duration', PARAM_INT);
     $form->notes = required_param('notes', PARAM_TEXT);
-    $form->teacherid = required_param('teacherid', PARAM_INT);
+    // if no teacher specified, the current user (who edits the slot) is assumed to be the teacher
+    $form->teacherid = optional_param('teacherid', $USER->id, PARAM_INT);
     $form->appointmentlocation = required_param('appointmentlocation', PARAM_CLEAN);
 }
 
@@ -40,6 +43,8 @@ function get_slot_data(&$form){
  *
  */
 function get_session_data(&$form){
+	global $USER;
+	$form = new stdClass();
     if (!$form->rangestart = optional_param('rangestart', '', PARAM_INT)){
         $year = required_param('startyear', PARAM_INT);
         $month = required_param('startmonth', PARAM_INT);
@@ -70,7 +75,8 @@ function get_session_data(&$form){
     $form->reuse = required_param('reuse', PARAM_INT);
     $form->divide = optional_param('divide', 0, PARAM_INT);
     $form->duration = optional_param('duration', 15, PARAM_INT);
-    $form->teacherid = required_param('teacherid', PARAM_INT);
+    // if no teacher specified, the current user (who edits the slot) is assumed to be the teacher
+    $form->teacherid = optional_param('teacherid', $USER->id, PARAM_INT);
     $form->appointmentlocation = optional_param('appointmentlocation', '', PARAM_CLEAN);
     $form->emailfrom = required_param('emailfrom', PARAM_CLEAN);
     $form->displayfrom = required_param('displayfrom', PARAM_CLEAN);
