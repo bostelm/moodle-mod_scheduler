@@ -1,6 +1,15 @@
 <?php
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
+$string['modulename'] = 'Scheduler';
+$string['modulename_help'] = 'The scheduler activity helps you in scheduling appointments with your students. 
+
+Teachers specify time slots for meetings, students then choose one of them on Moodle.
+Teachers in turn can record the outcome of the meeting - and optionally a grade - within the scheduler.
+
+Group scheduling is supported; that is, each time slot can accomodate several students, and optionally it is possible to schedule appointments for entire groups at the same time.';
+$string['modulename_link'] = 'mod/scheduler/view';
+$string['modulenameplural'] = 'Schedulers';
 
 /* ***** Capabilities ****** */
 $string['scheduler:addinstance'] = 'Add a new scheduler';
