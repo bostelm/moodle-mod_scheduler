@@ -11,6 +11,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$app = new stdClass();
+
 if ($subaction == 'updatenote' and (has_capability('mod/scheduler:manage', $context) or has_capability('mod/scheduler:manageallappointments', $context))){
     $app->id = required_param('appid', PARAM_INT);
     $distribute = optional_param('distribute', 0, PARAM_INT);

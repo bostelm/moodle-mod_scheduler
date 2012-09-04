@@ -93,7 +93,7 @@ if ($action){
 /************************************ View : New single slot form ****************************************/
 if ($action == 'addslot'){
     echo $OUTPUT->heading(get_string('addsingleslot', 'scheduler'));
-    
+    $form = new stdClass();
     if (!empty($errors)) {
         get_slot_data($form);
         $form->what = 'doaddupdateslot';
@@ -142,6 +142,7 @@ if ($action == 'updateslot') {
     $slotid = required_param('slotid', PARAM_INT);
     
     echo $OUTPUT->heading(get_string('updatesingleslot', 'scheduler'));
+    $form = new stdClass();
     
     if(empty($subaction)){
         if(!empty($errors)){ // if some errors, get data from client side
@@ -203,6 +204,7 @@ if ($action == 'addsession') {
         echo $OUTPUT->box($errorstr, 'center', '70%', '', 5, 'errorbox');
     }
     
+    $form = new stdClass();
     if (!empty($errors)){
         get_session_data($data);
         $form = &$data;
@@ -238,6 +240,7 @@ if ($action == 'addsession') {
 }
 /************************************ Schedule a student form ***********************************************/
 if ($action == 'schedule') {
+    $form = new stdClass();
     if ($subaction == 'dochooseslot'){
         /// set an advice message
         unset($erroritem);
@@ -308,6 +311,7 @@ if ($action == 'schedule') {
             $form->teacherid = $USER->id;
             $form->appointmentlocation = scheduler_get_last_location($scheduler);
             $form->slotid = 0;
+            $appointment = new stdClass();
             $appointment->slotid = -1;
             $appointment->studentid = $form->studentid;
             $appointment->appointmentnote = '';
@@ -344,6 +348,7 @@ if ($action == 'schedule') {
 }
 /************************************ Schedule a whole group in form ***********************************************/
 if ($action == 'schedulegroup') {
+    $form = new stdClass();
     if($subaction == 'dochooseslot'){
         /// set an advice message
         unset($erroritem);

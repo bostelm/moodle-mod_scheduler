@@ -520,6 +520,7 @@ function scheduler_add_update_calendar_events($slot, $course) {
             $studentEvent->eventtype = $studentEventType;
             $DB->update_record('event', $studentEvent);
         } else {
+            $studentEvent = new stdClass();
             $studentEvent->name = $studentEventName;
             $studentEvent->description = $studentEventDescription;
             $studentEvent->format = 1;
@@ -559,6 +560,7 @@ function scheduler_add_update_calendar_events($slot, $course) {
         $teacherEvent->eventtype = $teacherEventType;
         $DB->update_record('event', $teacherEvent);
     } else {
+        $teacherEvent = new stdClass();
         $teacherEvent->name = $teacherEventName;
         $teacherEvent->description = $teacherEventDescription;
         $teacherEvent->format = 1;
@@ -803,7 +805,8 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
     }
     
     if (empty($string)) {     // Cache all the strings for the rest of the page
-        
+
+        $string = new stdClass();        
         $string->email       = get_string('email');
         $string->lastaccess  = get_string('lastaccess');
         $string->activity    = get_string('activity');
@@ -813,6 +816,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $string->name        = get_string('name');
         $string->never       = get_string('never');
         
+        $datestring = new stdClass();        
         $datestring->day     = get_string('day');
         $datestring->days    = get_string('days');
         $datestring->hour    = get_string('hour');

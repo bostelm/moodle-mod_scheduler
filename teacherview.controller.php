@@ -23,6 +23,7 @@ switch ($action) {
         $slotid = optional_param('slotid', '', PARAM_INT);
         
         // get standard slot parms
+        $data = new stdClass();
         get_slot_data($data);
         $appointments = unserialize(stripslashes(optional_param('appointments', '', PARAM_RAW)));
         
@@ -30,7 +31,7 @@ switch ($action) {
         
         //  in the "schedule as seen" workflow, do not check for conflicting slots etc.
         $force = optional_param('seen', 0, PARAM_BOOL);
-        if (! $force) {
+        if (!$force) {
             
             // Avoid slots starting in the past (too far)
             if ($data->starttime < (time() - DAYSECS * 10)) {
@@ -146,6 +147,7 @@ switch ($action) {
         } 
         
         // make new slot record
+        $slot = new stdClass();
         $slot->schedulerid = $scheduler->id;
         $slot->starttime = $data->starttime;
         $slot->duration = $data->duration;
