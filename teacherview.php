@@ -131,7 +131,7 @@ if ($action == 'addslot'){
         foreach($errors as $anError){
             $errorstr .= $anError->message;
         }
-        echo $OUTPUT->box($errorstr);
+        echo $OUTPUT->box($errorstr, 'errorbox');
     }
     
     /// print form
@@ -185,7 +185,7 @@ if ($action == 'updateslot') {
         foreach($errors as $anError){
             $errorstr .= $anError->message;
         }
-        echo $OUTPUT->box($errorstr, 'center', '70%', '', 5, 'errorbox');
+        echo $OUTPUT->box($errorstr, 'errorbox');
     }
     
     /// print form
@@ -207,7 +207,7 @@ if ($action == 'addsession') {
         foreach($errors as $anError){
             $errorstr .= $anError->message;
         }
-        echo $OUTPUT->box($errorstr, 'center', '70%', '', 5, 'errorbox');
+        echo $OUTPUT->box($errorstr, 'errorbox');
     }
     
     $form = new stdClass();
@@ -338,7 +338,7 @@ if ($action == 'schedule') {
         foreach($errors as $anError){
             $errorstr .= $anError->message;
         }
-        echo $OUTPUT->box($errorstr, 'center', '70%', '', 5, 'errorbox');
+        echo $OUTPUT->box($errorstr, 'errorbox');
     }
     
     // diplay form
@@ -463,7 +463,7 @@ if ($action == 'schedulegroup') {
         foreach($errors as $anError){
             $errorstr .= $anError->message;
         }
-        echo $OUTPUT->box($errorstr, 'center', '70%', '', 5, 'errorbox');
+        echo $OUTPUT->box($errorstr, 'errorbox');
     }
     
     // diplay form

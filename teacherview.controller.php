@@ -35,20 +35,21 @@ switch ($action) {
             
             // Avoid slots starting in the past (too far)
             if ($data->starttime < (time() - DAYSECS * 10)) {
+                $erroritem = new stdClass();
                 $erroritem->message = get_string('startpast', 'scheduler');
                 $erroritem->on = 'rangestart';
                 $errors[] = $erroritem;
             }
             
             if ($data->exclusivity > 0 and count($appointments) > $data->exclusivity){
-                unset($erroritem);
+                $erroritem = new stdClass();
                 $erroritem->message = get_string('exclusivityoverload', 'scheduler');
                 $erroritem->on = 'exclusivity';
                 $errors[] = $erroritem;
             }
             
             if ($data->teacherid == 0){
-                unset($erroritem);
+                $erroritem = new stdClass();
                 $erroritem->message = get_string('noteacherforslot', 'scheduler');
                 $erroritem->on = 'teacherid';
                 $errors[] = $erroritem;

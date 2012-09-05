@@ -1,19 +1,20 @@
 
-<table>
+<table class="commands">
     <tr>
-        <td colspan="2">
+        <th colspan="2">
             <?php echo $OUTPUT->heading(get_string('add'),3) ?>
-        </td>
+        </th>
 <?php
 if ($displaydeletebuttons){
     $deletespan = (has_capability('mod/scheduler:manageallappointments', $context)) ? 4 : 2 ;
 ?>
-        <td colspan="<?php echo $deletespan; ?>" class="r1">
+        <th colspan="<?php echo $deletespan; ?>">
             <?php echo $OUTPUT->heading(get_string('delete'),3) ?>
-        </td>
+        </th>
 <?php
 }
 ?>
+    </tr>
     <tr>
         <td>
             <form action="view.php" method="post" name="addsessionform">
