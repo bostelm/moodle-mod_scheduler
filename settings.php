@@ -21,4 +21,7 @@ $settings->add(new admin_setting_configcheckbox('scheduler_showemailplain', get_
 $settings->add(new admin_setting_configcheckbox('scheduler_groupscheduling', get_string('groupscheduling', 'scheduler'),
     get_string('groupscheduling_desc', 'scheduler'), 1));
 
+$settings->add(new admin_setting_configtext('scheduler_maxstudentsperslot', get_string('maxstudentsperslot', 'scheduler'),
+    get_string('maxstudentsperslot_desc', 'scheduler'), 9, PARAM_INT));
+
 ?>

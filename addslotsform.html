@@ -125,8 +125,9 @@ if (has_capability('mod/scheduler:canscheduletootherteachers', $context)){
         <td align="right"><b><?php print_string('multiplestudents', 'scheduler') ?>:</b></td>
         <td align="left">
             <?php
+                $maxexclusive = $CFG->scheduler_maxstudentsperslot;
                 $exclusivemenu['0'] = get_string('unlimited', 'scheduler');
-                for($i = 1 ; $i < 10 ; $i++){
+                for($i = 1 ; $i <= $maxexclusive ; $i++){
                     $exclusivemenu[(string)$i] = $i;
                 }
                 echo html_writer::select($exclusivemenu, 'exclusivity', $form->exclusivity);

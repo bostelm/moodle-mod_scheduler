@@ -95,10 +95,11 @@ if($action == 'schedule' or $action == 'schedulegroup'){
            
         </script>
         <?php
+            $maxexclusive = $CFG->scheduler_maxstudentsperslot;
             $exclusivemenu['0'] = get_string('unlimited', 'scheduler');
             $knownslots = count($form->appointments);
             if ($knownslots == 0) $knownslots++;            
-            for($i = $knownslots ; $i < 10 ; $i++){
+            for($i = $knownslots ; $i <= $maxexclusive; $i++){
                 $exclusivemenu[(string)$i] = $i;
             }
             
