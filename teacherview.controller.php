@@ -439,7 +439,7 @@ switch ($action) {
     /************************************ Toggling to unlimited group ***************************************/
     case 'allowgroup':{
         $slotid = required_param('slotid', PARAM_INT);
-        unset($slot);
+        $slot = new stdClass();
         $slot->id = $slotid;
         $slot->exclusivity = 0;
         $DB->update_record('scheduler_slots', $slot);
@@ -449,7 +449,7 @@ switch ($action) {
     /************************************ Toggling to single student ******************************************/
     case 'forbidgroup':{
         $slotid = required_param('slotid', PARAM_INT);
-        unset($slot);
+        $slot = new stdClass();
         $slot->id = $slotid;
         $slot->exclusivity = 1;
         $DB->update_record('scheduler_slots', $slot);
@@ -459,7 +459,7 @@ switch ($action) {
     /************************************ Toggling reuse on ***************************************/
     case 'reuse':{
         $slotid = required_param('slotid', PARAM_INT);
-        unset($slot);
+        $slot = new stdClass();
         $slot->id = $slotid;
         $slot->reuse = 1;
         $DB->update_record('scheduler_slots', $slot);
@@ -469,7 +469,7 @@ switch ($action) {
     /************************************ Toggling reuse off ***************************************/
     case 'unreuse':{
         $slotid = required_param('slotid', PARAM_INT);
-        unset($slot);
+        $slot = new stdClass();
         $slot->id = $slotid;
         $slot->reuse = 0;
         $DB->update_record('scheduler_slots', $slot);
