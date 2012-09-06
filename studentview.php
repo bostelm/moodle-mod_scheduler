@@ -123,7 +123,7 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         $table = new html_table();
         
         $table->head  = array ($strdate, s(scheduler_get_teacher_name($scheduler)), $strnote, $strgrade);
-        $table->align = array ('LEFT', 'CENTER', 'LEFT', 'LEFT');
+        $table->align = array ('left', 'center', 'left', 'left');
         $table->size = array ('', '', '40%', '150');
         $table->width = '90%'; 
         $table->data = array();
@@ -193,8 +193,8 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
     echo $OUTPUT->heading(get_string('slots' ,'scheduler'));
     
     $table = new html_table;
-    $table->head  = array ($strdate, $strstart, $strend, get_string('choice', 'scheduler'), s(scheduler_get_teacher_name($scheduler)), get_string('groupsession', 'scheduler'));
-    $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT');
+    $table->head  = array ($strdate, $strstart, $strend, get_string('location', 'scheduler'), get_string('choice', 'scheduler'), s(scheduler_get_teacher_name($scheduler)), get_string('groupsession', 'scheduler'));
+    $table->align = array ('left', 'left', 'left', 'left', 'center', 'left', 'left');
     $table->data = array();
     $previousdate = '';
     $previoustime = 0;
@@ -207,10 +207,12 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         $startdatestr = ($startdate == $previousdate) ? '' : $startdate ;
         $starttimestr = ($starttime == $previoustime) ? '' : $starttime ;
         $endtimestr = ($endtime == $previousendtime) ? '' : $endtime ;
+        $location = s($aSlot->appointmentlocation);
         if ($aSlot->appointedbyme and !$aSlot->attended){
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));
             $radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" checked=\"checked\" />\n";
-            $table->data[] = array ("<b>$startdatestr</b>", "<b>$starttime</b>", "<b>$endtime</b>", $radio, "<b>"."<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course=$scheduler->course\">".fullname($teacher).'</a></b>','<b>'.$aSlot->groupsession.'</b>');
+            $table->data[] = array ("<b>$startdatestr</b>", "<b>$starttime</b>", "<b>$endtime</b>", "<b>$location</b>",
+            	$radio, "<b>"."<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course=$scheduler->course\">".fullname($teacher).'</a></b>','<b>'.$aSlot->groupsession.'</b>');
         } else {
             if ($aSlot->appointed and has_capability('mod/scheduler:seeotherstudentsbooking', $context)){
                 $appointments = scheduler_get_appointments($aSlot->id);
@@ -228,7 +230,8 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
             $canusegroup = ($aSlot->appointed) ? 0 : 1;
             $radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" onclick=\"checkGroupAppointment($canusegroup)\" />\n";
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));
-            $table->data[] = array ($startdatestr, $starttimestr, $endtimestr, $radio, "<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course={$scheduler->course}\">".fullname($teacher).'</a>', $aSlot->groupsession);
+            $table->data[] = array ($startdatestr, $starttimestr, $endtimestr, $location,
+            	$radio, "<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course={$scheduler->course}\">".fullname($teacher).'</a>', $aSlot->groupsession);
         }
         $previoustime = $starttime;
         $previousendtime = $endtime;

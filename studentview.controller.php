@@ -131,6 +131,7 @@ if ($action == 'savechoice') {
     
     /// create new appointment and add it for each member of the group
     foreach($oldslotowners as $astudentid){
+    	$appointment = new stdClass();
         $appointment->slotid = $slotid;
         // $appointment->notes = $notes;
         $appointment->studentid = $astudentid;
