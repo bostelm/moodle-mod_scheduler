@@ -71,18 +71,32 @@ if ($displaydeletebuttons){
 ?>
          <td>
             <form action="view.php" method="post" name="deleteunusedform">
+                <script type="text/javascript">
+                    function confirmdeletionunused(){
+                        if (confirm('<?php print_string('confirmdelete', 'scheduler') ?>')){
+                             document.forms['deleteunusedform'].submit();
+                        }
+                    }
+                </script>
                 <input type="hidden" name="what" value="deleteunused" />
                 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
                 <input type="hidden" name="page" value="<?php p($page) ?>" />
-                <input type="submit" name="go_btn" value="<?php echo $strdeleteunusedslots ?>" />
+                <input type="submit" name="go_btn" value="<?php echo $strdeleteunusedslots ?>" onclick="confirmdeletionunused()" />
             </form>
          </td>
          <td>
             <form action="view.php" method="post" name="deletemineform">
+                <script type="text/javascript">
+                    function confirmdeletionmine(){
+                        if (confirm('<?php print_string('confirmdelete', 'scheduler') ?>')){
+                             document.forms['deletemineform'].submit();
+                        }
+                    }
+                </script>
                 <input type="hidden" name="what" value="deleteonlymine" />
                 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
                 <input type="hidden" name="page" value="<?php p($page) ?>" />
-                <input type="submit" name="go_btn" value="<?php echo $strdeletemyslots ?>" />
+                <input type="submit" name="go_btn" value="<?php echo $strdeletemyslots ?>" onclick="confirmdeletionmine()" />
             </form>
          </td>
 <?php
