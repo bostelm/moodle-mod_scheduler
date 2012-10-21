@@ -266,6 +266,23 @@ function scheduler_scale_used($cmid, $scaleid) {
 }
 
 
+/**
+ * Checks if scale is being used by any instance of scheduler
+ *
+ * This is used to find out if scale used anywhere
+ * @param $scaleid int
+ * @return boolean True if the scale is used by any scheduler
+ */
+function scheduler_scale_used_anywhere($scaleid) {
+    global $DB;
+
+    if ($scaleid and $DB->record_exists('scheduler', array('scale'=>-$scaleid))) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 /*
  * Course resetting API
