@@ -247,17 +247,18 @@ switch ($action) {
         $startfrom = $data->rangestart;
         $noslotsallowed = true;
         for ($d = 0; $d <= $fordays; $d ++){
-            $eventdate = usergetdate($startfrom + ($d * 86400));
-            $dayofweek = date('l', $startfrom + ($d * 86400));
-            if ((($dayofweek == 'Monday') && ($data->monday == 1)) ||
-                    (($dayofweek == 'Tuesday') && ($data->tuesday == 1)) || 
-                    (($dayofweek == 'Wednesday') && ($data->wednesday == 1)) ||
-                    (($dayofweek == 'Thursday') && ($data->thursday == 1)) || 
-                    (($dayofweek == 'Friday') && ($data->friday == 1)) ||
-                    (($dayofweek == 'Saturday') && ($data->saturday == 1)) ||
-                    (($dayofweek == 'Sunday') && ($data->sunday == 1))){
+            $starttime = $startfrom + ($d * DAYSECS);
+            $eventdate = usergetdate($starttime);
+            $dayofweek = $eventdate['wday'];
+            if ((($dayofweek == 1) && ($data->monday == 1)) ||
+                    (($dayofweek == 2) && ($data->tuesday == 1)) || 
+                    (($dayofweek == 3) && ($data->wednesday == 1)) ||
+                    (($dayofweek == 4) && ($data->thursday == 1)) || 
+                    (($dayofweek == 5) && ($data->friday == 1)) ||
+                    (($dayofweek == 6) && ($data->saturday == 1)) ||
+                    (($dayofweek == 0) && ($data->sunday == 1))){
                 $noslotsallowed = false;
-                $data->starttime = $startfrom + ($d * 86400);
+                $data->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->starthour, $data->startminute);
                 $conflicts = scheduler_get_conflicts($scheduler->id, $data->starttime, $data->starttime + $data->duration * 60, $data->teacherid, false, SCHEDULER_ALL);
                 if (!$data->forcewhenoverlap){
                     if ($conflicts){
@@ -289,18 +290,19 @@ switch ($action) {
         $couldnotcreateslots = '';
         $startfrom = $data->timestart;
         for ($d = 0; $d <= $fordays; $d ++){
-            $eventdate = usergetdate($startfrom + ($d * DAYSECS));
-            $dayofweek = date('l', $startfrom + ($d * DAYSECS));
-            if ((($dayofweek == 'Monday') && ($data->monday == 1)) ||
-                    (($dayofweek == 'Tuesday') && ($data->tuesday == 1)) ||
-                    (($dayofweek == 'Wednesday') && ($data->wednesday == 1)) || 
-                    (($dayofweek == 'Thursday') && ($data->thursday == 1)) ||
-                    (($dayofweek == 'Friday') && ($data->friday == 1)) ||
-                    (($dayofweek == 'Saturday') && ($data->saturday == 1)) ||
-                    (($dayofweek == 'Sunday') && ($data->sunday == 1))){
-                $slot->starttime = $startfrom + ($d * DAYSECS);
-                $data->timestart = $startfrom + ($d * DAYSECS);
-                $data->timeend = make_timestamp(date('Y',$data->timestart), date('m',$data->timestart), date('d',$data->timestart), $data->endhour, $data->endminute);
+            $starttime = $startfrom + ($d * DAYSECS);
+            $eventdate = usergetdate($starttime);
+            $dayofweek = $eventdate['wday'];
+            if ((($dayofweek == 1) && ($data->monday == 1)) ||
+                    (($dayofweek == 2) && ($data->tuesday == 1)) ||
+                    (($dayofweek == 3) && ($data->wednesday == 1)) || 
+                    (($dayofweek == 4) && ($data->thursday == 1)) ||
+                    (($dayofweek == 5) && ($data->friday == 1)) ||
+                    (($dayofweek == 6) && ($data->saturday == 1)) ||
+                    (($dayofweek == 0) && ($data->sunday == 1))){
+                $slot->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->starthour, $data->startminute);
+                $data->timestart = $slot->starttime;
+                $data->timeend = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->endhour, $data->endminute);
                 
                 // this corrects around midnight bug
                 if ($data->timestart > $data->timeend){
