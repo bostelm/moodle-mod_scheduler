@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/20/en/Scheduler_module
+    http://docs.moodle.org/23/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 2.0 and above.
+This module is intended for Moodle 2.3 and above.
 
 
 === Authors ===
@@ -56,6 +56,10 @@ With further contributions taken from:
 
 === Release notes ===
 
+--- Version 2.3 ---
+
+Intended for Moodle 2.3 and later; no major functional changes, but API adapted and minor enhancements.
+
 --- Version 2.0 --- 
 
 No major functional changes over 1.9; bug fixes and API migration only. Requires 1.9 for database upgrades.  
@@ -72,5 +76,5 @@ that is, malfunction in this respect should be considered a bug:
 * New rich text editor and file API (activity intro only) 
 * Localization / language packs
 
-The module does not use any deprecated API as of Moodle 2.1.
+The module does not use any deprecated API as of Moodle 2.3.
 
