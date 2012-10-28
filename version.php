@@ -16,8 +16,8 @@ defined('MOODLE_INTERNAL') || die();
  * It is intended for use with Moodle 2.0 and 2.1.
  */
 
-$module->version  = 2011103003;  // The current module version (Date: YYYYMMDDXX)
-$module->release  = '2.0.1+';
+$module->version  = 2011103004;  // The current module version (Date: YYYYMMDDXX)
+$module->release  = '2.0.2';
 $module->requires = 2011033000;  // Requires Moodle 2.0
 $module->maturity = MATURITY_STABLE;
 
