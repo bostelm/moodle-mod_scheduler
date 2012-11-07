@@ -42,8 +42,12 @@ function scheduler_usertime($date, $local=0) {
     if ($date == 0) {
         return '';
     } else {
-        if (!$timeformat = get_user_preferences('calendar_timeformat')) {
-            $timeformat = get_string('strftimetime');
+        $timeformat = get_user_preferences('calendar_timeformat');//get user config
+        if(empty($timeformat)){
+            $timeformat = get_config(NULL,'calendar_site_timeformat');//get calendar config	if above not exist
+        }
+        if(empty($timeformat)){
+            $timeformat = get_string('strftimetime');//get locale default format if both above not exist
         }
         return userdate($date, $timeformat);    
     }
