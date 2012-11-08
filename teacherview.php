@@ -627,9 +627,9 @@ if ($slots){
                 } else {
                     // same thing but no link
                     if ($appstudent->attended == 1) {
-                        $checkbox .= '<img src="pix/ticked.gif" border="0">';
+                        $checkbox = '<img src="pix/ticked.gif" border="0">';
                     } else {
-                        $checkbox .= '<img src="pix/unticked.gif" border="0">';
+                        $checkbox = '<img src="pix/unticked.gif" border="0">';
                     }
                 }
                 $studentArray[] = "$checkbox $picture $name $grade<br/>";
