@@ -145,15 +145,6 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
 }
 /********************************************* csv generator : get parms ************************************/
 if ($action == 'dodownloadcsv'){
-    print_header_simple($scheduler->name, '',
-        "<a href=\"index.php?id={$course->id}\">{$strschedulers}</a> -> 
-        <a href=\"view.php?id={$cm->id}&amp;page={$page}\">".format_string($scheduler->name)."</a> -> ".get_string('csvparms', 'scheduler'), 
-        '', '', true, update_module_button($cm->id, $course->id, $strscheduler), 
-        navmenu($course, $cm));
-    
-    echo '<link rel="stylesheet" href="'.$CFG->wwwroot.'/mod/scheduler/scheduler.css" type="text/css" />';
-    echo '<link rel="stylesheet" href="'.$CFG->themewww.'/standard/scheduler.css" type="text/css" />';
-    echo '<link rel="stylesheet" href="'.$CFG->themewww.'/'.current_theme().'/scheduler.css" type="text/css" />';
     ?>
 <center>
 <?php 
@@ -226,7 +217,7 @@ echo $OUTPUT->box_start()
 </form>
 <?php 
 echo $OUTPUT->box_end();
-print_footer($course);
+echo $OUTPUT->footer();
 exit;
 }
 /********************************************* csv generator : generate **********************************/
@@ -236,12 +227,13 @@ if ($action == 'downloadcsv'){
     $csvrecordseparator = $ENDLINES[required_param('csvrecordseparator', PARAM_TEXT)];
     $csvfieldseparator = required_param('csvfieldseparator', PARAM_TEXT);
     if ($csvfieldseparator == 'TAB'){
-        $csvfieldseparator = "  ";
+        $csvfieldseparator = "\t";
     }
     $csvencoding = required_param('csvencoding', PARAM_CLEAN);
-    
+    $downloadfilename = clean_filename(shorten_text("{$course->shortname}_{$scheduler->name}", 20).'.csv');     
     /// sending headers
     header("Content-Type:text/csv\n\n");
+    header("Content-Disposition: attachment; filename=$downloadfilename");
     
     /// Prepare data
     $sql = "
@@ -297,10 +289,11 @@ if ($action == 'downloadcsv'){
                         $user = $DB->get_record('user', array('id' => $appointment->studentid), 'id,firstname,lastname');
                         $user->lastname = strtoupper($user->lastname);
                         $strattended = ($appointment->attended) ? ' (A) ': '';
-                        $appointedlist[] = fullname($user). " $strattended";
+                        $appointedlist[] = fullname($user).$strattended;
                     }
-                    $stream .= implode(',', $appointedlist) . $csvrecordseparator;
+                    $stream .= implode(',', $appointedlist);
                 }
+                $stream .= $csvrecordseparator;
             }
         }
     }
@@ -328,7 +321,11 @@ if ($action == 'downloadcsv'){
             s.teacherid
             ";
         $grades = $DB->get_records_sql($sql, array($scheduler->id));
+        $finals = array();
         foreach($grades as $grade){
+        	if (!array_key_exists($grade->studentid, $finals)) {
+        	    $finals[$grade->studentid] = new stdClass();
+        	}
             if ($scheduler->scale > 0){ // numeric scales
                 $finals[$grade->studentid]->sum = @$finals[$grade->studentid]->sum + $grade->grade;
                 $finals[$grade->studentid]->count = @$finals[$grade->studentid]->count + 1;
@@ -347,7 +344,8 @@ if ($action == 'downloadcsv'){
             }
             $finals[$grade->studentid]->lastname = $grade->lastname;
             $finals[$grade->studentid]->firstname = $grade->firstname;
-            $finals[$grade->studentid]->appointmentnote = @$finals[$grade->studentid]->appointmentnote.' | '.$grade->appointmentnote;
+            $separator = isset($finals[$grade->studentid]->appointmentnote) ? ' | ' : ''; 
+            $finals[$grade->studentid]->appointmentnote = @$finals[$grade->studentid]->appointmentnote.$separator.$grade->appointmentnote;
         }
         /// Making title line
         $stream .= get_string('student', 'scheduler') . $csvfieldseparator;
@@ -385,7 +383,7 @@ else{
     ?>
 <center>
 <?php echo $OUTPUT->heading(get_string('downloads', 'scheduler')) ?>
-<hr/ width="60%" class="separator">
+<hr width="60%" class="separator"/>
 <table>
     <tr>
         <td>

@@ -66,7 +66,7 @@ $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
 /// This is a pre-header selector for downloded documents generation
 
     if (has_capability('mod/scheduler:manage', $context) || has_capability('mod/scheduler:attend', $context)) {
-        if (preg_match("/downloadexcel|downloadcsv|downloadods|dodownloadcsv/", $action)){
+        if (preg_match('/downloadexcel|^downloadcsv|downloadods/', $action)){
             include($CFG->dirroot.'/mod/scheduler/downloads.php');
         }
     }
@@ -103,7 +103,7 @@ if (has_capability('mod/scheduler:manage', $context)) {
     elseif ($action == 'viewstudent'){
         include $CFG->dirroot.'/mod/scheduler/viewstudent.php';
     }
-    elseif ($action == 'downloads'){
+    elseif ($action == 'downloads' || $action == 'dodownloadcsv'){
         include $CFG->dirroot.'/mod/scheduler/downloads.php';
     }
     elseif ($action == 'datelist'){
