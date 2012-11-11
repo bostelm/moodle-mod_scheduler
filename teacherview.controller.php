@@ -183,8 +183,8 @@ switch ($action) {
             echo $OUTPUT->heading(get_string('slotupdated','scheduler'));
         }
         
+        $DB->delete_records('scheduler_appointment', array('slotid'=>$slot->id)); // cleanup old appointments
         if($appointments){
-            $DB->delete_records('scheduler_appointment', array('slotid'=>$slot->id)); // cleanup old appointments
             foreach ($appointments as $appointment){ // insert updated
                 $appointment->slotid = $slot->id; // now we know !!
                 $DB->insert_record('scheduler_appointment', $appointment);
