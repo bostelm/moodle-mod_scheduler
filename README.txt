@@ -52,6 +52,7 @@ With further contributions taken from:
 
 * Vivek Arora (independent migration of the module to 2.0)
 * Andriy Semenets (Russian and Ukrainian localization)
+* Gaël Mifsud (French localization)
 * Various authors of the core Moodle code
 
 

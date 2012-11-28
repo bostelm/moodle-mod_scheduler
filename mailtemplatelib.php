@@ -55,14 +55,15 @@ function scheduler_send_email_from_template($recipient, $sender, $course, $title
     
     global $CFG;
     global $SITE;
-    
-    $defaultvars = array( 
-        'SITE' => $SITE->shortname,
+
+    $defaultvars = array(
+        'SITE' => $SITE->fullname,
+        'SITE_SHORT' => $SITE->shortname,
         'SITE_URL' => $CFG->wwwroot,
         'SENDER'  => fullname($sender),
         'RECIPIENT'  => fullname($recipient)
     );
-    
+
     $subjectPrefix = $SITE->shortname;
     
     if ($course) {
