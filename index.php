@@ -21,7 +21,7 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 $PAGE->set_url('/mod/scheduler/index.php', array('id'=>$id));
 $PAGE->set_pagelayout('incourse');
 
-$coursecontext = get_context_instance(CONTEXT_COURSE, $id);
+$coursecontext = context_course::instance($id);
 require_login($course->id);
 
 add_to_log($course->id, 'scheduler', 'view all', "index.php?id=$course->id", '');
@@ -33,10 +33,11 @@ $strscheduler  = get_string('modulename', 'scheduler');
 
 /// Print the header
 
-$navlinks = array();
-$navlinks[] = array('name' => $strscheduler, 'link' => '', 'type' => 'title');    
-$navigation = build_navigation($navlinks);
-print_header_simple($strschedulers, '', $navigation, '', '', true, '', navmenu($course));
+$title = $course->shortname . ': ' . $strschedulers;
+$PAGE->set_title($title);
+$PAGE->set_heading($course->fullname);
+echo $OUTPUT->header($course);
+
 
 /// Get all the appropriate data
 
