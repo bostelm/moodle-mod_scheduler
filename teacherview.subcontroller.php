@@ -55,7 +55,7 @@ switch($subaction){
         return -1;
         
     case 'doremoveappointed':
-        unset($erroritem);
+        $erroritem = new stdClass();
         $erroritem->message = get_string('dontforgetsaveadvice', 'scheduler');
         $erroritem->on = '';
         $errors[] = $erroritem;
@@ -72,7 +72,7 @@ switch($subaction){
         break;
     
     case 'doaddappointed':
-        unset($erroritem);
+        $erroritem = new stdClass();
         $erroritem->message = get_string('dontforgetsaveadvice', 'scheduler');
         $erroritem->on = '';
         $errors[] = $erroritem;
@@ -82,7 +82,9 @@ switch($subaction){
         $form->appointments = unserialize(stripslashes(required_param('appointments', PARAM_RAW)));
         $form->slotid = optional_param('slotid', -1, PARAM_INT);
         
-        $form->studentid = $appointment->studentid = required_param('studenttoadd', PARAM_INT);
+        $form->studentid = required_param('studenttoadd', PARAM_INT);
+        $appointment = new stdClass();
+        $appointment->studentid = $form->studentid;
         $form->availableslots = scheduler_get_available_slots($form->studentid, $scheduler->id);            
         $appointment->attended = optional_param('attended', 0, PARAM_INT);
         $appointment->appointmentnote = optional_param('appointmentnote', '', PARAM_TEXT);
