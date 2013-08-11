@@ -66,13 +66,10 @@ if ($course->format == 'weeks') {
 }
 
 foreach ($schedulers as $scheduler) {
-    if (!$scheduler->visible) {
-        //Show dimmed if the mod is hidden
-        $link = "<a class=\"dimmed\" href=\"view.php?id={$scheduler->coursemodule}\">$scheduler->name</a>";
-    } else {
-        //Show normal if the mod is visible
-        $link = "<a href=\"view.php?id={$scheduler->coursemodule}\">$scheduler->name</a>";
-    }
+    $url = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->coursemodule));
+    //Show dimmed if the mod is hidden
+    $attr = $scheduler->visible ? null : array('class' => 'dimmed');
+    $link = html_writer::link($url, $scheduler->name, $attr);
     if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $coursecontext)) {
         if ($course->format == 'weeks' or $course->format == 'topics') {
             $table->data[] = array ($scheduler->section, $link);
