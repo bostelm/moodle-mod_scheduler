@@ -52,7 +52,7 @@ if ($id) {
 
 
 require_login($course->id, false, $cm);
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 // TODO require_capability('mod/scheduler:view', $context);
 
 add_to_log($course->id, 'scheduler', $action, "view.php?id={$cm->id}", $scheduler->id, $cm->id);
