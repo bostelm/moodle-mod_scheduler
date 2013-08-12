@@ -436,7 +436,7 @@ if ($action == 'schedulegroup') {
             $members = groups_get_members($form->groupid);
             $form->exclusivity = count($members);
             foreach($members as $member){
-                unset($appointment);
+                $appointment = new stdClass();
                 $appointment->slotid = -1;
                 // hack for 1.8 / 1.9 compatibility of groups_get_members() call
                 if (is_numeric($member)){
@@ -769,7 +769,7 @@ echo '<br /><center>' . get_string('markseen', 'scheduler') . '</center>';
     echo $OUTPUT->box_end();
 }
 
-/// print table of outstanding appointer (students)
+/// print table of students needing an appointment
 ?>
 <center>
 <table width="90%">
@@ -784,8 +784,9 @@ if (!$students) {
     if ($COURSE->id == SITEID){
         $nostudentstr .= '<br/>'.get_string('howtoaddstudents','scheduler');
     }
-    echo $OUTPUT->notification($nostudentstr);
-} else {
+    echo $OUTPUT->notification($nostudentstr, 'notifyproblem');
+}
+else {
     $mtable = new html_table();
     
     // build table header
@@ -872,9 +873,16 @@ if (!$students) {
         }
     }
     
+    $num = count($mtable->data);
+
     // dont print if allowed to book multiple appointments
-    // There are students who still have to make appointments
-    if (($num = count($mtable->data)) > 0) {
+    if ($num > $CFG->scheduler_maxstudentlistsize) {
+        // There are too many students who still have to make appointments, don't display a list
+        $toomanystr = get_string('missingstudentsmany', 'scheduler', $num);
+        echo $OUTPUT->notification($toomanystr, 'notifymessage');
+    }
+    else if ($num > 0) {
+        // There are students who still have to make appointments
         
         // Print number of students who still have to make an appointment
         echo $OUTPUT->heading(get_string('missingstudents', 'scheduler', $num), 3);
