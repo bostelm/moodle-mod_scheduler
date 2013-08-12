@@ -667,18 +667,18 @@ if ($slots){
             $strreused = get_string('setreused', 'scheduler');
             $strunreused = get_string('setunreused', 'scheduler');
             
-            $actions .= "<a href=\"view.php?what=deleteslot&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$strdelete}\"><img src=\"{$CFG->wwwroot}/pix/t/delete.gif\" alt=\"{$strdelete}\" /></a>";
-            $actions .= "&nbsp;<a href=\"view.php?what=updateslot&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$stredit}\"><img src=\"{$CFG->wwwroot}/pix/t/edit.gif\" alt=\"{$stredit}\" /></a>";
+            $actions .= "<a href=\"view.php?what=deleteslot&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$strdelete}\"><img src=\"{$CFG->wwwroot}/pix/t/delete.png\" alt=\"{$strdelete}\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?what=updateslot&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$stredit}\"><img src=\"{$CFG->wwwroot}/pix/t/edit.png\" alt=\"{$stredit}\" /></a>";
             if ($slot->isattended){
-                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/c/group.gif\" title=\"{$strattended}\" />";
+                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/i/groupevent.png\" title=\"{$strattended}\" />";
             } else {
                 if ($slot->isappointed > 1){
-                    $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/c/group.gif\" title=\"{$strnonexclusive}\" />";
+                    $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/i/groupevent.png\" title=\"{$strnonexclusive}\" />";
                 } else {
                     if ($slot->exclusivity == 1){
-                        $actions .= "&nbsp;<a href=\"view.php?what=allowgroup&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$strallowgroup}\"><img src=\"{$CFG->wwwroot}/pix/t/groupn.gif\" alt=\"{$strallowgroup}\" /></a>";
+                        $actions .= "&nbsp;<a href=\"view.php?what=allowgroup&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$strallowgroup}\"><img src=\"{$CFG->wwwroot}/pix/t/groupn.png\" alt=\"{$strallowgroup}\" /></a>";
                     } else {
-                        $actions .= "&nbsp;<a href=\"view.php?what=forbidgroup&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$strforbidgroup}\"><img src=\"{$CFG->wwwroot}/pix/t/groupv.gif\" alt=\"{$strforbidgroup}\" /></a>";
+                        $actions .= "&nbsp;<a href=\"view.php?what=forbidgroup&amp;id={$cm->id}&amp;slotid={$slot->id}&amp;page={$page}\" title=\"{$strforbidgroup}\"><img src=\"{$CFG->wwwroot}/pix/t/groupv.png\" alt=\"{$strforbidgroup}\" /></a>";
                     }
                 }
             }
@@ -688,15 +688,15 @@ if ($slots){
         } else {
             // just signal group status
             if ($slot->isattended){
-                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/c/group.gif\" title=\"{$strattended}\" />";
+                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/i/groupevent.png\" title=\"{$strattended}\" />";
             } else {
                 if ($slot->isappointed > 1){
-                    $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/c/group.gif\" title=\"{$strnonexclusive}\" />";
+                    $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/i/groupevent.png\" title=\"{$strnonexclusive}\" />";
                 } else {
                     if ($slot->exclusivity == 1){
-                        $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/t/groupn.gif\" title=\"{$strallowgroup}\" />";
+                        $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/t/groupn.png\" title=\"{$strallowgroup}\" />";
                     } else {
-                        $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/t/groupv.gif\" title=\"{$strforbidgroup}\" />";
+                        $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/pix/t/groupv.png\" title=\"{$strforbidgroup}\" />";
                     }
                 }
             }

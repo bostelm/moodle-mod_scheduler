@@ -59,23 +59,23 @@ function scheduler_usertime($date, $local=0) {
  * @return array of moodle user records
  */
 function scheduler_get_attendants($cmid){
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $context = context_module::instance($cmid);
     $attendants = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id,lastname,firstname,email,picture', 'lastname, firstname', '', '', '', '', false, false, false);
     return $attendants;
 }
 
 /**
  * get list of possible attendees (i.e., users that can make an appointment)
- * @param int $cm the course module
+ * @param object $cm the course module
  * @param $groups - single group or array of groups - only return
  *                  users who are in one of these group(s).
  * @return array of moodle user records
  */
 function scheduler_get_possible_attendees($cm, $groups=''){
-		
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+
+    $context = context_module::instance($cm->id);
     $attendees = get_users_by_capability($context, 'mod/scheduler:appoint', '', 'lastname, firstname', '', '', $groups, '', false, false, false);
-    
+
     return $attendees;
 }
 
@@ -801,11 +801,11 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
     static $datestring;
     static $countries;
     
-    $context = get_context_instance(CONTEXT_COURSE, $course->id);
+    $context = context_course::instance($course->id);
     if (isset($user->context->id)) {
         $usercontext = $user->context;
     } else {
-        $usercontext = get_context_instance(CONTEXT_USER, $user->id);
+        $usercontext = context_user::instance($user->id);
     }
     
     if (empty($string)) {     // Cache all the strings for the rest of the page
