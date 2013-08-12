@@ -399,20 +399,9 @@ function scheduler_delete_appointment($appointmentid, $slot=null, $scheduler=nul
 function scheduler_get_last_location(&$scheduler){
     global $USER, $DB;
     
-    // we could have made an embedded query in Mysql 5.0
     $lastlocation = '';
-    $select = 'schedulerid = ? AND teacherid = ? GROUP BY timemodified';
-    $maxtime = $DB->get_field_select('scheduler_slots', 'MAX(timemodified)', $select, array($scheduler->id, $USER->id), IGNORE_MULTIPLE);
-    if ($maxtime){
-        $select = "
-            schedulerid = :schedulerid AND 
-            timemodified = :maxtime AND 
-            teacherid = :userid 
-            GROUP BY timemodified
-            ";
-        $maxid = $DB->get_field_select('scheduler_slots', 'MAX(timemodified)', $select, array('schedulerid' => $scheduler->id, 'maxtime' => $maxtime, 'userid' => $USER->id), IGNORE_MULTIPLE );
-        $lastlocation = $DB->get_field('scheduler_slots', 'appointmentlocation', array('id' => $maxid));
-    }
+    $select = 'SELECT appointmentlocation FROM {scheduler_slots} WHERE schedulerid = ? AND teacherid = ? ORDER BY timemodified DESC';
+    $lastlocation = $DB->get_field_sql($select, array($scheduler->id, $USER->id), IGNORE_MULTIPLE);
     return $lastlocation;
 }
 
@@ -720,16 +709,16 @@ function scheduler_format_grade(&$scheduler, $grade, $short=false){
     return $result;
 }
 
+
 /**
- * a utility function for making grading lists
+ * a utility function for producing grading lists (for use in formslib)
  * @param reference $scheduler
- * @param string $id the form field id
- * @param string $selected the selected value
  * @return the html selection element for a grading list
  */
-function scheduler_make_grading_menu(&$scheduler, $id, $selected = '') {
+function scheduler_get_grading_choices(&$scheduler) {
 	global $DB;
     if ($scheduler->scale > 0){
+        $scalegrades = array();
         for($i = 0 ; $i <= $scheduler->scale ; $i++) {
             $scalegrades[$i] = $i; 
         }
@@ -740,6 +729,20 @@ function scheduler_make_grading_menu(&$scheduler, $id, $selected = '') {
             $scalegrades = make_menu_from_list($scale->scale);
         }
     }
+    return $scalegrades;
+}
+
+
+/**
+ * a utility function for making grading lists
+ * @param reference $scheduler
+ * @param string $id the form field id
+ * @param string $selected the selected value
+ * @return the html selection element for a grading list
+ */
+function scheduler_make_grading_menu(&$scheduler, $id, $selected = '') {
+	global $DB;
+    $scalegrades = scheduler_get_grading_choices($scheduler);
     $menu = html_writer::select($scalegrades, $id, $selected);
     return $menu;
 }

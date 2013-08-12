@@ -132,6 +132,51 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         // savepoint reached
         upgrade_mod_savepoint(true, 2011081302, 'scheduler');
     }
+
+    /* ******************* 2.5 upgrade line ********************** */
+    
+    if ($oldversion < 2012102903) {
+    
+        $dbman = $DB->get_manager();
+    
+        // Define fields notesformat and appointmentnote in respective tables
+        $table = new xmldb_table('scheduler_slots');
+        $formatfield = new xmldb_field('notesformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
+                        XMLDB_NOTNULL, null, '0', 'notes');    
+        if (!$dbman->field_exists($table, $formatfield)) {
+            $dbman->add_field($table, $formatfield);
+        }
+        
+        
+        $table = new xmldb_table('scheduler_appointment');
+        $formatfield = new xmldb_field('appointmentnoteformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
+                        XMLDB_NOTNULL, null, '0', 'appointmentnote');
+        if (!$dbman->field_exists($table, $formatfield)) {
+            $dbman->add_field($table, $formatfield);
+        }
+
+        // migrate html format
+        if ($CFG->texteditors !== 'textarea') {
+            $rs = $DB->get_recordset('scheduler_slots', null, '', 'id, notesformat');
+            foreach ($rs as $q) {
+                $q->notesformat = FORMAT_HTML;
+                $DB->update_record('scheduler_slots', $q);
+                upgrade_set_timeout();
+            }
+            $rs->close();
+        
+            $rs = $DB->get_recordset('scheduler_appointment', null, '', 'id, appointmentnoteformat');
+            foreach ($rs as $q) {
+                $q->appointmentnoteformat = FORMAT_HTML;
+                $DB->update_record('scheduler_appointment', $q);
+                upgrade_set_timeout();
+            }
+            $rs->close();
+        }
+        
+        // savepoint reached
+        upgrade_mod_savepoint(true, 2012102903, 'scheduler');
+    }
     
     return true;
 }
