@@ -16,8 +16,8 @@ defined('MOODLE_INTERNAL') || die();
  * It is intended for use with Moodle 2.3 and above.
  */
 
-$module->version  = 2012102801;       // The current module version (Date: YYYYMMDDXX)
-$module->release  = '2.3.0+';         // Human-friendly version name
+$module->version  = 2012102802;       // The current module version (Date: YYYYMMDDXX)
+$module->release  = '2.3.1';          // Human-friendly version name
 $module->requires = 2012062500;       // Requires Moodle 2.3
 $module->maturity = MATURITY_STABLE;  // Stable release
 
