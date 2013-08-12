@@ -33,7 +33,7 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $this->add_intro_editor(false, get_string('introduction', 'scheduler'));
 
 	    $mform->addElement('text', 'staffrolename', get_string('staffrolename', 'scheduler'), array('size'=>'48'));
-	    $mform->setType('name', PARAM_CLEANHTML);
+	    $mform->setType('staffrolename', PARAM_CLEANHTML);
 	    $mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
 	
 	    $modeoptions['onetime'] = get_string('oneatatime', 'scheduler');
@@ -70,7 +70,8 @@ class mod_scheduler_mod_form extends moodleform_mod {
 
 		// Legacy. This field is still in the DB but is meaningless, meanwhile.
 	    $mform->addElement('hidden', 'teacher');
-
+	    $mform->setType('teacher', PARAM_INT);
+	     
         $this->standard_coursemodule_elements();
 
         $this->add_action_buttons();
