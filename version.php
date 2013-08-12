@@ -17,7 +17,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $module->version  = 2012102901;       // The current module version (Date: YYYYMMDDXX)
 $module->release  = '2.x dev';        // Human-friendly version name
-$module->requires = 2012062500;       // Requires Moodle 2.3
+$module->requires = 2013051400;       // Requires Moodle 2.5
 $module->maturity = MATURITY_ALPHA;   // Alpha development code - not for production sites
 
 $module->cron     = 60;               // Period for cron to check this module (secs)
