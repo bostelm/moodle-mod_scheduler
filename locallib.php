@@ -772,11 +772,11 @@ function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee)
     }
     if ($attendant) {
         $vars['ATTENDANT']     = fullname($attendant);
-        $vars['ATTENDANT_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendant->id;
+        $vars['ATTENDANT_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendant->id.'&course='.$scheduler->course;
     }
     if ($attendee) {
         $vars['ATTENDEE']     = fullname($attendee);
-        $vars['ATTENDEE_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendee->id;
+        $vars['ATTENDEE_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendee->id.'&course='.$scheduler->course;
     }
     
     return $vars;
