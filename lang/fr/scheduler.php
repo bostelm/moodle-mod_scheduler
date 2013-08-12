@@ -113,13 +113,13 @@ $string['forcourses'] = 'Cours concernés';
 $string['friday'] = 'Vendredi';
 $string['generalconfig'] = 'Configuration générale';
 $string['gradingstrategy'] = 'Stratégie de notation';
-$string['gradingstrategy_help'] = 'Dans un planning où les étudiants peuvent avoir plusieurs entretiens, choisissez comment la notation doit être affichée.<br/>'.
-		'Le carnet de notes peut afficher soit <ul><li>la note moyenne ou</li><li>la note maximale</li></ul> que l\'étudiant a reçue.';
+$string['gradingstrategy_help'] = 'Dans un planning où les étudiants peuvent avoir plusieurs entretiens, choisissez comment la notation doit être affichée.<br/>
+Le carnet de notes peut afficher soit <ul><li>la note moyenne ou</li><li>la note maximale</li></ul> que l\'étudiant a reçue.';
 $string['group'] = 'groupe ';
 $string['groupbreakdown'] = 'Par taille de groupe';
 $string['groupscheduling'] = 'Autoriser les rendez-vous collectifs';
-$string['groupscheduling_desc'] = 'Permet à des groupes entiers d\'être en rendez-vous d\'un coup. '.
-		'(En plus de l\'option globale, l\'option de groupe de l\'activité doit être "Groupes visibles" ou "Groupes séparés" pour activer cette fonctionnalité.)';
+$string['groupscheduling_desc'] = 'Permet à des groupes entiers d\'être en rendez-vous d\'un coup. 
+		(En plus de l\'option globale, l\'option de groupe de l\'activité doit être "Groupes visibles" ou "Groupes séparés" pour activer cette fonctionnalité.)';
 $string['groupsession'] = 'Rendez-vous collectif';
 $string['groupsize'] = 'Taille du groupe';
 $string['guestscantdoanything'] = 'Les invités ne peuvent pas utiliser cette activité.';
@@ -205,8 +205,7 @@ $string['schedulegroups'] = 'Planifier par groupe';
 $string['scheduler'] = 'Carnet';
 $string['schedulestudents'] = 'Planifier par étudiant';
 $string['showemailplain'] = 'Show e-mail addresses in plain text';
-$string['showemailplain_desc'] = 'Dans la vue enseignant du planning, '.
-		'afficher les adresses e-mails des étudiants voulant un entretien de façon textuelle, en plus des liens mailto:.';
+$string['showemailplain_desc'] = 'Dans la vue enseignant du planning, afficher les adresses e-mails des étudiants voulant un entretien de façon textuelle, en plus des liens mailto:.';
 $string['seen'] = 'Vu ';
 $string['setreused'] = 'Rendre le créneau réutilisable';
 $string['setunreused'] = 'Rendre le créneau volatile';

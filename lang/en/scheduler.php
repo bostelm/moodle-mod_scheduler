@@ -113,13 +113,12 @@ $string['forcourses'] = 'Choose students in courses';
 $string['friday'] = 'Friday';
 $string['generalconfig'] = 'General configuration';
 $string['gradingstrategy'] = 'Grading strategy';
-$string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated. '.
-    'The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
+$string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated. 
+The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
 $string['groupbreakdown'] = 'By group size';
 $string['groupscheduling'] = 'Enable group scheduling';
-$string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once. ' .
-         '(Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
+$string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once. (Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
 $string['groupsession'] = 'Group session';
 $string['groupsize'] = 'Group size';
 $string['guestscantdoanything'] = 'Guests can\'t do anything here.';
@@ -206,8 +205,7 @@ $string['schedulegroups'] = 'Schedule by group';
 $string['scheduler'] = 'Scheduler';
 $string['schedulestudents'] = 'Schedule by student';
 $string['showemailplain'] = 'Show e-mail addresses in plain text';
-$string['showemailplain_desc'] = 'In the teacher\'s view of the scheduler, '.
-    'show the e-mail addresses of students needing an appointment in plain text, in addition to mailto: links.';
+$string['showemailplain_desc'] = 'In the teacher\'s view of the scheduler, show the e-mail addresses of students needing an appointment in plain text, in addition to mailto: links.';
 $string['seen'] = 'Seen';
 $string['setreused'] = 'Set reusable';
 $string['setunreused'] = 'Set volatile';
