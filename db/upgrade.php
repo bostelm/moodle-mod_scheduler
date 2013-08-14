@@ -157,21 +157,9 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
         // migrate html format
         if ($CFG->texteditors !== 'textarea') {
-            $rs = $DB->get_recordset('scheduler_slots', null, '', 'id, notesformat');
-            foreach ($rs as $q) {
-                $q->notesformat = FORMAT_HTML;
-                $DB->update_record('scheduler_slots', $q);
-                upgrade_set_timeout();
-            }
-            $rs->close();
-        
-            $rs = $DB->get_recordset('scheduler_appointment', null, '', 'id, appointmentnoteformat');
-            foreach ($rs as $q) {
-                $q->appointmentnoteformat = FORMAT_HTML;
-                $DB->update_record('scheduler_appointment', $q);
-                upgrade_set_timeout();
-            }
-            $rs->close();
+            upgrade_set_timeout();
+            $DB->set_field('scheduler_slots', 'notesformat', FORMAT_HTML);
+            $DB->set_field('scheduler_appointment', 'appointmentnoteformat', FORMAT_HTML);
         }
         
         // savepoint reached
