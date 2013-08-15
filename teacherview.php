@@ -620,7 +620,6 @@ echo '<br /><center>' . get_string('markseen', 'scheduler') . '</center>';
 echo $OUTPUT->heading(get_string('schedulestudents', 'scheduler'));
 
 $students = scheduler_get_possible_attendees($cm, $usergroups);
-
 if (!$students) {
     $nostudentstr = get_string('noexistingstudents','scheduler');
     if ($COURSE->id == SITEID){
@@ -631,7 +630,7 @@ if (!$students) {
 } else if (count($students) > $CFG->scheduler_maxstudentlistsize) {
 
     // There are too many students who still have to make appointments, don't display a list
-    $toomanystr = get_string('missingstudentsmany', 'scheduler', $num);
+    $toomanystr = get_string('missingstudentsmany', 'scheduler', count($students));
     echo $OUTPUT->notification($toomanystr, 'notifymessage');
 
 } else {
