@@ -615,18 +615,26 @@ echo '<br /><center>' . get_string('markseen', 'scheduler') . '</center>';
 	<center>
 		<table width="90%">
 			<tr valign="top">
-				<td width="50%"><?php
-				echo $OUTPUT->heading(get_string('schedulestudents', 'scheduler'));
+				<td width="50%">
+<?php
+echo $OUTPUT->heading(get_string('schedulestudents', 'scheduler'));
 
-				$students = scheduler_get_possible_attendees($cm, $usergroups);
-				if (!$students) {
+$students = scheduler_get_possible_attendees($cm, $usergroups);
+
+if (!$students) {
     $nostudentstr = get_string('noexistingstudents','scheduler');
     if ($COURSE->id == SITEID){
         $nostudentstr .= '<br/>'.get_string('howtoaddstudents','scheduler');
     }
     echo $OUTPUT->notification($nostudentstr, 'notifyproblem');
-}
-else {
+
+} else if (count($students) > $CFG->scheduler_maxstudentlistsize) {
+
+    // There are too many students who still have to make appointments, don't display a list
+    $toomanystr = get_string('missingstudentsmany', 'scheduler', $num);
+    echo $OUTPUT->notification($toomanystr, 'notifymessage');
+
+} else {
     $mtable = new html_table();
 
     // build table header
@@ -694,12 +702,7 @@ else {
     $num = count($mtable->data);
 
     // dont print if allowed to book multiple appointments
-    if ($num > $CFG->scheduler_maxstudentlistsize) {
-        // There are too many students who still have to make appointments, don't display a list
-        $toomanystr = get_string('missingstudentsmany', 'scheduler', $num);
-        echo $OUTPUT->notification($toomanystr, 'notifymessage');
-    }
-    else if ($num > 0) {
+    if ($num > 0) {
         // There are students who still have to make appointments
 
         // Print number of students who still have to make an appointment
