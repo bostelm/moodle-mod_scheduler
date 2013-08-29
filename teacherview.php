@@ -19,7 +19,10 @@ function scheduler_prepare_formdata($scheduler, $slot) {
     $data->notes = array();
     $data->notes['text'] = $slot->notes;
     $data->notes['format'] = $slot->notesformat;
-
+    if ($slot->emaildate < 0){
+        $data->emaildate = 0;
+    }
+    
     $appointments = $DB->get_records('scheduler_appointment', array('slotid' => $data->id));
     $i = 0;
     foreach ($appointments as $appointment) {
