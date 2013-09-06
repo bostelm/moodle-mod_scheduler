@@ -74,6 +74,10 @@ abstract class scheduler_slotform_base extends moodleform {
                 $mform->addElement('static', 'teacherid', $teachername, get_string('noteachershere', 'scheduler', $teachername));
             }
             $mform->addHelpButton('teacherid', 'bookwithteacher', 'scheduler');
+        } else {
+            $mform->addElement('hidden', 'teacherid');
+            $mform->setDefault('teacherid', $USER->id);
+            $mform->setType('teacherid', PARAM_INT);
         }
 
     }
