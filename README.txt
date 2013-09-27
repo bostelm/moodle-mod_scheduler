@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/23/en/Scheduler_module
+    http://docs.moodle.org/25/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 2.3 and above.
+This module is intended for Moodle 2.5 and above.
 
 
 === Authors ===
@@ -58,6 +58,14 @@ With further contributions taken from:
 
 === Release notes ===
 
+--- Version 2.5 ---
+
+Intended for Moodle 2.5 and later. 
+
+Module adapted to API changes Moodle core.
+"Add slot" and "Edit slot" forms refactored, now based on Moodle Forms.
+Language packs migrated to AMOS, removed from plugin codebase.
+
 --- Version 2.3 ---
 
 Intended for Moodle 2.3 and later; no major functional changes, but API adapted and minor enhancements.
@@ -75,8 +83,8 @@ that is, malfunction in this respect should be considered a bug:
 
 * Gradebook integration
 * Moodle 2 backup
-* New rich text editor and file API (activity intro only) 
+* New rich text editor and file API (activity intro and slot add/edit forms) 
 * Localization / language packs
 
-The module does not use any deprecated API as of Moodle 2.3.
+The module does not use any deprecated API as of Moodle 2.5.
 
