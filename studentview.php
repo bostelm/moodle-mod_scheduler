@@ -17,7 +17,8 @@ $mygroups = groups_get_all_groups($course->id, $USER->id, $cm->groupingid, 'g.id
 
 /// printing head information
 
-echo $OUTPUT->heading($scheduler->name);
+echo $OUTPUT->heading(format_string($scheduler->name), 2);
+
 if (trim(strip_tags($scheduler->intro))) {
     echo $OUTPUT->box_start('mod_introbox');
     echo format_module_intro('scheduler', $scheduler, $cm->id);
