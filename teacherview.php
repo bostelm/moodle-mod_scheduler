@@ -528,7 +528,7 @@ $tabrows[] = $row;
 print_tabs($tabrows, $currenttab);
 
 /// print heading
-echo $OUTPUT->heading($scheduler->name);
+echo $OUTPUT->heading(format_string($scheduler->name), 2);
 
 /// print page
 if (trim(strip_tags($scheduler->intro))) {
