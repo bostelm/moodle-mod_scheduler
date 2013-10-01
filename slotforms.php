@@ -239,7 +239,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         // Check whether students have been selected several times
         for ($i = 0; $i < $data['appointment_repeats']; $i++) {
             for ($j = 0; $j < $i; $j++) {
-                if ($data['studentid'][$i] == $data['studentid'][$j]) {
+                if ($data['studentid'][$i] > 0 && $data['studentid'][$i] == $data['studentid'][$j]) {
                     $errors['studgroup['.$i.']'] = get_string('studentmultiselect', 'scheduler');
                     $errors['studgroup['.$j.']'] = get_string('studentmultiselect', 'scheduler');
                 }
