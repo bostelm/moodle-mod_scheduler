@@ -52,7 +52,7 @@ if ($id) {
 
 
 require_login($course->id, false, $cm);
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 // TODO require_capability('mod/scheduler:view', $context);
 
 add_to_log($course->id, 'scheduler', $action, "view.php?id={$cm->id}", $scheduler->id, $cm->id);
@@ -82,7 +82,7 @@ $strend = get_string('end', 'scheduler');
 $strname = get_string('name');
 $strseen = get_string('seen', 'scheduler');
 $strnote = get_string('comments', 'scheduler');
-$strgrade = get_string('note', 'scheduler');
+$strgrade = get_string('grade', 'scheduler');
 $straction = get_string('action', 'scheduler');
 $strduration = get_string('duration', 'scheduler');
 $stremail = get_string('email');

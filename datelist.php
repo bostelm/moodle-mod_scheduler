@@ -18,8 +18,9 @@ if (has_capability('mod/scheduler:canseeotherteachersbooking', $context)) {
     $teacherid = optional_param('teacherid', $USER->id, PARAM_INT);
     $select = " teacherid = $teacherid ";
     $tutor =  $DB->get_record('user', array('id' => $teacherid));
-    $teachers = scheduler_get_attendants ($cm->id); // BUGFIX 
-    
+    $teachers = scheduler_get_attendants ($cm->id);
+
+    $teachermenu = array(); 
     foreach($teachers as $teacher){
         $teachermenu[$teacher->id] = fullname($teacher);
     }
@@ -185,7 +186,7 @@ if ($numrecords){
         $table->add_data($dataset);		
     }
     $table->print_html();
-    print_continue($CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id.'&amp;page='.$page);
+    echo $OUTPUT->continue_button($CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id.'&amp;page='.$page);
 }
 else{
     notice(get_string('noresults', 'scheduler'), $CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id);

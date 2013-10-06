@@ -558,12 +558,14 @@ function scheduler_get_user_grades($scheduler, $userid=0) {
     } else {
         $gradeitem = grade_item::fetch(array('itemtype'=>'mod', 'itemmodule'=>'scheduler', 'iteminstance'=>$scheduler->id, 'courseid'=>$scheduler->course));
         $existinggrades = grade_grade::fetch_all(array('itemid'=>$gradeitem->id));
-        foreach ($existinggrades as $grade) {
-            $u = $grade->userid;
-            if (!array_key_exists($u, $finalgrades)) {
-                $finalgrades[$u] = new stdClass();
-                $finalgrades[$u]->userid = $u;
-                $finalgrades[$u]->rawgrade = null;
+        if ($existinggrades) {
+            foreach ($existinggrades as $grade) {
+                $u = $grade->userid;
+                if (!array_key_exists($u, $finalgrades)) {
+                    $finalgrades[$u] = new stdClass();
+                    $finalgrades[$u]->userid = $u;
+                    $finalgrades[$u]->rawgrade = null;
+                }
             }
         }
     }
