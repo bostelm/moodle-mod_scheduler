@@ -205,8 +205,15 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         $starttime = scheduler_usertime($aSlot->starttime,1);
         $endtime = scheduler_usertime($aSlot->starttime + ($aSlot->duration * 60),1);
         $startdatestr = ($startdate == $previousdate) ? '' : $startdate ;
-        $starttimestr = ($starttime == $previoustime) ? '' : $starttime ;
-        $endtimestr = ($endtime == $previousendtime) ? '' : $endtime ;
+
+        // Suppress time display if it matches the previous slot.
+        if (empty($startdatestr) && $starttime == $previoustime && $endtime == $previousendtime) {
+            $starttimestr = $endtimestr = '';
+        } else {
+            $starttimestr = $starttime ;
+            $endtimestr =  $endtime ;
+        }
+
         $location = s($aSlot->appointmentlocation);
         if ($aSlot->appointedbyme and !$aSlot->attended){
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));
