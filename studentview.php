@@ -137,9 +137,23 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
             $startdate = scheduler_userdate($aSlot->starttime,1);
             $starttime = scheduler_usertime($aSlot->starttime,1);
             $endtime = scheduler_usertime($aSlot->starttime + ($aSlot->duration * 60),1);
-            $startdatestr = ($startdate == $previousdate) ? '' : $startdate ;
-            $starttimestr = ($starttime == $previoustime) ? '' : $starttime ;
-            $endtimestr = ($endtime == $previousendtime) ? '' : $endtime ;
+            // Simplify display of dates, start and end times
+            if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
+                // If this row exactly matches previous, nothing to display
+                $startdatestr = '';
+                $starttimestr = '';
+                $endtimestr = '';
+            } else if ($startdate == $previousdate) {
+                // If this date matches previous date, just display times
+                $startdatestr = '';
+                $starttimestr = $starttime;
+                $endtimestr = $endtime;
+            } else {
+                // Otherwise, display all elements
+                $startdatestr = $startdate;
+                $starttimestr = $starttime;
+                $endtimestr = $endtime;
+            }
             $studentappointment = $DB->get_record('scheduler_appointment', array('slotid' => $aSlot->id, 'studentid' => $USER->id));
             if ($scheduler->scale  > 0){
                 $studentappointment->grade = $studentappointment->grade.'/'.$scheduler->scale;
@@ -205,9 +219,23 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         $startdate = scheduler_userdate($aSlot->starttime,1);
         $starttime = scheduler_usertime($aSlot->starttime,1);
         $endtime = scheduler_usertime($aSlot->starttime + ($aSlot->duration * 60),1);
-        $startdatestr = ($startdate == $previousdate) ? '' : $startdate ;
-        $starttimestr = ($starttime == $previoustime) ? '' : $starttime ;
-        $endtimestr = ($endtime == $previousendtime) ? '' : $endtime ;
+        // Simplify display of dates, start and end times
+        if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
+            // If this row exactly matches previous, nothing to display
+            $startdatestr = '';
+            $starttimestr = '';
+            $endtimestr = '';
+        } else if ($startdate == $previousdate) {
+            // If this date matches previous date, just display times
+            $startdatestr = '';
+            $starttimestr = $starttime;
+            $endtimestr = $endtime;
+        } else {
+            // Otherwise, display all elements
+            $startdatestr = $startdate;
+            $starttimestr = $starttime;
+            $endtimestr = $endtime;
+        }
         $location = s($aSlot->appointmentlocation);
         if ($aSlot->appointedbyme and !$aSlot->attended){
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));
