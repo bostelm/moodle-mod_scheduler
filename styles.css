@@ -27,7 +27,7 @@ div .path-mod-scheduler .appointmentnote{
    margin : 1px;
 }
 
-.path-mod-scheduler table.commands th {
+.path-mod-scheduler table.schedulercommands th {
    background-color : #E7EFE7;
    border-style: solid;
    border-color: white;
