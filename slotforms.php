@@ -11,6 +11,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir.'/formslib.php');
+
 /**
  * Base class for slot-related forms
  */
