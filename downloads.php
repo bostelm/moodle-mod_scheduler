@@ -286,7 +286,7 @@ if ($action == 'downloadcsv'){
                 if (!empty($appointments)) {
                     $appointedlist = '';
                     foreach($appointments as $appointment){
-                        $user = $DB->get_record('user', array('id' => $appointment->studentid), 'id,firstname,lastname');
+                        $user = $DB->get_record('user', array('id' => $appointment->studentid));
                         $user->lastname = strtoupper($user->lastname);
                         $strattended = ($appointment->attended) ? ' (A) ': '';
                         $appointedlist[] = fullname($user).$strattended;
