@@ -232,8 +232,8 @@ if ($action == 'downloadcsv'){
     $csvencoding = required_param('csvencoding', PARAM_CLEAN);
     $downloadfilename = clean_filename(shorten_text("{$course->shortname}_{$scheduler->name}", 20).'.csv');     
     /// sending headers
-    header("Content-Type:text/csv\n\n");
-    header("Content-Disposition: attachment; filename=$downloadfilename");
+    header("Content-Type:application/download\n\n");
+    header("Content-Disposition: attachment; filename=\"$downloadfilename\"");
     
     /// Prepare data
     $sql = "
