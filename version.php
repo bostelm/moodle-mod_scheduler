@@ -15,9 +15,9 @@ defined('MOODLE_INTERNAL') || die();
  * This is the development branch (master) of the scheduler module.
  */
 
-$module->version  = 2013092800;       // The current module version (Date: YYYYMMDDXX)
-$module->release  = '2.x dev';        // Human-friendly version name
-$module->requires = 2013051400;       // Requires Moodle 2.5
+$module->version  = 2013120900;       // The current module version (Date: YYYYMMDDXX)
+$module->release  = '2.x dev';       // Human-friendly version name
+$module->requires = 2013111800;       // Requires Moodle 2.6
 $module->maturity = MATURITY_ALPHA;   // Alpha development code - not for production sites
 
 $module->cron     = 60;               // Period for cron to check this module (secs)
