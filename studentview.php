@@ -155,26 +155,22 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
                 $endtimestr = $endtime;
             }
             $studentappointment = $DB->get_record('scheduler_appointment', array('slotid' => $aSlot->id, 'studentid' => $USER->id));
-            if ($scheduler->scale  > 0){
-                $studentappointment->grade = $studentappointment->grade.'/'.$scheduler->scale;
-            }
             
             if (has_capability('mod/scheduler:seeotherstudentsresults', $context)){
                 $appointments = scheduler_get_appointments($aSlot->id);
                 $collegues = '';
                 foreach($appointments as $appstudent){
-                    $grade = $appstudent->grade;
-                    if ($scheduler->scale > 0){
-                        $grade = $grade . '/' . $scheduler->scale;
-                    }
+                    $grade = scheduler_format_grade($scheduler, $appstudent->grade, true);
                     $student = $DB->get_record('user', array('id' => $appstudent->studentid));
-                    $picture = print_user_picture($appstudent->studentid, $course->id, $student->picture, 0, true, true);
+                    $picture = $OUTPUT->user_picture($student, array('courseid' => $course->id));
                     $name = fullname($student);
-                    if ($appstudent->studentid == $USER->id) $name = "<b>$name</b>" ; // it's me !!
-                    $collegues .= " $picture $name ($grade)<br/>";
+                    if ($appstudent->studentid == $USER->id) {
+                        $name = "<b>$name</b>" ; // it's me !!
+                    }
+                    $collegues .= " $picture $name $grade<br/>";
                 }
             } else {
-                $collegues = $studentappointment->grade;
+                $collegues = scheduler_format_grade($scheduler, $studentappointment->grade);
             }
             
             $studentnotes1 = '';
