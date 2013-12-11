@@ -711,7 +711,11 @@ function scheduler_format_grade(&$scheduler, $grade, $short=false){
 
 
 /**
- * a utility function for producing grading lists (for use in formslib)
+ * A utility function for producing grading lists (for use in formslib)
+ *
+ * Note that the selection list will contain a "nothing selected" option 
+ * with key -1 which will be displayed as "No grade".
+ * 
  * @param reference $scheduler
  * @return the html selection element for a grading list
  */
@@ -729,12 +733,17 @@ function scheduler_get_grading_choices(&$scheduler) {
             $scalegrades = make_menu_from_list($scale->scale);
         }
     }
+    $scalegrades = array(-1 => get_string('nograde')) + $scalegrades;
     return $scalegrades;
 }
 
 
 /**
- * a utility function for making grading lists
+ * A utility function for making grading lists
+ *
+ * Note that the selection list will contain a "nothing selected" option 
+ * with key -1 which will be displayed as "No grade".
+ * 
  * @param reference $scheduler
  * @param string $id the form field id
  * @param string $selected the selected value
@@ -743,7 +752,7 @@ function scheduler_get_grading_choices(&$scheduler) {
 function scheduler_make_grading_menu(&$scheduler, $id, $selected = '') {
 	global $DB;
     $scalegrades = scheduler_get_grading_choices($scheduler);
-    $menu = html_writer::select($scalegrades, $id, $selected);
+    $menu = html_writer::select($scalegrades, $id, $selected, false);
     return $menu;
 }
 

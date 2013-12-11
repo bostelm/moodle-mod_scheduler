@@ -73,7 +73,8 @@ function scheduler_save_slotform($scheduler, $course, $slotid, $data) {
             $appointment->appointmentnote = $data->appointmentnote[$i]['text'];
             $appointment->appointmentnoteformat = $data->appointmentnote[$i]['format'];
             if (isset($data->grade)) {
-                $appointment->grade = $data->grade[$i];
+                $selgrade = $data->grade[$i];
+                $appointment->grade = ($selgrade >= 0) ? $selgrade : null;
             }
             $DB->insert_record('scheduler_appointment', $appointment);
             scheduler_update_grades($scheduler, $appointment->studentid);
