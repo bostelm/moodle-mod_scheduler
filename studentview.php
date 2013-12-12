@@ -137,30 +137,40 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
             $startdate = scheduler_userdate($aSlot->starttime,1);
             $starttime = scheduler_usertime($aSlot->starttime,1);
             $endtime = scheduler_usertime($aSlot->starttime + ($aSlot->duration * 60),1);
-            $startdatestr = ($startdate == $previousdate) ? '' : $startdate ;
-            $starttimestr = ($starttime == $previoustime) ? '' : $starttime ;
-            $endtimestr = ($endtime == $previousendtime) ? '' : $endtime ;
-            $studentappointment = $DB->get_record('scheduler_appointment', array('slotid' => $aSlot->id, 'studentid' => $USER->id));
-            if ($scheduler->scale  > 0){
-                $studentappointment->grade = $studentappointment->grade.'/'.$scheduler->scale;
+            // Simplify display of dates, start and end times
+            if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
+                // If this row exactly matches previous, nothing to display
+                $startdatestr = '';
+                $starttimestr = '';
+                $endtimestr = '';
+            } else if ($startdate == $previousdate) {
+                // If this date matches previous date, just display times
+                $startdatestr = '';
+                $starttimestr = $starttime;
+                $endtimestr = $endtime;
+            } else {
+                // Otherwise, display all elements
+                $startdatestr = $startdate;
+                $starttimestr = $starttime;
+                $endtimestr = $endtime;
             }
+            $studentappointment = $DB->get_record('scheduler_appointment', array('slotid' => $aSlot->id, 'studentid' => $USER->id));
             
             if (has_capability('mod/scheduler:seeotherstudentsresults', $context)){
                 $appointments = scheduler_get_appointments($aSlot->id);
                 $collegues = '';
                 foreach($appointments as $appstudent){
-                    $grade = $appstudent->grade;
-                    if ($scheduler->scale > 0){
-                        $grade = $grade . '/' . $scheduler->scale;
-                    }
+                    $grade = scheduler_format_grade($scheduler, $appstudent->grade, true);
                     $student = $DB->get_record('user', array('id' => $appstudent->studentid));
-                    $picture = print_user_picture($appstudent->studentid, $course->id, $student->picture, 0, true, true);
+                    $picture = $OUTPUT->user_picture($student, array('courseid' => $course->id));
                     $name = fullname($student);
-                    if ($appstudent->studentid == $USER->id) $name = "<b>$name</b>" ; // it's me !!
-                    $collegues .= " $picture $name ($grade)<br/>";
+                    if ($appstudent->studentid == $USER->id) {
+                        $name = "<b>$name</b>" ; // it's me !!
+                    }
+                    $collegues .= " $picture $name $grade<br/>";
                 }
             } else {
-                $collegues = $studentappointment->grade;
+                $collegues = scheduler_format_grade($scheduler, $studentappointment->grade);
             }
             
             $studentnotes1 = '';
@@ -205,9 +215,23 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         $startdate = scheduler_userdate($aSlot->starttime,1);
         $starttime = scheduler_usertime($aSlot->starttime,1);
         $endtime = scheduler_usertime($aSlot->starttime + ($aSlot->duration * 60),1);
-        $startdatestr = ($startdate == $previousdate) ? '' : $startdate ;
-        $starttimestr = ($starttime == $previoustime) ? '' : $starttime ;
-        $endtimestr = ($endtime == $previousendtime) ? '' : $endtime ;
+        // Simplify display of dates, start and end times
+        if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
+            // If this row exactly matches previous, nothing to display
+            $startdatestr = '';
+            $starttimestr = '';
+            $endtimestr = '';
+        } else if ($startdate == $previousdate) {
+            // If this date matches previous date, just display times
+            $startdatestr = '';
+            $starttimestr = $starttime;
+            $endtimestr = $endtime;
+        } else {
+            // Otherwise, display all elements
+            $startdatestr = $startdate;
+            $starttimestr = $starttime;
+            $endtimestr = $endtime;
+        }
         $location = s($aSlot->appointmentlocation);
         if ($aSlot->appointedbyme and !$aSlot->attended){
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));

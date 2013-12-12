@@ -42,6 +42,9 @@ if ($subaction == 'updategrades' and (has_capability('mod/scheduler:manage', $co
         preg_match("/^gr(.*)/", $key, $matches);
         $app->id = $matches[1];
         $app->grade = required_param($key, PARAM_INT);
+        if ($app->grade == -1) {
+            $app->grade = null;
+        }
         $app->timemodified = time();
         
         $distribute = optional_param('distribute'.$app->id, 0, PARAM_INT);
