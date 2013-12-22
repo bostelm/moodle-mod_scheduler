@@ -153,6 +153,7 @@ if ($action == 'savechoice') {
 }
 // *********************************** Disengage alone from the slot ******************************/
 if ($action == 'disengage') {
+	require_capability( 'mod/scheduler:disengage', $context);
     $where = 'studentid = :studentid AND attended = 0 AND ' .
              'EXISTS(SELECT 1 FROM {scheduler_slots} sl WHERE sl.id = slotid AND sl.schedulerid = :scheduler )';
     $params = array('scheduler'=>$scheduler->id, 'studentid'=>$USER->id);
