@@ -110,7 +110,7 @@ switch ($action) {
     }
     /************************************ Deleting multiple slots ***********************************************/
     case 'deleteslots': {
-        $slotids = required_param('items', PARAM_RAW);
+        $slotids = required_param('items', PARAM_SEQUENCE);
         $slots = explode(",", $slotids);
         foreach ($slots as $aSlotId) {
             scheduler_delete_slot($aSlotId, $scheduler);
