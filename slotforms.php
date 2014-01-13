@@ -155,7 +155,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         // Slot comments
         $mform->addElement('editor', 'notes', get_string('comments', 'scheduler'), array('rows' => 3, 'columns' => 60), array('collapsed' => true));
-        $mform->setType('notes', PARAM_RAW);
+        $mform->setType('notes', PARAM_RAW); // must be PARAM_RAW for rich text editor content
 
         // Appointments
 
