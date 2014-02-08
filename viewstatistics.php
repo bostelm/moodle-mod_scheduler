@@ -2,7 +2,7 @@
 
 /**
  * Statistics report for the scheduler
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -17,7 +17,7 @@ function byName($a, $b){
     return strcasecmp($a[0],$b[0]);
 }
 
-// precompute groups in case partial popuation is considered by grouping 
+// precompute groups in case partial popuation is considered by grouping
 
 $groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
 $usergroups = array_keys($groups);
@@ -39,7 +39,7 @@ print_tabs($tabrows, get_string($page, 'scheduler'));
 
 //display correct type of statistics by request
 
-$attendees = scheduler_get_possible_attendees ($cm, $usergroups); 
+$attendees = scheduler_get_possible_attendees ($cm, $usergroups);
 
 switch ($page) {
     case 'overall':
@@ -55,7 +55,7 @@ switch ($page) {
             a.attended = 1
             ';
         $attended = $DB->count_records_sql($sql, array($scheduler->id));
-        
+
         $sql = '
             SELECT
             COUNT(DISTINCT(a.studentid))
@@ -68,7 +68,7 @@ switch ($page) {
             a.attended = 0
             ';
         $registered = $DB->count_records_sql($sql, array($scheduler->id));
-        
+
         $sql = '
             SELECT
             COUNT(DISTINCT(s.id))
@@ -84,7 +84,7 @@ switch ($page) {
             a.attended IS NULL
             ';
         $freeowned = $DB->count_records_sql($sql, array($scheduler->id, $USER->id));
-        
+
         $sql = '
             SELECT
             COUNT(DISTINCT(s.id))
@@ -100,9 +100,9 @@ switch ($page) {
             a.attended IS NULL
             ';
         $freenotowned = $DB->count_records_sql($sql, array($scheduler->id, $USER->id));
-        
+
         $allattendees = ($attendees) ? count($attendees) : 0 ;
-        
+
         $str = '<h3>'.get_string('attendable', 'scheduler').'</h3>';
         $str .= '<b>'.get_string('attendablelbl', 'scheduler').'</b>: ' . $allattendees . '<br/>';
         $str .= '<h3>'.get_string('attended', 'scheduler').'</h3>';
@@ -114,13 +114,13 @@ switch ($page) {
         $str .= '<b>'.get_string('availableslotsowned', 'scheduler').'</b>: ' . $freeowned . '<br/>';
         $str .= '<b>'.get_string('availableslotsnotowned', 'scheduler').'</b>: ' . $freenotowned . '<br/>';
         $str .= '<b>'.get_string('availableslotsall', 'scheduler').'</b>: ' . ($freeowned + $freenotowned) . '<br/>';
-        
+
         echo $OUTPUT->box($str);
-        
+
         break;
     case 'studentbreakdown':
         //display the amount of time each student has received
-        
+
         if (!empty($attendees)) {
         	$table = new html_table();
             $table->head  = array (get_string('student', 'scheduler'), get_string('duration', 'scheduler'));
@@ -145,7 +145,7 @@ switch ($page) {
                 foreach($statrecords as $aRecord){
                     $table->data[] = array (fullname($attendees[$aRecord->studentid]), $aRecord->totaltime); // BUGFIX
                 }
-                
+
                 uasort($table->data, 'byName');
             }
             echo html_writer::table($table);
@@ -168,7 +168,7 @@ switch ($page) {
             a.slotid = s.id
             WHERE
             s.schedulerid = ? AND
-            
+
             a.studentid IS NOT NULL
             GROUP BY
             s.teacherid
@@ -212,7 +212,7 @@ switch ($page) {
             $table->head  = array (get_string('duration', 'scheduler'), get_string('appointments', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER');
             $table->width = '70%';
-            
+
             $durationcount = array();
             foreach($groupslots as $slot) {
                 if (array_key_exists($slot->duration, $durationcount)) {
@@ -223,9 +223,9 @@ switch ($page) {
             }
             foreach ($durationcount as $key => $duration) {
                 $table->data[] = array ($key, $duration);
-            }        
+            }
             echo html_writer::table($table);
-        }         
+        }
         break;
     case 'groupbreakdown':
         //display by number of atendees to one member of staff
@@ -234,13 +234,13 @@ switch ($page) {
             s.starttime,
             COUNT(*) as groupsize,
             MAX(s.duration) as duration
-            FROM 
+            FROM
             {scheduler_slots} s
             LEFT JOIN
             {scheduler_appointment} a
-            ON 
+            ON
             a.slotid = s.id
-            WHERE 
+            WHERE
             a.studentid IS NOT NULL AND
             schedulerid = '{$scheduler->id}'
             GROUP BY
@@ -258,7 +258,7 @@ switch ($page) {
                 if (!array_key_exists($aGroup->groupsize, $grouprows)){
                     $grouprows[$aGroup->groupsize]->occurrences = 0;
                     $grouprows[$aGroup->groupsize]->duration = 0;
-                }                
+                }
                 $grouprows[$aGroup->groupsize]->occurrences++;
                 $grouprows[$aGroup->groupsize]->duration += $aGroup->duration;
             }
@@ -268,8 +268,14 @@ switch ($page) {
             echo html_writer::table($table);
         }
 }
-echo '<br/>';
-print_continue("$CFG->wwwroot/mod/scheduler/view.php?id=".$cm->id);
+
+/// Add vertical white space
+echo html_writer::empty_tag('br');
+
+/// Print continue button
+$url = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
+echo $OUTPUT->continue_button($url);
+
 /// Finish the page
 echo $OUTPUT->footer($course);
 exit;
