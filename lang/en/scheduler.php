@@ -39,7 +39,7 @@ $string['allappointments'] = 'All Appointments';
 $string['allowgroup'] = 'Exclusive slot - click to change';
 $string['allslotsincloseddays'] = 'All slots were in closed days';
 $string['allteachersgrading'] = 'Teachers can grade all appointments';
-$string['allteachersgrading_desc'] = 'When enabled, teachers can grade appointmenents they are not assigned to.';
+$string['allteachersgrading_desc'] = 'When enabled, teachers can grade appointments they are not assigned to.';
 $string['alreadyappointed'] = 'Cannot make the appointment. The slot is already fully booked.';
 $string['appointagroup'] = 'Group appointment';
 $string['appointfor'] = 'Appoint for ';
@@ -198,7 +198,7 @@ $string['registeredlbl'] = 'Student appointed';
 $string['reminder'] = 'Reminder';
 $string['remindertext'] = 'This is just a reminder that you have not yet set up your appointment. Please choose a time-slot as soon as possible at ';
 $string['remindtitle'] = '{$a}: Appointment reminder';
-$string['remindwhere'] = 'Location of the appointement: ';
+$string['remindwhere'] = 'Location of the appointment: ';
 $string['remindwithwhom'] = 'Scheduled appointment with ';
 $string['resetslots'] = 'Delete scheduler slots';
 $string['resetappointments'] = 'Delete appointments and grades';
@@ -305,21 +305,14 @@ $string['appointagroup_help'] = 'Choose whether you want to make the appointment
 
 $string['bookwithteacher_help']='Choose a teacher for the appointment.';
 
-$string['choosingslotstart_help']='Change (or choose) the appointement start time. If this appointement collides with some other slots, you\'ll be asked
-if this slot replaces all conflicting appointements. Note that the new slot parameters will override all previous
+$string['choosingslotstart_help']='Change (or choose) the appointment start time. If this appointment collides with some other slots, you\'ll be asked
+if this slot replaces all conflicting appointments. Note that the new slot parameters will override all previous
 settings.';
 
 $string['exclusivity_help']='<p>You can set a limit on the amount of students that can apply for a given slot. </p>
 <p>Setting a limit of 1 (default) will toggle the slot in exclusive mode.</p>
 <p>If the slot is set to unlimited number (0), this slot will never be considered in constraints evaluation, even if other slots are exclusive or limited in the same time range.
 </p>';
-
-$string['forcewhenoverlap_help']='
-<p>This control allows forcing the addition of slots when the session conflicts with other slots. 
-In that case, only "clean" slots will be added. Conflicting will be ignored.</p>
-
-<p>If not used, the addition procedure will block when overlapping are detected, and you will asked for
-deleting previous slots before the procedure can add new slots.</p>';
 
 $string['location_help']='Specify the scheduled location of the meeting.';
 
@@ -328,12 +321,12 @@ $string['notifications_help']='When this option is enabled, teachers and student
 $string['reuse_help']='
 A <i>reuseable</i> slot will remain in the scheduler even a student or the teacher revokes an appointment. The freed slot is available again for appointing.</p>
 
-<p>A <i>volatile</i> slot will be automatically deleted in the above cases if it has to start to close to the current dat (it is considered you may not want to add a constraint so close to "right now"). The guard delay can be set by the instance-scoped configuration parameter "Reuse guard time".
+<p>A <i>volatile</i> slot will be automatically deleted in the above cases if it has its starting date too close to the current date (it is considered you may not want to add a constraint so close to "right now"). The guard delay can be set by the instance-scoped configuration parameter "Reuse guard time".
 </p>';
 
 $string['reuseguardtime_help']='
 <p>This parameter sets up the guard time for keeping volatile slots.</p>
-<p>When a slot is declared as volatile (not reusable), it will be automatically deleted when a student changes is appointment assignation, feeing completely the slot, or when a teacher revokes all appointments on it. The deletion takes place when the slot starts too close to the actual date.</p>
+<p>When a slot is declared as volatile (not reusable), it will be automatically deleted when a student changes is appointment assignation, freeing the slot completely, or when a teacher revokes all appointments on it. The deletion takes place when the slot starts too close to the actual date.</p>
 <p>The parameter specifies the delay, from "now on", under which a freed slot will be deleted and will not be available for further appointments.</p>';
 
 $string['staffrolename_help']='
@@ -369,7 +362,7 @@ in the scheduler titled "{$a->module}" on the website : {$a->site}
 has been cancelled or moved.';
 
 $string['email_cancelled_html'] = '<p>Your appointment on <b>{$a->date}</b> at <b>{$a->time}</b>,<br/> 
-with the student <b><a href="{$a->attendee_url}">{$a->attendee}</a></b> for course :</p>
+with the student <b><a href="{$a->attendee_url}">{$a->attendee}</a></b> for course:</p>
 
 <p><b>{$a->course_short} : <a href="{$a->course_url}">{$a->course}</a></b></p>
 
