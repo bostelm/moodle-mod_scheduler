@@ -31,7 +31,11 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->reuse = $data->reuse;
     $slot->exclusivity = $data->exclusivity;
-    $slot->duration = $data->duration;
+    if($data->divide) {
+        $slot->duration = $data->duration;
+    } else {
+        $slot->duration = $data->endhour*60+$data->endminute-$data->starthour*60-$data->startminute;
+    };
     $slot->notes = '';
     $slot->notesformat = FORMAT_HTML;
     $slot->timemodified = time();
@@ -65,8 +69,8 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
             } else {
                 $slot->emaildate = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 0, 0) - $data->emaildaterel;
             }
-            while ($slot->starttime <= $data->timeend - $data->duration * 60) {
-                $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $data->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
+            while ($slot->starttime <= $data->timeend - $slot->duration * 60) {
+                $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $slot->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
                 if ($conflicts) {
                     if (!$data->forcewhenoverlap) {
                         print_string('conflictingslots', 'scheduler');
@@ -90,8 +94,8 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                     $DB->insert_record('scheduler_slots', $slot, false, true);
                     $countslots++;
                 }
-                $slot->starttime += ($data->duration + $data->break) * 60;
-                $data->timestart += ($data->duration + $data->break) * 60;
+                $slot->starttime += ($slot->duration + $data->break) * 60;
+                $data->timestart += ($slot->duration + $data->break) * 60;
             }
         }
     }
