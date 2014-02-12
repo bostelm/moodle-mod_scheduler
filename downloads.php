@@ -33,9 +33,7 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
     $workbook->send($downloadfilename);
     
     /// Prepare data
-    $sql =  'SELECT DISTINCT' .
-    		' u.id, u.firstname, u.lastname, u.middlename, u.lastnamephonetic, u.firstnamephonetic, u.alternatename,' .
-    		' u.email, u.department' .
+    $sql = 'SELECT DISTINCT '.user_picture::fields('u', array('department')) 
     		' FROM {scheduler_slots} s, {user} u' .
     		' WHERE s.teacherid = u.id AND schedulerid = ?';
     $teachers = $DB->get_records_sql($sql, array($scheduler->id));

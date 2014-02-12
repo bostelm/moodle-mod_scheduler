@@ -82,8 +82,8 @@ if ($action == 'savechoice') {
     /// cleans up old slots if not attended (attended are definitive results, with grades)
     $sql = "
         SELECT 
-        s.*,
-        a.id as appointmentid
+        a.id as appointmentid,
+        s.*
         FROM 
         {scheduler_slots} AS s,
         {scheduler_appointment} AS a 

@@ -269,7 +269,7 @@ switch ($page) {
         }
 }
 echo '<br/>';
-print_continue("$CFG->wwwroot/mod/scheduler/view.php?id=".$cm->id);
+echo $OUTPUT->continue_button("$CFG->wwwroot/mod/scheduler/view.php?id=".$cm->id);
 /// Finish the page
 echo $OUTPUT->footer($course);
 exit;
