@@ -10,11 +10,13 @@
  */
 
 
+
 /************************************ ODS (OpenOffice Sheet) download generator ******************************/
 if ($action == 'downloadods'){
     require_once($CFG->libdir."/odslib.class.php");
     /// Calculate file name
-    $downloadfilename = clean_filename("{$course->shortname}_{$scheduler->name}.ods");
+    $schedname = format_string($scheduler->name);
+    $downloadfilename = clean_filename("{$course->shortname}_{$schedname}.ods");
     /// Creating a workbook
     $workbook = new MoodleODSWorkbook("-");
 }
@@ -23,7 +25,8 @@ if ($action == 'downloadexcel'){
     require_once($CFG->libdir."/excellib.class.php");
     
     /// Calculate file name
-    $downloadfilename = clean_filename(shorten_text("{$course->shortname}_{$scheduler->name}", 20).".xls");
+    $schedname = format_string($scheduler->name);
+    $downloadfilename = clean_filename("{$course->shortname}_{$schedname}");
     /// Creating a workbook
     $workbook = new MoodleExcelWorkbook("-");
 }
@@ -33,7 +36,7 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
     $workbook->send($downloadfilename);
     
     /// Prepare data
-    $sql = 'SELECT DISTINCT '.user_picture::fields('u', array('department')) 
+    $sql = 'SELECT DISTINCT '.user_picture::fields('u', array('department')) . 
     		' FROM {scheduler_slots} s, {user} u' .
     		' WHERE s.teacherid = u.id AND schedulerid = ?';
     $teachers = $DB->get_records_sql($sql, array($scheduler->id));
