@@ -2,7 +2,7 @@
 
 /**
  * Controller for student view
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -21,19 +21,19 @@ if ($action == 'savechoice') {
     $slotid = optional_param('slotid', '', PARAM_INT);
     $appointgroup = optional_param('appointgroup', 0, PARAM_INT);
     // $notes = optional_param('notes', '', PARAM_TEXT);
-    
+
     if (!$slotid) {
         notice(get_string('notselected', 'scheduler'), "view.php?id={$cm->id}");
     }
-    
+
     if (!$slot = $DB->get_record('scheduler_slots', array('id' => $slotid))) {
         print_error('errorinvalidslot', 'scheduler');
     }
-    
-    
+
+
     $available = scheduler_get_appointments($slotid);
     $consumed = ($available) ? count($available) : 0 ;
-    
+
     // if slot is already overcrowded
     if ($slot->exclusivity > 0 && $slot->exclusivity <= $consumed) {
         if ($updating = $DB->count_records('scheduler_appointment', array('slotid' => $slot->id, 'studentid' => $USER->id))) {
@@ -41,14 +41,14 @@ if ($action == 'savechoice') {
         } else {
             $message = get_string('slot_is_just_in_use', 'scheduler');
         }
-        echo $OUTPUT->box_start('error');
-        echo $message;
+        echo $OUTPUT->box_start('error generalbox errorboxcontent boxaligncenter boxwidthnormal');
+        echo html_writer::tag('p', $message);
         echo $OUTPUT->continue_button("{$CFG->wwwroot}/mod/scheduler/view.php?id={$cm->id}");
         echo $OUTPUT->box_end();
         echo $OUTPUT->footer($course);
         exit();
     }
-    
+
     /// If we are scheduling a full group we must discard all pending appointments of other participants of the scheduled group
     /// just add the list of other students for searching slots to delete
     if ($appointgroup){
@@ -78,18 +78,18 @@ if ($action == 'savechoice') {
         $oldslotowners[] = $USER->id;
     }
     $oldslotownerlist = implode("','", $oldslotowners);
-    
+
     /// cleans up old slots if not attended (attended are definitive results, with grades)
     $sql = "
-        SELECT 
+        SELECT
         a.id as appointmentid,
         s.*
-        FROM 
+        FROM
         {scheduler_slots} AS s,
-        {scheduler_appointment} AS a 
-        WHERE 
+        {scheduler_appointment} AS a
+        WHERE
         s.id = a.slotid AND
-        s.schedulerid = '{$slot->schedulerid}' AND 
+        s.schedulerid = '{$slot->schedulerid}' AND
         a.studentid IN ('$oldslotownerlist') AND
         a.attended = 0
         ";
@@ -98,37 +98,37 @@ if ($action == 'savechoice') {
     }
     if ($oldappointments = $DB->get_records_sql($sql)){
         foreach($oldappointments as $oldappointment){
-            
+
             $oldappid  = $oldappointment->appointmentid;
             $oldslotid = $oldappointment->id;
-            
-            // prepare notification e-mail first - slot might be deleted if it's volatile 
+
+            // prepare notification e-mail first - slot might be deleted if it's volatile
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id'=>$USER->id));
                 $teacher = $DB->get_record('user', array('id'=>$oldappointment->teacherid));
                 $vars = scheduler_get_mail_variables($scheduler,$oldappointment,$teacher,$student);
             }
-            
+
             // reload old slot
             $oldslot = $DB->get_record('scheduler_slots', array('id'=>$oldslotid));
             // delete the appointment (and possibly the slot)
             scheduler_delete_appointment($oldappid, $oldslot, $scheduler);
-            
+
             // notify teacher
             if ($scheduler->allownotifications){
                 scheduler_send_email_from_template($teacher, $student, $course, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
             }
-            
+
             // delete all calendar events for that slot
             scheduler_delete_calendar_events($oldappointment);
             // renew all calendar events as some appointments may be left for other students
             scheduler_add_update_calendar_events($oldappointment, $course);
         }
     }
-    
-    
+
+
     $newslot = $DB->get_record('scheduler_slots', array('id'=>$slotid));
-    
+
     /// create new appointment and add it for each member of the group
     foreach($oldslotowners as $astudentid){
     	$appointment = new stdClass();
@@ -141,7 +141,7 @@ if ($action == 'savechoice') {
         $DB->insert_record('scheduler_appointment', $appointment);
         scheduler_update_grades($scheduler, $astudentid);
         scheduler_events_update($newslot, $course);
-        
+
         // notify teacher
         if ($scheduler->allownotifications){
             $student = $DB->get_record('user', array('id' => $appointment->studentid));
@@ -162,18 +162,18 @@ if ($action == 'disengage') {
         foreach($appointments as $appointment){
             $oldslot = $DB->get_record('scheduler_slots', array('id' => $appointment->slotid));
             scheduler_delete_appointment($appointment->id, $oldslot, $scheduler);
-            
+
             // notify teacher
             if ($scheduler->allownotifications){
                 $student = $DB->get_record('user', array('id' => $USER->id));
                 $teacher = $DB->get_record('user', array('id' => $oldslot->teacherid));
                 $vars = scheduler_get_mail_variables($scheduler,$oldslot,$teacher,$student);
                 scheduler_send_email_from_template($teacher, $student, $COURSE, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
-            }                    
+            }
         }
-        
+
         // delete calendar events for that slot
-        scheduler_delete_calendar_events($oldslot);  
+        scheduler_delete_calendar_events($oldslot);
         // renew all calendar events as some appointments may be left for other students
         scheduler_add_update_calendar_events($oldslot, $course);
     }

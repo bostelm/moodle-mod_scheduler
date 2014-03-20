@@ -33,3 +33,11 @@ div .path-mod-scheduler .appointmentnote{
    border-color: white;
    border-width: 2px 10px;
 }
+
+.path-mod-70 {
+   width:70%;
+}
+
+table.generaltable {
+   width:99%;
+}
