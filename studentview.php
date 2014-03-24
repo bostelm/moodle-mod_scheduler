@@ -235,7 +235,11 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
         $location = s($aSlot->appointmentlocation);
         if ($aSlot->appointedbyme and !$aSlot->attended){
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));
-            $radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" checked=\"checked\" />\n";
+            if ($scheduler->schedulermode == 'multi') {
+            	$radio = "<input type=\"checkbox\" name=\"slotid[{$aSlot->id}]\" value=\"{$aSlot->id}\" checked=\"checked\" />\n";
+            } else {
+            	$radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" checked=\"checked\" />\n";
+            }
             $table->data[] = array ("<b>$startdatestr</b>", "<b>$starttime</b>", "<b>$endtime</b>", "<b>$location</b>",
             	$radio, "<b>"."<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course=$scheduler->course\">".fullname($teacher).'</a></b>','<b>'.$aSlot->groupsession.'</b>');
         } else {
@@ -253,7 +257,11 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
             }
             $canappoint = true;
             $canusegroup = ($aSlot->appointed) ? 0 : 1;
-            $radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" onclick=\"checkGroupAppointment($canusegroup)\" />\n";
+            if ($scheduler->schedulermode == 'multi') {
+            	$radio = "<input type=\"checkbox\" name=\"slotid[{$aSlot->id}]\" value=\"{$aSlot->id}\" onclick=\"checkGroupAppointment($canusegroup)\" />\n";
+            } else {
+            	$radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" onclick=\"checkGroupAppointment($canusegroup)\" />\n";
+            }
             $teacher = $DB->get_record('user', array('id'=>$aSlot->teacherid));
             $table->data[] = array ($startdatestr, $starttimestr, $endtimestr, $location,
             	$radio, "<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course={$scheduler->course}\">".fullname($teacher).'</a>', $aSlot->groupsession);

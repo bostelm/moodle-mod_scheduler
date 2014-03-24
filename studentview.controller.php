@@ -18,35 +18,59 @@ require_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
 /************************************************ Saving choice ************************************************/
 if ($action == 'savechoice') {
     // get parameters
-    $slotid = optional_param('slotid', '', PARAM_INT);
+    $slot_id_array = array();
+    $slot_id_array_raw = optional_param_array('slotid', '', PARAM_INT);
+    if (empty($slot_id_array_raw))
+    {
+    	$slot_id_array_raw[] = optional_param('slotid', '', PARAM_INT);
+    }
+    foreach ($slot_id_array_raw as $k=>$v)
+    {
+    	if (!empty($v))
+    	{
+    		$slot_id_array_request[] = $v;
+    	}
+    }
+    
     $appointgroup = optional_param('appointgroup', 0, PARAM_INT);
     // $notes = optional_param('notes', '', PARAM_TEXT);
     
-    if (!$slotid) {
+    if (!$slot_id_array_request) {
         notice(get_string('notselected', 'scheduler'), "view.php?id={$cm->id}");
     }
     
-    if (!$slot = $DB->get_record('scheduler_slots', array('id' => $slotid))) {
-        print_error('errorinvalidslot', 'scheduler');
-    }
+    // validate our slot ids
+    foreach ($slot_id_array_request as $index => $slotid)
+    {
+    	if (!$slot = $DB->get_record('scheduler_slots', array('id' => $slotid))) {
+    		print_error('errorinvalidslot', 'scheduler');
+    	}
+    	
+    	$available = scheduler_get_appointments($slotid);
+    	$consumed = ($available) ? count($available) : 0 ;
     
-    
-    $available = scheduler_get_appointments($slotid);
-    $consumed = ($available) ? count($available) : 0 ;
-    
-    // if slot is already overcrowded
-    if ($slot->exclusivity > 0 && $slot->exclusivity <= $consumed) {
-        if ($updating = $DB->count_records('scheduler_appointment', array('slotid' => $slot->id, 'studentid' => $USER->id))) {
-            $message = get_string('alreadyappointed', 'scheduler');
-        } else {
-            $message = get_string('slot_is_just_in_use', 'scheduler');
-        }
-        echo $OUTPUT->box_start('error');
-        echo $message;
-        echo $OUTPUT->continue_button("{$CFG->wwwroot}/mod/scheduler/view.php?id={$cm->id}");
-        echo $OUTPUT->box_end();
-        echo $OUTPUT->footer($course);
-        exit();
+    	$users_for_slot = scheduler_get_appointed($slotid);
+    	$already_signed_up = (isset($users_for_slot[$USER->id]));
+    	
+    	if (!$already_signed_up)
+    	{
+        	// if slot is already overcrowded
+        	if ($slot->exclusivity > 0 && ($slot->exclusivity <= $consumed)) {
+            	if ($updating = $DB->count_records('scheduler_appointment', array('slotid' => $slot->id, 'studentid' => $USER->id))) {
+                	$message = get_string('alreadyappointed', 'scheduler');
+            	} else {
+                	$message = get_string('slot_is_just_in_use', 'scheduler');
+            	}
+            	echo $OUTPUT->box_start('error');
+            	echo $message;
+            	echo $OUTPUT->continue_button("{$CFG->wwwroot}/mod/scheduler/view.php?id={$cm->id}");
+            	echo $OUTPUT->box_end();
+            	echo $OUTPUT->footer($course);
+            	exit();
+        	}
+        	$slot_id_array[$index] = $slotid;
+    	}
+    	$slot_id_array_validated[$index] = $slotid;
     }
     
     /// If we are scheduling a full group we must discard all pending appointments of other participants of the scheduled group
@@ -78,7 +102,7 @@ if ($action == 'savechoice') {
         $oldslotowners[] = $USER->id;
     }
     $oldslotownerlist = implode("','", $oldslotowners);
-    
+  
     /// cleans up old slots if not attended (attended are definitive results, with grades)
     $sql = "
         SELECT 
@@ -91,12 +115,15 @@ if ($action == 'savechoice') {
         s.id = a.slotid AND
         s.schedulerid = '{$slot->schedulerid}' AND 
         a.studentid IN ('$oldslotownerlist') AND
-        a.attended = 0
+        a.attended = 0 and
+        a.slotid NOT IN (" . implode(",", $slot_id_array_validated) . ") 
         ";
     if ($scheduler->schedulermode == 'onetime'){
         $sql .= " AND s.starttime > ".time();
     }
-    if ($oldappointments = $DB->get_records_sql($sql)){
+    if ($oldappointments = $DB->get_records_sql($sql))
+    {
+        
         foreach($oldappointments as $oldappointment){
             
             $oldappid  = $oldappointment->appointmentid;
@@ -126,31 +153,34 @@ if ($action == 'savechoice') {
         }
     }
     
-    
-    $newslot = $DB->get_record('scheduler_slots', array('id'=>$slotid));
-    
-    /// create new appointment and add it for each member of the group
-    foreach($oldslotowners as $astudentid){
-    	$appointment = new stdClass();
-        $appointment->slotid = $slotid;
-        // $appointment->notes = $notes;
-        $appointment->studentid = $astudentid;
-        $appointment->attended = 0;
-        $appointment->timecreated = time();
-        $appointment->timemodified = time();
-        $DB->insert_record('scheduler_appointment', $appointment);
-        scheduler_update_grades($scheduler, $astudentid);
-        scheduler_events_update($newslot, $course);
-        
-        // notify teacher
-        if ($scheduler->allownotifications){
-            $student = $DB->get_record('user', array('id' => $appointment->studentid));
-            $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-            $vars = scheduler_get_mail_variables($scheduler,$newslot,$teacher,$student);
-            scheduler_send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
+    foreach ($slot_id_array as $slotid)
+    {
+    	$newslot = $DB->get_record('scheduler_slots', array('id'=>$slotid));
+    	
+    	/// create new appointment and add it for each member of the group
+    	foreach($oldslotowners as $astudentid) {
+    		$appointment = new stdClass();
+        	$appointment->slotid = $slotid;
+        	// $appointment->notes = $notes;
+        	$appointment->studentid = $astudentid;
+        	$appointment->attended = 0;
+        	$appointment->timecreated = time();
+        	$appointment->timemodified = time();
+        	$DB->insert_record('scheduler_appointment', $appointment);
+        	scheduler_update_grades($scheduler, $astudentid);
+        	scheduler_events_update($newslot, $course);
+        	
+        	// notify teacher
+        	if ($scheduler->allownotifications) {
+        		$student = $DB->get_record('user', array('id' => $appointment->studentid));
+            	$teacher = $DB->get_record('user', array('id' => $slot->teacherid));
+            	$vars = scheduler_get_mail_variables($scheduler,$newslot,$teacher,$student);
+            	scheduler_send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
+            }
         }
     }
 }
+
 // *********************************** Disengage alone from the slot ******************************/
 if ($action == 'disengage') {
 	require_capability( 'mod/scheduler:disengage', $context);
