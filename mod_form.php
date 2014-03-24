@@ -2,7 +2,7 @@
 
 /**
  * Defines the scheduler module settings form.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -24,7 +24,7 @@ class mod_scheduler_mod_form extends moodleform_mod {
 
 	    global $CFG, $COURSE, $OUTPUT;
 	    $mform    =& $this->_form;
-	  
+
 	    $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
 	    $mform->setType('name', PARAM_CLEANHTML);
 	    $mform->addRule('name', null, 'required', null, 'client');
@@ -35,11 +35,27 @@ class mod_scheduler_mod_form extends moodleform_mod {
 	    $mform->addElement('text', 'staffrolename', get_string('staffrolename', 'scheduler'), array('size'=>'48'));
 	    $mform->setType('staffrolename', PARAM_CLEANHTML);
 	    $mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
-	
-	    $modeoptions['onetime'] = get_string('oneatatime', 'scheduler');
-	    $modeoptions['oneonly'] = get_string('oneappointmentonly', 'scheduler');
-	    $mform->addElement('select', 'schedulermode', get_string('mode', 'scheduler'), $modeoptions);
-	    $mform->addHelpButton('schedulermode', 'appointmentmode', 'scheduler');
+
+	    $modegroup = array();
+	    $modegroup[] = $mform->createElement('static', 'modeintro', '', get_string('modeintro', 'scheduler'));
+
+	    $maxbookoptions = array();
+        $maxbookoptions['0'] = get_string('unlimited', 'scheduler');
+        for ($i = 1; $i <= 10; $i++) {
+            $maxbookoptions[(string)$i] = $i;
+        }
+        $modegroup[] = $mform->createElement('select', 'maxbookings', '', $maxbookoptions);
+        $mform->setDefault('maxbookings', 1);
+
+	    $modegroup[] = $mform->createElement('static', 'modeappointments', '', get_string('modeappointments', 'scheduler'));
+
+	    $modeoptions['oneonly'] = get_string('modeoneonly', 'scheduler');
+	    $modeoptions['onetime'] = get_string('modeoneatatime', 'scheduler');
+	    $modegroup[] = $mform->createElement('select', 'schedulermode', '', $modeoptions);
+	    $mform->setDefault('schedulermode', 'oneonly');
+
+	    $mform->addGroup($modegroup, 'modegrp', get_string('mode', 'scheduler'), ' ', false);
+	    $mform->addHelpButton('modegrp', 'appointmentmode', 'scheduler');
 
 	    $reuseguardoptions[24] = 24 . ' ' . get_string('hours');
 	    $reuseguardoptions[48] = 48 . ' ' . get_string('hours');
@@ -71,7 +87,7 @@ class mod_scheduler_mod_form extends moodleform_mod {
 		// Legacy. This field is still in the DB but is meaningless, meanwhile.
 	    $mform->addElement('hidden', 'teacher');
 	    $mform->setType('teacher', PARAM_INT);
-	     
+
         $this->standard_coursemodule_elements();
 
         $this->add_action_buttons();

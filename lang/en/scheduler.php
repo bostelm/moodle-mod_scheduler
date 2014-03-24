@@ -2,7 +2,7 @@
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';
-$string['modulename_help'] = 'The scheduler activity helps you in scheduling appointments with your students. 
+$string['modulename_help'] = 'The scheduler activity helps you in scheduling appointments with your students.
 
 Teachers specify time slots for meetings, students then choose one of them on Moodle.
 Teachers in turn can record the outcome of the meeting - and optionally a grade - within the scheduler.
@@ -120,12 +120,12 @@ $string['friday'] = 'Friday';
 $string['generalconfig'] = 'General configuration';
 $string['grade'] = 'Grade';
 $string['gradingstrategy'] = 'Grading strategy';
-$string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated. 
+$string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated.
     The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
 $string['groupbreakdown'] = 'By group size';
 $string['groupscheduling'] = 'Enable group scheduling';
-$string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once. 
+$string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once.
 (Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
 $string['groupsession'] = 'Group session';
 $string['groupsize'] = 'Group size';
@@ -157,6 +157,10 @@ $string['minutesperslot'] = 'minutes per slot';
 $string['missingstudents'] = '{$a} students still need to make an appointment';
 $string['missingstudentsmany'] = '{$a} students still need to make an appointment. No list is being displayed due to size.';
 $string['mode'] = 'Mode';
+$string['modeintro'] = 'Students can register';
+$string['modeappointments'] = 'appointment(s)';
+$string['modeoneonly'] = 'in this scheduler';
+$string['modeoneatatime'] = 'at a time';
 $string['modulename'] = 'Scheduler';
 $string['modulenameplural'] = 'Schedulers';
 $string['monday'] = 'Monday';
@@ -188,8 +192,6 @@ $string['notselected'] = 'You have not yet made a choice';
 $string['now'] = 'Now';
 $string['occurrences'] = 'Occurrences';
 $string['on'] = 'on';
-$string['oneappointmentonly'] = 'Students can only register one appointment';
-$string['oneatatime'] = 'Students can only register one appointment at a time';
 $string['oneslotadded'] = '1 slot added';
 $string['onthemorningofappointment'] = 'On the morning of the appointment';
 $string['overall'] = 'Overall';
@@ -280,7 +282,7 @@ $string['yourslotnotes'] = 'Comments on the meeting';
 
 $string['forcewhenoverlap_help']='
 <h3>Forcing slots addition through a session</h3>
-<p>This control allows forcing the addition of slots when the session conflicts with other slots. 
+<p>This control allows forcing the addition of slots when the session conflicts with other slots.
 In that case, only "clean" slots will be added. Conflicting will be ignored.</p>
 
 <p>
@@ -295,8 +297,8 @@ $string['addscheduled_help']='
 $string['appointmentmode'] = 'Setting the appointment mode';
 $string['appointmentmode_help']='<p>You may choose here some variants in the way appointments can be taken. </p>
 <p><ul>
-<li><b>"One single appointment" mode:</b> The student can only have a single appointment in this module. Once it has been seen by the teacher, he will not be allowed to apply for any further meeting. The only way to reset ability of a student to apply is to delete the old "seen" records.</li>
-<li><b>"One at a time" mode:</b> The student can apply only to one (future) date. Once the meeting is over and concluded, he can appoint back. this mode is usefull to arbitrate project appointments on long run projects, specially when multiple phases of appointements are to be offered. 
+<li><b>"<i>n</i> appointments in this scheduler":</b> The student can only book a fixed number of appointments in this activity. Even if the teacher marks them as "seen", they will not be allowed to book further meetings. The only way to reset ability of a student to book is to delete the old "seen" records.</li>
+<li><b>"<i>n</i> appointments at a time":</b> The student can book a fixed number of appointments. Once the meeting is over and the teacher has marked the student as "seen", the student can book further appointments. However the student is limited to <i>n</i> "open" (unseen) slots at any given time.
 </li>
 </ul>
 </p>';
@@ -336,7 +338,7 @@ The label for the role who attends students. This is not necessarily a "teacher"
 /* ***********  E-mail templates from here on ************ */
 
 $string['email_applied_subject'] = '{$a->course_short}: New appointment';
-$string['email_applied_plain'] = 'An appointment has been applied for on {$a->date} at {$a->time}, 
+$string['email_applied_plain'] = 'An appointment has been applied for on {$a->date} at {$a->time},
 by the student {$a->attendee} for the course:
 
 {$a->course_short}: {$a->course}
@@ -352,7 +354,7 @@ by the student <a href="{$a->attendee_url}">{$a->attendee}</a> for the course:
 
 $string['email_cancelled_subject'] = '{$a->course_short}: Appointment cancelled or moved by a student';
 
-$string['email_cancelled_plain'] = 'Your appointment on  {$a->date} at {$a->time}, 
+$string['email_cancelled_plain'] = 'Your appointment on  {$a->date} at {$a->time},
 with the student {$a->attendee} for course:
 
 {$a->course_short} : {$a->course}
@@ -361,7 +363,7 @@ in the scheduler titled "{$a->module}" on the website : {$a->site}
 
 has been cancelled or moved.';
 
-$string['email_cancelled_html'] = '<p>Your appointment on <b>{$a->date}</b> at <b>{$a->time}</b>,<br/> 
+$string['email_cancelled_html'] = '<p>Your appointment on <b>{$a->date}</b> at <b>{$a->time}</b>,<br/>
 with the student <b><a href="{$a->attendee_url}">{$a->attendee}</a></b> for course:</p>
 
 <p><b>{$a->course_short} : <a href="{$a->course_url}">{$a->course}</a></b></p>
@@ -372,21 +374,21 @@ with the student <b><a href="{$a->attendee_url}">{$a->attendee}</a></b> for cour
 
 $string['email_reminder_subject'] = '{$a->course_short}: Appointment reminder';
 
-$string['email_reminder_plain'] = 'You have an upcoming appointment 
+$string['email_reminder_plain'] = 'You have an upcoming appointment
 on {$a->date} from {$a->time} to {$a->endtime}
 with {$a->attendant}.
 
 Location: {$a->location}';
 
-$string['email_reminder_html'] = '<p>You have an upcoming appointment on <b>{$a->date}</b> 
-from <b>{$a->time}</b> to <b>{$a->endtime}</b><br/> 
+$string['email_reminder_html'] = '<p>You have an upcoming appointment on <b>{$a->date}</b>
+from <b>{$a->time}</b> to <b>{$a->endtime}</b><br/>
 with <b><a href="{$a->attendant_url}">{$a->attendant}</a></b>.</p>
 
 <p>Location: <b>{$a->location}</b></p>';
 
 $string['email_teachercancelled_subject'] = '{$a->course_short}: Appointment cancelled by the teacher';
 
-$string['email_teachercancelled_plain'] = 'Your appointment on {$a->date} at {$a->time}, 
+$string['email_teachercancelled_plain'] = 'Your appointment on {$a->date} at {$a->time},
 with the {$a->staffrole} {$a->attendant} for course:
 
 {$a->course_short}: {$a->course}
@@ -395,7 +397,7 @@ in the scheduler titled "{$a->module}" on the website: {$a->site}
 
 has been cancelled. Please apply for a new slot.';
 
-$string['email_teachercancelled_html'] = '<p>Your appointment on <b>{$a->date}</b> at <b>{$a->time} </b>,<br/> 
+$string['email_teachercancelled_html'] = '<p>Your appointment on <b>{$a->date}</b> at <b>{$a->time} </b>,<br/>
 with the {$a->staffrole} <b><a href="{$a->attendant_url}">{$a->attendant}</a></b> for course:</p>
 
 <p><b>{$a->course_short}: <a href="{$a->course_url}">{$a->course}</a></b></p>
