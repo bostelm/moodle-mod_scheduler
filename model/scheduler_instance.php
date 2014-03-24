@@ -170,6 +170,14 @@ class scheduler_instance extends mvc_record_model {
         return $lastlocation;
     }
 
+    /**
+     * Checks whether this scheduler allows a student (in principle) to book several slots at a time
+     * @return boolean whether the student can book multiple appointements
+     */
+    public function allows_multiple_bookings() {
+        return ($this->maxbookings != 1);
+    }
+
     /* *********************** Loading lists of slots *********************** */
 
     /**
