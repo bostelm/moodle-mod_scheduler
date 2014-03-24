@@ -1,66 +1,73 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/scheduler/db" VERSION="20071113" COMMENT="XMLDB file for scheduler module"
+<XMLDB PATH="mod/scheduler/db" VERSION="2014032400" COMMENT="XMLDB file for scheduler module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="scheduler" COMMENT="Scheduler instances" NEXT="scheduler_slots">
+    <TABLE NAME="scheduler" COMMENT="Scheduler instances">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="course" NEXT="intro"/>
-        <FIELD NAME="intro" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="name" NEXT="introformat"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="schedulermode"/>
-        <FIELD NAME="schedulermode" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="introformat" NEXT="reuseguardtime"/>
-        <FIELD NAME="reuseguardtime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="schedulermode" NEXT="defaultslotduration"/>
-        <FIELD NAME="defaultslotduration" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="false" DEFAULT="15" SEQUENCE="false" PREVIOUS="reuseguardtime" NEXT="allownotifications"/>
-        <FIELD NAME="allownotifications" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultslotduration" NEXT="staffrolename"/>
-        <FIELD NAME="staffrolename" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" PREVIOUS="allownotifications" NEXT="teacher"/>
-        <FIELD NAME="teacher" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="staffrolename" NEXT="scale"/>
-        <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="teacher" NEXT="gradingstrategy"/>
-        <FIELD NAME="gradingstrategy" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="scale" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="gradingstrategy"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="schedulermode" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="maxbookings" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Maximum number of bookings for each student (depends on scheduler mode)"/>
+        <FIELD NAME="reuseguardtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="defaultslotduration" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="15" SEQUENCE="false"/>
+        <FIELD NAME="allownotifications" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="staffrolename" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="gradingstrategy" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for scheduler"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="scheduler_slots" COMMENT="Scheduler slots" PREVIOUS="scheduler" NEXT="scheduler_appointment">
+    <TABLE NAME="scheduler_slots" COMMENT="Scheduler slots">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="schedulerid"/>
-        <FIELD NAME="schedulerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="starttime"/>
-        <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="schedulerid" NEXT="duration"/>
-        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="starttime" NEXT="teacherid"/>
-        <FIELD NAME="teacherid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="duration" NEXT="appointmentlocation"/>
-        <FIELD NAME="appointmentlocation" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="teacherid" NEXT="reuse"/>
-        <FIELD NAME="reuse" TYPE="int" LENGTH="5" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="appointmentlocation" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="reuse" NEXT="notes"/>
-        <FIELD NAME="notes" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="timemodified" NEXT="notesformat"/>
-        <FIELD NAME="notesformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="notes" NEXT="exclusivity"/>
-        <FIELD NAME="exclusivity" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="notes" NEXT="appointmentnote"/>
-        <FIELD NAME="appointmentnote" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="exclusivity" NEXT="emaildate"/>
-        <FIELD NAME="emaildate" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="appointmentnote" NEXT="hideuntil"/>
-        <FIELD NAME="hideuntil" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="emaildate"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="schedulerid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="teacherid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="appointmentlocation" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="reuse" TYPE="int" LENGTH="5" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="notes" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="notesformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="exclusivity" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="appointmentnote" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="emaildate" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="hideuntil" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for scheduler_slots"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="schedulerid-teacherid" UNIQUE="false" FIELDS="schedulerid, teacherid" COMMENT="By scheduler id, then teacher id"/>
+      </INDEXES>
     </TABLE>
-    <TABLE NAME="scheduler_appointment" COMMENT="Scheduler appointments" PREVIOUS="scheduler_slots">
+    <TABLE NAME="scheduler_appointment" COMMENT="Scheduler appointments">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="slotid"/>
-        <FIELD NAME="slotid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="studentid"/>
-        <FIELD NAME="studentid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="slotid" NEXT="attended"/>
-        <FIELD NAME="attended" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="studentid" NEXT="grade"/>
-        <FIELD NAME="grade" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="attended" NEXT="appointmentnote"/>
-        <FIELD NAME="appointmentnote" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="grade" NEXT="appointmentnodeformat"/>
-        <FIELD NAME="appointmentnoteformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="appointmentnode" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="appointmentnote" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="timecreated"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="slotid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="studentid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="attended" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="appointmentnote" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="appointmentnoteformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for scheduler_appointment"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="slotid" UNIQUE="false" FIELDS="slotid" COMMENT="By slot id"/>
+        <INDEX NAME="studentid" UNIQUE="false" FIELDS="studentid" COMMENT="By student id"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
