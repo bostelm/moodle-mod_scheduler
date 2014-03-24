@@ -290,9 +290,9 @@ switch ($action) {
         $slot->hideuntil = time();
         $slot->appointmentlocation = '';
         $slot->emaildate = 0;
-        $slot->timemodified = time();                                
+        $slot->timemodified = time();
         $slotid = $DB->insert_record('scheduler_slots', $slot);
-        
+
         $appointment = new stdClass();
         $appointment->slotid = $slotid;
         $appointment->studentid = required_param('studentid', PARAM_INT);
@@ -302,10 +302,9 @@ switch ($action) {
         $appointment->timecreated = time();
         $appointment->timemodified = time();
         $DB->insert_record('scheduler_appointment', $appointment);
-        
+
         break;
     }
 }
 
 /*************************************************************************************************************/
-?>

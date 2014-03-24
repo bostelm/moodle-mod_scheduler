@@ -90,5 +90,3 @@ class mod_scheduler_mod_form extends moodleform_mod {
     }
 
 }
-
-?>

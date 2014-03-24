@@ -2,7 +2,7 @@
 
 /**
  * Controller for student-related use cases.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -16,8 +16,8 @@ $app = new stdClass();
 if ($subaction == 'updatenote' and (has_capability('mod/scheduler:manage', $context) or has_capability('mod/scheduler:manageallappointments', $context))){
     $app->id = required_param('appid', PARAM_INT);
     $distribute = optional_param('distribute', 0, PARAM_INT);
-    
-    
+
+
     if ($app->id){
         if ($distribute){
             echo "distributing";
@@ -46,7 +46,7 @@ if ($subaction == 'updategrades' and (has_capability('mod/scheduler:manage', $co
             $app->grade = null;
         }
         $app->timemodified = time();
-        
+
         $distribute = optional_param('distribute'.$app->id, 0, PARAM_INT);
         if ($distribute){ // distribute to all members
             $slotid = $DB->get_field('scheduler_appointment', 'slotid', array('id' => $app->id));
@@ -66,5 +66,3 @@ if ($subaction == 'updategrades' and (has_capability('mod/scheduler:manage', $co
         }
     }
 }
-
-?>

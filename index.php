@@ -1,9 +1,9 @@
-<?PHP 
+<?PHP
 
 /**
  * Main file of the scheduler package.
  * It lists all the instances of scheduler in a particular course.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -45,7 +45,7 @@ if (!$schedulers = get_all_instances_in_course('scheduler', $course)) {
     print_error('noschedulers', 'scheduler', "../../course/view.php?id=$course->id");
 }
 
-/// Print the list of instances 
+/// Print the list of instances
 
 $timenow = time();
 $strname  = get_string('name');
@@ -85,4 +85,3 @@ echo html_writer::table($table);
 
 echo $OUTPUT->footer($course);
 
-?>

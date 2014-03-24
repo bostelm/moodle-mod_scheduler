@@ -2,7 +2,7 @@
 
 /**
  * Prints the screen that displays a single student to a teacher.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -22,7 +22,7 @@ if (!in_array($order,array('ASC','DESC'))) {
 $usehtmleditor = can_use_html_editor();
 
 if ($subaction != ''){
-    include $CFG->dirroot.'/mod/scheduler/viewstudent.controller.php'; 
+    include $CFG->dirroot.'/mod/scheduler/viewstudent.controller.php';
 }
 
 scheduler_print_user($DB->get_record('user', array('id' => $studentid)), $course);
@@ -69,7 +69,7 @@ if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order
     } else {
         $orderlink = "<a href=\"view.php?what=viewstudent&amp;id=$cm->id&amp;studentid=".$studentid."&amp;course=$scheduler->course&amp;order=DESC&amp;page=$page\">";
     }
-    
+
     $table = new html_table();
     /// print page header and prepare table headers
     if ($page == 'appointments'){
@@ -105,7 +105,7 @@ if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order
                 else{
                     $grade = scheduler_format_grade($scheduler,$slot->grade);
                 }
-                
+
                 $teacher = $DB->get_record('user', array('id'=>$slot->teacherid));
                 $table->data[] = array ($startdate, $starttime, $endtime, "<img src=\"pix/ticked.gif\" border=\"0\" />", $slot->appointmentnote, $grade.$distributecheck, fullname($teacher));
             }
@@ -125,7 +125,7 @@ if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order
             $commenteditor .= print_textarea($usehtmleditor, 20, 60, 400, 200, 'appointmentnote', $slot->appointmentnote, $COURSE->id, true);
             if ($usehtmleditor) {
                 $commenteditor .= "<input type=\"hidden\" name=\"format\" value=\"FORMAT_HTML\" />\n";
-            } 
+            }
             else {
                 $commenteditor .= '<p align="right">';
                 $commenteditor .= $OUTPUT->help_icon('textformat', get_string('formattexttype'), 'moodle', true, false, '', true);
@@ -134,7 +134,7 @@ if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order
                 if (!$form->format) {
                     $form->format = 'MOODLE';
                 }
-                $commenteditor .= html_writer::select(format_text_menu(), 'format', $form->format); 
+                $commenteditor .= html_writer::select(format_text_menu(), 'format', $form->format);
                 $commenteditor .= '</p>';
             }
             $commenteditor .= $distributecheck;
@@ -165,4 +165,3 @@ return;
 /// Finish the page
 echo $OUTPUT->footer($course);
 exit;
-?>
