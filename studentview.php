@@ -165,7 +165,7 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
                     $picture = $OUTPUT->user_picture($student, array('courseid' => $course->id));
                     $name = fullname($student);
                     if ($appstudent->studentid == $USER->id) {
-                        $name = "<b>$name</b>" ; // it's me !!
+                        $name = "<strong>$name</strong>" ; // it's me !!
                     }
                     $collegues .= " $picture $name $grade<br/>";
                 }
@@ -177,12 +177,12 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
             $studentnotes2 = '';
             if ($aSlot->notes != ''){
                 $studentnotes1 = '<div class="slotnotes">';
-                $studentnotes1 .= '<b>'.get_string('yourslotnotes', 'scheduler').'</b><br/>';
+                $studentnotes1 .= '<strong>'.get_string('yourslotnotes', 'scheduler').'</strong><br/>';
                 $studentnotes1 .= format_string($aSlot->notes).'</div>';
             }
             if ($studentappointment->appointmentnote != ''){
                 $studentnotes2 .= '<div class="appointmentnote">';
-                $studentnotes2 .= '<b>'.get_string('yourappointmentnote', 'scheduler').'</b><br/>';
+                $studentnotes2 .= '<strong>'.get_string('yourappointmentnote', 'scheduler').'</strong><br/>';
                 $studentnotes2 .= format_string($studentappointment->appointmentnote).'</div>';
             }
             $studentnotes = "{$studentnotes1}{$studentnotes2}";
@@ -240,8 +240,8 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
             } else {
             	$radio = "<input type=\"radio\" name=\"slotid\" value=\"{$aSlot->id}\" checked=\"checked\" />\n";
             }
-            $table->data[] = array ("<b>$startdatestr</b>", "<b>$starttime</b>", "<b>$endtime</b>", "<b>$location</b>",
-            	$radio, "<b>"."<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course=$scheduler->course\">".fullname($teacher).'</a></b>','<b>'.$aSlot->groupsession.'</b>');
+            $table->data[] = array ("<strong>$startdatestr</strong>", "<strong>$starttime</strong>", "<strong>$endtime</strong>", "<strong>$location</strong>",
+            	$radio, "<strong>"."<a href=\"../../user/view.php?id={$aSlot->teacherid}&amp;course=$scheduler->course\">".fullname($teacher).'</a></strong>','<strong>'.$aSlot->groupsession.'</strong>');
         } else {
             if ($aSlot->appointed and has_capability('mod/scheduler:seeotherstudentsbooking', $context)){
                 $appointments = scheduler_get_appointments($aSlot->id);
@@ -317,9 +317,9 @@ if ($canappoint){
      Should add a note from the teacher to the student.
      TODO : addfield into appointments
      echo $OUTPUT->heading(get_string('savechoice', 'scheduler'), 3);
-     echo '<table><tr><td valign="top" align="right"><b>';
+     echo '<table><tr><td valign="top" align="right"><strong>';
      print_string('studentnotes', 'scheduler');
-     echo ' :</b></td><td valign="top" align="left"><textarea name="notes" cols="60" rows="20"></textarea></td></tr></table>';
+     echo ' :</strong></td><td valign="top" align="left"><textarea name="notes" cols="60" rows="20"></textarea></td></tr></table>';
      */
     echo '<br /><input type="submit" value="'.get_string('savechoice', 'scheduler').'" /> ';
     if (scheduler_group_scheduling_enabled($course, $cm)){
@@ -352,7 +352,7 @@ echo '</center>';
 else {
     if ($minhidedate > time()){
         $noslots = get_string('noslotsopennow', 'scheduler') .'<br/><br/>';
-        $noslots .= get_string('firstslotavailable', 'scheduler') . '<span style="color:#C00000"><b>'.userdate($minhidedate).'</b></span>';
+        $noslots .= get_string('firstslotavailable', 'scheduler') . '<span style="color:#C00000"><strong>'.userdate($minhidedate).'</strong></span>';
     } else {
         $noslots = get_string('noslotsavailable', 'scheduler') .'<br/><br/>';
     }

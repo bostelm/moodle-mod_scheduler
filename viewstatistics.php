@@ -104,16 +104,16 @@ switch ($page) {
         $allattendees = ($attendees) ? count($attendees) : 0 ;
 
         $str = '<h3>'.get_string('attendable', 'scheduler').'</h3>';
-        $str .= '<b>'.get_string('attendablelbl', 'scheduler').'</b>: ' . $allattendees . '<br/>';
+        $str .= '<strong>'.get_string('attendablelbl', 'scheduler').'</strong>: ' . $allattendees . '<br/>';
         $str .= '<h3>'.get_string('attended', 'scheduler').'</h3>';
-        $str .= '<b>'.get_string('attendedlbl', 'scheduler').'</b>: ' . $attended . '<br/><br/>';
+        $str .= '<strong>'.get_string('attendedlbl', 'scheduler').'</strong>: ' . $attended . '<br/><br/>';
         $str .= '<h3>'.get_string('unattended', 'scheduler').'</h3>';
-        $str .= '<b>'.get_string('registeredlbl', 'scheduler').'</b>: ' . $registered . '<br/>';
-        $str .= '<b>'.get_string('unregisteredlbl', 'scheduler').'</b>: ' . ($allattendees - $registered - $attended) . '<br/>'; //BUGFIX
+        $str .= '<strong>'.get_string('registeredlbl', 'scheduler').'</strong>: ' . $registered . '<br/>';
+        $str .= '<strong>'.get_string('unregisteredlbl', 'scheduler').'</strong>: ' . ($allattendees - $registered - $attended) . '<br/>'; //BUGFIX
         $str .= '<h3>'.get_string('availableslots', 'scheduler').'</h3>';
-        $str .= '<b>'.get_string('availableslotsowned', 'scheduler').'</b>: ' . $freeowned . '<br/>';
-        $str .= '<b>'.get_string('availableslotsnotowned', 'scheduler').'</b>: ' . $freenotowned . '<br/>';
-        $str .= '<b>'.get_string('availableslotsall', 'scheduler').'</b>: ' . ($freeowned + $freenotowned) . '<br/>';
+        $str .= '<strong>'.get_string('availableslotsowned', 'scheduler').'</strong>: ' . $freeowned . '<br/>';
+        $str .= '<strong>'.get_string('availableslotsnotowned', 'scheduler').'</strong>: ' . $freenotowned . '<br/>';
+        $str .= '<strong>'.get_string('availableslotsall', 'scheduler').'</strong>: ' . ($freeowned + $freenotowned) . '<br/>';
 
         echo $OUTPUT->box($str);
 

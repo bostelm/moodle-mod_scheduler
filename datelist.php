@@ -116,7 +116,7 @@ if ($numrecords){
 
 
     $tablecolumns = array('courseshort', 'schedulerid', 'starttime', 'appointmentlocation', 'student', 'department', 'notes', 'grade', 'appointmentnote');
-    $tableheaders = array("<b>$coursestr</b>", "<b>$schedulerstr</b>", "<b>$whenstr</b>", "<b>$wherestr</b>", "<b>$whostr</b>", "<b>$wherefromstr</b>", "<b>$whatstr</b>", "<b>$whatresultedstr</b>", "<b>$whathappenedstr</b>");
+    $tableheaders = array("<strong>$coursestr</strong>", "<strong>$schedulerstr</strong>", "<strong>$whenstr</strong>", "<strong>$wherestr</strong>", "<strong>$whostr</strong>", "<strong>$wherefromstr</strong>", "<strong>$whatstr</strong>", "<strong>$whatresultedstr</strong>", "<strong>$whathappenedstr</strong>");
 
     $table = new flexible_table('mod-scheduler-datelist');
     $table->define_columns($tablecolumns);
