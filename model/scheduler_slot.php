@@ -254,7 +254,7 @@ class scheduler_slot extends mvc_child_record_model {
 
         $eventdata->eventtype = $eventtype;
 
-        $existingevents = $DB->get_records('event', array('eventtype' => $eventtype));
+        $existingevents = $DB->get_records('event', array('modulename' => 'scheduler', 'eventtype' => $eventtype));
         $handledevents = array();
         $handledusers = array();
 

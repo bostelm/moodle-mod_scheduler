@@ -75,7 +75,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
         // Make sure calendar events are all created.
         $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
-        $start = $slot->get_record()->starttime;
+        $start = $slot->starttime;
         $slot->save();
 
         // Load again, to delete.
@@ -140,11 +140,11 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
         $slot->save();
 
-        $oldstart = $slot->get_record()->starttime;
+        $oldstart = $slot->starttime;
 
-        $this->assert_event_exists($this->teacherid, $slot->get_record()->starttime, "Meeting with your Students");
+        $this->assert_event_exists($this->teacherid, $slot->starttime, "Meeting with your Students");
         foreach ($this->students as $student) {
-            $this->assert_event_exists($student, $slot->get_record()->starttime, "Meeting with your Teacher");
+            $this->assert_event_exists($student, $slot->starttime, "Meeting with your Teacher");
         }
 
         $newstart = time() + 3*DAYSECS;

@@ -265,6 +265,23 @@ class scheduler_instance extends mvc_record_model {
     /* ************** End of slot retrieveal routines ******************** */
 
     /**
+     * retrieves an appointment and the corresponding slot
+     */
+    public function get_slot_appointment($appointmentid) {
+        global $DB;
+
+        $appointrec = $DB->get_record('scheduler_appointment', array('id' => $appointmentid), '*', MUST_EXIST);
+        $slotrec = $DB->get_record('scheduler_slots', array('id' => $appointrec->slotid), '*', MUST_EXIST);
+
+        $slot = new scheduler_slot($this);
+        $slot->load_record($slotrec);
+        $appointment = new scheduler_appointment($slot);
+        $appointment->load_record($appointrec);
+
+        return array($slot, $appointment);
+    }
+
+    /**
      * Create a new slot relating to this scheduler.
      */
     public function create_slot() {

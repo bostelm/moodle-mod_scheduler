@@ -22,7 +22,7 @@ function scheduler_prepare_formdata($scheduler, $slot) {
     if ($slot->emaildate < 0){
         $data->emaildate = 0;
     }
-    
+
     $appointments = $DB->get_records('scheduler_appointment', array('slotid' => $data->id));
     $i = 0;
     foreach ($appointments as $appointment) {
@@ -470,7 +470,7 @@ if ($slots){
                 $student = $DB->get_record('user', array('id'=>$appstudent->studentid));
                 if ($student) {
                     $picture = $OUTPUT->user_picture($student);
-                    $name = "<a href=\"view.php?what=viewstudent&amp;id={$cm->id}&amp;studentid={$student->id}&amp;course={$scheduler->course}&amp;order=DESC\">".fullname($student).'</a>';
+                    $name = "<a href=\"view.php?what=viewstudent&amp;id={$cm->id}&amp;appointmentid={$appstudent->id}&amp;course={$scheduler->course}&amp;order=DESC\">".fullname($student).'</a>';
                 }
 
 

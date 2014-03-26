@@ -38,11 +38,11 @@ class scheduler_appointment extends mvc_child_record_model {
 
     public function save() {
         parent::save();
-        $scheddata = $this->get_scheduler()->get_record();
+        $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $this->studentid);
     }
 
-    protected function get_scheduler() {
+    public function get_scheduler() {
         return $this->get_parent()->get_parent();
     }
 

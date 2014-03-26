@@ -121,8 +121,21 @@ abstract class mvc_record_model extends mvc_model {
      * changes to the returned record object will not lead to changes in the
      * data of the present record.
      */
-    public function get_record() {
-        return $this->data;
+    public function get_data() {
+        return clone($this->data);
+    }
+
+    /**
+     * Set a number of properties at once.
+     */
+    public function set_data($data, $propnames = null) {
+        $data = (array) $data;
+        if (is_null($propnames)) {
+            $propnames = array_keys($data);
+        }
+        foreach ($propnames as $propname) {
+            $this->{$propname} = $data[$propname];
+        }
     }
 
     public function delete() {
