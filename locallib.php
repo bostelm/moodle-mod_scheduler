@@ -928,6 +928,10 @@ function scheduler_group_scheduling_enabled($course, $cm) {
     return $globalenable && $localenable;
 }
 
+function scheduler_has_teachers($context) {
+    $teachers = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id');
+    return count($teachers) > 0;
+}
 
 /**
  * adds an error css marker in case of matching error
