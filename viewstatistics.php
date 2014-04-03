@@ -256,6 +256,7 @@ switch ($page) {
             $grouprows = array();
             foreach($groupslots as $aGroup){
                 if (!array_key_exists($aGroup->groupsize, $grouprows)){
+                    $grouprows[$aGroup->groupsize] = new stdClass();
                     $grouprows[$aGroup->groupsize]->occurrences = 0;
                     $grouprows[$aGroup->groupsize]->duration = 0;
                 }
