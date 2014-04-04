@@ -100,16 +100,27 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
 
-    /**
-     * Does the slot have at least one appointment?
-     */
-    public function is_appointed() {
-        return (boolean) ($this->data->appointcnt > 0);
-    }
-
     public function get_appointment_count() {
         return $this->appointments->get_child_count();
     }
+
+    /**
+     * Get the appointment in this slot for a specific student, or null if the student doesn't have one.
+     *
+     * @param int $studentid the id number of the student in question
+     * @return scheduler_appointment the appointment for the specified student
+     */
+    public function get_student_appointment($studentid) {
+        $studapp = null;
+        foreach ($this->get_appointments() as $app) {
+            if ($app->studentid == $studentid) {
+                $studapp = $app;
+                break;
+            }
+        }
+        return $studapp;
+    }
+
 
     /**
      * Has the slot been attended?
@@ -127,6 +138,30 @@ class scheduler_slot extends mvc_child_record_model {
             $result = $result || $appointment->studentid == $studentid;
         }
         return $result;
+    }
+
+    public function count_remaining_appointments() {
+        if ($this->exclusivity == 0) {
+            return -1;
+        } else {
+            $rem = $this->exclusivity - $this->get_appointment_count();
+            if ($rem < 0) {
+                $rem = 0;
+            }
+            return $rem;
+        }
+    }
+
+    /**
+     *  Get an appointment by ID
+     */
+    public function get_appointment($id) {
+        global $DB;
+
+        $appdata = $DB->get_record('scheduler_appointment', array('id' => $id, 'slotid'=> $this->id), '*', MUST_EXIST);
+        $app = new scheduler_appointment($this);
+        $app->load_record($appdata);
+        return $app;
     }
 
     /**

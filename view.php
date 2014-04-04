@@ -13,6 +13,7 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/mod/scheduler/lib.php');
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
+require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 
 // common parameters
 $id = optional_param('id', '', PARAM_INT);    // Course Module ID, or
@@ -41,6 +42,8 @@ add_to_log($course->id, 'scheduler', $action, "view.php?id={$cm->id}", $schedule
 
 // Initialize $PAGE, compute blocks
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
+
+$output = $PAGE->get_renderer('mod_scheduler');
 
 /// This is a pre-header selector for downloded documents generation
 

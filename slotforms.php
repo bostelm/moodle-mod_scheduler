@@ -168,12 +168,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $studentsmenu = array('0' => get_string('choosedots'));
         if ($students) {
             foreach ($students as $astudent) {
-                if ($this->scheduler->schedulermode == 'oneonly' && scheduler_has_slot($astudent->id, $this->scheduler, true, false, $this->slotid)) {
+/*                if ($this->scheduler->schedulermode == 'oneonly' && scheduler_has_slot($astudent->id, $this->scheduler, true, false, $this->slotid)) {
                     continue;
                 }
                 if ($this->scheduler->schedulermode == 'onetime' && scheduler_has_slot($astudent->id, $this->scheduler, true, true, $this->slotid)) {
                     continue;
-                }
+                }*/
                 $studentsmenu[$astudent->id] = fullname($astudent);
             }
         }
@@ -193,7 +193,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $repeatarray[] = $mform->createElement('group', 'studgroup', get_string('student', 'scheduler'), $grouparray, null, false);
 
         // Appointment notes
-        $repeatarray[] = $mform->createElement('editor', 'appointmentnote', get_string('appointmentnotes', 'scheduler'), 
+        $repeatarray[] = $mform->createElement('editor', 'appointmentnote', get_string('appointmentnotes', 'scheduler'),
                           array('rows' => 3, 'columns' => 60), array('collapsed' => true));
 
         if (isset($this->_customdata['repeats'])) {

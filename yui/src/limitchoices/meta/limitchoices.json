@@ -1,0 +1,7 @@
+{
+    "moodle-mod_scheduler-limitchoices": {
+        "requires": [
+            "base", "node", "event"
+        ]
+    }
+}

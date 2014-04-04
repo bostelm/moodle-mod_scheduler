@@ -137,8 +137,9 @@ switch ($action) {
             }
         }
 
-        $slot = $DB->get_record('scheduler_slots', array('id'=>$slotid));
-        scheduler_events_update($slot, $course);
+		// Trigger update of calendar events
+        $slot = scheduler_slot::load_by_id($slotid, $scheduler);
+        $slot->save();
         break;
     }
     /************************************ Revoking all appointments to a slot ***************************************/

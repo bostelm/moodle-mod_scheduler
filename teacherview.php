@@ -12,7 +12,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function scheduler_prepare_formdata($scheduler, $slot) {
+function scheduler_prepare_formdata(scheduler_instance $scheduler, $slot) {
     global $DB;
 
     $data = clone (object) $slot;
@@ -36,13 +36,17 @@ function scheduler_prepare_formdata($scheduler, $slot) {
     return $data;
 }
 
-function scheduler_save_slotform($scheduler, $course, $slotid, $data) {
+function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid, $data) {
 
-    global $DB, $OUTPUT;
+    global $DB;
 
-    // make new slot record
-    $slot = new stdClass();
-    $slot->schedulerid = $scheduler->id;
+	if ($slotid) {
+	   $slot = scheduler_slot::load_by_id($slotid, $scheduler);
+	} else{
+	    $slot = new scheduler_slot($scheduler);
+	}
+
+    // Set data fields from input form.
     $slot->starttime = $data->starttime;
     $slot->duration = $data->duration;
     $slot->exclusivity = $data->exclusivity;
@@ -54,34 +58,38 @@ function scheduler_save_slotform($scheduler, $course, $slotid, $data) {
     $slot->reuse = $data->reuse;
     $slot->emaildate = $data->emaildate;
     $slot->timemodified = time();
-    if (!$slotid) {
-        // add it
-        $slot->id = $DB->insert_record('scheduler_slots', $slot);
-    } else {
-        // update it
-        $slot->id = $slotid;
-        $DB->update_record('scheduler_slots', $slot);
-    }
 
-    $DB->delete_records('scheduler_appointment', array('slotid'=>$slot->id)); // cleanup old appointments
+	$currentapps = $slot->get_appointments();
+	$processedstuds = array();
     for ($i = 0; $i < $data->appointment_repeats; $i++) {
         if ($data->studentid[$i] > 0) {
-            $appointment = new stdClass();
-            $appointment->slotid = $slot->id;
-            $appointment->studentid = $data->studentid[$i];
-            $appointment->attended = isset($data->attended[$i]);
-            $appointment->appointmentnote = $data->appointmentnote[$i]['text'];
-            $appointment->appointmentnoteformat = $data->appointmentnote[$i]['format'];
+        	$app = null;
+        	foreach ($currentapps as $currentapp) {
+        	    if ($currentapp->studentid == $data->studentid[$i]) {
+        	    	$app = $currentapp;
+        	        $processedstuds[] = $currentapp->studentid;
+        	    }
+        	}
+        	if ($app == null) {
+        	    $app = $slot->create_appointment();
+        	    $app->studentid = $data->studentid[$i];
+        	}
+            $app->attended = isset($data->attended[$i]);
+            $app->appointmentnote = $data->appointmentnote[$i]['text'];
+            $app->appointmentnoteformat = $data->appointmentnote[$i]['format'];
             if (isset($data->grade)) {
                 $selgrade = $data->grade[$i];
-                $appointment->grade = ($selgrade >= 0) ? $selgrade : null;
+                $app->grade = ($selgrade >= 0) ? $selgrade : null;
             }
-            $DB->insert_record('scheduler_appointment', $appointment);
-            scheduler_update_grades($scheduler, $appointment->studentid);
+        }
+    }
+    foreach ($currentapps as $currentapp) {
+        if (!in_array($currentapp->studentid, $processedstuds)) {
+            $slot->remove_appointment($currentapp);
         }
     }
 
-    scheduler_events_update($slot, $course);
+    $slot->save();
 }
 
 

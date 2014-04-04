@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_scheduler-limitchoices",
+    "builds": {
+        "moodle-mod_scheduler-limitchoices": {
+            "jsfiles": [
+                "limitchoices.js"
+            ]
+        }
+    }
+}

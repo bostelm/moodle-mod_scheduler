@@ -11,6 +11,10 @@
    color : green;
 }
 
+.path-mod-scheduler div.otherstudent.highlight{
+   font-weight : bold;
+}
+
 .path-mod-scheduler div.slotnotes{
    background-color : #E8E9EE;
    border : solid 1px #A7ABBE;
@@ -28,16 +32,31 @@ div .path-mod-scheduler .appointmentnote{
 }
 
 .path-mod-scheduler table.schedulercommands th {
-   background-color : #E7EFE7;
-   border-style: solid;
-   border-color: white;
-   border-width: 2px 10px;
+    background-color : #E7EFE7;
+    border-style: solid;
+    border-color: white;
+    border-width: 2px 10px;
 }
 
-.path-mod-70 {
-   width:70%;
+
+.path-mod-scheduler #slotbookertable {
+    margin-left:auto;
+    margin-right:auto;
 }
 
-table.generaltable {
-   width:99%;
+.path-mod-scheduler #slotbookertable tr.booked {
+    background-color : #E7EFE7;
+    font-weight : bold;
+}
+
+.path-mod-scheduler div.bookercontrols {
+    text-align: center;
+}
+
+.path-mod-scheduler div.studentlist.expanded {
+    display: block;
+}
+
+.path-mod-scheduler div.studentlist.collapsed {
+    display: none;
 }
