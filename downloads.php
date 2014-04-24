@@ -150,7 +150,7 @@ echo $OUTPUT->box_start()
 <input type="hidden" name="subaction" value="<?php p($subaction) ?>" />
 <table>
     <tr>
-        <td align="right" valign="top"><b><?php print_string('csvrecordseparator','scheduler') ?>:</b></td>
+        <td align="right" valign="top"><strong><?php print_string('csvrecordseparator','scheduler') ?>:</strong></td>
         <td align="left" valign="top">
             <select name="csvrecordseparator">
                 <option value="CR">[CR] (\r) - OLD MAC</option>
@@ -160,7 +160,7 @@ echo $OUTPUT->box_start()
         </td>
     </tr>
     <tr>
-        <td align="right" valign="top"><b><?php print_string('csvfieldseparator','scheduler') ?>:</b></td>
+        <td align="right" valign="top"><strong><?php print_string('csvfieldseparator','scheduler') ?>:</strong></td>
         <td align="left" valign="top">
             <select name="csvfieldseparator">
                 <option value="TAB">[TAB]</option>
@@ -170,7 +170,7 @@ echo $OUTPUT->box_start()
         </td>
     </tr>
     <tr>
-        <td align="right" valign="top"><b><?php print_string('csvencoding','scheduler') ?>:</b></td>
+        <td align="right" valign="top"><strong><?php print_string('csvencoding','scheduler') ?>:</strong></td>
         <td align="left" valign="top">
             <select name="csvencoding">
                 <option value="UTF-16">UTF-16</option>

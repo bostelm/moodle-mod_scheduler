@@ -1,15 +1,14 @@
-<?PHP  
+<?PHP
 
 /**
  * This page prints a particular instance of scheduler and handles
  * top level interactions
- * 
+ *
  * @package    mod
  * @subpackage scheduler
- * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/mod/scheduler/lib.php');
@@ -18,7 +17,7 @@ require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 // common parameters
 $id = optional_param('id', '', PARAM_INT);    // Course Module ID, or
 $a = optional_param('a', '', PARAM_INT);     // scheduler ID
-$action = optional_param('what', 'view', PARAM_CLEAN); 
+$action = optional_param('what', 'view', PARAM_CLEAN);
 $subaction = optional_param('subaction', '', PARAM_CLEAN);
 $page = optional_param('page', 'allappointments', PARAM_CLEAN);
 $offset = optional_param('offset', '', PARAM_CLEAN);
@@ -26,30 +25,13 @@ $usehtmleditor = false;
 $editorfields = '';
 
 if ($id) {
-    if (! $cm = get_coursemodule_from_id('scheduler', $id)) {
-        print_error('invalidcoursemodule');
-    }
-    
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
-        print_error('coursemisconf');
-    }
-    
-    if (! $scheduler = $DB->get_record('scheduler', array('id' => $cm->instance))) {
-        print_error('invalidcoursemodule');
-    }
-    
+    $cm = get_coursemodule_from_id('scheduler', $id, 0, false, MUST_EXIST);
+    $scheduler = scheduler_instance::load_by_coursemodule_id($id);
 } else {
-    if (! $scheduler = $DB->get_record('scheduler', array('id' => $a))) {
-        print_error('invalidcoursemodule');
-    }
-    if (! $course = $DB->get_record('course', array('id' => $scheduler->course))) {
-        print_error('coursemisconf');
-    }
-    if (! $cm = get_coursemodule_from_instance('scheduler', $scheduler->id, $course->id)) {
-        print_error('invalidcoursemodule');
-    }
+    $scheduler = scheduler_instance::load_by_id($a);
+    $cm = get_coursemodule_from_id('scheduler', $scheduler->id, 0, false, MUST_EXIST);
 }
-
+$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
 require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
@@ -57,11 +39,8 @@ $context = context_module::instance($cm->id);
 
 add_to_log($course->id, 'scheduler', $action, "view.php?id={$cm->id}", $scheduler->id, $cm->id);
 
-$groupmode = groupmode($course, $cm);
-
 // Initialize $PAGE, compute blocks
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
-
 
 /// This is a pre-header selector for downloded documents generation
 
@@ -115,14 +94,12 @@ if (has_capability('mod/scheduler:manage', $context)) {
 }
 
 // student side
-elseif (has_capability('mod/scheduler:appoint', $context)) { 
+elseif (has_capability('mod/scheduler:appoint', $context)) {
     include $CFG->dirroot.'/mod/scheduler/studentview.php';
 }
 // for guests
 else {
     echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'center', '70%');
-}    
+}
 
 echo $OUTPUT->footer($course);
-
-?>

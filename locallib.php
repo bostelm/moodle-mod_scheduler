@@ -2,7 +2,7 @@
 
 /**
  * General library for the scheduler module.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -13,10 +13,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__).'/customlib.php');
 
+require_once(dirname(__FILE__).'/model/scheduler_instance.php');
+require_once(dirname(__FILE__).'/model/scheduler_slot.php');
+require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
+
 
 /**
  * Parameter $local added by power-web.at
- * When local Date is needed the $local Param must be set to 1 
+ * When local Date is needed the $local Param must be set to 1
  * @param int $date a timestamp
  * @param int $local
  * @todo check consistence
@@ -31,8 +35,8 @@ function scheduler_userdate($date, $local=0) {
 }
 
 /**
- * Parameter $local added by power-web.at 
- * When local Time is needed the $local Param must be set to 1 
+ * Parameter $local added by power-web.at
+ * When local Time is needed the $local Param must be set to 1
  * @param int $date a timestamp
  * @param int $local
  * @todo check consistence
@@ -49,7 +53,7 @@ function scheduler_usertime($date, $local=0) {
         if(empty($timeformat)){
             $timeformat = get_string('strftimetime');//get locale default format if both above not exist
         }
-        return userdate($date, $timeformat);    
+        return userdate($date, $timeformat);
     }
 }
 
@@ -60,8 +64,8 @@ function scheduler_usertime($date, $local=0) {
  */
 function scheduler_get_attendants($cmid){
     $context = context_module::instance($cmid);
-    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend', 
-                    user_picture::fields('u'), 'u.lastname, u.firstname', 
+    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend',
+                    user_picture::fields('u'), 'u.lastname, u.firstname',
                     '', '', '', '', false, false, false);
     return $attendants;
 }
@@ -95,7 +99,7 @@ function scheduler_get_possible_attendees($cm, $groups=''){
  */
 function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0, $student=0, $others=SCHEDULER_SELF, $careexclusive=true) {
     global $CFG, $DB;
-    
+
     switch ($others){
         case SCHEDULER_SELF:
             $schedulerScope = "s.schedulerid = {$schedulerid} AND ";
@@ -115,9 +119,9 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
 
     $sql = 'SELECT s.* from {scheduler_slots} s '.$studentJoin.' WHERE '.
     		 $schedulerScope.$teacherScope.$exclusiveClause.$timeClause;
-        
+
     $conflicting = $DB->get_records_sql($sql);
-    
+
     return $conflicting;
 }
 
@@ -134,7 +138,7 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
  */
 function scheduler_get_consumed($schedulerid, $starttime, $endtime, $teacherid=0) {
     global $CFG, $DB;
-    
+
     $teacherScope = ($teacherid != 0) ? " teacherid = '{$teacherid}' AND " : '' ;
     $sql = "
         SELECT
@@ -167,7 +171,7 @@ function scheduler_get_consumed($schedulerid, $starttime, $endtime, $teacherid=0
  */
 function scheduler_get_exclusivity($schedulerid, $starttime) {
     global $CFG, $DB;
-    
+
     $sql = '
         SELECT
         exclusivity
@@ -189,7 +193,7 @@ function scheduler_get_exclusivity($schedulerid, $starttime) {
  */
 function scheduler_get_unappointed_slots($schedulerid){
     global $CFG, $DB;
-    
+
     $sql = '
         SELECT
         s.*,
@@ -223,7 +227,7 @@ function scheduler_get_unappointed_slots($schedulerid){
  */
 function scheduler_get_available_slots($studentid, $schedulerid, $studentside=false){
     global $CFG, $DB;
-    
+
     // more compatible tryout
     $slots = $DB->get_records('scheduler_slots', array('schedulerid' => $schedulerid), 'starttime');
     $retainedslots = array();
@@ -246,7 +250,7 @@ function scheduler_get_available_slots($studentid, $schedulerid, $studentside=fa
             }
         }
     }
-    
+
     return $retainedslots;
 }
 
@@ -263,12 +267,12 @@ function scheduler_get_available_slots($studentid, $schedulerid, $studentside=fa
  */
 function scheduler_has_slot($userlist, &$scheduler, $student=true, $unattended = false, $otherthan = 0){
     global $CFG, $DB;
-    
+
     $userlist = str_replace(',', "','", $userlist);
-    
+
     $unattendedClause = ($unattended) ? ' AND a.attended = 0 ' : '' ;
     $otherthanClause = ($otherthan) ? " AND a.slotid != $otherthan " : '' ;
-    
+
     if ($student){
         $sql = "
             SELECT
@@ -298,7 +302,7 @@ function scheduler_has_slot($userlist, &$scheduler, $student=true, $unattended =
  */
 function scheduler_get_appointed($slotid){
     global $CFG, $DB;
-    
+
     $sql = "
         SELECT
         u.*
@@ -320,20 +324,20 @@ function scheduler_get_appointed($slotid){
  */
 function scheduler_delete_slot($slotid, $scheduler=null){
     global $DB;
-    
+
     if ($slot = $DB->get_record('scheduler_slots', array('id' => $slotid))) {
         scheduler_delete_calendar_events($slot);
     }
     $DB->delete_records('scheduler_slots', array('id' => $slotid));
     $DB->delete_records('scheduler_appointment', array('slotid' => $slotid));
-    
+
     if ($slot) {
     	if (!$scheduler){ // fetch optimization
 	        $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
     	}
     	scheduler_update_grades($scheduler); // generous, but works
     }
-    
+
 }
 
 
@@ -346,9 +350,9 @@ function scheduler_delete_slot($slotid, $scheduler=null){
  */
 function scheduler_get_appointments($slotid){
     global $CFG, $DB;
-    
+
     $apps = $DB->get_records('scheduler_appointment', array('slotid' => $slotid));
-    
+
     return $apps;
 }
 
@@ -362,9 +366,9 @@ function scheduler_get_appointments($slotid){
  */
 function scheduler_delete_appointment($appointmentid, $slot=null, $scheduler=null){
     global $DB;
-    
+
     if (!$oldrecord = $DB->get_record('scheduler_appointment', array('id' => $appointmentid))) return ;
-    
+
     if (!$slot){ // fetch optimization
         $slot = $DB->get_record('scheduler_slots', array('id' => $oldrecord->slotid));
     }
@@ -376,7 +380,7 @@ function scheduler_delete_appointment($appointmentid, $slot=null, $scheduler=nul
         if (!$scheduler){ // fetch optimization
             $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
         }
-        scheduler_update_grades($scheduler, $oldrecord->studentid);        
+        scheduler_update_grades($scheduler, $oldrecord->studentid);
         // not reusable slot. Delete it if slot is too near and has no more appointments.
         if ($slot->reuse == 0) {
             $consumed = scheduler_get_consumed($slot->schedulerid, $slot->starttime, $slot->starttime + $slot->duration * 60);
@@ -400,7 +404,7 @@ function scheduler_delete_appointment($appointmentid, $slot=null, $scheduler=nul
  */
 function scheduler_get_last_location(&$scheduler){
     global $USER, $DB;
-    
+
     $lastlocation = '';
     $select = 'SELECT appointmentlocation FROM {scheduler_slots} WHERE schedulerid = ? AND teacherid = ? ORDER BY timemodified DESC';
     $lastlocation = $DB->get_field_sql($select, array($scheduler->id, $USER->id), IGNORE_MULTIPLE);
@@ -417,7 +421,7 @@ function scheduler_get_last_location(&$scheduler){
  */
 function scheduler_free_late_unused_slots($schedulerid, $now=0){
     global $CFG, $DB;
-    
+
     if(!$now) {
         $now = time();
     }
@@ -451,56 +455,56 @@ function scheduler_free_late_unused_slots($schedulerid, $now=0){
   * Updates events in the calendar to the information provided.
   * If the events do not yet exist it creates them.
   * The only argument this function requires is the complete database record of a scheduler slot.
-  * The course parameter should be the full record of the course for this scheduler so the 
+  * The course parameter should be the full record of the course for this scheduler so the
   * teacher-title and student-title can be determined.
   * @param object $slot the slot instance
   * @param object $course the actual course
   */
-function scheduler_add_update_calendar_events($slot, $course) {    
-    
+function scheduler_add_update_calendar_events($slot, $course) {
+
     global $DB;
-    
+
     //firstly, collect up the information we'll need no matter what.
     $eventDuration = ($slot->duration) * 60;
     $eventStartTime = $slot->starttime;
-    
+
     // get all students attached to that slot
     $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id), '', 'studentid,studentid');
-    
+
     // nothing to do
     if (!$appointments) return;
-    
+
     $studentids = array_keys($appointments);
-    
+
     $teacher = $DB->get_record('user', array('id'=>$slot->teacherid));
     $students = $DB->get_records_list('user', 'id', $studentids);
-    
+
     $schedulerDescription = $DB->get_field('scheduler', 'intro', array('id' => $slot->schedulerid));
     $schedulerName = $DB->get_field('scheduler', 'name', array('id' => $slot->schedulerid));
     $teacherEventDescription = "$schedulerName<br/><br/>$schedulerDescription";
-    
+
     $studentEventDescription = $teacherEventDescription;
-    
+
     //the eventtype field stores a code that is used to relate calendar events with the slots that 'own' them.
     //the code is SSstu (for a student event) or SSsup (for a teacher event).
     //then, the id of the scheduler slot that it belongs to.
     //finally, the courseID. I can't remember why, TODO: remember the good reason.
-    //all in a colon delimited string. This will run into problems when the IDs of slots and courses are bigger than 7 digits in length...    
+    //all in a colon delimited string. This will run into problems when the IDs of slots and courses are bigger than 7 digits in length...
     $teacherEventType = "SSsup:{$slot->id}:{$course->id}";
     $studentEventType = "SSstu:{$slot->id}:{$course->id}";
-    
+
     $studentNames = array();
-    
+
     foreach($students as $student){
         $studentNames[] = fullname($student);
         $studentEventName = get_string('meetingwith', 'scheduler').' '.get_string('teacher','scheduler').', '.fullname($teacher);
         $studentEventName = shorten_text($studentEventName, 200);
-        
+
         //firstly, deal with the student's event
         //if it exists, update it, else create a new one.
 
 		$studentEvent = scheduler_get_student_event($slot, $student->id);
-        
+
         if ($studentEvent) {
             $studentEvent->name = $studentEventName;
             $studentEvent->description = $studentEventDescription;
@@ -531,9 +535,9 @@ function scheduler_add_update_calendar_events($slot, $course) {
             // This should be changed to use add_event()
             $DB->insert_record('event', $studentEvent);
         }
-        
+
     }
-    
+
     if (count($studentNames) > 1){
         $teacherEventName = get_string('meetingwithplural', 'scheduler').' '.get_string('students', 'scheduler').', '.implode(', ', $studentNames);
     } else {
@@ -577,22 +581,22 @@ function scheduler_add_update_calendar_events($slot, $course) {
  * Will delete calendar events for a given scheduler slot, and not complain if the record does not exist.
  * The only argument this function requires is the complete database record of a scheduler slot.
  * @param object $slot the slot instance
- * @uses $DB 
+ * @uses $DB
  * @return boolean true if success, false otherwise
  */
 function scheduler_delete_calendar_events($slot) {
     global $DB;
-    
+
     $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
-    
+
     if (!$scheduler) return false ;
-    
+
     $teacherEventType = "SSsup:{$slot->id}:{$scheduler->course}";
     $studentEventType = "SSstu:{$slot->id}:{$scheduler->course}";
-    
+
     $teacherDeletionSuccess = $DB->delete_records('event', array('eventtype'=>$teacherEventType));
     $studentDeletionSuccess = $DB->delete_records('event', array('eventtype'=>$studentEventType));
-    
+
     return ($teacherDeletionSuccess && $studentDeletionSuccess);
     //this return may not be meaningful if the delete records functions do not return anything meaningful.
 }
@@ -608,10 +612,10 @@ function scheduler_delete_calendar_events($slot) {
  */
 function scheduler_events_update($slot, $course) {
     global $DB;
-    
+
     $slotDoesntHaveAStudent = !$DB->count_records('scheduler_appointment', array('slotid' => $slot->id));
     $slotWasAttended = $DB->count_records('scheduler_appointment', array('slotid' => $slot->id, 'attended' => 1));
-    
+
     if ($slotDoesntHaveAStudent || $slotWasAttended) {
         scheduler_delete_calendar_events($slot);
     }
@@ -623,29 +627,29 @@ function scheduler_events_update($slot, $course) {
 /**
  * This function gets the calendar entry of the teacher relating to a slot.
  * If none is found, the return value is false.
- * 
+ *
  * @param object $slot the slot instance
  * @uses $DB
  * @return stdClass the calendar event of the teacher
  */
 function scheduler_get_teacher_event($slot) {
     global $DB;
-    
+
     //first we need to know the course that the scheduler belongs to...
     $courseid = $DB->get_field('scheduler', 'course', array('id' => $slot->schedulerid), MUST_EXIST);
-    
+
     //now try to fetch the event records...
     $teacherEventType = "SSsup:{$slot->id}:{$courseid}";
-    
+
     $event = $DB->get_record('event', array('eventtype' => $teacherEventType), '*', IGNORE_MISSING);
-    
-	return $event; 
+
+	return $event;
 }
 
 /**
  * This function gets the calendar entry of a student relating to a slot.
  * If none is found, the return value is false.
- * 
+ *
  * @param object $slot the slot instance
  * @param int $studentid the id number of the student record
  * @uses $DB
@@ -653,15 +657,15 @@ function scheduler_get_teacher_event($slot) {
  */
 function scheduler_get_student_event($slot, $studentid) {
     global $DB;
-    
+
     //first we need to know the course that the scheduler belongs to...
     $courseid = $DB->get_field('scheduler', 'course', array('id' => $slot->schedulerid), MUST_EXIST);
-    
+
     //now try to fetch the event records...
     $studentEventType = "SSstu:{$slot->id}:{$courseid}";
-    
+
     $event = $DB->get_record('event', array('eventtype' => $studentEventType, 'userid'=>$studentid), '*', IGNORE_MISSING);
-	return $event; 
+	return $event;
 }
 
 
@@ -674,9 +678,9 @@ function scheduler_get_student_event($slot, $studentid) {
  * @return string the formatted grade
  */
 function scheduler_format_grade(&$scheduler, $grade, $short=false){
-    
+
     global $DB;
-    
+
     $result = '';
     if ($scheduler->scale == 0 || is_null($grade) ){
         // scheduler doesn't allow grading, or no grade entered
@@ -715,9 +719,9 @@ function scheduler_format_grade(&$scheduler, $grade, $short=false){
 /**
  * A utility function for producing grading lists (for use in formslib)
  *
- * Note that the selection list will contain a "nothing selected" option 
+ * Note that the selection list will contain a "nothing selected" option
  * with key -1 which will be displayed as "No grade".
- * 
+ *
  * @param reference $scheduler
  * @return the html selection element for a grading list
  */
@@ -726,7 +730,7 @@ function scheduler_get_grading_choices(&$scheduler) {
     if ($scheduler->scale > 0){
         $scalegrades = array();
         for($i = 0 ; $i <= $scheduler->scale ; $i++) {
-            $scalegrades[$i] = $i; 
+            $scalegrades[$i] = $i;
         }
     }
     else {
@@ -743,9 +747,9 @@ function scheduler_get_grading_choices(&$scheduler) {
 /**
  * A utility function for making grading lists
  *
- * Note that the selection list will contain a "nothing selected" option 
+ * Note that the selection list will contain a "nothing selected" option
  * with key -1 which will be displayed as "No grade".
- * 
+ *
  * @param reference $scheduler
  * @param string $id the form field id
  * @param string $selected the selected value
@@ -760,20 +764,20 @@ function scheduler_make_grading_menu(&$scheduler, $id, $selected = '') {
 
 
 /**
- * Construct an array with subtitution rules for mail templates, relating to 
+ * Construct an array with subtitution rules for mail templates, relating to
  * a single appointment. Any of the parameters can be null.
  * @param object $scheduler The scheduler instance
  * @param object $slot The slot data, obtained with get_record().
  * @param user $attendant A {@link $USER} object describing the attendant (teacher)
  * @param user $attendee A {@link $USER} object describing the attendee (student)
- * @return array A hash with mail template substitutions 
+ * @return array A hash with mail template substitutions
  */
 function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee) {
-    
+
     global $CFG;
-    
+
     $vars = array();
-    
+
     if ($scheduler) {
         $vars['MODULE']     = $scheduler->name;
         $vars['STAFFROLE']  = scheduler_get_teacher_name($scheduler);
@@ -792,9 +796,9 @@ function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee)
         $vars['ATTENDEE']     = fullname($attendee);
         $vars['ATTENDEE_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendee->id.'&course='.$scheduler->course;
     }
-    
+
     return $vars;
-    
+
 }
 
 /**
@@ -806,25 +810,25 @@ function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee)
  * @param course $course A {@link $COURSE} object representing a course
  */
 function scheduler_print_user($user, $course, $messageselect=false, $return=false) {
-    
+
     global $CFG, $USER, $OUTPUT ;
-    
+
     $output = '';
-    
+
     static $string;
     static $datestring;
     static $countries;
-    
+
     $context = context_course::instance($course->id);
     if (isset($user->context->id)) {
         $usercontext = $user->context;
     } else {
         $usercontext = context_user::instance($user->id);
     }
-    
+
     if (empty($string)) {     // Cache all the strings for the rest of the page
 
-        $string = new stdClass();        
+        $string = new stdClass();
         $string->email       = get_string('email');
         $string->lastaccess  = get_string('lastaccess');
         $string->activity    = get_string('activity');
@@ -833,8 +837,8 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $string->role        = get_string('role');
         $string->name        = get_string('name');
         $string->never       = get_string('never');
-        
-        $datestring = new stdClass();        
+
+        $datestring = new stdClass();
         $datestring->day     = get_string('day');
         $datestring->days    = get_string('days');
         $datestring->hour    = get_string('hour');
@@ -845,16 +849,16 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $datestring->secs    = get_string('secs');
         $datestring->year    = get_string('year');
         $datestring->years   = get_string('years');
-        
+
     }
-    
+
     /// Get the hidden field list
     if (has_capability('moodle/course:viewhiddenuserfields', $context)) {
         $hiddenfields = array();
     } else {
         $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
     }
-    
+
     $output .= '<table class="userinfobox">';
     $output .= '<tr>';
     $output .= '<td class="left side">';
@@ -869,10 +873,10 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
 
 	$extrafields = scheduler_get_user_fields($user);
 	foreach ($extrafields as $field) {
-        $output .= $field->title . ': ' . $field->value . '<br />';	    
+        $output .= $field->title . ': ' . $field->value . '<br />';
 	}
-	
-    
+
+
     if (!isset($hiddenfields['lastaccess'])) {
         if ($user->lastaccess) {
             $output .= $string->lastaccess .': '. userdate($user->lastaccess);
@@ -890,18 +894,18 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
     if (!empty($CFG->enablenotes) and (has_capability('moodle/notes:manage', $context) || has_capability('moodle/notes:view', $context))) {
         $output .= '<a href="'.$CFG->wwwroot.'/notes/index.php?course=' . $course->id. '&amp;user='.$user->id.'">'.get_string('notes','notes').'</a><br />';
     }
-    
+
     if (has_capability('moodle/site:viewreports', $context) or has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
         $output .= '<a href="'. $CFG->wwwroot .'/course/user.php?id='. $course->id .'&amp;user='. $user->id .'">'. $string->activity .'</a><br />';
     }
     $output .= '<a href="'. $CFG->wwwroot .'/user/profile.php?id='. $user->id .'">'. $string->fullprofile .'...</a>';
-    
+
     if (!empty($messageselect)) {
         $output .= '<br /><input type="checkbox" name="user'.$user->id.'" /> ';
     }
-    
+
     $output .= '</td></tr></table>';
-    
+
     if ($return) {
         return $output;
     } else {
@@ -924,11 +928,15 @@ function scheduler_group_scheduling_enabled($course, $cm) {
     return $globalenable && $localenable;
 }
 
+function scheduler_has_teachers($context) {
+    $teachers = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id');
+    return count($teachers) > 0;
+}
 
 /**
  * adds an error css marker in case of matching error
  * @param array $errors the current error set
- * @param string $errorkey 
+ * @param string $errorkey
  */
 if (!function_exists('print_error_class')){
     function print_error_class($errors, $errorkeylist){
@@ -939,8 +947,8 @@ if (!function_exists('print_error_class')){
                     echo " class=\"formerror\" ";
                     return;
                 }
-            }        
+            }
         }
     }
 }
-?>
+

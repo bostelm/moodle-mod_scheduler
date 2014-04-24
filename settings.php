@@ -1,8 +1,8 @@
-<?php  
+<?php
 
 /**
  * Global configuration settings for the scheduler module.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -29,7 +29,6 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configtext('scheduler_maxstudentlistsize', get_string('maxstudentlistsize', 'scheduler'),
                     get_string('maxstudentlistsize_desc', 'scheduler'), 200, PARAM_INT));
-    
+
 }
 
-?>

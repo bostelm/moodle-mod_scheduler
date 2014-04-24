@@ -2,7 +2,7 @@
 
 /**
  * Prints the screen that displays a single student to a teacher.
- * 
+ *
  * @package    mod
  * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -10,159 +10,160 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once $CFG->dirroot.'/mod/scheduler/locallib.php';
 
+require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 
-$studentid = required_param('studentid', PARAM_INT);
-$order = optional_param('order','ASC',PARAM_ALPHA);
-if (!in_array($order,array('ASC','DESC'))) {
-    $order='ASC';
+if (!has_capability('mod/scheduler:manage', $context)) {
+    require_capability('mod/scheduler:manageallappointments', $context);
 }
 
-$usehtmleditor = can_use_html_editor();
+$appointmentid = required_param('appointmentid', PARAM_INT);
+list($slot, $appointment) = $scheduler->get_slot_appointment($appointmentid);
+$studentid = $appointment->studentid;
 
-if ($subaction != ''){
-    include $CFG->dirroot.'/mod/scheduler/viewstudent.controller.php'; 
-}
+$sql = "
+SELECT
+s.*,
+a.id as appid,
+a.studentid,
+a.attended,
+a.appointmentnote,
+a.grade,
+a.timemodified as apptimemodified
+FROM
+{scheduler_slots} s,
+{scheduler_appointment} a
+WHERE
+s.id = a.slotid AND
+schedulerid = ? AND
+studentid = ?
+ORDER BY
+starttime ASC
+";
 
-scheduler_print_user($DB->get_record('user', array('id' => $studentid)), $course);
+$slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid));
 
-//print tabs
+scheduler_print_user($DB->get_record('user', array('id' => $appointment->studentid)), $course);
+
+$params = array(
+                'startdate' => scheduler_userdate($slot->starttime, 1),
+                'starttime' => scheduler_usertime($slot->starttime, 1),
+                'endtime' => scheduler_usertime($slot->endtime, 1),
+                'teacher' => fullname($slot->get_teacher())
+                );
+echo html_writer::tag('p', get_string('appointmentsummary', 'scheduler', $params));
+
+// Print tabs.
 $tabrows = array();
 $row  = array();
-if($page == 'appointments'){
-    $currenttab = get_string('appointments', 'scheduler');
-} else {
-    $currenttab = get_string('notes', 'scheduler');
-}
-$tabname = get_string('appointments', 'scheduler');
-$row[] = new tabobject($tabname, "view.php?what=viewstudent&amp;id={$cm->id}&amp;studentid={$studentid}&amp;course={$scheduler->course}&amp;order={$order}&amp;page=appointments", $tabname);
-$tabname = get_string('comments', 'scheduler');
-$row[] = new tabobject($tabname, "view.php?what=viewstudent&amp;id={$cm->id}&amp;studentid={$studentid}&amp;course={$scheduler->course}&amp;order={$order}&amp;page=notes", $tabname);
-$tabrows[] = $row;
-print_tabs($tabrows, $currenttab);
+$urlparas = array('what' => 'viewstudent',
+                  'id' => $scheduler->cmid,
+                  'appointmentid' => $appointmentid,
+                  'course' => $scheduler->courseid);
+$taburl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 
-/// if slots have been booked
-$sql = "
-    SELECT
-    s.*,
-    a.id as appid,
-    a.studentid,
-    a.attended,
-    a.appointmentnote,
-    a.grade,
-    a.timemodified as apptimemodified
-    FROM
-    {scheduler_slots} s,
-    {scheduler_appointment} a
-    WHERE
-    s.id = a.slotid AND
-    schedulerid = ? AND
-    studentid = ?
-    ORDER BY
-    starttime $order
-    ";
-if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order))) {
-    /// provide link to sort in the opposite direction
-    if($order == 'DESC'){
-        $orderlink = "<a href=\"view.php?what=viewstudent&amp;id=$cm->id&amp;studentid=".$studentid."&amp;course=$scheduler->course&amp;order=ASC&amp;page=$page\">";
-    } else {
-        $orderlink = "<a href=\"view.php?what=viewstudent&amp;id=$cm->id&amp;studentid=".$studentid."&amp;course=$scheduler->course&amp;order=DESC&amp;page=$page\">";
+$pages = array('thisappointment');
+if ($slot->get_appointment_count() > 1) {
+    $pages[] = 'otherstudents';
+}
+if (count($slots) > 1) {
+    $pages[] = 'otherappointments';
+}
+
+if (!in_array($page, $pages) ) {
+    $page = 'thisappointment';
+}
+
+if (count($pages) > 1) {
+    foreach ($pages as $tabpage) {
+        $tabname = get_string('tab-'.$tabpage, 'scheduler');
+        $row[] = new tabobject($tabpage, new moodle_url($taburl, array('page' => $tabpage)), $tabname);
     }
-    
-    $table = new html_table();
-    /// print page header and prepare table headers
-    if ($page == 'appointments'){
-        echo $OUTPUT->heading(get_string('slots' ,'scheduler'));
-        $table->head  = array ($strdate, $strstart, $strend, $strseen, $strnote, $strgrade, s(scheduler_get_teacher_name($scheduler)));
-        $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT', 'CENTER', 'CENTER');
-        $table->width = '80%';
-    } else {
-        echo $OUTPUT->heading(get_string('comments' ,'scheduler'));
-        $table->head  = array (get_string('studentcomments', 'scheduler'), get_string('comments', 'scheduler'), $straction);
-        $table->align = array ('LEFT', 'LEFT');
-        $table->width = '80%';
-    }
-    foreach($slots as $slot) {
-        $startdate = scheduler_userdate($slot->starttime,1);
-        $starttime = scheduler_usertime($slot->starttime,1);
-        $endtime = scheduler_usertime($slot->starttime + ($slot->duration * 60),1);
-        $distributecheck = '';
-        if ($page == 'appointments'){
-            if ($DB->count_records('scheduler_appointment', array('slotid' => $slot->id)) > 1){
-                $distributecheck = "<br/><input type=\"checkbox\" name=\"distribute{$slot->appid}\" value=\"1\" /> ".get_string('distributetoslot', 'scheduler')."\n";
+    $tabrows[] = $row;
+    print_tabs($tabrows, $page);
+}
+
+if ($page == 'thisappointment') {
+    // Print editable appointment description.
+    require_once($CFG->dirroot.'/mod/scheduler/appointmentforms.php');
+
+    $actionurl = new moodle_url($taburl, array('page' => 'thisappointment'));
+    $returnurl = new moodle_url($taburl, array('page' => 'thisappointment'));
+
+    $distribute = ($slot->get_appointment_count() > 1);
+    $gradeedit = ($slot->teacherid == $USER->id) || $CFG->scheduler_allteachersgrading;
+    $mform = new scheduler_editappointment_form($appointment, $actionurl, $gradeedit, $distribute);
+    $mform->set_data($mform->prepare_appointment_data($appointment));
+
+    if ($mform->is_cancelled()) {
+        redirect($returnurl);
+    } else if ($formdata = $mform->get_data()) {
+        $data = $mform->extract_appointment_data($formdata);
+        if ($distribute && isset($formdata->distribute)) {
+            foreach ($slot->get_appointments() as $otherapp) {
+                $otherapp->set_data($data);
             }
-            //display appointments
-            if ($slot->attended == 0){
-            	$teacher = $DB->get_record('user', array('id'=>$slot->teacherid));
-                $table->data[] = array ($startdate, $starttime, $endtime, "<img src=\"pix/unticked.gif\" border=\"0\" />", $slot->appointmentnote, scheduler_format_grade($scheduler,$slot->grade), fullname($teacher));
-            }
-            else {
-                $slot->appointmentnote .= "<br/><span class=\"timelabel\">[".userdate($slot->apptimemodified)."]</span>";
-                if (($scheduler->scale !=0 ) && (($slot->teacherid == $USER->id) || $CFG->scheduler_allteachersgrading)){
-                    $grade = scheduler_make_grading_menu($scheduler, 'gr'.$slot->appid, $slot->grade, true);
-                }
-                else{
-                    $grade = scheduler_format_grade($scheduler,$slot->grade);
-                }
-                
-                $teacher = $DB->get_record('user', array('id'=>$slot->teacherid));
-                $table->data[] = array ($startdate, $starttime, $endtime, "<img src=\"pix/ticked.gif\" border=\"0\" />", $slot->appointmentnote, $grade.$distributecheck, fullname($teacher));
-            }
+            $slot->save();
         } else {
-            if ($DB->count_records('scheduler_appointment', array('slotid' => $slot->id)) > 1){
-                $distributecheck = "<input type=\"checkbox\" name=\"distribute\" value=\"1\" /> ".get_string('distributetoslot', 'scheduler')."\n";
-            }
-            //display notes
-            $actions = "<a href=\"javascript:document.forms['updatenote{$slot->id}'].submit()\">".get_string('savecomment', 'scheduler').'</a>';
-            $commenteditor = "<form name=\"updatenote{$slot->id}\" action=\"view.php\" method=\"post\">\n";
-            $commenteditor .= "<input type=\"hidden\" name=\"what\" value=\"viewstudent\" />\n";
-            $commenteditor .= "<input type=\"hidden\" name=\"subaction\" value=\"updatenote\" />\n";
-            $commenteditor .= "<input type=\"hidden\" name=\"page\" value=\"appointments\" />\n";
-            $commenteditor .= "<input type=\"hidden\" name=\"id\" value=\"{$cm->id}\" />\n";
-            $commenteditor .= "<input type=\"hidden\" name=\"studentid\" value=\"{$studentid}\" />\n";
-            $commenteditor .= "<input type=\"hidden\" name=\"appid\" value=\"{$slot->appid}\" />\n";
-            $commenteditor .= print_textarea($usehtmleditor, 20, 60, 400, 200, 'appointmentnote', $slot->appointmentnote, $COURSE->id, true);
-            if ($usehtmleditor) {
-                $commenteditor .= "<input type=\"hidden\" name=\"format\" value=\"FORMAT_HTML\" />\n";
-            } 
-            else {
-                $commenteditor .= '<p align="right">';
-                $commenteditor .= $OUTPUT->help_icon('textformat', get_string('formattexttype'), 'moodle', true, false, '', true);
-                $commenteditor .= get_string('formattexttype');
-                $commenteditor .= ':&nbsp;';
-                if (!$form->format) {
-                    $form->format = 'MOODLE';
-                }
-                $commenteditor .= html_writer::select(format_text_menu(), 'format', $form->format); 
-                $commenteditor .= '</p>';
-            }
-            $commenteditor .= $distributecheck;
-            $commenteditor .= "</form>";
-            $table->data[] = array ($slot->notes.'<br/><font size=-2>'.$startdate.' '.$starttime.' to '.$endtime.'</font>', $commenteditor, $actions);
+            $appointment->set_data($data);
+            $appointment->save();
         }
+        redirect($returnurl);
+    } else {
+        $mform->display();
     }
-    // print slots table
-    if ($page == 'appointments'){
-        echo '<form name="studentform" action="view.php" method="post">';
-        echo "<input type=\"hidden\" name=\"id\" value=\"{$cm->id}\" />\n";
-        echo "<input type=\"hidden\" name=\"subaction\" value=\"updategrades\" />\n";
-        echo "<input type=\"hidden\" name=\"what\" value=\"viewstudent\" />\n";
-        echo "<input type=\"hidden\" name=\"page\" value=\"appointments\" />\n";
-        echo "<input type=\"hidden\" name=\"studentid\" value=\"{$studentid}\" />\n";
+
+} else if ($page == 'otherappointments') {
+    // Print table of other appointments of the same student.
+
+    $table = new html_table();
+
+    $table->head  = array ($strdate, $strstart, $strend, $strseen, $strnote, $strgrade, s(scheduler_get_teacher_name($scheduler)));
+    $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT', 'CENTER', 'CENTER');
+
+    foreach ($slots as $otherslot) {
+        $startdate = scheduler_userdate($otherslot->starttime, 1);
+        $studenturl = new moodle_url($taburl, array('appointmentid' => $otherslot->appid, 'page' => 'thisappointment'));
+        $datelink = $OUTPUT->action_link($studenturl, $startdate);
+        $starttime = scheduler_usertime($otherslot->starttime, 1);
+        $endtime = scheduler_usertime($otherslot->starttime + ($otherslot->duration * 60), 1);
+        $iconid = $otherslot->attended ? 'ticked' : 'unticked';
+        $iconhelp = $otherslot->attended ? 'seen' : 'notseen';
+        $attendedpix = $OUTPUT->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
+
+        $otherslot->appointmentnote .= "<br/><span class=\"timelabel\">[".userdate($otherslot->apptimemodified)."]</span>";
+        $grade = scheduler_format_grade($scheduler, $otherslot->grade);
+        $teacher = $DB->get_record('user', array('id' => $otherslot->teacherid));
+        $table->data[] = array ($datelink, $starttime, $endtime, $attendedpix,
+                                 $otherslot->appointmentnote, $grade, fullname($teacher));
     }
     echo html_writer::table($table);
-    if ($page == 'appointments'){
-        if ($scheduler->scale != 0) {
-            echo "<p><center><input type=\"submit\" name=\"go_btn\" value=\"".get_string('updategrades', 'scheduler')."\" />";
-        }
-        echo '</form>';
-    }
-}
-echo $OUTPUT->continue_button($CFG->wwwroot.'/mod/scheduler/view.php?id='.$cm->id);
 
-return;
-/// Finish the page
+} else if ($page == 'otherstudents') {
+    // Print table of other students in the same slot.
+
+    $table = new html_table();
+
+    $table->head  = array($strname, $strseen, $strnote, $strgrade);
+    $table->align = array('LEFT', 'CENTER', 'LEFT', 'CENTER');
+
+    foreach ($slot->get_appointments() as $otherappointment) {
+        $studentname = fullname($otherappointment->student);
+        $studenturl = new moodle_url($taburl, array('appointmentid' => $otherappointment->id, 'page' => 'thisappointment'));
+        $studentlink = $OUTPUT->action_link($studenturl, $studentname);
+        $grade = scheduler_format_grade($scheduler, $otherappointment->grade);
+        $iconid = $otherappointment->attended ? 'ticked' : 'unticked';
+        $iconhelp = $otherappointment->attended ? 'seen' : 'notseen';
+        $icon = $OUTPUT->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
+        $note = $otherappointment->appointmentnote;
+        if ($note) {
+            $note .= '<br/><span class="timelabel">['.userdate($otherappointment->timemodified).']</span>';
+        }
+        $table->data[] = array ($studentlink, $icon, $note, $grade);
+    }
+    echo html_writer::table($table);
+}
+
+echo $OUTPUT->continue_button(new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid)));
 echo $OUTPUT->footer($course);
 exit;
-?>
