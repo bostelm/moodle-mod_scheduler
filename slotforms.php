@@ -222,11 +222,6 @@ class scheduler_editslot_form extends scheduler_slotform_base {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Avoid slots starting in the past (too far)
-        if ($data['starttime'] < (time() - DAYSECS * 10)) {
-            $errors['starttime'] = get_string('startpast', 'scheduler');
-        }
-
         // Check number of appointments vs exclusivity
         $numappointments = 0;
         for ($i = 0; $i < $data['appointment_repeats']; $i++) {
@@ -236,6 +231,11 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         }
         if ($data['exclusivity'] > 0 && $numappointments > $data['exclusivity']) {
             $errors['exclusivity'] = get_string('exclusivityoverload', 'scheduler', $numappointments);
+        }
+
+        // Avoid empty slots starting in the past
+        if ($numappointments == 0 && $data['starttime'] < time()) {
+            $errors['starttime'] = get_string('startpast', 'scheduler');
         }
 
         // Check whether students have been selected several times

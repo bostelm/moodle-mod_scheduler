@@ -99,7 +99,8 @@ abstract class mvc_record_model extends mvc_model {
         } else if (property_exists($this->data, 'id') && ($this->data->id)) {
             $DB->update_record($this->get_table(), $this->data);
         } else {
-            $DB->insert_record($this->get_table(), $this->data);
+            $newid = $DB->insert_record($this->get_table(), $this->data);
+            $this->data->id = $newid;
         }
     }
 

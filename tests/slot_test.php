@@ -69,6 +69,33 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assertFalse($ex, "Checking whether record $id is absent in table $table: $msg");
     }
 
+    public function test_create() {
+
+        global $DB;
+
+        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
+        $slot = $scheduler->create_slot();
+
+        $slot->teacherid =  $this->getDataGenerator()->create_user()->id;
+        $slot->starttime = time();
+        $slot->duration = 60;
+
+        $newapp1 = $slot->create_appointment();
+        $newapp1->studentid = $this->getDataGenerator()->create_user()->id;
+        $newapp2 = $slot->create_appointment();
+        $newapp2->studentid = $this->getDataGenerator()->create_user()->id;
+
+        $slot->save();
+
+        $newid = $slot->get_id();
+        $this->assertNotEquals(0, $newid, "Checking slot id after creation");
+
+        $newcnt = $DB->count_records('scheduler_appointment', array('slotid' => $newid));
+        $this->assertEquals(2, $newcnt, "Counting number of appointments after addition");
+
+    }
+
+
     public function test_delete() {
 
         $scheduler = scheduler_instance::load_by_id($this->schedulerid);

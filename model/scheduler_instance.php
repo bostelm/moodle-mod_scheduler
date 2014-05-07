@@ -288,7 +288,7 @@ class scheduler_instance extends mvc_record_model {
     }
 
     public function get_all_slots($limitfrom='', $limitnum='') {
-        return $this->load_slots(null, null, array(), $limitfrom, $limitnum);
+        return $this->fetch_slots(null, null, array(), $limitfrom, $limitnum);
     }
 
     /**

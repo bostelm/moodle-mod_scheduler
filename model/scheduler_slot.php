@@ -59,6 +59,7 @@ class scheduler_slot extends mvc_child_record_model {
      * Save any changes to the database
      */
     public function save() {
+        $this->data->schedulerid = $this->get_parent()->get_id();
         parent::save();
         $this->appointments->save_children();
         $this->update_calendar();
