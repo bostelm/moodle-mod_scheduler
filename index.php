@@ -14,24 +14,26 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
 $id = required_param('id', PARAM_INT);   // course
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
-if (!$course = $DB->get_record('course', array('id' => $id))) {
-    print_error('invalidcourseid');
-}
-$PAGE->set_url('/mod/scheduler/index.php', array('id'=>$id));
+$PAGE->set_url('/mod/scheduler/index.php', array('id' => $id));
 $PAGE->set_pagelayout('incourse');
 
 $coursecontext = context_course::instance($id);
 require_login($course->id);
 
-add_to_log($course->id, 'scheduler', 'view all', "index.php?id=$course->id", '');
+$event = \mod_scheduler\event\course_module_instance_list_viewed::create(array(
+    'context' => $coursecontext
+));
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
-/// Get all required strings
+// Get all required strings.
 
 $strschedulers = get_string('modulenameplural', 'scheduler');
 $strscheduler  = get_string('modulename', 'scheduler');
 
-/// Print the header
+// Print the header.
 
 $title = $course->shortname . ': ' . $strschedulers;
 $PAGE->set_title($title);
@@ -39,13 +41,14 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header($course);
 
 
-/// Get all the appropriate data
+// Get all the appropriate data.
 
 if (!$schedulers = get_all_instances_in_course('scheduler', $course)) {
-    print_error('noschedulers', 'scheduler', "../../course/view.php?id=$course->id");
+    notice(get_string('noschedulers', 'scheduler'), "../../course/view.php?id=$course->id");
+    die;
 }
 
-/// Print the list of instances
+// Print the list of instances.
 
 $timenow = time();
 $strname  = get_string('name');
@@ -67,7 +70,7 @@ if ($course->format == 'weeks') {
 
 foreach ($schedulers as $scheduler) {
     $url = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->coursemodule));
-    //Show dimmed if the mod is hidden
+    // Show dimmed if the mod is hidden.
     $attr = $scheduler->visible ? null : array('class' => 'dimmed');
     $link = html_writer::link($url, $scheduler->name, $attr);
     if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $coursecontext)) {
@@ -81,7 +84,7 @@ foreach ($schedulers as $scheduler) {
 
 echo html_writer::table($table);
 
-/// Finish the page
+// Finish the page.
 
 echo $OUTPUT->footer($course);
 

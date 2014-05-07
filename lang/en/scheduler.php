@@ -23,6 +23,12 @@ $string['scheduler:manageallappointments'] = 'Manage all scheduler data';
 $string['scheduler:seeotherstudentsbooking'] = 'See other student booking on the slot';
 $string['scheduler:seeotherstudentsresults'] = 'See other slot student\'s result';
 
+/* ***** Events ***** */
+$string['event_bookingformviewed'] = 'Scheduler booking form viewed';
+$string['event_bookingadded'] = 'Scheduler booking added';
+$string['event_bookingremoved'] = 'Scheduler booking removed';
+$string['event_appointmentlistviewed'] = 'Scheduler appointment list viewed';
+
 /* ***** Interface strings ****** */
 
 $string['onedaybefore'] = '1 day before slot';

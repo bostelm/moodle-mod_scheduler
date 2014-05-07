@@ -118,6 +118,7 @@ if ($action == 'savechoice') {
 
             $oldappid  = $oldappointment->appointmentid;
             $oldslotid = $oldappointment->id;
+            $oldslot = scheduler_slot::load_by_id($oldslotid, $scheduler);
 
             // Prepare notification e-mail first - slot might be deleted if it's volatile.
             if ($scheduler->allownotifications) {
@@ -125,6 +126,8 @@ if ($action == 'savechoice') {
                 $teacher = $DB->get_record('user', array('id' => $oldappointment->teacherid));
                 $vars = scheduler_get_mail_variables($scheduler, $oldappointment, $teacher, $student);
             }
+
+            \mod_scheduler\event\booking_removed::create_from_slot($oldslot)->trigger();
 
             // Delete the appointment (and possibly the slot).
             $scheduler->delete_appointment($oldappid);
@@ -148,6 +151,8 @@ if ($action == 'savechoice') {
             $appointment->timemodified = time();
             scheduler_update_grades($scheduler, $astudentid);
 
+            \mod_scheduler\event\booking_added::create_from_slot($newslot)->trigger();
+
             // Notify the teacher.
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id' => $appointment->studentid));
@@ -160,7 +165,7 @@ if ($action == 'savechoice') {
     }
 }
 
-// *********************************** Disengage alone from the slot ******************************/
+// *********************************** Disengage from the slot (only the current student) ******************************/
 if ($action == 'disengage') {
     require_sesskey();
     require_capability('mod/scheduler:disengage', $context);
@@ -172,6 +177,9 @@ if ($action == 'disengage') {
         foreach ($appointments as $appointment) {
 
             $oldslot = $scheduler->get_slot($appointment->slotid);
+
+            \mod_scheduler\event\booking_removed::create_from_slot($oldslot)->trigger();
+
             $scheduler->delete_appointment($appointment->id);
 
             // Notify the teacher.

@@ -65,6 +65,10 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
 
+    public function get_scheduler() {
+        return $this->get_parent();
+    }
+
     /**
      * Return the teacher object
      */

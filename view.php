@@ -38,8 +38,6 @@ require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
 // TODO require_capability('mod/scheduler:view', $context);
 
-add_to_log($course->id, 'scheduler', $action, "view.php?id={$cm->id}", $scheduler->id, $cm->id);
-
 // Initialize $PAGE, compute blocks
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
 
@@ -102,7 +100,7 @@ elseif (has_capability('mod/scheduler:appoint', $context)) {
 }
 // for guests
 else {
-    echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'center', '70%');
+    echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');
 }
 
 echo $OUTPUT->footer($course);

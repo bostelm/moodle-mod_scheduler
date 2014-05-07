@@ -13,6 +13,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
+\mod_scheduler\event\booking_form_viewed::create_from_scheduler($scheduler)->trigger();
+
 // Clean all late slots (for everybody).
 scheduler_free_late_unused_slots($scheduler->id);
 
