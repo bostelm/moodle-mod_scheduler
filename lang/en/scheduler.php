@@ -48,6 +48,7 @@ $string['appointingstudent'] = 'Appointment for slot';
 $string['appointingstudentinnew'] = 'Appointment for new slot';
 $string['appointmentno'] = 'Appointment {$a}';
 $string['appointmentnotes'] = 'Notes for appointment';
+$string['appointments'] = 'Appointments';
 $string['appointsolo'] = 'just me';
 $string['appointsomeone'] = 'Add new appointment';
 $string['appointmentsummary'] = 'Appointment on {$a->startdate} from {$a->starttime} to {$a->endtime} with {$a->teacher}';
