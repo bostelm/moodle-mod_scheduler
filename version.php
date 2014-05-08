@@ -22,5 +22,3 @@ $module->requires  = 2014050600;        // Requires Moodle 2.7
 $module->maturity  = MATURITY_ALPHA;    // Alpha development code - not for production sites
 
 $module->cron     = 60;               // Period for cron to check this module (secs)
-
-?>
