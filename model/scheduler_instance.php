@@ -428,8 +428,7 @@ class scheduler_instance extends mvc_record_model {
      */
     public function get_possible_attendees($groups = '') {
         // TODO does this need to go to the controller?
-        $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-        $attendees = get_users_by_capability($context, 'mod/scheduler:appoint', '',
+        $attendees = get_users_by_capability($this->get_context(), 'mod/scheduler:appoint', '',
             'lastname, firstname', '', '', $groups, '', false, false, false);
 
         return $attendees;

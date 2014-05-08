@@ -765,7 +765,7 @@ if (!$students) {
 ?>
 				</td>
 				<?php
-				if (scheduler_group_scheduling_enabled($course, $cm)){
+				if ($scheduler->is_group_scheduling_enabled()){
     ?>
 				<td width="50%"><?php
 

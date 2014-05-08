@@ -668,13 +668,6 @@ function scheduler_get_teacher_name($scheduler) {
     return $name;
 }
 
-function scheduler_group_scheduling_enabled($course, $cm) {
-    global $CFG;
-    $globalenable = (bool) $CFG->scheduler_groupscheduling;
-    $localenable = (groupmode($course, $cm) > 0);
-    return $globalenable && $localenable;
-}
-
 function scheduler_has_teachers($context) {
     $teachers = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id');
     return count($teachers) > 0;
