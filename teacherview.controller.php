@@ -354,7 +354,7 @@ switch ($action) {
                             }
                         }
                     } 
-                    else {
+                    if (!$conflicts || $data->forcewhenoverlap) {
                         $DB->insert_record('scheduler_slots', $slot, false);
                         $countslots++;
                     }
