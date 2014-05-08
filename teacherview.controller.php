@@ -90,7 +90,8 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                             scheduler_delete_slot($conflict->id);
                         }
                     }
-                } else {
+                }
+                if (!$conflicts || $data->forcewhenoverlap) {
                     $DB->insert_record('scheduler_slots', $slot, false, true);
                     $countslots++;
                 }
