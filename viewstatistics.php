@@ -22,26 +22,16 @@ function byName($a, $b){
 $groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
 $usergroups = array_keys($groups);
 
-//display statistics tabs
+// Display navigation tabs.
 
-$tabs = array('overall', 'studentbreakdown', 'staffbreakdown','lengthbreakdown','groupbreakdown');
-$tabrows = array();
-$row  = array();
-$currenttab = '';
-foreach ($tabs as $tab) {
-    $a = ($tab == 'staffbreakdown') ? format_string(scheduler_get_teacher_name($scheduler)) : '';
-    $tabname = get_string($tab, 'scheduler', strtolower($a));
-    $row[] = new tabobject($tabname, "view.php?what=viewstatistics&amp;id=$cm->id&amp;course=$scheduler->course&amp;page=".$tab, $tabname);
-}
-$tabrows[] = $row;
-
-print_tabs($tabrows, get_string($page, 'scheduler'));
+$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid));
+echo $output->teacherview_tabs($scheduler, $taburl, $subpage);
 
 //display correct type of statistics by request
 
-$attendees = scheduler_get_possible_attendees ($cm, $usergroups);
+$attendees = $scheduler->get_possible_attendees($usergroups);
 
-switch ($page) {
+switch ($subpage) {
     case 'overall':
         $sql = '
             SELECT
@@ -176,7 +166,7 @@ switch ($page) {
         if ($statrecords = $DB->get_records_sql($sql, array($scheduler->id))) {
         	$table = new html_table();
             $table->width = '70%';
-            $table->head  = array (s(scheduler_get_teacher_name($scheduler)), get_string('cumulatedduration', 'scheduler'));
+            $table->head  = array (s($scheduler->get_teacher_name()), get_string('cumulatedduration', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER');
             foreach($statrecords as $aRecord){
                 $aTeacher = $DB->get_record('user', array('id'=>$aRecord->teacherid));

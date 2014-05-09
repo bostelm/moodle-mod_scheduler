@@ -16,20 +16,12 @@ require_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 \mod_scheduler\event\booking_form_viewed::create_from_scheduler($scheduler)->trigger();
 
 // Clean all late slots (for everybody).
-scheduler_free_late_unused_slots($scheduler->id);
+$scheduler->free_late_unused_slots();
 
 $mygroups = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->groupingid, 'g.id, g.name');
 
-// Printing the heading.
-
-echo $output->heading(format_string($scheduler->name), 2);
-
-if (trim(strip_tags($scheduler->intro))) {
-    echo $output->box_start('mod_introbox');
-    echo format_module_intro('scheduler', $scheduler->get_data(), $scheduler->cmid);
-    echo $output->box_end();
-}
-
+// Print intro.
+echo $output->mod_intro($scheduler);
 
 // Get past slots.
 

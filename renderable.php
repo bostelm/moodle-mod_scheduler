@@ -9,7 +9,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -55,15 +54,22 @@ class scheduler_student_list implements renderable {
     public $showgrades;
     public $expandable = true;
     public $expanded = true;
+    public $editable = false;
+    public $checkboxname = '';
+    public $buttontext = '';
+    public $actionurl = null;
+    public $linkappointment = false;
 
-    public function add_student(scheduler_appointment $appointmentmodel, $highlight) {
+    public function add_student(scheduler_appointment $appointmentmodel, $highlight, $checked = false) {
         $student = new stdClass();
         $student->user = $appointmentmodel->get_student();
         if ($this->showgrades) {
             $student->grade = $appointmentmodel->grade;
         }
         $student->highlight = $highlight;
-        $this->students[]= $student;
+        $student->checked = $checked;
+        $student->entryid = $appointmentmodel->id;
+        $this->students[] = $student;
     }
 
     public function __construct(scheduler_instance $scheduler, $showgrades=true) {
@@ -126,6 +132,118 @@ class scheduler_slot_booker implements renderable {
         $this->style = $style;
         $this->actionurl = $actionurl;
         $this->maxselect = $maxselect;
+    }
+
+}
+
+
+class scheduler_command_bar implements renderable {
+    public $commandgroups = array();
+
+    /**
+     * Adds a group of commands consisting of several buttons and a common title
+     *
+     * @param string $title the title of the group
+     * @param array $buttons an array of single_button instances, representing the commands
+     */
+    public function add_group($title, array $buttons) {
+        $group = new stdClass();
+        $group->title = $title;
+        $group->buttons = $buttons;
+
+        $this->commandgroups[] = $group;
+    }
+
+    public function action_button(moodle_url $url, $titlekey, $confirmkey = null) {
+        $button = new single_button($url, get_string($titlekey, 'scheduler'));
+        if ($confirmkey) {
+            $button->add_action(new confirm_action(get_string($confirmkey, 'scheduler')));
+        }
+        return $button;
+    }
+
+    /**
+     * Contructs a command bar
+     */
+    public function __construct() {
+        // Nothing to add right now.
+    }
+
+}
+
+/**
+ * This class represents a table of slots displayed to a teacher, with options to modify the list.
+ */
+class scheduler_slot_manager implements renderable {
+
+    public $slots = array();
+    public $scheduler;
+    public $studentid;
+    public $actionurl;
+
+    /**
+     *  should the teacher owning the slot be shown?
+     */
+    public $showteacher = true;
+
+    public function add_slot(scheduler_slot $slotmodel, scheduler_student_list $students, $editable) {
+        $slot = new stdClass();
+        $slot->slotid = $slotmodel->id;
+        $slot->starttime = $slotmodel->starttime;
+        $slot->endtime = $slotmodel->endtime;
+        $slot->teacher = $slotmodel->get_teacher();
+        $slot->students = $students;
+        $slot->editable = $editable;
+        $slot->isattended = $slotmodel->is_attended();
+        $slot->isappointed = $slotmodel->get_appointment_count();
+        $slot->exclusivity = $slotmodel->exclusivity;
+
+        $this->slots[] = $slot;
+    }
+
+    /**
+     * Contructs a slot manager.
+     *
+     * @param scheduler_instance $scheduler the scheduler in which the booking takes place
+     * @param moodle_url action_url
+     */
+    public function __construct(scheduler_instance $scheduler, moodle_url $actionurl) {
+        $this->scheduler = $scheduler;
+        $this->actionurl = $actionurl;
+    }
+
+}
+
+
+/**
+ * This class represents a table of slots displayed to a teacher, with options to modify the list.
+ */
+class scheduler_scheduling_list implements renderable {
+
+    public $lines = array();
+    public $scheduler;
+    public $extraheaders;
+
+
+    public function add_line($pix, $name, array $extrafields, $actions) {
+        $line = new stdClass();
+        $line->pix = $pix;
+        $line->name = $name;
+        $line->extrafields = $extrafields;
+        $line->actions = $actions;
+
+        $this->lines[] = $line;
+    }
+
+    /**
+     * Contructs a scheduling list
+     *
+     * @param scheduler_instance $scheduler the scheduler in which the booking takes place
+     * @param moodle_url action_url
+     */
+    public function __construct(scheduler_instance $scheduler, array $extraheaders) {
+        $this->scheduler = $scheduler;
+        $this->extraheaders = $extraheaders;
     }
 
 }

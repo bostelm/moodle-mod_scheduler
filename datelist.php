@@ -14,6 +14,11 @@ defined('MOODLE_INTERNAL') || die();
 include_once $CFG->libdir.'/tablelib.php';
 
 
+// Print top tabs.
+
+$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'datelist'));
+echo $output->teacherview_tabs($scheduler, $taburl, 'datelist');
+
 if (has_capability('mod/scheduler:canseeotherteachersbooking', $context)) {
     $teacherid = optional_param('teacherid', $USER->id, PARAM_INT);
     $select = " teacherid = $teacherid ";
@@ -186,7 +191,7 @@ if ($numrecords){
         $table->add_data($dataset);
     }
     $table->print_html();
-    echo $OUTPUT->continue_button($CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id.'&amp;page='.$page);
+    echo $OUTPUT->continue_button($CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id.'&amp;subpage='.$subpage);
 }
 else{
     notice(get_string('noresults', 'scheduler'), $CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id);

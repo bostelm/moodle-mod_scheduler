@@ -254,6 +254,18 @@ class mvc_child_list {
         }
     }
 
+    public function get_child_by_id($id) {
+        $this->load();
+        $found = null;
+        foreach ($this->children as $child) {
+            if ($child->id == $id) {
+                $found = $child;
+                break;
+            }
+        }
+        return $found;
+    }
+
     public function get_children() {
         $this->load();
         return $this->children;

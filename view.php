@@ -15,18 +15,18 @@ require_once($CFG->dirroot.'/mod/scheduler/lib.php');
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 
-// common parameters
-$id = optional_param('id', '', PARAM_INT);    // Course Module ID, or
-$a = optional_param('a', '', PARAM_INT);     // scheduler ID
-$action = optional_param('what', 'view', PARAM_CLEAN);
-$subaction = optional_param('subaction', '', PARAM_CLEAN);
-$page = optional_param('page', 'allappointments', PARAM_CLEAN);
-$offset = optional_param('offset', '', PARAM_CLEAN);
+// Read common request parameters.
+$id = optional_param('id', '', PARAM_INT);    // Course Module ID - if it's not specified, must specify 'a', see below.
+$action = optional_param('what', 'view', PARAM_ALPHA);
+$subaction = optional_param('subaction', '', PARAM_ALPHA);
+$subpage = optional_param('subpage', 'allappointments', PARAM_ALPHA);
+$offset = optional_param('offset', -1, PARAM_INT);
 
 if ($id) {
     $cm = get_coursemodule_from_id('scheduler', $id, 0, false, MUST_EXIST);
     $scheduler = scheduler_instance::load_by_coursemodule_id($id);
 } else {
+    $a = required_param('a', PARAM_INT);     // Scheduler ID.
     $scheduler = scheduler_instance::load_by_id($a);
     $cm = get_coursemodule_from_id('scheduler', $scheduler->id, 0, false, MUST_EXIST);
 }

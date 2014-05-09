@@ -17,7 +17,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*/
 class scheduler_slot extends mvc_child_record_model {
 
     protected $appointments;
@@ -33,7 +33,7 @@ class scheduler_slot extends mvc_child_record_model {
         $this->set_parent($scheduler);
         $this->data->schedulerid = $scheduler->get_id();
         $this->appointments = new mvc_child_list($this, 'scheduler_appointment', 'slotid',
-            new scheduler_appointment_factory($this));
+                        new scheduler_appointment_factory($this));
     }
 
     /**
@@ -50,11 +50,11 @@ class scheduler_slot extends mvc_child_record_model {
      */
     /*  public static function load_from_record(stdClass $record, scheduler_instance $scheduler) {
      $slot = new scheduler_slot($scheduler);
-     $slot->data = $record;
-     return $slot;
-     }
+    $slot->data = $record;
+    return $slot;
+    }
 
-     */
+    */
     /**
      * Save any changes to the database
      */
@@ -131,7 +131,11 @@ class scheduler_slot extends mvc_child_record_model {
      * Has the slot been attended?
      */
     public function is_attended() {
-        return (boolean) ($this->data->isattended);
+        $isattended = false;
+        foreach ($this->appointments->get_children() as $app) {
+            $isattended = $isattended || $app->attended;
+        }
+        return $isattended;
     }
 
     /**
@@ -161,12 +165,7 @@ class scheduler_slot extends mvc_child_record_model {
      *  Get an appointment by ID
      */
     public function get_appointment($id) {
-        global $DB;
-
-        $appdata = $DB->get_record('scheduler_appointment', array('id' => $id, 'slotid'=> $this->id), '*', MUST_EXIST);
-        $app = new scheduler_appointment($this);
-        $app->load_record($appdata);
-        return $app;
+        return $this->appointments->get_child_by_id($id);
     }
 
     /**
@@ -199,10 +198,10 @@ class scheduler_slot extends mvc_child_record_model {
 
     /* The event code is SSstu (for a student event) or SSsup (for a teacher event).
      * then, the id of the scheduler slot that it belongs to.
-     * finally, the courseID (legacy reasons -- not really used),
-     * all in a colon delimited string. This will run into problems when the IDs of slots and courses
-     * are bigger than 7 digits in length...
-     */
+    * finally, the courseID (legacy reasons -- not really used),
+    * all in a colon delimited string. This will run into problems when the IDs of slots and courses
+    * are bigger than 7 digits in length...
+    */
 
     private function get_teacher_eventtype() {
         $slotid = $this->get_id();
@@ -275,10 +274,10 @@ class scheduler_slot extends mvc_child_record_model {
             $teacherids[] = $teacher->id;
             if (count($studentids) > 1) {
                 $teachereventname = get_string('meetingwithplural', 'scheduler').' '.
-                    get_string('students', 'scheduler').', '.implode(', ', $studentnames);
+                                get_string('students', 'scheduler').', '.implode(', ', $studentnames);
             } else {
                 $teachereventname = get_string('meetingwith', 'scheduler').' '.
-                    get_string('student', 'scheduler').', '.$studentnames[0];
+                                get_string('student', 'scheduler').', '.$studentnames[0];
             }
             $teacherevent->name = shorten_text($teachereventname, 200);
         }

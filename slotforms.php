@@ -24,7 +24,7 @@ abstract class scheduler_slotform_base extends moodleform {
     protected $usergroups;
     protected $has_duration = false;
 
-    public function __construct($action, $scheduler, $cm, $usergroups, $customdata=null) {
+    public function __construct($action, scheduler_instance $scheduler, $cm, $usergroups, $customdata=null) {
         $this->scheduler = $scheduler;
         $this->cm = $cm;
         $this->context = context_module::instance($cm->id);
@@ -57,12 +57,12 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size'=>'30'));
         $mform->setType('appointmentlocation', PARAM_NOTAGS);
         $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 50);
-        $mform->setDefault('appointmentlocation', scheduler_get_last_location($this->scheduler));
+        $mform->setDefault('appointmentlocation', $this->scheduler->get_last_location($USER));
         $mform->addHelpButton('appointmentlocation', 'location', 'scheduler');
 
         // Choose the teacher (if allowed)
         if (has_capability('mod/scheduler:canscheduletootherteachers', $this->context)) {
-            $teachername = s(scheduler_get_teacher_name($this->scheduler));
+            $teachername = s($this->scheduler->get_teacher_name());
             $teachers = scheduler_get_attendants($this->cm->id);
             $teachersmenu = array();
             if ($teachers) {
@@ -121,7 +121,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
     protected function definition() {
 
-        global $DB;
+        global $DB, $output;
 
         $mform = $this->_form;
         $this->slotid = 0;
@@ -164,7 +164,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $repeatarray[] = $mform->createElement('header', 'appointhead', get_string('appointmentno', 'scheduler', '{no}'));
 
         // Choose student
-        $students = scheduler_get_possible_attendees($this->cm, $this->usergroups);
+        $students = $this->scheduler->get_possible_attendees($this->usergroups);
         $studentsmenu = array('0' => get_string('choosedots'));
         if ($students) {
             foreach ($students as $astudent) {
@@ -185,7 +185,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         // Grade
         if ($this->scheduler->scale != 0) {
-            $gradechoices = scheduler_get_grading_choices($this->scheduler);
+            $gradechoices = $output->grading_choices($this->scheduler);
             $grouparray[] = $mform->createElement('static', 'attendedlabel', '', get_string('grade', 'scheduler'));
             $grouparray[] = $mform->createElement('select', 'grade', '', $gradechoices);
         }

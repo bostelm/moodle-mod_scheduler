@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_scheduler-delselected",
+    "builds": {
+        "moodle-mod_scheduler-delselected": {
+            "jsfiles": [
+                "delselected.js"
+            ]
+        }
+    }
+}

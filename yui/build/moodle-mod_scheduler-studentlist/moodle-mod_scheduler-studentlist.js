@@ -37,4 +37,4 @@ MOD.init = function(imageid, expanded) {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "node", "event"]});
+}, '@VERSION@', {"requires": ["base", "node", "event", "io"]});
