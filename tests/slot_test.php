@@ -186,8 +186,8 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assert_event_exists($this->teacherid, $newstart, "Meeting with your Students");
 
         // Delete one of the appointments.
-        $DB->delete_records('scheduler_appointment', array('id' => $this->appointmentids[0]));
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $app = $slot->get_appointment($this->appointmentids[0]);
+        $slot->remove_appointment($app);
         $slot->save();
 
         $this->assert_event_absent($this->students[0], $newstart);
@@ -217,7 +217,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
     }
 
     private function assert_event_absent($userid, $time) {
-        $events = calendar_get_events($time - 60, $time + 60, $userid, false, false);
+        $events = calendar_get_events($time - MINSECS, $time + HOURSECS, $userid, false, false);
         $this->assertEquals(0, count($events), "Expecting no event at time $time for user $userid");
     }
 }

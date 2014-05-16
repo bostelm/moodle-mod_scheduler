@@ -232,7 +232,9 @@ class scheduler_slot extends mvc_child_record_model {
 
         $studentids = array();
         foreach ($myappointments as $appointment) {
-            $studentids[] = $appointment->studentid;
+            if (!$appointment->is_attended()) {
+                $studentids[] = $appointment->studentid;
+            }
         }
 
         $teacher = $DB->get_record('user', array('id' => $this->teacherid));
