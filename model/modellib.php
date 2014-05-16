@@ -307,7 +307,8 @@ class mvc_child_list {
         if (is_null($this->children) || !in_array($child, $this->children)) {
             throw new coding_exception ('Child record to remove not found in list');
         }
-        $this->children = array_diff_key($this->children, array($child->get_id()));
+        $key = array_search($child, $this->children, true);
+        unset($this->children[$key]);
         $this->childrenfordeletion[] = $child;
     }
 
