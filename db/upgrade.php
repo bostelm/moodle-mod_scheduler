@@ -122,10 +122,8 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         }
 
         // Convert old calendar events.
-        $sql = 'UPDATE {event} SET modulename = "scheduler" WHERE eventtype LIKE "SSsup:%"';
-        $DB->execute($sql);
-        $sql = 'UPDATE {event} SET modulename = "scheduler" WHERE eventtype LIKE "SSstu:%"';
-        $DB->execute($sql);
+        $sql = 'UPDATE {event} SET modulename = ? WHERE eventtype LIKE ? OR eventtype LIKE ?';
+        $DB->execute($sql, array('scheduler', 'SSsup:%', 'SSstu:%'));
 
         // Savepoint reached.
         upgrade_mod_savepoint(true, 2014050200, 'scheduler');
