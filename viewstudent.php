@@ -165,4 +165,3 @@ return;
 /// Finish the page
 echo $OUTPUT->footer($course);
 exit;
-?>

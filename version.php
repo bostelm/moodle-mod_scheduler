@@ -22,4 +22,3 @@ $module->maturity = MATURITY_STABLE;  // Stable branch
 
 $module->cron     = 60;               // Period for cron to check this module (secs)
 
-?>

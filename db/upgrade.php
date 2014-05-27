@@ -169,4 +169,3 @@ function xmldb_scheduler_upgrade($oldversion=0) {
     return true;
 }
 
-?>

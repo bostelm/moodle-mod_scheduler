@@ -32,4 +32,3 @@ if ($ADMIN->fulltree) {
     
 }
 
-?>

@@ -622,4 +622,3 @@ function scheduler_grade_item_delete($scheduler) {
 }
 
 
-?>

@@ -353,4 +353,3 @@ else {
 } else {
     notify(get_string('noslots', 'scheduler'));
 }
-?>

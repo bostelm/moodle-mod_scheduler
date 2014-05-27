@@ -460,4 +460,3 @@ if ($scheduler->scale != 0){
 </center>
 <?php
 }
-?>

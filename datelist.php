@@ -191,4 +191,3 @@ if ($numrecords){
 else{
     notice(get_string('noresults', 'scheduler'), $CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id);
 }
-?>
