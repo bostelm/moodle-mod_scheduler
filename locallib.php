@@ -581,6 +581,8 @@ function scheduler_add_update_calendar_events($slot, $course) {
 function scheduler_delete_calendar_events($slot) {
     global $DB;
     
+    if(!$slot->schedulerid) return false;
+    
     $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
     
     if (!$scheduler) return false ;
