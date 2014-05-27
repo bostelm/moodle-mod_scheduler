@@ -60,7 +60,7 @@ function scheduler_usertime($date, $local=0) {
  */
 function scheduler_get_attendants($cmid){
     $context = context_module::instance($cmid);
-    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id,lastname,firstname,email,picture', 'lastname, firstname', '', '', '', '', false, false, false);
+    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend', user_picture::fields('u') , 'lastname, firstname', '', '', '', '', false, false, false);
     return $attendants;
 }
 
