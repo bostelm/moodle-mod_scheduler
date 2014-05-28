@@ -62,7 +62,7 @@ $sql = "
     ORDER BY
     starttime $order
     ";
-if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid, $order))) {
+if ($slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid))) {
     /// provide link to sort in the opposite direction
     if($order == 'DESC'){
         $orderlink = "<a href=\"view.php?what=viewstudent&amp;id=$cm->id&amp;studentid=".$studentid."&amp;course=$scheduler->course&amp;order=ASC&amp;page=$page\">";
