@@ -67,4 +67,3 @@ if ($subaction == 'updategrades' and (has_capability('mod/scheduler:manage', $co
     }
 }
 
-?>

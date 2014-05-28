@@ -125,4 +125,3 @@ else {
 
 echo $OUTPUT->footer($course);
 
-?>

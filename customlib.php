@@ -64,4 +64,3 @@ function scheduler_get_user_fields($user) {
 }
 
 
-?>

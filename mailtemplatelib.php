@@ -83,4 +83,3 @@ function scheduler_send_email_from_template($recipient, $sender, $course, $title
     return $res;
 }
 
-?>

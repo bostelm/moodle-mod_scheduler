@@ -60,7 +60,7 @@ function scheduler_usertime($date, $local=0) {
  */
 function scheduler_get_attendants($cmid){
     $context = context_module::instance($cmid);
-    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id,lastname,firstname,email,picture', 'lastname, firstname', '', '', '', '', false, false, false);
+    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend', user_picture::fields('u') , 'lastname, firstname', '', '', '', '', false, false, false);
     return $attendants;
 }
 
@@ -581,6 +581,8 @@ function scheduler_add_update_calendar_events($slot, $course) {
 function scheduler_delete_calendar_events($slot) {
     global $DB;
     
+    if(!$slot->schedulerid) return false;
+    
     $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
     
     if (!$scheduler) return false ;
@@ -941,4 +943,3 @@ if (!function_exists('print_error_class')){
         }
     }
 }
-?>

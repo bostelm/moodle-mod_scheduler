@@ -85,4 +85,3 @@ echo html_writer::table($table);
 
 echo $OUTPUT->footer($course);
 
-?>

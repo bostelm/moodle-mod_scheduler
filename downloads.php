@@ -35,11 +35,7 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
     /// Prepare data
     $sql = "
         SELECT DISTINCT
-        u.id,
-        u.firstname,
-        u.lastname,
-        u.email,
-        u.department
+        ".user_picture::fields('u',array('email','department'))."
         FROM
         {scheduler_slots} s,
         {user} u
@@ -238,11 +234,7 @@ if ($action == 'downloadcsv'){
     /// Prepare data
     $sql = "
         SELECT DISTINCT
-        u.id,
-        u.firstname,
-        u.lastname,
-        u.email,
-        u.department
+        ".user_picture::fields('u',array('email','department'))."
         FROM
         {scheduler_slots} s,
         {user} u
@@ -304,8 +296,7 @@ if ($action == 'downloadcsv'){
             a.studentid,
             a.grade,
             a.appointmentnote,
-            u.lastname,
-            u.firstname
+            ".user_picture::fields('u')."
             FROM
             {user} u,
             {scheduler_slots} s,
@@ -460,4 +451,3 @@ if ($scheduler->scale != 0){
 </center>
 <?php
 }
-?>

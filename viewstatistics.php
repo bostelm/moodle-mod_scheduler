@@ -242,13 +242,13 @@ switch ($page) {
             a.slotid = s.id
             WHERE 
             a.studentid IS NOT NULL AND
-            schedulerid = '{$scheduler->id}'
+            schedulerid = ?
             GROUP BY
             s.starttime
             ORDER BY
             groupsize DESC
             ";
-        if ($groupslots = $DB->get_records_sql($sql)){
+        if ($groupslots = $DB->get_records_sql($sql,array($scheduler->id))){
         	$table = new html_table();
             $table->head  = array (get_string('groupsize', 'scheduler'), get_string('occurrences', 'scheduler'), get_string('cumulatedduration', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER', 'CENTER');
@@ -269,8 +269,7 @@ switch ($page) {
         }
 }
 echo '<br/>';
-print_continue("$CFG->wwwroot/mod/scheduler/view.php?id=".$cm->id);
+echo $OUTPUT->continue_button("$CFG->wwwroot/mod/scheduler/view.php?id=".$cm->id);
 /// Finish the page
 echo $OUTPUT->footer($course);
 exit;
-?>
