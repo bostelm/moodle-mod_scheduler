@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_scheduler-studentlist",
+    "builds": {
+        "moodle-mod_scheduler-studentlist": {
+            "jsfiles": [
+                "studentlist.js"
+            ]
+        }
+    }
+}

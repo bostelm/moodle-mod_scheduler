@@ -20,7 +20,7 @@ require_once('modellib.php');
  *
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*/
 class scheduler_appointment extends mvc_child_record_model {
 
 
@@ -34,9 +34,11 @@ class scheduler_appointment extends mvc_child_record_model {
         $this->set_parent($slot);
         $this->data->slotid = $slot->get_id();
         $this->data->attended = 0;
+        $this->data->appointmentnoteformat = FORMAT_HTML;
     }
 
     public function save() {
+        $this->data->slotid = $this->get_parent()->get_id();
         parent::save();
         $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $this->studentid);

@@ -1,4 +1,4 @@
-<?PHP
+<?php
 
 /**
  * This page prints a particular instance of scheduler and handles
@@ -13,21 +13,20 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/mod/scheduler/lib.php');
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
+require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 
-// common parameters
-$id = optional_param('id', '', PARAM_INT);    // Course Module ID, or
-$a = optional_param('a', '', PARAM_INT);     // scheduler ID
-$action = optional_param('what', 'view', PARAM_CLEAN);
-$subaction = optional_param('subaction', '', PARAM_CLEAN);
-$page = optional_param('page', 'allappointments', PARAM_CLEAN);
-$offset = optional_param('offset', '', PARAM_CLEAN);
-$usehtmleditor = false;
-$editorfields = '';
+// Read common request parameters.
+$id = optional_param('id', '', PARAM_INT);    // Course Module ID - if it's not specified, must specify 'a', see below.
+$action = optional_param('what', 'view', PARAM_ALPHA);
+$subaction = optional_param('subaction', '', PARAM_ALPHA);
+$subpage = optional_param('subpage', 'allappointments', PARAM_ALPHA);
+$offset = optional_param('offset', -1, PARAM_INT);
 
 if ($id) {
     $cm = get_coursemodule_from_id('scheduler', $id, 0, false, MUST_EXIST);
     $scheduler = scheduler_instance::load_by_coursemodule_id($id);
 } else {
+    $a = required_param('a', PARAM_INT);     // Scheduler ID.
     $scheduler = scheduler_instance::load_by_id($a);
     $cm = get_coursemodule_from_id('scheduler', $scheduler->id, 0, false, MUST_EXIST);
 }
@@ -37,20 +36,20 @@ require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
 // TODO require_capability('mod/scheduler:view', $context);
 
-add_to_log($course->id, 'scheduler', $action, "view.php?id={$cm->id}", $scheduler->id, $cm->id);
-
-// Initialize $PAGE, compute blocks
+// Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
 
-/// This is a pre-header selector for downloded documents generation
+$output = $PAGE->get_renderer('mod_scheduler');
 
-    if (has_capability('mod/scheduler:manage', $context) || has_capability('mod/scheduler:attend', $context)) {
-        if (preg_match('/downloadexcel|^downloadcsv|downloadods/', $action)){
-            include($CFG->dirroot.'/mod/scheduler/downloads.php');
-        }
+// This is a pre-header selector for downloded documents generation.
+
+if (has_capability('mod/scheduler:manage', $context) || has_capability('mod/scheduler:attend', $context)) {
+    if (preg_match('/downloadexcel|^downloadcsv|downloadods/', $action)) {
+        include($CFG->dirroot.'/mod/scheduler/downloads.php');
     }
+}
 
-/// Print the page header
+// Print the page header.
 
 $strschedulers = get_string('modulenameplural', 'scheduler');
 $strscheduler  = get_string('modulename', 'scheduler');
@@ -72,34 +71,29 @@ $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
-/// route to screen
+// route to screen
 
 // teacher side
 if (has_capability('mod/scheduler:manage', $context)) {
-    if ($action == 'viewstatistics'){
-        include $CFG->dirroot.'/mod/scheduler/viewstatistics.php';
+    if ($action == 'viewstatistics') {
+        include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
+    } else if ($action == 'viewstudent') {
+        include($CFG->dirroot.'/mod/scheduler/viewstudent.php');
+    } else if ($action == 'downloads' || $action == 'dodownloadcsv') {
+        include($CFG->dirroot.'/mod/scheduler/downloads.php');
+    } else if ($action == 'datelist') {
+        include($CFG->dirroot.'/mod/scheduler/datelist.php');
+    } else {
+        include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }
-    elseif ($action == 'viewstudent'){
-        include $CFG->dirroot.'/mod/scheduler/viewstudent.php';
-    }
-    elseif ($action == 'downloads' || $action == 'dodownloadcsv'){
-        include $CFG->dirroot.'/mod/scheduler/downloads.php';
-    }
-    elseif ($action == 'datelist'){
-        include $CFG->dirroot.'/mod/scheduler/datelist.php';
-    }
-    else{
-        include $CFG->dirroot.'/mod/scheduler/teacherview.php';
-    }
-}
 
-// student side
-elseif (has_capability('mod/scheduler:appoint', $context)) {
-    include $CFG->dirroot.'/mod/scheduler/studentview.php';
-}
-// for guests
-else {
-    echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'center', '70%');
+    // student side
+} else if (has_capability('mod/scheduler:appoint', $context)) {
+    include($CFG->dirroot.'/mod/scheduler/studentview.php');
+
+    // for guests
+} else {
+    echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');
 }
 
 echo $OUTPUT->footer($course);

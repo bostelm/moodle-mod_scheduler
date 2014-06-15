@@ -1,14 +1,13 @@
-.path-mod-scheduler .formerror{
-   border : red 1px solid;
-   background-color : #FDD9D9;
-}
-
 .path-mod-scheduler .timelabel{
    color : #808080;
 }
 
 .path-mod-scheduler .attended{
    color : green;
+}
+
+.path-mod-scheduler div.otherstudent.highlight{
+   font-weight : bold;
 }
 
 .path-mod-scheduler div.slotnotes{
@@ -27,17 +26,116 @@ div .path-mod-scheduler .appointmentnote{
    margin : 1px;
 }
 
-.path-mod-scheduler table.schedulercommands th {
-   background-color : #E7EFE7;
-   border-style: solid;
-   border-color: white;
-   border-width: 2px 10px;
+.path-mod-scheduler #slotbookertable {
+    margin-left:auto;
+    margin-right:auto;
 }
 
-.path-mod-70 {
-   width:70%;
+.path-mod-scheduler #slotbookertable tr.booked {
+    background-color : #E7EFE7;
+    font-weight : bold;
 }
 
-table.generaltable {
-   width:99%;
+.path-mod-scheduler div.bookercontrols {
+    text-align: center;
+}
+
+.path-mod-scheduler div.studentlist.expanded {
+    display: block;
+}
+
+.path-mod-scheduler div.studentlist.collapsed {
+    display: none;
+}
+
+.path-mod-scheduler dl.commandbar  {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color : #EEEEEE;
+    padding: 0.5em; 
+} 
+
+.path-mod-scheduler dl.commandbar dt {
+    float: left; 
+    clear: left; 
+    width: 100px; 
+    text-align: right; 
+    font-weight: bold; 
+}
+
+.path-mod-scheduler dl.commandbar dd {
+    margin: 0 0 0 110px; 
+}
+
+.path-mod-scheduler dl.commandbar dd div.singlebutton,
+.path-mod-scheduler dl.commandbar dd div.singlebutton form {
+    display: inline; 
+}
+
+.path-mod-scheduler dl.commandbar dd div.singlebutton form#delselected ,
+.path-mod-scheduler input.slotselect {
+    display: none;
+}
+
+body.path-mod-scheduler.jsenabled dl.commandbar dd div.singlebutton form#delselected {
+    display: inline;
+}
+body.path-mod-scheduler.jsenabled input.slotselect {
+    display: inline;
+}
+
+body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
+    display: none;
+}
+
+.path-mod-scheduler img.statictickbox {
+    padding-right: 5px;
+}
+
+.path-mod-scheduler .maildisplay {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    background: #eeeeee;
+    text-align: center;
+}
+
+.path-mod-scheduler div.schedulelist.halfsize {
+    width: 46%;
+    display: inline-table;
+    padding: 3px;
+}
+
+.path-mod-scheduler div.schedulelist.fullsize {
+    width: 96%;
+    display: block;
+    padding: 3px;
+}
+
+.path-mod-scheduler div.schedulelist div.singlebutton,
+.path-mod-scheduler div.schedulelist div.singlebutton form {
+    display: inline;
+}
+
+.path-mod-scheduler div.actionmessage {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    border: solid 2px;
+    padding: 5px;    
+    display: block;
+    text-align: center;
+    font-weight: bold;
+}
+
+.path-mod-scheduler div.actionmessage.success {
+    background-color: #96FCA6;
+    border-color: #14FA34;
+}
+
+.path-mod-scheduler div.actionmessage.error {
+    background-color: ##FFB2B8;
+    border-color: #F40000;
 }

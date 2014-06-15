@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_scheduler-saveseen",
+    "builds": {
+        "moodle-mod_scheduler-saveseen": {
+            "jsfiles": [
+                "saveseen.js"
+            ]
+        }
+    }
+}

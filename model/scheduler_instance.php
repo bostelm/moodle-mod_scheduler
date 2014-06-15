@@ -9,7 +9,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once('modellib.php');
@@ -17,8 +16,10 @@ require_once('modellib.php');
 class scheduler_instance extends mvc_record_model {
 
     protected $cm = null;
+    protected $context = null;
     protected $groupmode;
     protected $slots;
+    protected $scalecache = null;
 
     protected function get_table() {
         return 'scheduler';
@@ -27,9 +28,8 @@ class scheduler_instance extends mvc_record_model {
     protected function __construct() {
         parent::__construct();
         $this->slots = new mvc_child_list($this, 'scheduler_slots', 'schedulerid',
-            new scheduler_slot_factory($this));
+                        new scheduler_slot_factory($this));
     }
-
 
     /**
      * Create a scheduler instance from the database.
@@ -77,8 +77,6 @@ class scheduler_instance extends mvc_record_model {
         $this->slots->delete_children();
     }
 
-
-
     /**
      * Retrieve the course module id of this scheduler
      */
@@ -91,6 +89,16 @@ class scheduler_instance extends mvc_record_model {
      */
     public function get_courseid() {
         return $this->data->course;
+    }
+
+    /**
+     * Retrieve the activity module context of this scheduler
+     */
+    public function get_context() {
+        if ($this->context == null) {
+            $this->context = context_module::instance($this->get_cmid());
+        }
+        return $this->context;
     }
 
     /**
@@ -162,8 +170,8 @@ class scheduler_instance extends mvc_record_model {
         global $DB;
 
         $select = 'schedulerid = :schedulerid AND teacherid = :teacherid ORDER BY timemodified DESC LIMIT 1';
-        $params = array('schedulerid'=>$this->data->id, 'teacherid'=>$user->id);
-        $lastlocation = $DB->get_field('scheduler_slots', 'appointmentlocation', $params, IGNORE_MISSING);
+        $params = array('schedulerid' => $this->data->id, 'teacherid' => $user->id);
+        $lastlocation = $DB->get_field('scheduler_slots', 'appointmentlocation', $params, IGNORE_MULTIPLE);
         if (!$lastlocation) {
             $lastlocation = '';
         }
@@ -178,12 +186,38 @@ class scheduler_instance extends mvc_record_model {
         return ($this->maxbookings != 1);
     }
 
+    /**
+     * Checks whether this scheduler uses grading at all.
+     * @return boolean
+     */
+    public function uses_grades() {
+        return ($this->scale != 0);
+    }
+
+    public function get_scale_levels() {
+        global $DB;
+
+        if (is_null($this->scalecache)) {
+            $this->scalecache = array();
+            if ($this->scale < 0) {
+                $scaleid = -($this->scale);
+                if ($scale = $DB->get_record('scale', array('id' => $scaleid))) {
+                    $levels = explode(',', $scale->scale);
+                    foreach ($levels as $id => $value) {
+                        $this->scalecache[$id+1] = $value;
+                    }
+                }
+            }
+        }
+        return $this->scalecache;
+    }
+
     /* *********************** Loading lists of slots *********************** */
 
     /**
-     * Load a generic list of slots
+     * Fetch a generic list of slots from the database
      */
-    protected function load_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='') {
+    protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='s.id') {
         global $DB;
         $acntselect = '(SELECT COUNT(a.id) FROM {scheduler_appointment} a WHERE a.slotid=s.id) AS appointcnt';
         $attendedselect = 'EXISTS(SELECT 1 FROM {scheduler_appointment} a WHERE a.slotid=s.id AND a.attended=1) AS isattended';
@@ -200,14 +234,16 @@ class scheduler_instance extends mvc_record_model {
             $having = 'HAVING '.$havingcond;
         }
 
-        $sql = "$select $where $having";
+        $order = 'ORDER BY '.$orderby;
+
+        $sql = "$select $where $having $order";
 
         $slotdata = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
         $slots = array();
         foreach ($slotdata as $slotrecord) {
             $slot = new scheduler_slot($this);
             $slot->load_record($slotrecord);
-            $slots[$slotrecord->id] = $slot;
+            $slots[] = $slot;
         }
         return $slots;
     }
@@ -217,21 +253,80 @@ class scheduler_instance extends mvc_record_model {
         return '(s.starttime > :cutofftime)';
     }
 
+    protected function student_in_slot_condition(&$params, $studentid, $mustbeattended, $mustbeunattended) {
+        $cond = 'EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.studentid = :studentid and a.slotid=s.id';
+        if ($mustbeattended) {
+            $cond .= ' AND a.attended = 1';
+        }
+        if ($mustbeunattended) {
+            $cond .= ' AND a.attended = 0';
+        }
+        $cond .= ')';
+        $params['studentid'] = $studentid;
+        return $cond;
+    }
+
+    public function get_slot($id) {
+
+        global $DB;
+
+        $slotdata = $DB->get_record('scheduler_slots', array('id' => $id, 'schedulerid'=> $this->id), '*', MUST_EXIST);
+        $slot = new scheduler_slot($this);
+        $slot->load_record($slotdata);
+        return $slot;
+    }
+
     public function get_slots() {
         return $this->slots->get_children();
     }
 
-    public function get_all_slots($limitfrom='', $limitnum='') {
-        return $this->load_slots(null, null, array(), $limitfrom, $limitnum);
+    public function get_slot_count() {
+        return $this->slots->get_child_count();
     }
 
-    public function get_slot_count() {
-        global $DB;
-        return $DB->count_records('scheduler_slots', array('schedulerid'=>$this->data->id));
+    public function get_all_slots($limitfrom='', $limitnum='') {
+        return $this->fetch_slots(null, null, array(), $limitfrom, $limitnum);
+    }
+
+    /**
+     * Retrieves slots booked by a student. These will be sorted by start time.
+     *
+     * @param int $studentid
+     * @param boolean $includepast whether to include past slots
+     * @param boolean $includeupcoming whether to include upcoming, but no longer rebookable slots
+     * @param boolean $includerebookable whether to include future, rebookable slots
+     */
+    public function get_booked_slots($studentid, $includepast, $includeupcoming, $includerebookable) {
+
+        $params = array();
+        $whereconds = array();
+        if ($includepast) {
+            $whereconds[] = '(s.starttime <= :now1)';
+            $params['now1'] = time();
+        }
+        if ($includeupcoming) {
+            $whereconds[] = '(s.starttime > :now2)';
+            $params['now2'] = time();
+        }
+        if ($includerebookable) {
+            $whereconds[] = '(s.starttime > :now2)';
+            $params['now2'] = time();
+        }
+        $wherecond = count($whereconds) > 0 ? implode(' OR ', $whereconds) : '';
+        $mustbeattended   = $includeupcoming && !$includerebookable;
+        $mustbeunattended = !$includeupcoming && $includerebookable;
+        $wherecond = '('.$wherecond.') AND '.
+                        $this->student_in_slot_condition($params, $studentid, $mustbeattended, $mustbeunattended);
+
+        $slots = $this->fetch_slots($wherecond, '', $params, '', '', 's.starttime');
+
+        return $slots;
     }
 
     /**
      * retrieves slots available to a student
+     * Note: this does not check for scheduling conflicts.
+     *
      * @param int $studentid
      * @param boolean $includebooked include slots that were booked by this student (but not yet attended)
      * @uses $CFG
@@ -241,14 +336,14 @@ class scheduler_instance extends mvc_record_model {
         global $CFG, $DB;
 
         $params = array();
-        $wherecond = '';
-        $havingcond = $this->slots_in_future_condition($params).'AND (s.exclusivity = 0 OR s.exclusivity > appointcnt)';
+        $wherecond = $this->slots_in_future_condition($params).' AND (s.hideuntil < :nowhide)';
+        $params['nowhide'] = time();
+        $havingcond = 's.exclusivity = 0 OR s.exclusivity > appointcnt';
         if ($includebooked) {
-            $havingcond = '('.$havingcond.') OR EXISTS '.
-                '(SELECT 1 FROM {scheduler_appointment} a WHERE a.studentid = :studentid and a.slotid=s.id AND a.attended = 0)';
-            $params['studentid'] = $studentid;
+            $havingcond = '('.$havingcond.') OR ('.$this->student_in_slot_condition($params, $studentid, false, true).')';
         }
-        $slots = $this->load_slots($wherecond, $havingcond, $params);
+        $order = 's.starttime ASC';
+        $slots = $this->fetch_slots($wherecond, $havingcond, $params, '', '', $order);
 
         return $slots;
     }
@@ -258,7 +353,7 @@ class scheduler_instance extends mvc_record_model {
      */
     public function get_slots_without_appointment() {
         $havingcond = 'appointcnt = 0';
-        $slots = $this->load_slots('', $havingcond, array());
+        $slots = $this->fetch_slots('', $havingcond, array());
         return $slots;
     }
 
@@ -288,6 +383,39 @@ class scheduler_instance extends mvc_record_model {
         return $this->slots->create_child();
     }
 
+    /**
+     * Computes how many appointments a student can still book.
+     *
+     * @param int $studentid
+     * @return int the number of bookable or changeable appointments, possibly 0; returns -1 if unlimited.
+     */
+    public function count_bookable_appointments($studentid) {
+        global $DB;
+
+        // find how many slots have already been booked/assigned, unchangeably
+        $sql = 'SELECT COUNT(*) FROM {scheduler_slots} s'
+                        .' JOIN {scheduler_appointment} a ON s.id = a.slotid'
+                                        .' WHERE s.schedulerid = :schedulerid AND a.studentid=:studentid';
+        if ($this->schedulermode == 'onetime') {
+            $sql .= ' AND s.starttime <= :cutofftime AND a.attended = 0';
+        } else {
+            $sql .= ' AND (s.starttime <= :cutofftime OR a.attended = 1)';
+        }
+        $params = array('schedulerid' => $this->id, 'studentid' => $studentid, 'cutofftime' => time());
+
+        $booked = $DB->count_records_sql($sql, $params);
+        $allowed = $this->maxbookings;
+
+        if ($allowed == 0) {
+            return -1;
+        } else if ($booked >= $allowed) {
+            return 0;
+        } else {
+            return $allowed - $booked;
+        }
+
+    }
+
 
     /**
      * get list of possible attendees (i.e., users that can make an appointment)
@@ -297,11 +425,93 @@ class scheduler_instance extends mvc_record_model {
      */
     public function get_possible_attendees($groups = '') {
         // TODO does this need to go to the controller?
-        $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-        $attendees = get_users_by_capability($context, 'mod/scheduler:appoint', '',
-                         'lastname, firstname', '', '', $groups, '', false, false, false);
+        $attendees = get_users_by_capability($this->get_context(), 'mod/scheduler:appoint', '',
+                        'lastname, firstname', '', '', $groups, '', false, false, false);
 
         return $attendees;
+    }
+
+    /**
+     * Get a list of students that can still mae an appointment
+     *
+     * @param $groups - single group or array of groups - only return
+     *                  users who are in one of these group(s).
+     * @param int $cutoff - if the number of students in the course is more than this limit,
+     * 						the routine will return
+     *                      (this is for performance reasons)
+     * @return int|array of moodle user records; or integer 0 if there are no students in the course;
+     *                    or the number of students if there are too many students
+     */
+    public function get_students_for_scheduling($groups = '', $cutoff = 0) {
+        $studs = $this->get_possible_attendees($groups);
+        if (($cutoff > 0 && count($studs) > $cutoff) || count($studs) == 0) {
+            return count($studs);
+        }
+        $schedstuds = array();
+        foreach ($studs as $stud) {
+            if ($this->count_bookable_appointments($stud->id) > 0) {
+                $schedstuds[] = $stud;
+            }
+        }
+        return $schedstuds;
+    }
+
+
+    /**
+     * Delete an appointment, and do whatever is needed
+     *
+     * N.B. this might delete certain empty slots as well.
+     *
+     * @param int $appointmentid
+     * @param object $slot
+     * @uses $DB
+     */
+    public function delete_appointment($appointmentid) {
+        global $DB;
+
+        if (!$oldrecord = $DB->get_record('scheduler_appointment', array('id' => $appointmentid))) {
+            return;
+        }
+
+        $slot = $this->get_slot($oldrecord->slotid);
+        $appointment = $slot->get_appointment($appointmentid);
+
+        if ($slot) {
+            // Delete the appointment.
+            $appointment->delete();
+            scheduler_update_grades($this, $oldrecord->studentid);
+            // Not a reusable slot. Delete it if slot is too near and has no more appointments.
+            if ($slot->reuse == 0) {
+                $consumed = scheduler_get_consumed($slot->schedulerid, $slot->starttime, $slot->starttime + $slot->duration * 60);
+                if (!$consumed) {
+                    if (time() > 0 ) { //  ULPGC ecastro, volatiles are deleted always   $slot->starttime - $scheduler->reuseguardtime * 3600){
+                        $slot->delete();
+                    }
+                }
+            } else {
+                // Trigger save action, in order to update calendar events etc.
+                $slot->save();
+            }
+        }
+    }
+
+    /**
+     * frees all empty slots that are in the past, hance no longer bookable
+     * @uses $CFG
+     * @uses $DB
+     */
+    public function free_late_unused_slots() {
+        global $CFG, $DB;
+
+        $now = time();
+        $sql =  'SELECT DISTINCT s.id FROM {scheduler_slots} s '
+                        .'LEFT JOIN {scheduler_appointment} a ON s.id = a.slotid '
+                                        .'WHERE a.studentid IS NULL AND s.schedulerid = ? AND starttime < ?';
+        $todelete = $DB->get_records_sql($sql, array($this->id, $now));
+        if ($todelete) {
+            list($usql, $params) = $DB->get_in_or_equal(array_keys($todelete));
+            $DB->delete_records_select('scheduler_slots', " id $usql ", $params);
+        }
     }
 
 }

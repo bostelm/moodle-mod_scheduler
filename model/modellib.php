@@ -99,7 +99,8 @@ abstract class mvc_record_model extends mvc_model {
         } else if (property_exists($this->data, 'id') && ($this->data->id)) {
             $DB->update_record($this->get_table(), $this->data);
         } else {
-            $DB->insert_record($this->get_table(), $this->data);
+            $newid = $DB->insert_record($this->get_table(), $this->data);
+            $this->data->id = $newid;
         }
     }
 
@@ -253,6 +254,18 @@ class mvc_child_list {
         }
     }
 
+    public function get_child_by_id($id) {
+        $this->load();
+        $found = null;
+        foreach ($this->children as $child) {
+            if ($child->id == $id) {
+                $found = $child;
+                break;
+            }
+        }
+        return $found;
+    }
+
     public function get_children() {
         $this->load();
         return $this->children;
@@ -294,7 +307,8 @@ class mvc_child_list {
         if (is_null($this->children) || !in_array($child, $this->children)) {
             throw new coding_exception ('Child record to remove not found in list');
         }
-        $this->children = array_diff_key($this->children, array($child->get_id()));
+        $key = array_search($child, $this->children, true);
+        unset($this->children[$key]);
         $this->childrenfordeletion[] = $child;
     }
 

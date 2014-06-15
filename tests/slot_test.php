@@ -69,6 +69,33 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assertFalse($ex, "Checking whether record $id is absent in table $table: $msg");
     }
 
+    public function test_create() {
+
+        global $DB;
+
+        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
+        $slot = $scheduler->create_slot();
+
+        $slot->teacherid =  $this->getDataGenerator()->create_user()->id;
+        $slot->starttime = time();
+        $slot->duration = 60;
+
+        $newapp1 = $slot->create_appointment();
+        $newapp1->studentid = $this->getDataGenerator()->create_user()->id;
+        $newapp2 = $slot->create_appointment();
+        $newapp2->studentid = $this->getDataGenerator()->create_user()->id;
+
+        $slot->save();
+
+        $newid = $slot->get_id();
+        $this->assertNotEquals(0, $newid, "Checking slot id after creation");
+
+        $newcnt = $DB->count_records('scheduler_appointment', array('slotid' => $newid));
+        $this->assertEquals(2, $newcnt, "Counting number of appointments after addition");
+
+    }
+
+
     public function test_delete() {
 
         $scheduler = scheduler_instance::load_by_id($this->schedulerid);
@@ -159,8 +186,8 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assert_event_exists($this->teacherid, $newstart, "Meeting with your Students");
 
         // Delete one of the appointments.
-        $DB->delete_records('scheduler_appointment', array('id' => $this->appointmentids[0]));
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $app = $slot->get_appointment($this->appointmentids[0]);
+        $slot->remove_appointment($app);
         $slot->save();
 
         $this->assert_event_absent($this->students[0], $newstart);
@@ -190,7 +217,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
     }
 
     private function assert_event_absent($userid, $time) {
-        $events = calendar_get_events($time - 60, $time + 60, $userid, false, false);
+        $events = calendar_get_events($time - MINSECS, $time + HOURSECS, $userid, false, false);
         $this->assertEquals(0, count($events), "Expecting no event at time $time for user $userid");
     }
 }

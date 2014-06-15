@@ -31,7 +31,7 @@ class scheduler_editappointment_form extends moodleform {
 
     protected function definition() {
 
-        global $DB;
+        global $output;
 
         $mform = $this->_form;
         $scheduler = $this->appointment->get_scheduler();
@@ -43,12 +43,12 @@ class scheduler_editappointment_form extends moodleform {
         // Grade
         if ($scheduler->scale != 0) {
             if ($this->editgrade) {
-                $gradechoices = scheduler_get_grading_choices($scheduler);
+                $gradechoices = $output->grading_choices($scheduler);
                 $mform->addElement('select', 'grade', get_string('grade', 'scheduler'), $gradechoices);
                 $mform->disabledIf('grade', 'attended', 'notchecked');
             } else {
-                $gradetext = scheduler_format_grade($scheduler, $this->appointment->grade);
-                $mform->addElement('static', 'grade', get_string('grade', 'scheduler'), $gradetext);
+                $gradetext = $output->format_grade($scheduler, $this->appointment->grade);
+                $mform->addElement('static', 'gradedisplay', get_string('grade', 'scheduler'), $gradetext);
             }
         }
         // Appointment notes
