@@ -111,16 +111,17 @@ switch ($action) {
     /************************************ Deleting a slot ***********************************************/
     case 'deleteslot': {
         $slotid = required_param('slotid', PARAM_INT);
-
-        scheduler_delete_slot($slotid, $scheduler);
+        $slot = $scheduler->get_slot($slotid);
+        $slot->delete();
         break;
     }
     /************************************ Deleting multiple slots ***********************************************/
     case 'deleteslots': {
         $slotids = required_param('items', PARAM_SEQUENCE);
         $slots = explode(",", $slotids);
-        foreach ($slots as $aSlotId) {
-            scheduler_delete_slot($aSlotId, $scheduler);
+        foreach ($slots as $slotid) {
+            $slot = $scheduler->get_slot($slotid);
+            $slot->delete();
         }
         break;
     }
