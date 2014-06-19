@@ -57,13 +57,9 @@ class mod_scheduler_mod_form extends moodleform_mod {
 	    $mform->addGroup($modegroup, 'modegrp', get_string('mode', 'scheduler'), ' ', false);
 	    $mform->addHelpButton('modegrp', 'appointmentmode', 'scheduler');
 
-	    $reuseguardoptions[24] = 24 . ' ' . get_string('hours');
-	    $reuseguardoptions[48] = 48 . ' ' . get_string('hours');
-	    $reuseguardoptions[72] = 72 . ' ' . get_string('hours');
-	    $reuseguardoptions[96] = 96 . ' ' . get_string('hours');
-	    $reuseguardoptions[168] = 168 . ' ' . get_string('hours');
-	    $mform->addElement('select', 'reuseguardtime', get_string('reuseguardtime', 'scheduler'), $reuseguardoptions);
-	    $mform->addHelpButton('reuseguardtime', 'reuseguardtime', 'scheduler');
+
+		$mform->addElement('duration', 'guardtime', get_string('guardtime', 'scheduler'), array('optional' => true));
+	    $mform->addHelpButton('guardtime', 'guardtime', 'scheduler');
 
 	    $mform->addElement('text', 'defaultslotduration', get_string('defaultslotduration', 'scheduler'), array('size'=>'2'));
 	    $mform->setType('defaultslotduration', PARAM_INT);

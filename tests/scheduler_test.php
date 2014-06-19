@@ -163,4 +163,112 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+	private function assert_slot_times($expected, $actual, $options) {
+        $this->assertEquals(count($expected), count($actual));
+        $slottimes = array();
+        foreach ($expected as $e) {
+            $slottimes[] = $options['slottimes'][$e];
+        }
+        foreach ($actual as $a) {
+            $this->assertTrue( in_array($a->starttime, $slottimes));
+        }
+	}
+
+	private function check_timed_slots($schedulerid, $studentid, $slotoptions, $expAttended, $expUpcoming, $expAvailable, $expBookable) {
+
+        $sched = scheduler_instance::load_by_id($schedulerid);
+
+        $attended = $sched->get_attended_slots_for_student($studentid);
+        $this->assert_slot_times($expAttended, $attended, $slotoptions);
+
+        $upcoming = $sched->get_upcoming_slots_for_student($studentid);
+        $this->assert_slot_times($expUpcoming, $upcoming, $slotoptions);
+
+        $available = $sched->get_slots_available_to_student($studentid, false);
+        $this->assert_slot_times($expAvailable, $available, $slotoptions);
+
+        $bookable = $sched->get_slots_available_to_student($studentid, true);
+        $this->assert_slot_times($expBookable, $bookable, $slotoptions);
+
+	}
+
+    public function test_load_slot_timing() {
+
+		global $DB;
+
+		$currentstud = $this->getDataGenerator()->create_user()->id;
+
+        $options = array();
+        $options['slottimes'] = array();
+        $options['slotstudents'] = array();
+        $options['slotattended'] = array();
+
+        // Create slots 0 to 5, n days in the future, booked by the student but not attended
+        for ($c = 0; $c <= 5; $c++) {
+            $options['slottimes'][$c] = time()+$c*DAYSECS+12*HOURSECS;
+            $options['slotstudents'][$c] = $currentstud;
+	        $options['slotattended'][$c] = false;
+        }
+
+        // Create slot 6, located in the past, booked by the student but not attended
+        $options['slottimes'][6] = time()-3*DAYSECS;
+        $options['slotstudents'][6] = $currentstud;
+        $options['slotattended'][6] = false;
+
+        // Create slot 7, located in the past, booked by the student and attended
+        $options['slottimes'][7] = time()-4*DAYSECS;
+        $options['slotstudents'][7] = $currentstud;
+        $options['slotattended'][7] = true;
+
+        // Create slot 8, located less than one day in the future but marked attended
+        $options['slottimes'][8] = time()+9*HOURSECS;
+        $options['slotstudents'][8] = $currentstud;
+        $options['slotattended'][8] = true;
+
+        // Create slots 10 to 14, (n-10) days in the future, open for booking
+        for ($c = 10; $c <= 14; $c++) {
+            $options['slottimes'][$c] = time()+($c-10)*DAYSECS+10*HOURSECS;
+        }
+
+        $schedrec = $this->getDataGenerator()->create_module('scheduler', array('course'=>$this->courseid), $options);
+        $schedid = $schedrec->id;
+
+		$schedrec->guardtime = 0;
+		$DB->update_record('scheduler', $schedrec);
+
+	    $this->check_timed_slots($schedid, $currentstud, $options,
+	     			array(7, 8),
+	     			array(6),
+	     			array(10, 11, 12, 13, 14),
+	     			array(10, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5) );
+
+		$schedrec->guardtime = DAYSECS;
+		$DB->update_record('scheduler', $schedrec);
+
+	    $this->check_timed_slots($schedid, $currentstud, $options,
+	     			array(7, 8),
+	     			array(6, 0),
+	     			array(11, 12, 13, 14),
+	     			array(11, 12, 13, 14, 1, 2, 3, 4, 5) );
+
+		$schedrec->guardtime = 4*DAYSECS;
+		$DB->update_record('scheduler', $schedrec);
+
+	    $this->check_timed_slots($schedid, $currentstud, $options,
+	     			array(7, 8),
+	     			array(6, 0, 1, 2, 3),
+	     			array(14),
+	     			array(14, 4, 5) );
+
+		$schedrec->guardtime = 20*DAYSECS;
+		$DB->update_record('scheduler', $schedrec);
+
+	    $this->check_timed_slots($schedid, $currentstud, $options,
+	     			array(7, 8),
+	     			array(6, 0, 1, 2, 3, 4, 5),
+	     			array(),
+	     			array() );
+
+    }
+
 }

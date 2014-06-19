@@ -110,41 +110,6 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
     return $conflicting;
 }
 
-/**
- * Returns count of slots that would overlap with this
- * use it as a test function before toggling to exclusive
- * @param int $schedulerid the actual scheduler instance
- * @param int $starttime the starttime identifying the slot
- * @param int $endtime the endtime of the period
- * @param int $teacher the teacher constraint, if null stands for "all teachers"
- * @return int the number of compatible slots
- * @uses $CFG
- * @uses $DB
- */
-function scheduler_get_consumed($schedulerid, $starttime, $endtime, $teacherid=0) {
-    global $CFG, $DB;
-
-    $teacherScope = ($teacherid != 0) ? " teacherid = '{$teacherid}' AND " : '' ;
-    $sql = "
-        SELECT
-        COUNT(*)
-        FROM
-        {scheduler_slots} s,
-        {scheduler_appointment} a
-        WHERE
-        a.slotid = s.id AND
-        schedulerid = {$schedulerid} AND
-        {$teacherScope}
-        ( (s.starttime <= {$starttime} AND
-        {$starttime} < s.starttime + s.duration * 60) OR
-        (s.starttime < {$endtime} AND
-        {$endtime} <= s.starttime + s.duration * 60) OR
-        (s.starttime >= {$starttime} AND
-        s.starttime + s.duration * 60 <= {$endtime}) )
-        ";
-    $count = $DB->count_records_sql($sql, NULL);
-    return $count;
-}
 
 /**
  * checks if user has an appointment in this scheduler

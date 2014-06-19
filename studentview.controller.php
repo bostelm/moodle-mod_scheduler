@@ -120,7 +120,7 @@ if ($action == 'savechoice') {
             $oldslotid = $oldappointment->id;
             $oldslot = scheduler_slot::load_by_id($oldslotid, $scheduler);
 
-            // Prepare notification e-mail first - slot might be deleted if it's volatile.
+            // Prepare notification e-mail first
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id' => $USER->id));
                 $teacher = $DB->get_record('user', array('id' => $oldappointment->teacherid));

@@ -25,7 +25,7 @@ echo $output->mod_intro($scheduler);
 
 // Get past slots.
 
-$pastslots = $scheduler->get_booked_slots($USER->id, true, false, false);
+$pastslots = $scheduler->get_attended_slots_for_student($USER->id);
 
 if (count($pastslots) > 0) {
     $slottable = new scheduler_slot_table($scheduler, $scheduler->uses_grades());
@@ -48,7 +48,7 @@ if (count($pastslots) > 0) {
     echo $output->render($slottable);
 }
 
-$upcomingslots = $scheduler->get_booked_slots($USER->id, false, true, false);
+$upcomingslots = $scheduler->get_upcoming_slots_for_student($USER->id);
 
 if (count($upcomingslots) > 0) {
     $slottable = new scheduler_slot_table($scheduler, $scheduler->uses_grades());

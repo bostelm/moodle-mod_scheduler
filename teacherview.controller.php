@@ -29,7 +29,6 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     $slot->schedulerid = $scheduler->id;
     $slot->teacherid = $data->teacherid;
     $slot->appointmentlocation = $data->appointmentlocation;
-    $slot->reuse = $data->reuse;
     $slot->exclusivity = $data->exclusivity;
     if($data->divide) {
         $slot->duration = $data->duration;
@@ -165,9 +164,6 @@ switch ($action) {
         }
 
         $slot->save();
-        if (!$slot->reuse and $slot->starttime > time() - $scheduler->reuseguardtime) {
-            $DB->delete_records('scheduler_slots', array('id'=>$slot->id));
-        }
         break;
     }
 
@@ -187,26 +183,6 @@ switch ($action) {
         $slot = new stdClass();
         $slot->id = $slotid;
         $slot->exclusivity = 1;
-        $DB->update_record('scheduler_slots', $slot);
-        break;
-    }
-
-    /************************************ Toggling reuse on ***************************************/
-    case 'reuse':{
-        $slotid = required_param('slotid', PARAM_INT);
-        $slot = new stdClass();
-        $slot->id = $slotid;
-        $slot->reuse = 1;
-        $DB->update_record('scheduler_slots', $slot);
-        break;
-    }
-
-    /************************************ Toggling reuse off ***************************************/
-    case 'unreuse':{
-        $slotid = required_param('slotid', PARAM_INT);
-        $slot = new stdClass();
-        $slot->id = $slotid;
-        $slot->reuse = 0;
         $DB->update_record('scheduler_slots', $slot);
         break;
     }
@@ -277,7 +253,6 @@ switch ($action) {
         $slot->starttime = time();
         $slot->duration = $scheduler->defaultslotduration;
         $slot->exclusivity = 1;
-        $slot->reuse = 0;
         $slot->notes = '';
         $slot->notesformat = FORMAT_HTML;
         $slot->hideuntil = time();

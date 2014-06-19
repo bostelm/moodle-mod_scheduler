@@ -48,11 +48,6 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->setDefault('exclusivity', 1);
         $mform->addHelpButton('exclusivity', 'exclusivity', 'scheduler');
 
-        // reuse the slot?
-        $mform->addElement('selectyesno', 'reuse', get_string('reuse', 'scheduler'));
-        $mform->setDefault('reuse', 1);
-        $mform->addHelpButton('reuse', 'reuse', 'scheduler');
-
         // location of the appointment
         $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size'=>'30'));
         $mform->setType('appointmentlocation', PARAM_NOTAGS);
@@ -431,7 +426,6 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $slot = new stdClass();
         $slot->appointmentlocation = $data->appointmentlocation;
         $slot->exclusivity = $data->exclusivity;
-        $slot->reuse = $data->reuse;
         $slot->duration = $data->duration;
         $slot->schedulerid = $scheduler->id;
         $slot->timemodified = time();

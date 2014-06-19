@@ -74,7 +74,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
     /* ******************* 2.7 upgrade line ********************** */
 
-    if ($oldversion < 2014050200) {
+    if ($oldversion < 2014052800) {
 
         // Define field teacher to be dropped from scheduler.
         $table = new xmldb_table('scheduler');
@@ -89,7 +89,17 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         $table = new xmldb_table('scheduler');
         $field = new xmldb_field('maxbookings', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'schedulermode');
 
+
         // Conditionally launch add field maxbookings.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field guardtime to be added to scheduler.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('guardtime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'maxbookings');
+
+        // Conditionally launch add field guardtime.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -126,7 +136,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         $DB->execute($sql, array('scheduler', 'SSsup:%', 'SSstu:%'));
 
         // Savepoint reached.
-        upgrade_mod_savepoint(true, 2014050200, 'scheduler');
+        upgrade_mod_savepoint(true, 2014052800, 'scheduler');
     }
 
     return true;

@@ -248,13 +248,9 @@ class scheduler_instance extends mvc_record_model {
         return $slots;
     }
 
-    protected function slots_in_future_condition(&$params) {
-        $params['cutofftime'] = time();
-        return '(s.starttime > :cutofftime)';
-    }
-
+	protected $studparno = 0;
     protected function student_in_slot_condition(&$params, $studentid, $mustbeattended, $mustbeunattended) {
-        $cond = 'EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.studentid = :studentid and a.slotid=s.id';
+        $cond = 'EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.studentid = :studentid'.$this->studparno.' and a.slotid=s.id';
         if ($mustbeattended) {
             $cond .= ' AND a.attended = 1';
         }
@@ -262,7 +258,8 @@ class scheduler_instance extends mvc_record_model {
             $cond .= ' AND a.attended = 0';
         }
         $cond .= ')';
-        $params['studentid'] = $studentid;
+        $params['studentid'.$this->studparno] = $studentid;
+        $this->studparno++;
         return $cond;
     }
 
@@ -289,34 +286,33 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
-     * Retrieves slots booked by a student. These will be sorted by start time.
+     * Retrieves attended of a student. These will be sorted by start time.
      *
      * @param int $studentid
-     * @param boolean $includepast whether to include past slots
-     * @param boolean $includeupcoming whether to include upcoming, but no longer rebookable slots
-     * @param boolean $includerebookable whether to include future, rebookable slots
      */
-    public function get_booked_slots($studentid, $includepast, $includeupcoming, $includerebookable) {
+    public function get_attended_slots_for_student($studentid) {
 
         $params = array();
-        $whereconds = array();
-        if ($includepast) {
-            $whereconds[] = '(s.starttime <= :now1)';
-            $params['now1'] = time();
-        }
-        if ($includeupcoming) {
-            $whereconds[] = '(s.starttime > :now2)';
-            $params['now2'] = time();
-        }
-        if ($includerebookable) {
-            $whereconds[] = '(s.starttime > :now2)';
-            $params['now2'] = time();
-        }
-        $wherecond = count($whereconds) > 0 ? implode(' OR ', $whereconds) : '';
-        $mustbeattended   = $includeupcoming && !$includerebookable;
-        $mustbeunattended = !$includeupcoming && $includerebookable;
-        $wherecond = '('.$wherecond.') AND '.
-                        $this->student_in_slot_condition($params, $studentid, $mustbeattended, $mustbeunattended);
+        $wherecond = $this->student_in_slot_condition($params, $studentid, true, false);
+
+        $slots = $this->fetch_slots($wherecond, '', $params, '', '', 's.starttime');
+
+        return $slots;
+    }
+
+    /**
+     * Retrieves upcoming slots booked by a student. These will be sorted by start time.
+     * A slot is "upcoming" if it is not attended, but can no longer be rebooked;
+     * because it is closer than the "guard time" to the current time.
+     *
+     * @param int $studentid
+     */
+    public function get_upcoming_slots_for_student($studentid) {
+
+        $params = array();
+        $wherecond = '(s.starttime <= :guard)';
+        $params['guard'] = time() + $this->guardtime;
+        $wherecond .= ' AND '.$this->student_in_slot_condition($params, $studentid, false, true);
 
         $slots = $this->fetch_slots($wherecond, '', $params, '', '', 's.starttime');
 
@@ -336,9 +332,11 @@ class scheduler_instance extends mvc_record_model {
         global $CFG, $DB;
 
         $params = array();
-        $wherecond = $this->slots_in_future_condition($params).' AND (s.hideuntil < :nowhide)';
+        $wherecond = '(s.starttime > :cutofftime) AND (s.hideuntil < :nowhide)';
         $params['nowhide'] = time();
-        $havingcond = 's.exclusivity = 0 OR s.exclusivity > appointcnt';
+        $params['cutofftime'] = time() + $this->guardtime;
+        $havingcond = '(s.exclusivity = 0 OR s.exclusivity > appointcnt)'
+                    . ' AND NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
         if ($includebooked) {
             $havingcond = '('.$havingcond.') OR ('.$this->student_in_slot_condition($params, $studentid, false, true).')';
         }
@@ -476,23 +474,9 @@ class scheduler_instance extends mvc_record_model {
         $slot = $this->get_slot($oldrecord->slotid);
         $appointment = $slot->get_appointment($appointmentid);
 
-        if ($slot) {
-            // Delete the appointment.
-            $appointment->delete();
-            scheduler_update_grades($this, $oldrecord->studentid);
-            // Not a reusable slot. Delete it if slot is too near and has no more appointments.
-            if ($slot->reuse == 0) {
-                $consumed = scheduler_get_consumed($slot->schedulerid, $slot->starttime, $slot->starttime + $slot->duration * 60);
-                if (!$consumed) {
-                    if (time() > 0 ) { //  ULPGC ecastro, volatiles are deleted always   $slot->starttime - $scheduler->reuseguardtime * 3600){
-                        $slot->delete();
-                    }
-                }
-            } else {
-                // Trigger save action, in order to update calendar events etc.
-                $slot->save();
-            }
-        }
+        // Delete the appointment.
+        $slot->remove_appointment($appointment);
+        $slot->save();
     }
 
     /**

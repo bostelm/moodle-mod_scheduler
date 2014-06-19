@@ -91,13 +91,6 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
-     * Is the slot re-usable?
-     */
-    public function is_reusable() {
-        return (boolean) ($this->data->reuse);
-    }
-
-    /**
      * Is this a group slot (i.e., more than one student is permitted)
      */
     public function is_groupslot() {

@@ -52,7 +52,6 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->notesformat = $data->notes['format'];
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->hideuntil = $data->hideuntil;
-    $slot->reuse = $data->reuse;
     $slot->emaildate = $data->emaildate;
     $slot->timemodified = time();
 
