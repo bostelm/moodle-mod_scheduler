@@ -285,6 +285,12 @@ class scheduler_instance extends mvc_record_model {
         return $this->fetch_slots(null, null, array(), $limitfrom, $limitnum);
     }
 
+    public function get_slots_for_teacher($teacherid) {
+        $wherecond = 'teacherid = :teacherid';
+        $paras = array('teacherid' => $teacherid);
+        return $this->fetch_slots($wherecond, null, $paras, '', '');
+    }
+
     /**
      * Retrieves attended of a student. These will be sorted by start time.
      *

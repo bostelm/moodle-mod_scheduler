@@ -138,28 +138,38 @@ class scheduler_slot_booker implements renderable {
 
 
 class scheduler_command_bar implements renderable {
-    public $commandgroups = array();
+    public $menus = array();
+    public $linkactions = array();
+    public $title = '';
 
     /**
-     * Adds a group of commands consisting of several buttons and a common title
+     * Adds a group of menu items in a menu.
      *
      * @param string $title the title of the group
-     * @param array $buttons an array of single_button instances, representing the commands
+     * @param array $actions an array of action_menu_link instances, representing the commands
      */
-    public function add_group($title, array $buttons) {
-        $group = new stdClass();
-        $group->title = $title;
-        $group->buttons = $buttons;
-
-        $this->commandgroups[] = $group;
+    public function add_group($title, array $actions) {
+        $menu = new action_menu($actions);
+        $menu->actiontext = $title;
+        $this->menus[] = $menu;
     }
 
-    public function action_button(moodle_url $url, $titlekey, $confirmkey = null) {
-        $button = new single_button($url, get_string($titlekey, 'scheduler'));
-        if ($confirmkey) {
-            $button->add_action(new confirm_action(get_string($confirmkey, 'scheduler')));
+    public function action_link(moodle_url $url, $titlekey, $iconkey, $confirmkey = null, $id = null) {
+        $title = get_string($titlekey, 'scheduler');
+        $pix = new pix_icon($iconkey, $title, 'moodle', array('class' => 'iconsmall', 'title' => ''));
+        $attributes = array();
+        if ($id) {
+            $attributes['id'] = $id;
         }
-        return $button;
+        if ($confirmkey) {
+            if (!$id) {
+                $id = html_writer::random_id('command_link');
+            }
+            $attributes['id'] = $id;
+            $this->linkactions[$id] = new confirm_action(get_string($confirmkey, 'scheduler'));
+        }
+        $act = new action_menu_link_secondary($url, $pix, $title, $attributes);
+        return $act;
     }
 
     /**

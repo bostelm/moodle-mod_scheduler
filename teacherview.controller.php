@@ -189,15 +189,9 @@ switch ($action) {
 
     /************************************ Deleting all slots ***************************************************/
     case 'deleteall':{
-        if ($slots = $DB->get_records('scheduler_slots', array('schedulerid' => $cm->instance))) {
-            foreach ($slots as $aSlot) {
-                scheduler_delete_calendar_events($aSlot);
-            }
-            list($usql, $params) = $DB->get_in_or_equal(array_keys($slots));
-            $DB->delete_records_select('scheduler_appointment', " slotid $usql ", $params);
-            $DB->delete_records('scheduler_slots', array('schedulerid' => $cm->instance));
-            unset($slots);
-            scheduler_update_grades($scheduler);
+        require_capability('mod/scheduler:manageallappointments', $context);
+        foreach ($scheduler->get_all_slots() as $slot) {
+            $slot->delete();
         }
         break;
     }
@@ -233,15 +227,8 @@ switch ($action) {
     }
     /************************************ Deleting current teacher's slots ***************************************/
     case 'deleteonlymine': {
-        if ($slots = $DB->get_records_select('scheduler_slots', "schedulerid = {$cm->instance} AND teacherid = {$USER->id}", null, '', 'id,id')) {
-            foreach ($slots as $aSlot) {
-                scheduler_delete_calendar_events($aSlot);
-            }
-            $DB->delete_records('scheduler_slots', array('schedulerid'=>$cm->instance, 'teacherid'=>$USER->id));
-            $slotList = implode(',', array_keys($slots));
-            $DB->delete_records_select('scheduler_appointment', "slotid IN ($slotList)");
-            unset($slots);
-            scheduler_update_grades($scheduler);
+        foreach ($scheduler->get_slots_for_teacher($USER->id) as $slot) {
+            $slot->delete();
         }
         break;
     }

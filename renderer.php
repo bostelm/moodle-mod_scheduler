@@ -429,18 +429,17 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
     public function render_scheduler_command_bar(scheduler_command_bar $commandbar) {
         $o = '';
-        $o .= html_writer::start_tag('dl', array('class' => 'commandbar'));
-        foreach ($commandbar->commandgroups as $g) {
-            if (count($g->buttons) > 0) {
-                $o .= html_writer::tag('dt', $g->title);
-                $o .= html_writer::start_tag('dd');
-                foreach ($g->buttons as $button) {
-                    $o .= $this->render($button);
-                }
-                $o .= html_writer::end_tag('dd');
-            }
+        foreach ($commandbar->linkactions as $id => $action) {
+            $this->add_action_handler($action, $id);
         }
-        $o .= html_writer::end_tag('dl');
+        $o .= html_writer::start_div('commandbar');
+        if ($commandbar->title) {
+            $o .= html_writer::span($commandbar->title, 'title');
+        }
+        foreach ($commandbar->menus as $m) {
+            $o .= $this->render($m);
+        }
+        $o .= html_writer::end_div();
         return $o;
     }
 
@@ -591,8 +590,10 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $data[] = $field;
             }
             $actions = '';
-            foreach ($line->actions as $action) {
-                $actions .= $action;
+            if ($line->actions) {
+                $menu = new action_menu($line->actions);
+                $menu->actiontext = get_string('schedule', 'scheduler');
+                $actions = $this->render($menu);
             }
             $data[] = $actions;
             $mtable->data[] = $data;
