@@ -95,9 +95,9 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
             $appointments = $DB->get_records('scheduler_appointment', array('slotid' => $slot->id));
 
             /// fill slot data
-            $datestart = scheduler_userdate($slot->starttime,1);
-            $timestart = scheduler_usertime($slot->starttime,1);
-            $timeend = scheduler_usertime($slot->starttime + $slot->duration * 60,1);
+            $datestart = $output->userdate($slot->starttime);
+            $timestart = $output->usertime($slot->starttime);
+            $timeend = $output->usertime($slot->starttime + $slot->duration * 60);
             $i[$sheetname] = @$i[$sheetname] + 1;
             $myxls[$sheetname]->write_string($i[$sheetname],0,$datestart);
             $myxls[$sheetname]->write_string($i[$sheetname],1,$timestart);
@@ -259,9 +259,9 @@ if ($action == 'downloadcsv'){
                 $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id));
 
                 /// fill slot data
-                $datestart = scheduler_userdate($slot->starttime,1);
-                $timestart = scheduler_usertime($slot->starttime,1);
-                $timeend = scheduler_usertime($slot->starttime + $slot->duration * 60,1);
+                $datestart = $output->userdate($slot->starttime);
+                $timestart = $output->usertime($slot->starttime);
+                $timeend = $output->usertime($slot->starttime + $slot->duration * 60);
                 $stream .= $datestart . $csvfieldseparator;
                 $stream .= $timestart . $csvfieldseparator;
                 $stream .= $timeend . $csvfieldseparator;

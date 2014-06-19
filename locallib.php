@@ -19,45 +19,6 @@ require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
 
 
 /**
- * Parameter $local added by power-web.at
- * When local Date is needed the $local Param must be set to 1
- * @param int $date a timestamp
- * @param int $local
- * @todo check consistence
- * @return string printable date
- */
-function scheduler_userdate($date, $local=0) {
-    if ($date == 0) {
-        return '';
-    } else {
-        return userdate($date, get_string('strftimedaydate'));
-    }
-}
-
-/**
- * Parameter $local added by power-web.at
- * When local Time is needed the $local Param must be set to 1
- * @param int $date a timestamp
- * @param int $local
- * @todo check consistence
- * @return string printable time
- */
-function scheduler_usertime($date, $local=0) {
-    if ($date == 0) {
-        return '';
-    } else {
-        $timeformat = get_user_preferences('calendar_timeformat');//get user config
-        if(empty($timeformat)){
-            $timeformat = get_config(NULL,'calendar_site_timeformat');//get calendar config	if above not exist
-        }
-        if(empty($timeformat)){
-            $timeformat = get_string('strftimetime');//get locale default format if both above not exist
-        }
-        return userdate($date, $timeformat);
-    }
-}
-
-/**
  * get list of attendants for slot form
  * @param int $cmid the course module
  * @return array of moodle user records
@@ -246,7 +207,7 @@ function scheduler_get_mail_variables (scheduler_instance $scheduler, $slot, $at
     if ($slot) {
         $vars ['DATE']     = userdate($slot->starttime, get_string('strftimedate'));
         $vars ['TIME']     = userdate($slot->starttime, get_string('strftimetime'));
-        $vars ['ENDTIME']  = userdate($slot->starttime+$slot->duration*60, get_string('strftimetime'));
+        $vars ['ENDTIME']  = userdate($slot->endtime, get_string('strftimetime'));
         $vars ['LOCATION'] = $slot->appointmentlocation;
     }
     if ($attendant) {

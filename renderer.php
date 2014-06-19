@@ -19,6 +19,40 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
 */
 class mod_scheduler_renderer extends plugin_renderer_base {
 
+	/**
+	 * Format a date in the current user's timezone.
+	 * @param int $date a timestamp
+	 * @return string printable date
+ 	 */
+    public static function userdate($date) {
+        if ($date == 0) {
+            return '';
+        } else {
+            return userdate($date, get_string('strftimedaydate'));
+        }
+    }
+
+    /**
+     * Format a time in the current user's timezone.
+     * @param int $date a timestamp
+     * @return string printable time
+     */
+    public static function usertime($date) {
+        if ($date == 0) {
+            return '';
+        } else {
+            $timeformat = get_user_preferences('calendar_timeformat'); // Get user config.
+            if (empty($timeformat)) {
+                $timeformat = get_config(null, 'calendar_site_timeformat'); // Get calendar config if above not exist.
+            }
+            if (empty($timeformat)) {
+                $timeformat = get_string('strftimetime'); //Get locale default format if both of the above do not exist.
+            }
+            return userdate($date, $timeformat);
+        }
+    }
+
+
     /**
      * Formats a grade in a specific scheduler for display
      * @param scheduler_instance $scheduler
@@ -167,9 +201,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         foreach ($slottable->slots as $slot) {
             $rowdata = array();
 
-            $startdate = scheduler_userdate($slot->starttime, 1);
-            $starttime = scheduler_usertime($slot->starttime, 1);
-            $endtime = scheduler_usertime($slot->endtime, 1);
+            $startdate = $this->userdate($slot->starttime);
+            $starttime = $this->usertime($slot->starttime);
+            $endtime   = $this->usertime($slot->endtime);
             // Simplify display of dates, start and end times.
             if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
                 // If this row exactly matches previous, there's nothing to display.
@@ -327,9 +361,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
             $rowdata = array();
 
-            $startdate = scheduler_userdate($slot->starttime, 1);
-            $starttime = scheduler_usertime($slot->starttime, 1);
-            $endtime = scheduler_usertime($slot->endtime, 1);
+            $startdate = $this->userdate($slot->starttime);
+            $starttime = $this->usertime($slot->starttime);
+            $endtime = $this->usertime($slot->endtime);
             // Simplify display of dates, start and end times.
             if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
                 // If this row exactly matches previous, there's nothing to display.
@@ -475,9 +509,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $selectbox = html_writer::checkbox('selectedslot[]', $slot->slotid, false, '', array('class' => 'slotselect'));
             $rowdata[] = $slot->editable ? $selectbox : '';
 
-            $startdate = scheduler_userdate($slot->starttime, 1);
-            $starttime = scheduler_usertime($slot->starttime, 1);
-            $endtime = scheduler_usertime($slot->endtime, 1);
+            $startdate = $this->userdate($slot->starttime);
+            $starttime = $this->usertime($slot->starttime);
+            $endtime = $this->usertime($slot->endtime);
             // Simplify display of dates, start and end times.
             if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
                 // If this row exactly matches previous, there's nothing to display.

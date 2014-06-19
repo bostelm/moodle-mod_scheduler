@@ -98,8 +98,8 @@ function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, 
     $starttimemem = '';
     $availableslotsmenu = array();
     foreach ($availableslots as $slot) {
-        $startdatecnv = scheduler_userdate($slot->starttime, 1);
-        $starttimecnv = scheduler_usertime($slot->starttime, 1);
+        $startdatecnv = $output->userdate($slot->starttime);
+        $starttimecnv = $output->usertime($slot->starttime);
 
         $startdatestr = ($startdatemem != '' and $startdatemem == $startdatecnv) ? "-----------------" : $startdatecnv;
         $starttimestr = ($starttimemem != '' and $starttimemem == $starttimecnv) ? '' : $starttimecnv;
