@@ -405,7 +405,7 @@ class scheduler_instance extends mvc_record_model {
         } else {
             $sql .= ' AND (s.starttime <= :cutofftime OR a.attended = 1)';
         }
-        $params = array('schedulerid' => $this->id, 'studentid' => $studentid, 'cutofftime' => time());
+        $params = array('schedulerid' => $this->id, 'studentid' => $studentid, 'cutofftime' => time() + $this->guardtime);
 
         $booked = $DB->count_records_sql($sql, $params);
         $allowed = $this->maxbookings;
