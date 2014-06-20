@@ -203,7 +203,7 @@ function scheduler_get_unappointed_slots($schedulerid){
         GROUP BY
         s.id
         HAVING
-        appointed = 0 OR appointed IS NULL
+        MAX(a.studentid) = 0 OR MAX(a.studentid) IS NULL
         ORDER BY
         s.starttime ASC
         ';
