@@ -36,9 +36,9 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
     $workbook->send($downloadfilename);
 
     /// Prepare data
-    $sql = 'SELECT DISTINCT '.user_picture::fields('u', array('department')) .
-    		' FROM {scheduler_slots} s, {user} u' .
-        ".user_picture::fields('u',array('email','department'))."
+    $sql = 'SELECT DISTINCT '.user_picture::fields('u',array('email','department'))
+          .' FROM {scheduler_slots} s, {user} u'
+          .' WHERE s.teacherid = u.id AND schedulerid = ?';
     $teachers = $DB->get_records_sql($sql, array($scheduler->id));
     $slots = $DB->get_records('scheduler_slots', array('schedulerid' => $scheduler->id), 'starttime', 'id, starttime, duration, exclusivity, teacherid, hideuntil');
     if ($subaction == 'singlesheet'){
@@ -286,12 +286,10 @@ if ($action == 'downloadcsv'){
         }
     }
     else if ($subaction == 'grades'){
-        $sql = 'SELECT a.id, a.studentid, a.grade, a.appointmentnote,' .
-        		' u.lastname, u.firstname, u.middlename, u.lastnamephonetic, u.firstnamephonetic, u.alternatename' .
+        $sql = 'SELECT a.id, a.studentid, a.grade, a.appointmentnote,' .user_picture::fields('u').
         		' FROM {user} u, {scheduler_slots} s, {scheduler_appointment} a' .
         		' WHERE u.id = a.studentid AND a.slotid = s.id AND s.schedulerid = ? AND a.attended = 1' .
         		' ORDER BY u.lastname, u.firstname, s.teacherid';
-            ".user_picture::fields('u')."
         $grades = $DB->get_records_sql($sql, array($scheduler->id));
         $finals = array();
         foreach($grades as $grade){
