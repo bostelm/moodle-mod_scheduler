@@ -23,7 +23,7 @@ $mygroups = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->grouping
 // Print intro.
 echo $output->mod_intro($scheduler);
 
-// Get past slots.
+// Get past (attended) slots.
 
 $pastslots = $scheduler->get_attended_slots_for_student($USER->id);
 
@@ -44,7 +44,7 @@ if (count($pastslots) > 0) {
         $slottable->add_slot($pastslot, $appointment, $others);
     }
 
-    echo $output->heading(get_string('pastslots', 'scheduler'), 3);
+    echo $output->heading(get_string('attendedslots', 'scheduler'), 3);
     echo $output->render($slottable);
 }
 
