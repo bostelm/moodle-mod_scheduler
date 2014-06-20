@@ -215,14 +215,13 @@ class scheduler_instance extends mvc_record_model {
 
     /* *********************** Loading lists of slots *********************** */
 
+
     /**
      * Fetch a generic list of slots from the database
      */
     protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='s.id') {
         global $DB;
-        $acntselect = '(SELECT COUNT(a.id) FROM {scheduler_appointment} a WHERE a.slotid=s.id) AS appointcnt';
-        $attendedselect = 'EXISTS(SELECT 1 FROM {scheduler_appointment} a WHERE a.slotid=s.id AND a.attended=1) AS isattended';
-        $select = 'SELECT s.*, '.$acntselect.', '.$attendedselect.' FROM {scheduler_slots} s';
+        $select = 'SELECT s.* FROM {scheduler_slots} s';
 
         $where = 'WHERE schedulerid = :schedulerid';
         if ($wherecond) {
@@ -247,6 +246,14 @@ class scheduler_instance extends mvc_record_model {
             $slots[] = $slot;
         }
         return $slots;
+    }
+
+    /**
+     * Subquery that counts appointments in the current slot.
+     * Only to be used in conjunction with fetch_slots()
+     */
+    protected function appointment_count_query() {
+        return '(SELECT COUNT(a.id) FROM {scheduler_appointment} a WHERE a.slotid=s.id)';
     }
 
 	protected $studparno = 0;
@@ -342,7 +349,7 @@ class scheduler_instance extends mvc_record_model {
         $wherecond = '(s.starttime > :cutofftime) AND (s.hideuntil < :nowhide)';
         $params['nowhide'] = time();
         $params['cutofftime'] = time() + $this->guardtime;
-        $havingcond = '(s.exclusivity = 0 OR s.exclusivity > appointcnt)'
+        $havingcond = '(s.exclusivity = 0 OR s.exclusivity > '.$this->appointment_count_query().')'
                     . ' AND NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
         if ($includebooked) {
             $havingcond = '('.$havingcond.') OR ('.$this->student_in_slot_condition($params, $studentid, false, true).')';
@@ -357,7 +364,7 @@ class scheduler_instance extends mvc_record_model {
      * retrieves slots without any appointment made
      */
     public function get_slots_without_appointment() {
-        $havingcond = 'appointcnt = 0';
+        $havingcond = $this->appointment_count_query().' = 0';
         $slots = $this->fetch_slots('', $havingcond, array());
         return $slots;
     }
