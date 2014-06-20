@@ -75,11 +75,12 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                         print_string('conflictingslots', 'scheduler');
                         echo '<ul>';
                         foreach ($conflicts as $aconflict) {
-                            $sql = 'SELECT c.fullname, c.shortname, sl.starttime '
-                                            .'FROM {course} c, {scheduler} s, {scheduler_slots} sl '
-                                                            .'WHERE s.course = c.id AND sl.schedulerid = s.id AND sl.id = :conflictid';
+                            $sql = 'SELECT c.fullname, c.shortname, s.name as schedname, sl.starttime '
+                                    .'FROM {course} c, {scheduler} s, {scheduler_slots} sl '
+                                    .'WHERE s.course = c.id AND sl.schedulerid = s.id AND sl.id = :conflictid';
                             $conflictinfo = $DB->get_record_sql($sql, array('conflictid' => $aconflict->id));
-                            $msg = userdate($conflictinfo->starttime) . ' ' . usertime($conflictinfo->starttime) . ' ' . get_string('incourse', 'scheduler') . ': ';
+                            $msg = $output->userdate($conflictinfo->starttime) . ', ' . $output->usertime($conflictinfo->starttime) . ': ';
+                            $msg .= s($conflictinfo->schedname). ' '.get_string('incourse', 'scheduler') . ' ';
                             $msg .= $conflictinfo->shortname . ' - ' . $conflictinfo->fullname;
                             echo html_writer::tag('li', $msg);
                         }
