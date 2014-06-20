@@ -76,25 +76,16 @@ function scheduler_update_instance($scheduler) {
  * @uses $DB
  */
 function scheduler_delete_instance($id) {
-    global $CFG, $DB;
+    global $DB;
 
-    if (! $scheduler = $DB->get_record('scheduler', array('id' => $id))) {
+    if (! $DB->record_exists('scheduler', array('id' => $id))) {
         return false;
     }
 
-    $result = $DB->delete_records('scheduler', array('id' => $scheduler->id));
+    $scheduler = scheduler_instance::load_by_id($id);
+    $scheduler->delete();
 
-    $oldslots = $DB->get_records('scheduler_slots', array('schedulerid' => $scheduler->id), '', 'id, id');
-    if ($oldslots){
-        foreach(array_keys($oldslots) as $slotid){
-            // will delete appointments and remaining related events
-            scheduler_delete_slot($slotid);
-        }
-    }
-
-    scheduler_grade_item_delete($scheduler);
-
-    return $result;
+    return true;
 }
 
 /**

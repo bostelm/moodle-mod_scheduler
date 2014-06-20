@@ -86,7 +86,8 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                         echo '</ul><br/>';
                     } else { // we force, so delete all conflicting before inserting
                         foreach ($conflicts as $conflict) {
-                            scheduler_delete_slot($conflict->id);
+                        	$cslot = $scheduler->get_slot($conflict->id);
+                            $cslot->delete();
                         }
                     }
                 }
