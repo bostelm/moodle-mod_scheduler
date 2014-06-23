@@ -290,13 +290,13 @@ class scheduler_instance extends mvc_record_model {
     }
 
     public function get_all_slots($limitfrom='', $limitnum='') {
-        return $this->fetch_slots(null, null, array(), $limitfrom, $limitnum);
+        return $this->fetch_slots('', '', array(), $limitfrom, $limitnum);
     }
 
     public function get_slots_for_teacher($teacherid) {
         $wherecond = 'teacherid = :teacherid';
         $paras = array('teacherid' => $teacherid);
-        return $this->fetch_slots($wherecond, null, $paras, '', '');
+        return $this->fetch_slots($wherecond, '', $paras, '', '');
     }
 
     /**
@@ -349,13 +349,14 @@ class scheduler_instance extends mvc_record_model {
         $wherecond = '(s.starttime > :cutofftime) AND (s.hideuntil < :nowhide)';
         $params['nowhide'] = time();
         $params['cutofftime'] = time() + $this->guardtime;
-        $havingcond = '(s.exclusivity = 0 OR s.exclusivity > '.$this->appointment_count_query().')'
-                    . ' AND NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
+        $subcond = '(s.exclusivity = 0 OR s.exclusivity > '.$this->appointment_count_query().')'
+             . ' AND NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
         if ($includebooked) {
-            $havingcond = '('.$havingcond.') OR ('.$this->student_in_slot_condition($params, $studentid, false, true).')';
+            $subcond = '('.$subcond.') OR ('.$this->student_in_slot_condition($params, $studentid, false, true).')';
         }
+        $wherecond .= ' AND ('.$subcond.')';
         $order = 's.starttime ASC';
-        $slots = $this->fetch_slots($wherecond, $havingcond, $params, '', '', $order);
+        $slots = $this->fetch_slots($wherecond, '', $params, '', '', $order);
 
         return $slots;
     }
@@ -364,8 +365,8 @@ class scheduler_instance extends mvc_record_model {
      * retrieves slots without any appointment made
      */
     public function get_slots_without_appointment() {
-        $havingcond = $this->appointment_count_query().' = 0';
-        $slots = $this->fetch_slots('', $havingcond, array());
+        $wherecond = $this->appointment_count_query().' = 0';
+        $slots = $this->fetch_slots($wherecond, '', array());
         return $slots;
     }
 
