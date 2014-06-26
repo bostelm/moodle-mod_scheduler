@@ -311,8 +311,8 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $mform->addElement('date_selector', 'rangestart', get_string('date', 'scheduler'));
         $mform->setDefault('rangestart', time());
 
-        $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'));
-        $mform->setDefault('rangeend', time());
+        $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'),
+                            array('optional'  => true) );
 
         // Weekdays selection
         $weekdays = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday');
@@ -396,9 +396,12 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $errors = parent::validation($data, $files);
 
         // Range is negative
-        $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
-        if ($fordays < 0) {
-            $errors['rangeend'] = get_string('negativerange', 'scheduler');
+        $fordays = 0;
+        if ($data['rangeend'] > 0) {
+            $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
+            if ($fordays < 0) {
+                $errors['rangeend'] = get_string('negativerange', 'scheduler');
+            }
         }
 
         // Time range is negative

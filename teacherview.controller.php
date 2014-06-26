@@ -18,7 +18,10 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
 
     $data = (object) $formdata;
 
-    $fordays = (($data->rangeend - $data->rangestart) / DAYSECS);
+    $fordays = 0;
+    if ($data->rangeend > 0){
+        $fordays = ($data->rangeend - $data->rangestart) / DAYSECS;
+    }
 
     // Create as many slots of $duration as will fit between $starttime and $endtime and that do not conflict.
     $countslots = 0;
