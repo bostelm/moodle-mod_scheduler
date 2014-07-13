@@ -177,8 +177,6 @@ $string['modeintro'] = 'Students can register';
 $string['modeappointments'] = 'appointment(s)';
 $string['modeoneonly'] = 'in this scheduler';
 $string['modeoneatatime'] = 'at a time';
-$string['modulename'] = 'Scheduler';
-$string['modulenameplural'] = 'Schedulers';
 $string['monday'] = 'Monday';
 $string['move'] = 'Change';
 $string['moveslot'] = 'Move slot';
@@ -303,14 +301,11 @@ $string['yourslotnotes'] = 'Comments on the meeting';
 /* ***********  Help strings from here on ************ */
 
 $string['forcewhenoverlap_help']='
-<h3>Forcing slots addition through a session</h3>
-<p>This control allows forcing the addition of slots when the session conflicts with other slots.
-In that case, only "clean" slots will be added. Conflicting will be ignored.</p>
-
-<p>
-If not used, the addition procedure will block when overlapping are detected, and you will asked for
-deleting previous slots before the procedure can add new slots.
-</p>';
+<h3>Forcing slot creation when slots overlap</h3>
+<p>This setting determines how new slots will be handled if they overlap with other, already existing slots.</p>
+<p>If enabled, the overlapping existing slot will be deleted and the new slot created.</p>
+<p>If disabled, the overlapping existing slot will be kept and a new slot will <em>not</em> be created.</p>
+';
 
 $string['addscheduled_help']='
 <h3>Adding an appointment on slot setup</h3>
