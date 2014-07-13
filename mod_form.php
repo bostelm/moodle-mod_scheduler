@@ -26,15 +26,16 @@ class mod_scheduler_mod_form extends moodleform_mod {
 	    $mform    =& $this->_form;
 
 	    $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
-	    $mform->setType('name', PARAM_CLEANHTML);
+	    $mform->setType('name', PARAM_TEXT);
 	    $mform->addRule('name', null, 'required', null, 'client');
 
         // Introduction.
         $this->add_intro_editor(false, get_string('introduction', 'scheduler'));
 
 	    $mform->addElement('text', 'staffrolename', get_string('staffrolename', 'scheduler'), array('size'=>'48'));
-	    $mform->setType('staffrolename', PARAM_CLEANHTML);
-	    $mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
+	    $mform->setType('staffrolename', PARAM_TEXT);
+		$mform->addRule('staffrolename', get_string('error'), 'maxlength', 255);
+		$mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
 
 	    $modegroup = array();
 	    $modegroup[] = $mform->createElement('static', 'modeintro', '', get_string('modeintro', 'scheduler'));

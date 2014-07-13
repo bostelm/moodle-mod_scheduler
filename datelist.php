@@ -176,7 +176,7 @@ if ($numrecords){
             $coursedata,
             $schedulerdata,
             $whendata,
-            $row->appointmentlocation,
+            format_string($row->appointmentlocation),
             $whodata,
             $row->studentdepartment,
             $whatdata,

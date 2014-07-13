@@ -50,8 +50,8 @@ abstract class scheduler_slotform_base extends moodleform {
 
         // location of the appointment
         $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size'=>'30'));
-        $mform->setType('appointmentlocation', PARAM_NOTAGS);
-        $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 50);
+        $mform->setType('appointmentlocation', PARAM_TEXT);
+        $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 255);
         $mform->setDefault('appointmentlocation', $this->scheduler->get_last_location($USER));
         $mform->addHelpButton('appointmentlocation', 'location', 'scheduler');
 

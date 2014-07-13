@@ -386,7 +386,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $rowdata[] = $starttimestr;
             $rowdata[] = $endtimestr;
 
-            $rowdata[] = s($slot->location);
+            $rowdata[] = format_string($slot->location);
 
             if ($booker->style == 'multi') {
                 $inputname = "slotcheck[{$slot->slotid}]";

@@ -135,9 +135,11 @@ class scheduler_instance extends mvc_record_model {
 
     /**
      * Retrieve the name for "teacher" in the context of this scheduler
+     *
+     * TODO: This involves part of the presentation, should it be here?
      */
     public function get_teacher_name() {
-        $name = $this->data->staffrolename;
+        $name = format_string($this->data->staffrolename);
         if (empty($name)) {
             $name = get_string('teacher', 'scheduler');
         }

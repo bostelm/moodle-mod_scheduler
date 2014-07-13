@@ -74,7 +74,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
     /* ******************* 2.7 upgrade line ********************** */
 
-    if ($oldversion < 2014052800) {
+    if ($oldversion < 2014071300) {
 
         // Define field teacher to be dropped from scheduler.
         $table = new xmldb_table('scheduler');
@@ -103,6 +103,20 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+
+        // Changing length of field staffrolename on table scheduler to (255).
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('staffrolename', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'allownotifications');
+
+        // Launch change of precision for field staffrolename.
+        $dbman->change_field_precision($table, $field);
+
+        // Changing length of field appointmentlocation on table scheduler_slots to (255).
+        $table = new xmldb_table('scheduler_slots');
+        $field = new xmldb_field('appointmentlocation', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'teacherid');
+
+        // Launch change of precision for field appointmentlocation.
+        $dbman->change_field_precision($table, $field);
 
         // Define index schedulerid-teacherid (not unique) to be added to scheduler_slots.
         $table = new xmldb_table('scheduler_slots');
@@ -136,7 +150,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         $DB->execute($sql, array('scheduler', 'SSsup:%', 'SSstu:%'));
 
         // Savepoint reached.
-        upgrade_mod_savepoint(true, 2014052800, 'scheduler');
+        upgrade_mod_savepoint(true, 2014071300, 'scheduler');
     }
 
     return true;
