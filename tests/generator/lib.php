@@ -51,7 +51,7 @@ class mod_scheduler_generator extends testing_module_generator {
         self::set_default($record, 'intro', 'Test scheduler '.$i);
         self::set_default($record, 'introformat', FORMAT_MOODLE);
         self::set_default($record, 'schedulermode', 'onetime');
-        self::set_default($record, 'reuseguardtime', 24);
+        self::set_default($record, 'guardtime', 0);
         self::set_default($record, 'defaultslotduration', 15);
         self::set_default($record, 'staffrolename', '');
         self::set_default($record, 'scale', 0);
@@ -74,7 +74,6 @@ class mod_scheduler_generator extends testing_module_generator {
                 $slot->duration = 10;
                 $slot->teacherid = 2; // admin - for the moment
                 $slot->appointmentlocation = 'Test Loc';
-                $slot->reuse = 0;
                 $slot->timemodified = time();
                 $slot->notes = '';
                 $slot->appointmentnote = '';
@@ -89,7 +88,7 @@ class mod_scheduler_generator extends testing_module_generator {
                         $appointment = new stdClass();
                         $appointment->slotid = $slotid;
                         $appointment->studentid = $userid;
-                        $appointment->attended = 0;
+                        $appointment->attended = isset($options['slotattended'][$slotkey]) && $options['slotattended'][$slotkey];
                         $appointment->grade = 0;
                         $appointment->appointmentnote = '';
                         $appointment->timecreated = time();

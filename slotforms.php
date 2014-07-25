@@ -48,15 +48,10 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->setDefault('exclusivity', 1);
         $mform->addHelpButton('exclusivity', 'exclusivity', 'scheduler');
 
-        // reuse the slot?
-        $mform->addElement('selectyesno', 'reuse', get_string('reuse', 'scheduler'));
-        $mform->setDefault('reuse', 1);
-        $mform->addHelpButton('reuse', 'reuse', 'scheduler');
-
         // location of the appointment
         $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size'=>'30'));
-        $mform->setType('appointmentlocation', PARAM_NOTAGS);
-        $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 50);
+        $mform->setType('appointmentlocation', PARAM_TEXT);
+        $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 255);
         $mform->setDefault('appointmentlocation', $this->scheduler->get_last_location($USER));
         $mform->addHelpButton('appointmentlocation', 'location', 'scheduler');
 
@@ -316,8 +311,8 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $mform->addElement('date_selector', 'rangestart', get_string('date', 'scheduler'));
         $mform->setDefault('rangestart', time());
 
-        $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'));
-        $mform->setDefault('rangeend', time());
+        $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'),
+                            array('optional'  => true) );
 
         // Weekdays selection
         $weekdays = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday');
@@ -359,6 +354,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         // Force when overlap?
         $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
+        $mform->addHelpButton('forcewhenoverlap', 'forcewhenoverlap', 'scheduler');
 
         // Common fields
         $this->add_base_fields();
@@ -401,9 +397,12 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $errors = parent::validation($data, $files);
 
         // Range is negative
-        $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
-        if ($fordays < 0) {
-            $errors['rangeend'] = get_string('negativerange', 'scheduler');
+        $fordays = 0;
+        if ($data['rangeend'] > 0) {
+            $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
+            if ($fordays < 0) {
+                $errors['rangeend'] = get_string('negativerange', 'scheduler');
+            }
         }
 
         // Time range is negative
@@ -431,7 +430,6 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $slot = new stdClass();
         $slot->appointmentlocation = $data->appointmentlocation;
         $slot->exclusivity = $data->exclusivity;
-        $slot->reuse = $data->reuse;
         $slot->duration = $data->duration;
         $slot->schedulerid = $scheduler->id;
         $slot->timemodified = time();

@@ -36,9 +36,9 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
     $workbook->send($downloadfilename);
 
     /// Prepare data
-    $sql = 'SELECT DISTINCT '.user_picture::fields('u', array('department')) .
-    		' FROM {scheduler_slots} s, {user} u' .
-    		' WHERE s.teacherid = u.id AND schedulerid = ?';
+    $sql = 'SELECT DISTINCT '.user_picture::fields('u',array('email','department'))
+          .' FROM {scheduler_slots} s, {user} u'
+          .' WHERE s.teacherid = u.id AND schedulerid = ?';
     $teachers = $DB->get_records_sql($sql, array($scheduler->id));
     $slots = $DB->get_records('scheduler_slots', array('schedulerid' => $scheduler->id), 'starttime', 'id, starttime, duration, exclusivity, teacherid, hideuntil');
     if ($subaction == 'singlesheet'){
@@ -95,9 +95,9 @@ if($action == 'downloadexcel' || $action == 'downloadods'){
             $appointments = $DB->get_records('scheduler_appointment', array('slotid' => $slot->id));
 
             /// fill slot data
-            $datestart = scheduler_userdate($slot->starttime,1);
-            $timestart = scheduler_usertime($slot->starttime,1);
-            $timeend = scheduler_usertime($slot->starttime + $slot->duration * 60,1);
+            $datestart = $output->userdate($slot->starttime);
+            $timestart = $output->usertime($slot->starttime);
+            $timeend = $output->usertime($slot->starttime + $slot->duration * 60);
             $i[$sheetname] = @$i[$sheetname] + 1;
             $myxls[$sheetname]->write_string($i[$sheetname],0,$datestart);
             $myxls[$sheetname]->write_string($i[$sheetname],1,$timestart);
@@ -230,11 +230,7 @@ if ($action == 'downloadcsv'){
     /// Prepare data
     $sql = "
         SELECT DISTINCT
-        u.id,
-        u.firstname,
-        u.lastname,
-        u.email,
-        u.department
+        ".user_picture::fields('u',array('email','department'))."
         FROM
         {scheduler_slots} s,
         {user} u
@@ -259,9 +255,9 @@ if ($action == 'downloadcsv'){
                 $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id));
 
                 /// fill slot data
-                $datestart = scheduler_userdate($slot->starttime,1);
-                $timestart = scheduler_usertime($slot->starttime,1);
-                $timeend = scheduler_usertime($slot->starttime + $slot->duration * 60,1);
+                $datestart = $output->userdate($slot->starttime);
+                $timestart = $output->usertime($slot->starttime);
+                $timeend = $output->usertime($slot->starttime + $slot->duration * 60);
                 $stream .= $datestart . $csvfieldseparator;
                 $stream .= $timestart . $csvfieldseparator;
                 $stream .= $timeend . $csvfieldseparator;
@@ -290,8 +286,7 @@ if ($action == 'downloadcsv'){
         }
     }
     else if ($subaction == 'grades'){
-        $sql = 'SELECT a.id, a.studentid, a.grade, a.appointmentnote,' .
-        		' u.lastname, u.firstname, u.middlename, u.lastnamephonetic, u.firstnamephonetic, u.alternatename' .
+        $sql = 'SELECT a.id, a.studentid, a.grade, a.appointmentnote,' .user_picture::fields('u').
         		' FROM {user} u, {scheduler_slots} s, {scheduler_appointment} a' .
         		' WHERE u.id = a.studentid AND a.slotid = s.id AND s.schedulerid = ? AND a.attended = 1' .
         		' ORDER BY u.lastname, u.firstname, s.teacherid';

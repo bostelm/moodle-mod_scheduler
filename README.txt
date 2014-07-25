@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/25/en/Scheduler_module
+    http://docs.moodle.org/27/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 2.5 and above.
+This module is intended for Moodle 2.7 and above.
 
 
 === Authors ===
@@ -57,6 +57,23 @@ With further contributions taken from:
 
 
 === Release notes ===
+
+--- Version 2.7 ---
+
+Intended for Moodle 2.7 and later. 
+
+New features:
+
+Students can now be allowed to book several slots at a time.
+"Volatile slots" replaced with "guard time" - students cannot change their booking
+for slots closer than this time to the current time.
+
+Refatoring / API changes:
+
+Major refactoring of teacher view (slot list), student view (booking screen),
+teacher view of individual appointments, as well as of the backend.
+Security enhancements (sessionid parameter now used throughout).
+Adapted to changes in core API and to the new logging/event system (Event 2).
 
 --- Version 2.5 ---
 
@@ -85,6 +102,7 @@ that is, malfunction in this respect should be considered a bug:
 * Moodle 2 backup
 * New rich text editor and file API (activity intro and slot add/edit forms) 
 * Localization / language packs
+* Logging / event system
 
-The module does not use any deprecated API as of Moodle 2.5.
+The module does not use any deprecated API as of Moodle 2.7.
 

@@ -46,9 +46,9 @@ $slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid));
 scheduler_print_user($DB->get_record('user', array('id' => $appointment->studentid)), $course);
 
 $params = array(
-                'startdate' => scheduler_userdate($slot->starttime, 1),
-                'starttime' => scheduler_usertime($slot->starttime, 1),
-                'endtime' => scheduler_usertime($slot->endtime, 1),
+                'startdate' => $output->userdate($slot->starttime),
+                'starttime' => $output->usertime($slot->starttime),
+                'endtime' => $output->usertime($slot->endtime),
                 'teacher' => fullname($slot->get_teacher())
                 );
 echo html_writer::tag('p', get_string('appointmentsummary', 'scheduler', $params));
@@ -122,14 +122,14 @@ if ($subpage == 'thisappointment') {
     $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT', 'CENTER', 'CENTER');
 
     foreach ($slots as $otherslot) {
-        $startdate = scheduler_userdate($otherslot->starttime, 1);
+        $startdate = $output->userdate($otherslot->starttime);
         $studenturl = new moodle_url($taburl, array('appointmentid' => $otherslot->appid, 'page' => 'thisappointment'));
-        $datelink = $OUTPUT->action_link($studenturl, $startdate);
-        $starttime = scheduler_usertime($otherslot->starttime, 1);
-        $endtime = scheduler_usertime($otherslot->starttime + ($otherslot->duration * 60), 1);
+        $datelink = $output->action_link($studenturl, $startdate);
+        $starttime = $output->usertime($otherslot->starttime);
+        $endtime = $output->usertime($otherslot->starttime + $otherslot->duration * 60);
         $iconid = $otherslot->attended ? 'ticked' : 'unticked';
         $iconhelp = $otherslot->attended ? 'seen' : 'notseen';
-        $attendedpix = $OUTPUT->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
+        $attendedpix = $output->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
 
         $otherslot->appointmentnote .= "<br/><span class=\"timelabel\">[".userdate($otherslot->apptimemodified)."]</span>";
         $grade = $output->format_grade($scheduler, $otherslot->grade);

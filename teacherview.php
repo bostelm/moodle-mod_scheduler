@@ -52,7 +52,6 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->notesformat = $data->notes['format'];
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->hideuntil = $data->hideuntil;
-    $slot->reuse = $data->reuse;
     $slot->emaildate = $data->emaildate;
     $slot->timemodified = time();
 
@@ -99,8 +98,8 @@ function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, 
     $starttimemem = '';
     $availableslotsmenu = array();
     foreach ($availableslots as $slot) {
-        $startdatecnv = scheduler_userdate($slot->starttime, 1);
-        $starttimecnv = scheduler_usertime($slot->starttime, 1);
+        $startdatecnv = $output->userdate($slot->starttime);
+        $starttimecnv = $output->usertime($slot->starttime);
 
         $startdatestr = ($startdatemem != '' and $startdatemem == $startdatecnv) ? "-----------------" : $startdatecnv;
         $starttimestr = ($starttimemem != '' and $starttimemem == $starttimecnv) ? '' : $starttimecnv;
@@ -386,41 +385,47 @@ if ($slots) {
     }
 }
 
+echo $output->heading(get_string('slots', 'scheduler'));
+
 // Print instructions and button for creating slots.
 $key = ($slots) ? 'addslot' : 'welcomenewteacher';
 echo html_writer::div(get_string($key, 'scheduler'));
 
+
+
 $commandbar = new scheduler_command_bar();
+$commandbar->title = get_string('actions', 'scheduler');
+
 $addbuttons = array();
-$addbuttons[] = $commandbar->action_button(new moodle_url($actionurl, array('what' => 'addsession')), 'addsession');
-$addbuttons[] = $commandbar->action_button(new moodle_url($actionurl, array('what' => 'addslot')), 'addsingleslot');
+$addbuttons[] = $commandbar->action_link(new moodle_url($actionurl, array('what' => 'addsession')), 'addsession', 't/add');
+$addbuttons[] = $commandbar->action_link(new moodle_url($actionurl, array('what' => 'addslot')), 'addsingleslot', 't/add');
 $commandbar->add_group(get_string('addcommands', 'scheduler'), $addbuttons);
 
 // If slots already exist, also show delete buttons.
 if ($slots) {
     $delbuttons = array();
 
-    $PAGE->requires->yui_module('moodle-mod_scheduler-delselected', 'M.mod_scheduler.delselected.init');
-    $delselected = $commandbar->action_button(
-                    new moodle_url($actionurl, array('what' => 'deleteslots')),
-                    'deleteselection', 'confirmdelete');
+    $delselectedurl = new moodle_url($actionurl, array('what' => 'deleteslots'));
+    $PAGE->requires->yui_module('moodle-mod_scheduler-delselected', 'M.mod_scheduler.delselected.init',
+                                array($delselectedurl->out(false)) );
+    $delselected = $commandbar->action_link($delselectedurl, 'deleteselection', 't/delete', 'confirmdelete', 'delselected');
     $delselected->formid = 'delselected';
     $delbuttons[] = $delselected;
 
     if (has_capability('mod/scheduler:manageallappointments', $context) && $subpage == 'allappointments') {
-        $delbuttons[] = $commandbar->action_button(
+        $delbuttons[] = $commandbar->action_link(
                         new moodle_url($actionurl, array('what' => 'deleteall')),
-                        'deleteallslots', 'confirmdelete');
-        $delbuttons[] = $commandbar->action_button(
+                        'deleteallslots', 't/delete', 'confirmdelete');
+        $delbuttons[] = $commandbar->action_link(
                         new moodle_url($actionurl, array('what' => 'deleteallunused')),
-                        'deleteallunusedslots', 'confirmdelete');
+                        'deleteallunusedslots', 't/delete', 'confirmdelete');
     }
-    $delbuttons[] = $commandbar->action_button(
+    $delbuttons[] = $commandbar->action_link(
                     new moodle_url($actionurl, array('what' => 'deleteunused')),
-                    'deleteunusedslots', 'confirmdelete');
-    $delbuttons[] = $commandbar->action_button(
+                    'deleteunusedslots', 't/delete', 'confirmdelete');
+    $delbuttons[] = $commandbar->action_link(
                     new moodle_url($actionurl, array('what' => 'deleteonlymine')),
-                    'deletemyslots', 'confirmdelete');
+                    'deletemyslots', 't/delete', 'confirmdelete');
 
     $commandbar->add_group(get_string('deletecommands', 'scheduler'), $delbuttons);
 }
@@ -455,7 +460,6 @@ if ($slots) {
         $slotman->add_slot($slot, $studlist, $editable);
     }
 
-    echo $output->heading(get_string('slots', 'scheduler'));
     echo $output->render($slotman);
 
     if ($sqlcount > 25) {
@@ -529,12 +533,14 @@ if ($students === 0) {
         $picture = $output->user_picture($student);
         $name = $output->user_profile_link($scheduler, $student);
         $actions = array();
-        $actions[] = $output->render(new single_button(
+        $actions[] = new action_menu_link_secondary(
                         new moodle_url($actionurl, array('what' => 'schedule', 'studentid' => $student->id)),
-                        get_string('schedule', 'scheduler') ));
-        $actions[] = $output->render(new single_button(
+                        new pix_icon('e/insert_date', '', 'moodle'),
+                        get_string('scheduleinslot', 'scheduler') );
+        $actions[] = new action_menu_link_secondary(
                         new moodle_url($actionurl, array('what' => 'markasseennow', 'studentid' => $student->id)),
-                        get_string('markasseennow', 'scheduler') ));
+                        new pix_icon('t/approve', '', 'moodle'),
+                        get_string('markasseennow', 'scheduler') );
 
         $userfields = scheduler_get_user_fields($student);
         $fieldvals = array();
@@ -581,9 +587,10 @@ if ($students === 0) {
                     }
                     $name .= ' ['. implode(', ', $groupmembers) . ']';
                     $actions = array();
-                    $actions[] = $output->render(new single_button(
+                    $actions[] = new action_menu_link_secondary(
                                     new moodle_url($actionurl, array('what' => 'schedulegroup', 'groupid' => $group->id)),
-                                    get_string('schedule', 'scheduler') ));
+                                    new pix_icon('e/insert_date', '', 'moodle'),
+                                    get_string('scheduleinslot', 'scheduler') );
 
                     $grouptable->add_line($picture, $name, array(), $actions);
                     $groupcnt++;

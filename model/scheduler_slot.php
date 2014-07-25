@@ -78,7 +78,7 @@ class scheduler_slot extends mvc_child_record_model {
         if ($this->data->teacherid) {
             return $DB->get_record('user', array('id' => $this->data->teacherid), '*', MUST_EXIST);
         } else {
-            return null;
+            return new stdClass();
         }
     }
 
@@ -88,13 +88,6 @@ class scheduler_slot extends mvc_child_record_model {
      */
     public function get_endtime() {
         return $this->data->starttime + $this->data->duration*MINSECS;
-    }
-
-    /**
-     * Is the slot re-usable?
-     */
-    public function is_reusable() {
-        return (boolean) ($this->data->reuse);
     }
 
     /**

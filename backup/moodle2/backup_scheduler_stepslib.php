@@ -24,15 +24,15 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
 
         // Define each element separated
         $scheduler = new backup_nested_element('scheduler', array('id'), array(
-            'name', 'intro', 'introformat', 'schedulermode',
-            'reuseguardtime', 'defaultslotduration', 'allownotifications', 'staffrolename',
-            'teacher', 'scale', 'gradingstrategy', 'timemodified'));
+            'name', 'intro', 'introformat', 'schedulermode', 'maxbookings',
+            'guardtime', 'defaultslotduration', 'allownotifications', 'staffrolename',
+            'scale', 'gradingstrategy', 'timemodified'));
 
         $slots = new backup_nested_element('slots');
 
         $slot = new backup_nested_element('slot', array('id'), array(
             'starttime', 'duration', 'teacherid', 'appointmentlocation',
-            'reuse', 'timemodified', 'notes', 'exclusivity',
+            'timemodified', 'notes', 'exclusivity',
             'appointmentnote', 'emaildate', 'hideuntil'));
 
         $appointments = new backup_nested_element('appointments');
@@ -61,10 +61,9 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
 
         // Define id annotations
         $scheduler->annotate_ids('scale', 'scale');
-        $scheduler->annotate_ids('user', 'teacher');
-        
+
         $slot->annotate_ids('user', 'teacherid');
-        
+
         $appointment->annotate_ids('user', 'studentid');
 
         // Define file annotations

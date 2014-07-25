@@ -19,45 +19,6 @@ require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
 
 
 /**
- * Parameter $local added by power-web.at
- * When local Date is needed the $local Param must be set to 1
- * @param int $date a timestamp
- * @param int $local
- * @todo check consistence
- * @return string printable date
- */
-function scheduler_userdate($date, $local=0) {
-    if ($date == 0) {
-        return '';
-    } else {
-        return userdate($date, get_string('strftimedaydate'));
-    }
-}
-
-/**
- * Parameter $local added by power-web.at
- * When local Time is needed the $local Param must be set to 1
- * @param int $date a timestamp
- * @param int $local
- * @todo check consistence
- * @return string printable time
- */
-function scheduler_usertime($date, $local=0) {
-    if ($date == 0) {
-        return '';
-    } else {
-        $timeformat = get_user_preferences('calendar_timeformat');//get user config
-        if(empty($timeformat)){
-            $timeformat = get_config(NULL,'calendar_site_timeformat');//get calendar config	if above not exist
-        }
-        if(empty($timeformat)){
-            $timeformat = get_string('strftimetime');//get locale default format if both above not exist
-        }
-        return userdate($date, $timeformat);
-    }
-}
-
-/**
  * get list of attendants for slot form
  * @param int $cmid the course module
  * @return array of moodle user records
@@ -110,41 +71,6 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
     return $conflicting;
 }
 
-/**
- * Returns count of slots that would overlap with this
- * use it as a test function before toggling to exclusive
- * @param int $schedulerid the actual scheduler instance
- * @param int $starttime the starttime identifying the slot
- * @param int $endtime the endtime of the period
- * @param int $teacher the teacher constraint, if null stands for "all teachers"
- * @return int the number of compatible slots
- * @uses $CFG
- * @uses $DB
- */
-function scheduler_get_consumed($schedulerid, $starttime, $endtime, $teacherid=0) {
-    global $CFG, $DB;
-
-    $teacherScope = ($teacherid != 0) ? " teacherid = '{$teacherid}' AND " : '' ;
-    $sql = "
-        SELECT
-        COUNT(*)
-        FROM
-        {scheduler_slots} s,
-        {scheduler_appointment} a
-        WHERE
-        a.slotid = s.id AND
-        schedulerid = {$schedulerid} AND
-        {$teacherScope}
-        ( (s.starttime <= {$starttime} AND
-        {$starttime} < s.starttime + s.duration * 60) OR
-        (s.starttime < {$endtime} AND
-        {$endtime} <= s.starttime + s.duration * 60) OR
-        (s.starttime >= {$starttime} AND
-        s.starttime + s.duration * 60 <= {$endtime}) )
-        ";
-    $count = $DB->count_records_sql($sql, NULL);
-    return $count;
-}
 
 /**
  * checks if user has an appointment in this scheduler
@@ -208,29 +134,6 @@ function scheduler_get_appointed($slotid){
     return $DB->get_records_sql($sql, array($slotid));
 }
 
-/**
- * fully deletes a slot with all dependancies
- * @param int slotid
- * @param stdClass $scheduler (optional)
- * @uses $DB
- */
-function scheduler_delete_slot($slotid, $scheduler=null){
-    global $DB;
-
-    if ($slot = $DB->get_record('scheduler_slots', array('id' => $slotid))) {
-        scheduler_delete_calendar_events($slot);
-    }
-    $DB->delete_records('scheduler_slots', array('id' => $slotid));
-    $DB->delete_records('scheduler_appointment', array('slotid' => $slotid));
-
-    if ($slot) {
-        if (!$scheduler){ // fetch optimization
-            $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
-        }
-        scheduler_update_grades($scheduler); // generous, but works
-    }
-}
-
 
 /// Events related functions
 
@@ -281,8 +184,8 @@ function scheduler_get_mail_variables (scheduler_instance $scheduler, $slot, $at
     if ($slot) {
         $vars ['DATE']     = userdate($slot->starttime, get_string('strftimedate'));
         $vars ['TIME']     = userdate($slot->starttime, get_string('strftimetime'));
-        $vars ['ENDTIME']  = userdate($slot->starttime+$slot->duration*60, get_string('strftimetime'));
-        $vars ['LOCATION'] = $slot->appointmentlocation;
+        $vars ['ENDTIME']  = userdate($slot->endtime, get_string('strftimetime'));
+        $vars ['LOCATION'] = format_string($slot->appointmentlocation);
     }
     if ($attendant) {
         $vars['ATTENDANT']     = fullname($attendant);

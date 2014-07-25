@@ -26,15 +26,16 @@ class mod_scheduler_mod_form extends moodleform_mod {
 	    $mform    =& $this->_form;
 
 	    $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
-	    $mform->setType('name', PARAM_CLEANHTML);
+	    $mform->setType('name', PARAM_TEXT);
 	    $mform->addRule('name', null, 'required', null, 'client');
 
         // Introduction.
         $this->add_intro_editor(false, get_string('introduction', 'scheduler'));
 
 	    $mform->addElement('text', 'staffrolename', get_string('staffrolename', 'scheduler'), array('size'=>'48'));
-	    $mform->setType('staffrolename', PARAM_CLEANHTML);
-	    $mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
+	    $mform->setType('staffrolename', PARAM_TEXT);
+		$mform->addRule('staffrolename', get_string('error'), 'maxlength', 255);
+		$mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
 
 	    $modegroup = array();
 	    $modegroup[] = $mform->createElement('static', 'modeintro', '', get_string('modeintro', 'scheduler'));
@@ -57,13 +58,9 @@ class mod_scheduler_mod_form extends moodleform_mod {
 	    $mform->addGroup($modegroup, 'modegrp', get_string('mode', 'scheduler'), ' ', false);
 	    $mform->addHelpButton('modegrp', 'appointmentmode', 'scheduler');
 
-	    $reuseguardoptions[24] = 24 . ' ' . get_string('hours');
-	    $reuseguardoptions[48] = 48 . ' ' . get_string('hours');
-	    $reuseguardoptions[72] = 72 . ' ' . get_string('hours');
-	    $reuseguardoptions[96] = 96 . ' ' . get_string('hours');
-	    $reuseguardoptions[168] = 168 . ' ' . get_string('hours');
-	    $mform->addElement('select', 'reuseguardtime', get_string('reuseguardtime', 'scheduler'), $reuseguardoptions);
-	    $mform->addHelpButton('reuseguardtime', 'reuseguardtime', 'scheduler');
+
+		$mform->addElement('duration', 'guardtime', get_string('guardtime', 'scheduler'), array('optional' => true));
+	    $mform->addHelpButton('guardtime', 'guardtime', 'scheduler');
 
 	    $mform->addElement('text', 'defaultslotduration', get_string('defaultslotduration', 'scheduler'), array('size'=>'2'));
 	    $mform->setType('defaultslotduration', PARAM_INT);

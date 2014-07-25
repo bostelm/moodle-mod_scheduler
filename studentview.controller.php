@@ -23,7 +23,10 @@ if ($action == 'savechoice') {
     $slotids = array();
     $slotidsraw = optional_param_array('slotcheck', '', PARAM_INT);
     if (empty($slotidsraw)) {
-        $slotids[] = required_param('slotid', PARAM_INT);
+        $slotid = optional_param('slotid', -1, PARAM_INT);
+        if ($slotid >= 0) {
+            $slotids[] = $slotid;
+        }
     } else {
         foreach ($slotidsraw as $k => $v) {
             if (!empty($v)) {
@@ -103,38 +106,44 @@ if ($action == 'savechoice') {
     }
     $oldslotownerlist = implode("','", $oldslotowners);
 
-    // Cleans up old slots if not attended (attended are definitive results, with grades).
-    $sql = 'SELECT a.id as appointmentid, s.* '.
-           'FROM {scheduler_slots} AS s, {scheduler_appointment} AS a '.
-           'WHERE s.id = a.slotid AND s.schedulerid = :schedulerid '.
-           "AND a.studentid IN ('$oldslotownerlist') ".
-           'AND a.attended = 0 '.
-           "AND a.slotid NOT IN (" . implode(",", $slotidsvalidated) . ") ".
-           'AND s.starttime > :now';
-    $paras = array('schedulerid' => $slot->schedulerid, 'now' => time());
-    if ($oldappointments = $DB->get_records_sql($sql, $paras)) {
+    if ($oldslotowners) {
+        // Cleans up old slots if not attended and within rebookable time limits
+        $sql = 'SELECT a.id as appointmentid, s.* '.
+                        'FROM {scheduler_slots} AS s, {scheduler_appointment} AS a '.
+                        'WHERE s.id = a.slotid AND s.schedulerid = :schedulerid '.
+                        "AND a.studentid IN ('$oldslotownerlist') ".
+                        'AND a.attended = 0 '.
+                        'AND s.starttime > :cutoff';
+        $paras = array('schedulerid' => $scheduler->id, 'cutoff' => time() + $scheduler->guardtime);
+        if ($slotidsvalidated) {
+             list($extrasql, $extraparas) = $DB->get_in_or_equal($slotidsvalidated, SQL_PARAMS_NAMED, 'param', false);
+             $sql .= ' AND a.slotid '.$extrasql;
+             $paras = array_merge($paras, $extraparas);
+        }
+        if ($oldappointments = $DB->get_records_sql($sql, $paras)) {
 
-        foreach ($oldappointments as $oldappointment) {
+            foreach ($oldappointments as $oldappointment) {
 
-            $oldappid  = $oldappointment->appointmentid;
-            $oldslotid = $oldappointment->id;
-            $oldslot = scheduler_slot::load_by_id($oldslotid, $scheduler);
+                $oldappid  = $oldappointment->appointmentid;
+                $oldslotid = $oldappointment->id;
+                $oldslot = scheduler_slot::load_by_id($oldslotid, $scheduler);
 
-            // Prepare notification e-mail first - slot might be deleted if it's volatile.
-            if ($scheduler->allownotifications) {
-                $student = $DB->get_record('user', array('id' => $USER->id));
-                $teacher = $DB->get_record('user', array('id' => $oldappointment->teacherid));
-                $vars = scheduler_get_mail_variables($scheduler, $oldappointment, $teacher, $student);
-            }
+                // Prepare notification e-mail first
+                if ($scheduler->allownotifications) {
+                    $student = $DB->get_record('user', array('id' => $USER->id));
+                    $teacher = $DB->get_record('user', array('id' => $oldappointment->teacherid));
+                    $vars = scheduler_get_mail_variables($scheduler, $oldappointment, $teacher, $student);
+                }
 
-            \mod_scheduler\event\booking_removed::create_from_slot($oldslot)->trigger();
+                \mod_scheduler\event\booking_removed::create_from_slot($oldslot)->trigger();
 
-            // Delete the appointment (and possibly the slot).
-            $scheduler->delete_appointment($oldappid);
+                // Delete the appointment (and possibly the slot).
+                $scheduler->delete_appointment($oldappid);
 
-            // Notify the teacher.
-            if ($scheduler->allownotifications) {
-                scheduler_send_email_from_template($teacher, $student, $course, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
+                // Notify the teacher.
+                if ($scheduler->allownotifications) {
+                    scheduler_send_email_from_template($teacher, $student, $course, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
+                }
             }
         }
     }
@@ -170,8 +179,8 @@ if ($action == 'disengage') {
     require_sesskey();
     require_capability('mod/scheduler:disengage', $context);
     $where = 'studentid = :studentid AND attended = 0 AND ' .
-        'EXISTS(SELECT 1 FROM {scheduler_slots} sl WHERE sl.id = slotid AND sl.schedulerid = :scheduler )';
-    $params = array('scheduler' => $scheduler->id, 'studentid' => $USER->id);
+        'EXISTS(SELECT 1 FROM {scheduler_slots} sl WHERE sl.id = slotid AND sl.schedulerid = :scheduler AND sl.starttime > :cutoff)';
+    $params = array('scheduler' => $scheduler->id, 'studentid' => $USER->id, 'cutoff' => time() + $scheduler->guardtime);
     $appointments = $DB->get_records_select('scheduler_appointment', $where, $params);
     if ($appointments) {
         foreach ($appointments as $appointment) {

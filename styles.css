@@ -48,38 +48,41 @@ div .path-mod-scheduler .appointmentnote{
     display: none;
 }
 
-.path-mod-scheduler dl.commandbar  {
-    width: 90%;
+.path-mod-scheduler div.commandbar  {
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     background-color : #EEEEEE;
     padding: 0.5em; 
 } 
 
-.path-mod-scheduler dl.commandbar dt {
+.path-mod-scheduler div.commandbar span.title {
     float: left; 
-    clear: left; 
-    width: 100px; 
-    text-align: right; 
+    clear: right; 
+    width: 10em; 
+    text-align: left; 
     font-weight: bold; 
 }
 
-.path-mod-scheduler dl.commandbar dd {
-    margin: 0 0 0 110px; 
-}
-
-.path-mod-scheduler dl.commandbar dd div.singlebutton,
-.path-mod-scheduler dl.commandbar dd div.singlebutton form {
-    display: inline; 
-}
-
-.path-mod-scheduler dl.commandbar dd div.singlebutton form#delselected ,
-.path-mod-scheduler input.slotselect {
-    display: none;
-}
-
-body.path-mod-scheduler.jsenabled dl.commandbar dd div.singlebutton form#delselected {
+.path-mod-scheduler div.commandbar .moodle-actionmenu {
     display: inline;
+}
+
+
+.path-mod-scheduler div.commandbar .moodle-actionmenu .menubar {
+    width: 15em;
+}
+
+.path-mod-scheduler .moodle-actionmenu img.iconsmall {
+    width: auto;
+}
+.path-mod-scheduler .moodle-actionmenu .menu-action-text {
+    display: inline;
+} 
+
+
+body.path-mod-scheduler input.slotselect {
+    display: none;
 }
 body.path-mod-scheduler.jsenabled input.slotselect {
     display: inline;

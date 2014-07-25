@@ -21,7 +21,6 @@ echo $output->teacherview_tabs($scheduler, $taburl, 'datelist');
 
 if (has_capability('mod/scheduler:canseeotherteachersbooking', $context)) {
     $teacherid = optional_param('teacherid', $USER->id, PARAM_INT);
-    $select = " teacherid = $teacherid ";
     $tutor =  $DB->get_record('user', array('id' => $teacherid));
     $teachers = scheduler_get_attendants ($cm->id);
 
@@ -40,7 +39,7 @@ if (has_capability('mod/scheduler:canseeotherteachersbooking', $context)) {
         <?php
 }
 else{
-    $select = " teacherid = $USER->id ";
+    $teacherid = $USER->id;
 }
 
 /// getting date list
@@ -48,20 +47,15 @@ else{
 $sql = "
     SELECT
     a.id AS id,
-    u1.id AS studentid,
-    u1.email AS studentmail,
-    u1.lastname AS studentlastname,
-    u1.firstname AS studentfirstname,
-    u1.department AS studentdepartment,
+    ".user_picture::fields('u1',array('email','department'),'studentid','student').",
+    ".$DB->sql_fullname('u1.firstname','u1.lastname')." AS studentfullname,
     a.appointmentnote,
     a.grade,
     sc.name,
     sc.id as schedulerid,
     c.shortname as courseshort,
     c.id as courseid,
-    u2.email,
-    u2.lastname,
-    u2.firstname,
+    ".user_picture::fields('u2',NULL,'teacherid').",
     s.id as sid,
     s.starttime,
     s.duration,
@@ -120,14 +114,14 @@ if ($numrecords){
     $whathappenedstr = get_string('whathappened','scheduler');
 
 
-    $tablecolumns = array('courseshort', 'schedulerid', 'starttime', 'appointmentlocation', 'student', 'department', 'notes', 'grade', 'appointmentnote');
+    $tablecolumns = array('courseshort', 'schedulerid', 'starttime', 'appointmentlocation', 'studentfullname', 'studentdepartment', 'notes', 'grade', 'appointmentnote');
     $tableheaders = array("<strong>$coursestr</strong>", "<strong>$schedulerstr</strong>", "<strong>$whenstr</strong>", "<strong>$wherestr</strong>", "<strong>$whostr</strong>", "<strong>$wherefromstr</strong>", "<strong>$whatstr</strong>", "<strong>$whatresultedstr</strong>", "<strong>$whathappenedstr</strong>");
 
     $table = new flexible_table('mod-scheduler-datelist');
     $table->define_columns($tablecolumns);
     $table->define_headers($tableheaders);
 
-    $table->define_baseurl($CFG->wwwroot.'/mod/scheduler/view.php?what=datelist&amp;id='.$cm->id);
+    $table->define_baseurl($CFG->wwwroot.'/mod/scheduler/view.php?what=datelist&amp;id='.$cm->id.'&amp;teacherid='.$teacherid);
 
     $table->sortable(true, 'when'); //sorted by date by default
     $table->collapsible(true);
@@ -174,15 +168,15 @@ if ($numrecords){
         $schedulermem = $row->name;
         $whendata = ($whenmem != "$row->starttime $row->duration") ? '<strong>'.date("d M Y G:i", $row->starttime).' '.get_string('for','scheduler')." $row->duration ".get_string('mins', 'scheduler').'</strong>' : '';
         $whenmem = "$row->starttime $row->duration";
-        $whodata = ($whomem != $row->studentmail) ? "<a href=\"{$CFG->wwwroot}/mod/scheduler/view.php?what=viewstudent&a={$row->schedulerid}&amp;studentid=$row->studentid&amp;course=$row->courseid\">".$row->studentfirstname.' '.$row->studentlastname.'</a>' : '';
-        $whomem = $row->studentmail;
+        $whodata = ($whomem != $row->studentemail) ? "<a href=\"{$CFG->wwwroot}/mod/scheduler/view.php?what=viewstudent&a={$row->schedulerid}&amp;studentid=$row->studentid&amp;course=$row->courseid\">".$row->studentfirstname.' '.$row->studentlastname.'</a>' : '';
+        $whomem = $row->studentemail;
         $whatdata = ($whatmem != $row->notes) ? format_string($row->notes) : '';
         $whatmem = $row->notes;
         $dataset = array(
             $coursedata,
             $schedulerdata,
             $whendata,
-            $row->appointmentlocation,
+            format_string($row->appointmentlocation),
             $whodata,
             $row->studentdepartment,
             $whatdata,

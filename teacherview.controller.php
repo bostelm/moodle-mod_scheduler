@@ -18,7 +18,10 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
 
     $data = (object) $formdata;
 
-    $fordays = (($data->rangeend - $data->rangestart) / DAYSECS);
+    $fordays = 0;
+    if ($data->rangeend > 0){
+        $fordays = ($data->rangeend - $data->rangestart) / DAYSECS;
+    }
 
     // Create as many slots of $duration as will fit between $starttime and $endtime and that do not conflict.
     $countslots = 0;
@@ -29,7 +32,6 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     $slot->schedulerid = $scheduler->id;
     $slot->teacherid = $data->teacherid;
     $slot->appointmentlocation = $data->appointmentlocation;
-    $slot->reuse = $data->reuse;
     $slot->exclusivity = $data->exclusivity;
     if($data->divide) {
         $slot->duration = $data->duration;
@@ -76,18 +78,20 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                         print_string('conflictingslots', 'scheduler');
                         echo '<ul>';
                         foreach ($conflicts as $aconflict) {
-                            $sql = 'SELECT c.fullname, c.shortname, sl.starttime '
-                                            .'FROM {course} c, {scheduler} s, {scheduler_slots} sl '
-                                                            .'WHERE s.course = c.id AND sl.schedulerid = s.id AND sl.id = :conflictid';
+                            $sql = 'SELECT c.fullname, c.shortname, s.name as schedname, sl.starttime '
+                                    .'FROM {course} c, {scheduler} s, {scheduler_slots} sl '
+                                    .'WHERE s.course = c.id AND sl.schedulerid = s.id AND sl.id = :conflictid';
                             $conflictinfo = $DB->get_record_sql($sql, array('conflictid' => $aconflict->id));
-                            $msg = userdate($conflictinfo->starttime) . ' ' . usertime($conflictinfo->starttime) . ' ' . get_string('incourse', 'scheduler') . ': ';
+                            $msg = $output->userdate($conflictinfo->starttime) . ', ' . $output->usertime($conflictinfo->starttime) . ': ';
+                            $msg .= s($conflictinfo->schedname). ' '.get_string('incourse', 'scheduler') . ' ';
                             $msg .= $conflictinfo->shortname . ' - ' . $conflictinfo->fullname;
                             echo html_writer::tag('li', $msg);
                         }
                         echo '</ul><br/>';
                     } else { // we force, so delete all conflicting before inserting
                         foreach ($conflicts as $conflict) {
-                            scheduler_delete_slot($conflict->id);
+                        	$cslot = $scheduler->get_slot($conflict->id);
+                            $cslot->delete();
                         }
                     }
                 }
@@ -112,16 +116,17 @@ switch ($action) {
     /************************************ Deleting a slot ***********************************************/
     case 'deleteslot': {
         $slotid = required_param('slotid', PARAM_INT);
-
-        scheduler_delete_slot($slotid, $scheduler);
+        $slot = $scheduler->get_slot($slotid);
+        $slot->delete();
         break;
     }
     /************************************ Deleting multiple slots ***********************************************/
     case 'deleteslots': {
         $slotids = required_param('items', PARAM_SEQUENCE);
         $slots = explode(",", $slotids);
-        foreach ($slots as $aSlotId) {
-            scheduler_delete_slot($aSlotId, $scheduler);
+        foreach ($slots as $slotid) {
+            $slot = $scheduler->get_slot($slotid);
+            $slot->delete();
         }
         break;
     }
@@ -165,9 +170,6 @@ switch ($action) {
         }
 
         $slot->save();
-        if (!$slot->reuse and $slot->starttime > time() - $scheduler->reuseguardtime) {
-            $DB->delete_records('scheduler_slots', array('id'=>$slot->id));
-        }
         break;
     }
 
@@ -191,37 +193,11 @@ switch ($action) {
         break;
     }
 
-    /************************************ Toggling reuse on ***************************************/
-    case 'reuse':{
-        $slotid = required_param('slotid', PARAM_INT);
-        $slot = new stdClass();
-        $slot->id = $slotid;
-        $slot->reuse = 1;
-        $DB->update_record('scheduler_slots', $slot);
-        break;
-    }
-
-    /************************************ Toggling reuse off ***************************************/
-    case 'unreuse':{
-        $slotid = required_param('slotid', PARAM_INT);
-        $slot = new stdClass();
-        $slot->id = $slotid;
-        $slot->reuse = 0;
-        $DB->update_record('scheduler_slots', $slot);
-        break;
-    }
-
     /************************************ Deleting all slots ***************************************************/
     case 'deleteall':{
-        if ($slots = $DB->get_records('scheduler_slots', array('schedulerid' => $cm->instance))) {
-            foreach ($slots as $aSlot) {
-                scheduler_delete_calendar_events($aSlot);
-            }
-            list($usql, $params) = $DB->get_in_or_equal(array_keys($slots));
-            $DB->delete_records_select('scheduler_appointment', " slotid $usql ", $params);
-            $DB->delete_records('scheduler_slots', array('schedulerid' => $cm->instance));
-            unset($slots);
-            scheduler_update_grades($scheduler);
+        require_capability('mod/scheduler:manageallappointments', $context);
+        foreach ($scheduler->get_all_slots() as $slot) {
+            $slot->delete();
         }
         break;
     }
@@ -257,15 +233,8 @@ switch ($action) {
     }
     /************************************ Deleting current teacher's slots ***************************************/
     case 'deleteonlymine': {
-        if ($slots = $DB->get_records_select('scheduler_slots', "schedulerid = {$cm->instance} AND teacherid = {$USER->id}", null, '', 'id,id')) {
-            foreach ($slots as $aSlot) {
-                scheduler_delete_calendar_events($aSlot);
-            }
-            $DB->delete_records('scheduler_slots', array('schedulerid'=>$cm->instance, 'teacherid'=>$USER->id));
-            $slotList = implode(',', array_keys($slots));
-            $DB->delete_records_select('scheduler_appointment', "slotid IN ($slotList)");
-            unset($slots);
-            scheduler_update_grades($scheduler);
+        foreach ($scheduler->get_slots_for_teacher($USER->id) as $slot) {
+            $slot->delete();
         }
         break;
     }
@@ -277,7 +246,6 @@ switch ($action) {
         $slot->starttime = time();
         $slot->duration = $scheduler->defaultslotduration;
         $slot->exclusivity = 1;
-        $slot->reuse = 0;
         $slot->notes = '';
         $slot->notesformat = FORMAT_HTML;
         $slot->hideuntil = time();

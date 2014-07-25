@@ -1,8 +1,7 @@
 YUI.add('moodle-mod_scheduler-delselected', function (Y, NAME) {
 
 var SELECTORS = {
-        DELBUTTON: 'form#delselected input[type="submit"]',
-        DELFORM:   'form#delselected',
+        DELACTION: 'a#delselected',
         SELECTBOX: 'table#slotmanager input.slotselect'
     },
     MOD;
@@ -15,7 +14,7 @@ MOD = M.mod_scheduler.delselected = {};
  *
  * @return void
  */
-MOD.copy_selection = function(form) {
+MOD.collect_selection = function(link, baseurl) {
 
 	var sellist = '';
 	Y.all(SELECTORS.SELECTBOX).each( function(box) {
@@ -24,17 +23,15 @@ MOD.copy_selection = function(form) {
 				sellist += ',';
 			}
 			sellist += box.get('value');
-		}		
+		}
 	});
-	form.one('input[name="items"]').set('value', sellist);
+	link.setAttribute('href', baseurl+'&items='+sellist);
 };
 
-MOD.init = function() {
-	var form = Y.one(SELECTORS.DELFORM);	
-	var button = Y.one(SELECTORS.DELBUTTON);
-	form.append('<input name="items" type="hidden" />');
-	button.on('click', function(e) {
-		M.mod_scheduler.delselected.copy_selection(form);		
+MOD.init = function(baseurl) {
+	var link = Y.one(SELECTORS.DELACTION);
+	link.on('click', function(e) {
+		M.mod_scheduler.delselected.collect_selection(link, baseurl);
 	});
 };
 
