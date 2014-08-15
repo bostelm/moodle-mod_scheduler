@@ -154,9 +154,10 @@ function scheduler_cron () {
         // get teacher
         $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
 
-        // get course
-        $scheduler = $DB->get_record('scheduler', array('id'=>$slot->schedulerid));
-        $course = $DB->get_record('course', array('id'=>$scheduler->course));
+        // get scheduler, slot and course
+        $scheduler = scheduler_instance::load_by_id($slot->schedulerid);
+        $slotm = $scheduler->get_slot($slot->id);
+        $course = $DB->get_record('course', array('id' => $scheduler->course));
 
         // get appointed student list
         $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id), '', 'id, studentid');
@@ -164,7 +165,7 @@ function scheduler_cron () {
         //if no email previously sent and one is required
         foreach ($appointments as $appointment) {
             $student = $DB->get_record('user', array('id'=>$appointment->studentid));
-            $vars = scheduler_get_mail_variables ($scheduler, $slot, $teacher, $student);
+            $vars = scheduler_get_mail_variables ($scheduler, $slotm, $teacher, $student);
             scheduler_send_email_from_template ($student, $teacher, $course, 'remindtitle', 'reminder', $vars, 'scheduler');
         }
         // mark as sent
