@@ -85,6 +85,10 @@ function scheduler_delete_instance($id) {
     $scheduler = scheduler_instance::load_by_id($id);
     $scheduler->delete();
 
+    // Clean up any possibly remaining event records.
+    $params = array('modulename' => 'scheduler', 'instance' => $id);
+    $DB->delete_records('event', $params);
+
     return true;
 }
 

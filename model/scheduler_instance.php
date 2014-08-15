@@ -73,9 +73,9 @@ class scheduler_instance extends mvc_record_model {
      * Delete the scheduler
      */
     public function delete() {
-        parent::delete();
         $this->slots->delete_children();
         scheduler_grade_item_delete($this);
+        parent::delete();
     }
 
     /**
