@@ -131,8 +131,8 @@ if ($action == 'savechoice') {
                 // Prepare notification e-mail first
                 if ($scheduler->allownotifications) {
                     $student = $DB->get_record('user', array('id' => $USER->id));
-                    $teacher = $DB->get_record('user', array('id' => $oldappointment->teacherid));
-                    $vars = scheduler_get_mail_variables($scheduler, $oldappointment, $teacher, $student);
+                    $teacher = $DB->get_record('user', array('id' => $oldslot->teacherid));
+                    $vars = scheduler_get_mail_variables($scheduler, $oldslot, $teacher, $student, $course, $teacher);
                 }
 
                 \mod_scheduler\event\booking_removed::create_from_slot($oldslot)->trigger();
@@ -166,7 +166,7 @@ if ($action == 'savechoice') {
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id' => $appointment->studentid));
                 $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-                $vars = scheduler_get_mail_variables($scheduler, $newslot, $teacher, $student);
+                $vars = scheduler_get_mail_variables($scheduler, $newslot, $teacher, $student, $course, $teacher);
                 scheduler_send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
             }
         }
@@ -195,7 +195,7 @@ if ($action == 'disengage') {
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id' => $USER->id));
                 $teacher = $DB->get_record('user', array('id' => $oldslot->teacherid));
-                $vars = scheduler_get_mail_variables($scheduler, $oldslot, $teacher, $student);
+                $vars = scheduler_get_mail_variables($scheduler, $oldslot, $teacher, $student, $course, $teacher);
                 scheduler_send_email_from_template($teacher, $student, $COURSE, 'cancelledbystudent', 'cancelled', $vars, 'scheduler');
             }
         }

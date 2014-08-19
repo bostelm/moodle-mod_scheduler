@@ -165,15 +165,21 @@ function scheduler_delete_calendar_events($slot) {
 /**
  * Construct an array with subtitution rules for mail templates, relating to
  * a single appointment. Any of the parameters can be null.
- * @param object $scheduler The scheduler instance
- * @param object $slot The slot data, obtained with get_record().
+ * @param scheduler_instance $scheduler The scheduler instance
+ * @param scheduler_slot $slot The slot data as an MVC object
  * @param user $attendant A {@link $USER} object describing the attendant (teacher)
  * @param user $attendee A {@link $USER} object describing the attendee (student)
+ * @param object $course A course object relating to the ontext of the message
+ * @param object $recipient A {@link $USER} object describing the recipient of the message (used for determining the message language)
  * @return array A hash with mail template substitutions
  */
-function scheduler_get_mail_variables (scheduler_instance $scheduler, $slot, $attendant, $attendee) {
+function scheduler_get_mail_variables (scheduler_instance $scheduler, scheduler_slot $slot, $attendant, $attendee, $course, $recipient) {
 
     global $CFG;
+
+    $lang = scheduler_get_message_language($recipient, $course);
+    // Force any string formatting to happen in the target language.
+    $oldlang = force_current_language($lang);
 
     $vars = array();
 
@@ -195,6 +201,9 @@ function scheduler_get_mail_variables (scheduler_instance $scheduler, $slot, $at
         $vars['ATTENDEE']     = fullname($attendee);
         $vars['ATTENDEE_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendee->id.'&course='.$scheduler->course;
     }
+
+    // Reset language settings.
+    force_current_language($oldlang);
 
     return $vars;
 
