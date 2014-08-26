@@ -6,8 +6,8 @@
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
- 
+
+
 /**
  * Define all the restore steps that will be used by the restore_scheduler_activity_task
  */
@@ -25,10 +25,10 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
         $scheduler = new restore_path_element('scheduler', '/activity/scheduler');
         $paths[] = $scheduler;
 
-        $slot = new restore_path_element('scheduler_slot', '/activity/scheduler/slots/slot');
-        $paths[] = $slot;
-
         if ($userinfo) {
+            $slot = new restore_path_element('scheduler_slot', '/activity/scheduler/slots/slot');
+            $paths[] = $slot;
+
             $appointment = new restore_path_element('scheduler_appointment', '/activity/scheduler/slots/slot/appointments/appointment');
             $paths[] = $appointment;
         }
@@ -49,7 +49,6 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
         if ($data->scale < 0) { // scale found, get mapping
             $data->scale = -($this->get_mappingid('scale', abs($data->scale)));
         }
-        $data->teacher = $this->get_mappingid('user', $data->teacher);
 
         // insert the scheduler record
         $newitemid = $DB->insert_record('scheduler', $data);
@@ -72,7 +71,7 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
         $data->teacherid = $this->get_mappingid('user', $data->teacherid);
 
         $newitemid = $DB->insert_record('scheduler_slots', $data);
-        $this->set_mapping('scheduler_slot', $oldid, $newitemid, true); 
+        $this->set_mapping('scheduler_slot', $oldid, $newitemid, true);
         // Apply only once we have files in the slot
     }
 
@@ -83,14 +82,14 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
         $oldid = $data->id;
 
         $data->slotid = $this->get_new_parentid('scheduler_slot');
-        
+
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         $data->studentid = $this->get_mappingid('user', $data->studentid);
 
         $newitemid = $DB->insert_record('scheduler_appointment', $data);
-        // $this->set_mapping('scheduler_appointments', $oldid, $newitemid, true); 
+        // $this->set_mapping('scheduler_appointments', $oldid, $newitemid, true);
         // Apply only once we have files in the appointment
     }
 

@@ -52,23 +52,23 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
 
         // Define sources
         $scheduler->set_source_table('scheduler', array('id' => backup::VAR_ACTIVITYID));
-        $slot->set_source_table('scheduler_slots', array('schedulerid' => backup::VAR_PARENTID));
 
         // Include appointments only if we back up user information
         if ($userinfo) {
+            $slot->set_source_table('scheduler_slots', array('schedulerid' => backup::VAR_PARENTID));
             $appointment->set_source_table('scheduler_appointment', array('slotid' => backup::VAR_PARENTID));
         }
 
         // Define id annotations
         $scheduler->annotate_ids('scale', 'scale');
 
-        $slot->annotate_ids('user', 'teacherid');
-
-        $appointment->annotate_ids('user', 'studentid');
+        if ($userinfo) {
+            $slot->annotate_ids('user', 'teacherid');
+            $appointment->annotate_ids('user', 'studentid');
+        }
 
         // Define file annotations
         $scheduler->annotate_files('mod_scheduler', 'intro', null); // This file area has no itemid
-
 
         // Return the root element (scheduler), wrapped into standard activity structure
         return $this->prepare_activity_structure($scheduler);
