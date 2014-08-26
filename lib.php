@@ -173,6 +173,7 @@ function scheduler_cron () {
         //if no email previously sent and one is required
         foreach ($appointments as $appointment) {
             $student = $DB->get_record('user', array('id'=>$appointment->studentid));
+            cron_setup_user($student, $course);
             $vars = scheduler_get_mail_variables ($scheduler, $slot, $teacher, $student);
             scheduler_send_email_from_template ($student, $teacher, $course, 'remindtitle', 'reminder', $vars, 'scheduler');                
         }
@@ -180,6 +181,9 @@ function scheduler_cron () {
         $slot->emaildate = -1;
         $DB->update_record('scheduler_slots', $slot);
     }
+
+    cron_setup_user();
+
     return true;
 }
 
