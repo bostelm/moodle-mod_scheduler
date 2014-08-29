@@ -340,7 +340,9 @@ $string['notifications_help']='When this option is enabled, teachers and student
 $string['staffrolename_help']='
 The label for the role who attends students. This is not necessarily a "teacher".';
 
-$string['guardtime_help'] = 'Guard time help - TBA';
+$string['guardtime_help'] = 'A guard time prevents students from changing their booking shortly before the appointment.
+<p>If the guard time is enabled and set to, for example, 2 hours, then students will be unable to book a slot that starts in less than 2 hours time from now,
+and they will be unable to drop an appointment if it start in less than 2 hours.</p>';
 
 /* ***********  E-mail templates from here on ************ */
 
