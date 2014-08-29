@@ -184,8 +184,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $table->head  = array(get_string('date', 'scheduler'),
                         $slottable->scheduler->get_teacher_name(),
+                        get_string('location', 'scheduler'),
                         get_string('comments', 'scheduler'));
-        $table->align = array('left', 'center', 'left');
+        $table->align = array('left', 'left', 'left', 'left');
 
         if ($slottable->showgrades) {
             $table->head[] = get_string('grade', 'scheduler');
@@ -228,6 +229,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $rowdata[] = $timedata;
 
             $rowdata[] = $this->user_profile_link($slottable->scheduler, $slot->teacher);
+            $rowdata[] = format_string($slot->location);
 
             $studentnotes1 = '';
             $studentnotes2 = '';
@@ -345,10 +347,10 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $table = new html_table();
         $table->head  = array( get_string('date', 'scheduler'), get_string('start', 'scheduler'),
                         get_string('end', 'scheduler'), get_string('location', 'scheduler'),
-                        get_string('choice', 'scheduler'),
+                        get_string('comments', 'scheduler'), get_string('choice', 'scheduler'),
                         s($booker->scheduler->get_teacher_name()),
                         get_string('groupsession', 'scheduler'));
-        $table->align = array ('left', 'left', 'left', 'left', 'center', 'left', 'left');
+        $table->align = array ('left', 'left', 'left', 'left', 'left', 'center', 'left', 'left');
         $table->id = 'slotbookertable';
         $table->data = array();
 
@@ -387,6 +389,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $rowdata[] = $endtimestr;
 
             $rowdata[] = format_string($slot->location);
+
+            $textoptions = array('context' => $booker->scheduler->context);
+            $rowdata[] = format_text($slot->notes, $slot->notesformat, $textoptions);
 
             if ($booker->style == 'multi') {
                 $inputname = "slotcheck[{$slot->slotid}]";
