@@ -68,7 +68,11 @@ Students can now be allowed to book several slots at a time.
 "Volatile slots" replaced with "guard time" - students cannot change their booking
 for slots closer than this time to the current time.
 
-Refatoring / API changes:
+Feature changes:
+
+"Notes" field will now be shown to students at booking time.
+
+Refactoring / API changes:
 
 Major refactoring of teacher view (slot list), student view (booking screen),
 teacher view of individual appointments, as well as of the backend.
@@ -100,7 +104,7 @@ that is, malfunction in this respect should be considered a bug:
 
 * Gradebook integration
 * Moodle 2 backup
-* New rich text editor and file API (activity intro and slot add/edit forms) 
+* New rich text editor and file API 
 * Localization / language packs
 * Logging / event system
 
