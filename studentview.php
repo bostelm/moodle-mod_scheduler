@@ -71,7 +71,7 @@ if (count($upcomingslots) > 0) {
     echo $output->render($slottable);
 }
 
-$bookablecnt = $scheduler->count_bookable_appointments($USER->id);
+$bookablecnt = $scheduler->count_bookable_appointments($USER->id, true);
 $bookableslots = $scheduler->get_slots_available_to_student($USER->id, true);
 
 if ($bookablecnt == 0) {

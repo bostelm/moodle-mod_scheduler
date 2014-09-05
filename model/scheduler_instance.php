@@ -402,18 +402,22 @@ class scheduler_instance extends mvc_record_model {
      * Computes how many appointments a student can still book.
      *
      * @param int $studentid
+     * @param boolean $includechangeable include appointments that are booked but can still be changed?
      * @return int the number of bookable or changeable appointments, possibly 0; returns -1 if unlimited.
      */
-    public function count_bookable_appointments($studentid) {
+    public function count_bookable_appointments($studentid, $includechangeable = true) {
         global $DB;
 
-        // find how many slots have already been booked/assigned, unchangeably
+        // find how many slots have already been booked
         $sql = 'SELECT COUNT(*) FROM {scheduler_slots} s'
-                        .' JOIN {scheduler_appointment} a ON s.id = a.slotid'
-                                        .' WHERE s.schedulerid = :schedulerid AND a.studentid=:studentid';
+                 .' JOIN {scheduler_appointment} a ON s.id = a.slotid'
+                 .' WHERE s.schedulerid = :schedulerid AND a.studentid=:studentid';
         if ($this->schedulermode == 'onetime') {
-            $sql .= ' AND s.starttime <= :cutofftime AND a.attended = 0';
-        } else {
+            if ($includechangeable) {
+                $sql .= ' AND s.starttime <= :cutofftime';
+            }
+            $sql .= ' AND a.attended = 0';
+        } else if ($includechangeable) {
             $sql .= ' AND (s.starttime <= :cutofftime OR a.attended = 1)';
         }
         $params = array('schedulerid' => $this->id, 'studentid' => $studentid, 'cutofftime' => time() + $this->guardtime);
@@ -464,7 +468,7 @@ class scheduler_instance extends mvc_record_model {
         }
         $schedstuds = array();
         foreach ($studs as $stud) {
-            if ($this->count_bookable_appointments($stud->id) > 0) {
+            if ($this->count_bookable_appointments($stud->id, false) > 0) {
                 $schedstuds[] = $stud;
             }
         }
