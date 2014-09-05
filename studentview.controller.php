@@ -45,7 +45,7 @@ if ($action == 'savechoice') {
 
     $errormessage = '';
 
-    $bookinglimit = $scheduler->count_bookable_appointments($USER->id);
+    $bookinglimit = $scheduler->count_bookable_appointments($USER->id, true);
     if ($bookinglimit >= 0 && count($slotids) > $bookinglimit) {
         $errormessage = get_string('selectedtoomany', 'scheduler', $bookinglimit);
     }
