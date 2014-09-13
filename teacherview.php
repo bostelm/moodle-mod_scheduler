@@ -148,8 +148,8 @@ if ($action != 'view') {
 
 /************************************ View : New single slot form ****************************************/
 if ($action == 'addslot') {
-    $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'addslot', 'id' => $cm->id));
-    $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id));
+    $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'addslot', 'subpage' => $subpage, 'id' => $cm->id));
+    $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'subpage' => $subpage, 'id' => $cm->id));
 
     if (!scheduler_has_teachers($context)) {
         print_error('needteachers', 'scheduler', $returnurl);
@@ -343,7 +343,7 @@ $scheduler->free_late_unused_slots();
 
 // Print top tabs.
 
-$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'view'));
+$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'view', 'subpage' => $subpage));
 $actionurl = new moodle_url($taburl, array('offset' => $offset, 'sesskey' => sesskey()));
 
 $inactive = array();
