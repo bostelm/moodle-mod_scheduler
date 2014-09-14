@@ -760,28 +760,71 @@ function scheduler_make_grading_menu(&$scheduler, $id, $selected = '') {
 
 
 /**
- * Construct an array with subtitution rules for mail templates, relating to 
+ * Returns a float or a string which denotes a given user's timezone.
+ *
+ * A float value means that a simple offset from GMT is used, while a string (it will be the name of a timezone in the database)
+ * means that for this timezone there are also DST rules to be taken into account.
+ * Checks various settings and picks the most dominant of those which have a value.
+ *
+ * This is mainly a copy of lib/moodlelib.php, function get_user_timezone(),
+ * but with an additional parameter to specify a user (other than the current one)
+ * for whom the setting is computed.
+ *
+ * @param float|int|string $tz timezone to calculate GMT time offset before
+ *        calculating user timezone, 99 is default user timezone
+ *        {@link http://docs.moodle.org/dev/Time_API#Timezone}
+ * @return float|string
+ */
+function scheduler_get_user_timezone(stdClass $user, $tz = 99) {
+    global $CFG;
+
+    $timezones = array(
+        $tz,
+        isset($CFG->forcetimezone) ? $CFG->forcetimezone : 99,
+        isset($user->timezone) ? $user->timezone : 99,
+        isset($CFG->timezone) ? $CFG->timezone : 99,
+        );
+
+    $tz = 99;
+
+    // Loop while $tz is, empty but not zero, or 99, and there is another timezone is the array.
+    while (((empty($tz) && !is_numeric($tz)) || $tz == 99) && $next = each($timezones)) {
+        $tz = $next['value'];
+    }
+    return is_numeric($tz) ? (float) $tz : $tz;
+}
+
+
+/**
+ * Construct an array with subtitution rules for mail templates, relating to
  * a single appointment. Any of the parameters can be null.
  * @param object $scheduler The scheduler instance
  * @param object $slot The slot data, obtained with get_record().
  * @param user $attendant A {@link $USER} object describing the attendant (teacher)
  * @param user $attendee A {@link $USER} object describing the attendee (student)
- * @return array A hash with mail template substitutions 
+ * @param user $recipient A {@link $USER} object describing the recipient of the message
+ * @return array A hash with mail template substitutions
  */
-function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee) {
-    
-    global $CFG;
-    
+function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee, $recipient) {
+
+    global $CFG, $USER;
+
+	if (!$recipient) {
+	    $recipient = $USER;
+	}
+
+	$tz = scheduler_get_user_timezone($recipient);
+
     $vars = array();
-    
+
     if ($scheduler) {
         $vars['MODULE']     = $scheduler->name;
         $vars['STAFFROLE']  = scheduler_get_teacher_name($scheduler);
     }
     if ($slot) {
-        $vars ['DATE']     = userdate($slot->starttime,get_string('strftimedate'));
-        $vars ['TIME']     = userdate($slot->starttime,get_string('strftimetime'));
-        $vars ['ENDTIME']  = userdate($slot->starttime+$slot->duration*60, get_string('strftimetime'));
+        $vars ['DATE']     = userdate($slot->starttime,get_string('strftimedate'), $tz);
+        $vars ['TIME']     = userdate($slot->starttime,get_string('strftimetime'), $tz);
+        $vars ['ENDTIME']  = userdate($slot->starttime+$slot->duration*60, get_string('strftimetime'), $tz);
         $vars ['LOCATION'] = $slot->appointmentlocation;
     }
     if ($attendant) {
@@ -792,9 +835,9 @@ function scheduler_get_mail_variables ($scheduler, $slot, $attendant, $attendee)
         $vars['ATTENDEE']     = fullname($attendee);
         $vars['ATTENDEE_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendee->id.'&course='.$scheduler->course;
     }
-    
+
     return $vars;
-    
+
 }
 
 /**
