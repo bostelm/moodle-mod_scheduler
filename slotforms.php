@@ -39,12 +39,8 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform = $this->_form;
 
         // exclusivity
-        $maxexclusive = $CFG->scheduler_maxstudentsperslot;
-        $exclusivemenu['0'] = get_string('unlimited', 'scheduler');
-        for ($i = 1; $i <= $maxexclusive; $i++) {
-            $exclusivemenu[(string)$i] = $i;
-        }
-        $mform->addElement('select', 'exclusivity', get_string('multiplestudents', 'scheduler'), $exclusivemenu);
+        $mform->addElement('text', 'exclusivity', get_string('multiplestudents', 'scheduler'));
+        $mform->setType('exclusivity', PARAM_INTEGER);
         $mform->setDefault('exclusivity', 1);
         $mform->addHelpButton('exclusivity', 'exclusivity', 'scheduler');
 
