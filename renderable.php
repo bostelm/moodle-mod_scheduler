@@ -24,6 +24,7 @@ class scheduler_slot_table implements renderable {
         $slot->starttime = $slotmodel->starttime;
         $slot->endtime = $slotmodel->endtime;
         $slot->attended = $appointmentmodel->attended;
+        $slot->location = $slotmodel->appointmentlocation;
         $slot->slotnotes = $slotmodel->notes;
         $slot->slotnotesformat = $slotmodel->notesformat;
         $slot->teacher = $slotmodel->get_teacher();
@@ -108,6 +109,8 @@ class scheduler_slot_booker implements renderable {
         $slot->starttime = $slotmodel->starttime;
         $slot->endtime = $slotmodel->endtime;
         $slot->location = $slotmodel->appointmentlocation;
+        $slot->notes = $slotmodel->notes;
+        $slot->notesformat = $slotmodel->notesformat;
         $slot->bookedbyme = $bookedbyme;
         $slot->canbook = $canbook;
         $slot->groupinfo = $groupinfo;

@@ -164,7 +164,7 @@ switch ($action) {
                 $student = $DB->get_record('user', array('id' => $oldstudent));
                 $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
 
-                $vars = scheduler_get_mail_variables($scheduler, $slot, $teacher, $student);
+                $vars = scheduler_get_mail_variables($scheduler, $slot, $teacher, $student, $COURSE, $student);
                 scheduler_send_email_from_template($student, $teacher, $COURSE, 'cancelledbyteacher', 'teachercancelled', $vars, 'scheduler');
             }
         }
