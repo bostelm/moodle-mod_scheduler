@@ -279,14 +279,11 @@ $string['yourslotnotes'] = 'Comments on the meeting';
 /* ***********  Help strings from here on ************ */
 
 $string['forcewhenoverlap_help']='
-<h3>Forcing slots addition through a session</h3>
-<p>This control allows forcing the addition of slots when the session conflicts with other slots. 
-In that case, only "clean" slots will be added. Conflicting will be ignored.</p>
-
-<p>
-If not used, the addition procedure will block when overlapping are detected, and you will asked for
-deleting previous slots before the procedure can add new slots.
-</p>';
+<h3>Forcing slot creation when slots overlap</h3>
+<p>This setting determines how new slots will be handled if they overlap with other, already existing slots.</p>
+<p>If enabled, the overlapping existing slot will be deleted and the new slot created.</p>
+<p>If disabled, the overlapping existing slot will be kept and a new slot will <em>not</em> be created.</p>
+';
 
 $string['addscheduled_help']='
 <h3>Adding an appointment on slot setup</h3>
@@ -313,13 +310,6 @@ $string['exclusivity_help']='<p>You can set a limit on the amount of students th
 <p>Setting a limit of 1 (default) will toggle the slot in exclusive mode.</p>
 <p>If the slot is set to unlimited number (0), this slot will never be considered in constraints evaluation, even if other slots are exclusive or limited in the same time range.
 </p>';
-
-$string['forcewhenoverlap_help']='
-<p>This control allows forcing the addition of slots when the session conflicts with other slots. 
-In that case, only "clean" slots will be added. Conflicting will be ignored.</p>
-
-<p>If not used, the addition procedure will block when overlapping are detected, and you will asked for
-deleting previous slots before the procedure can add new slots.</p>';
 
 $string['location_help']='Specify the scheduled location of the meeting.';
 

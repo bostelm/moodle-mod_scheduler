@@ -359,6 +359,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         // Force when overlap?
         $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
+        $mform->addHelpButton('forcewhenoverlap', 'forcewhenoverlap', 'scheduler');
 
         // Common fields
         $this->add_base_fields();
