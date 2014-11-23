@@ -398,6 +398,7 @@ $commandbar->title = get_string('actions', 'scheduler');
 
 $addbuttons = array();
 $addbuttons[] = $commandbar->action_link(new moodle_url($actionurl, array('what' => 'addsession')), 'addsession', 't/add');
+$addbuttons[] = $commandbar->action_link(new moodle_url($actionurl, array('what' => 'addaperiodsession')), 'addaperiodsession', 't/add');
 $addbuttons[] = $commandbar->action_link(new moodle_url($actionurl, array('what' => 'addslot')), 'addsingleslot', 't/add');
 $commandbar->add_group(get_string('addcommands', 'scheduler'), $addbuttons);
 
