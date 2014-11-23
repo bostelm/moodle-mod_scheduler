@@ -484,33 +484,7 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
 
         $mform = $this->_form;
 
-        // Start and end of range
-//        $mform->addElement('date_selector', 'rangestart', get_string('date', 'scheduler'));
-//        $mform->setDefault('rangestart', time());
-
-//        $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'));
-//        $mform->setDefault('rangeend', time());
-
-        // Weekdays selection
-//        $weekdays = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday');
-//        foreach ($weekdays as $day) {
-//            $label = ($day == 'monday') ? get_string('addondays', 'scheduler') : '';
-//            $mform->addElement('advcheckbox', $day, $label, get_string($day, 'scheduler'));
-//            $mform->setDefault($day, true);
-//        }
-//        $mform->addElement('advcheckbox', 'saturday', '', get_string('saturday', 'scheduler'));
-//        $mform->addElement('advcheckbox', 'sunday', '', get_string('sunday', 'scheduler'));
-        
-        //TODO: remove? it was the jquery localization option
-//        $courselang = substr($COURSE->lang, 0, 2); 
-//        if ($courselang == 'en'){
-//            $courselang = '';
-//        }
-        
         $listdates = "";
-//        $rangestart = time();
-        
-//        $mform->addElement('hidden', 'rangestart', $rangestart);
         $mform->addElement('hidden', 'getlistdates', $listdates);
         // Define Calendar panel
         $mform->addElement('html', '<div id="calendar" class="yui3-skin-sam">');
@@ -592,23 +566,12 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Range is negative
-//        $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
-//        if ($fordays < 0) {
-//            $errors['rangeend'] = get_string('negativerange', 'scheduler');
-//        }
-
         // Time range is negative
         $starttime = $data['starthour']*60+$data['startminute'];
         $endtime = $data['endhour']*60+$data['endminute'];
         if ($starttime > $endtime)  {
             $errors['endtime'] = get_string('negativerange', 'scheduler');
         }
-
-        //TODO: need one more field to pass this: First slot is in the past
-//        if ($data['rangestart'] < time() - DAYSECS) {
-//            $errors['rangestart'] = get_string('startpast', 'scheduler');
-//        }
 
         // Break must be nonnegative
         if ($data['break'] < 0) {
