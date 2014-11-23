@@ -475,3 +475,197 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         return $errors;
     }
 }
+//TDMU
+class scheduler_addaperiodsession_form extends scheduler_slotform_base {
+
+    protected function definition() {
+
+        global $DB, $CFG, $COURSE;
+
+        $mform = $this->_form;
+
+        // Start and end of range
+//        $mform->addElement('date_selector', 'rangestart', get_string('date', 'scheduler'));
+//        $mform->setDefault('rangestart', time());
+
+//        $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'));
+//        $mform->setDefault('rangeend', time());
+
+        // Weekdays selection
+//        $weekdays = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday');
+//        foreach ($weekdays as $day) {
+//            $label = ($day == 'monday') ? get_string('addondays', 'scheduler') : '';
+//            $mform->addElement('advcheckbox', $day, $label, get_string($day, 'scheduler'));
+//            $mform->setDefault($day, true);
+//        }
+//        $mform->addElement('advcheckbox', 'saturday', '', get_string('saturday', 'scheduler'));
+//        $mform->addElement('advcheckbox', 'sunday', '', get_string('sunday', 'scheduler'));
+        
+        //TODO: remove? it was the jquery localization option
+//        $courselang = substr($COURSE->lang, 0, 2); 
+//        if ($courselang == 'en'){
+//            $courselang = '';
+//        }
+        
+        $listdates = "";
+//        $rangestart = time();
+        
+//        $mform->addElement('hidden', 'rangestart', $rangestart);
+        $mform->addElement('hidden', 'getlistdates', $listdates);
+        // Define Calendar panel
+        $mform->addElement('html', '<div id="calendar" class="yui3-skin-sam">');
+        $mform->addElement('html', '<div id="calContainer"></div>');     
+        $mform->addElement('html', '</div>');
+        // Start and end time
+        $hours = array();
+        $minutes = array();
+        for ($i=0; $i<=23; $i++) {
+            $hours[$i] = sprintf("%02d", $i);
+        }
+        for ($i=0; $i<60; $i+=5) {
+            $minutes[$i] = sprintf("%02d", $i);
+        }
+        $starttimegroup = array();
+        $starttimegroup[] = $mform->createElement('select', 'starthour', get_string('hour', 'form'), $hours);
+        $starttimegroup[] = $mform->createElement('select', 'startminute', get_string('minute', 'form'), $minutes);
+        $mform->addGroup ($starttimegroup, 'starttime', get_string('starttime', 'scheduler'), null, false);
+        $endtimegroup = array();
+        $endtimegroup[] = $mform->createElement('select', 'endhour', get_string('hour', 'form'), $hours);
+        $endtimegroup[] = $mform->createElement('select', 'endminute', get_string('minute', 'form'), $minutes);
+        $mform->addGroup ($endtimegroup, 'endtime', get_string('endtime', 'scheduler'), null, false);
+
+        // Divide into slots?
+        $mform->addElement('selectyesno', 'divide', get_string('divide', 'scheduler'));
+        $mform->setDefault('divide', 1);
+
+        // Duration of the slot
+        $this->add_duration_field('minutesperslot');
+
+        // Ignore conflict checkbox
+        $mform->addElement('checkbox', 'ignoreconflicts', get_string('ignoreconflicts', 'scheduler'));
+        $mform->setDefault('ignoreconflicts', false);
+        $mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
+        
+        // Break between slots
+        $this->add_minutes_field('break', 'break', 0, 'minutes');
+
+        // Force when overlap?
+        $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
+
+        // Common fields
+        $this->add_base_fields();
+
+        // Display slot from date - relative
+        $hideuntilsel = array();
+        $hideuntilsel[0] =  get_string('now', 'scheduler');
+        $hideuntilsel[DAYSECS] = get_string('onedaybefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $hideuntilsel[DAYSECS*$i] = get_string('xdaysbefore', 'scheduler', $i);
+        }
+        $hideuntilsel[WEEKSECS] = get_string('oneweekbefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $hideuntilsel[WEEKSECS*$i] = get_string('xweeksbefore', 'scheduler', $i);
+        }
+        $mform->addElement('select', 'hideuntilrel', get_string('displayfrom', 'scheduler'), $hideuntilsel);
+        $mform->setDefault('hideuntilsel', 0);
+
+        // E-mail reminder from
+        $remindersel = array();
+        $remindersel[-1] = get_string('never', 'scheduler');
+        $remindersel[0] = get_string('onthemorningofappointment', 'scheduler');
+        $remindersel[DAYSECS] = get_string('onedaybefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $remindersel[DAYSECS * $i] = get_string('xdaysbefore', 'scheduler', $i);
+        }
+        $remindersel[WEEKSECS] = get_string('oneweekbefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $remindersel[WEEKSECS*$i] = get_string('xweeksbefore', 'scheduler', $i);
+        }
+
+        $mform->addElement('select', 'emaildaterel', get_string('emailreminder', 'scheduler'), $remindersel);
+        $mform->setDefault('remindersel', -1);
+
+        $this->add_action_buttons();
+
+    }
+
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // Range is negative
+//        $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
+//        if ($fordays < 0) {
+//            $errors['rangeend'] = get_string('negativerange', 'scheduler');
+//        }
+
+        // Time range is negative
+        $starttime = $data['starthour']*60+$data['startminute'];
+        $endtime = $data['endhour']*60+$data['endminute'];
+        if ($starttime > $endtime)  {
+            $errors['endtime'] = get_string('negativerange', 'scheduler');
+        }
+
+        //TODO: need one more field to pass this: First slot is in the past
+//        if ($data['rangestart'] < time() - DAYSECS) {
+//            $errors['rangestart'] = get_string('startpast', 'scheduler');
+//        }
+
+        // Break must be nonnegative
+        if ($data['break'] < 0) {
+            $errors['breakgroup'] = get_string('breaknotnegative', 'scheduler');
+        }
+
+        // TODO conflict checks
+
+        /*
+
+        /// make a base slot for generating
+        $slot = new stdClass();
+        $slot->appointmentlocation = $data->appointmentlocation;
+        $slot->exclusivity = $data->exclusivity;
+        $slot->reuse = $data->reuse;
+        $slot->duration = $data->duration;
+        $slot->schedulerid = $scheduler->id;
+        $slot->timemodified = time();
+        $slot->teacherid = $data->teacherid;
+
+        /// check if overlaps. Check also if some slots are in allowed day range
+        $startfrom = $data->rangestart;
+        $noslotsallowed = true;
+        for ($d = 0; $d <= $fordays; $d ++){
+        $starttime = $startfrom + ($d * DAYSECS);
+        $eventdate = usergetdate($starttime);
+        $dayofweek = $eventdate['wday'];
+        if ((($dayofweek == 1) && ($data->monday == 1)) ||
+                        (($dayofweek == 2) && ($data->tuesday == 1)) ||
+                        (($dayofweek == 3) && ($data->wednesday == 1)) ||
+                        (($dayofweek == 4) && ($data->thursday == 1)) ||
+                        (($dayofweek == 5) && ($data->friday == 1)) ||
+                        (($dayofweek == 6) && ($data->saturday == 1)) ||
+                        (($dayofweek == 0) && ($data->sunday == 1))){
+                        $noslotsallowed = false;
+                        $data->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->starthour, $data->startminute);
+                        $conflicts = scheduler_get_conflicts($scheduler->id, $data->starttime, $data->starttime + $data->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
+                        if (!$data->forcewhenoverlap){
+                        if ($conflicts){
+                        unset($erroritem);
+                        $erroritem->message = get_string('overlappings', 'scheduler');
+                        $erroritem->on = 'range';
+                        $errors[] = $erroritem;
+                        }
+                        }
+                        }
+                        }
+
+                        /// Finally check if some slots are allowed (an error is thrown to ask care to this situation)
+                        if ($noslotsallowed){
+                        unset($erroritem);
+                        $erroritem->message = get_string('allslotsincloseddays', 'scheduler');
+                        $erroritem->on = 'days';
+                        $errors[] = $erroritem;
+                        }
+         */
+
+        return $errors;
+    }
+}
