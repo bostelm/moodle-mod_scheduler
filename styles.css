@@ -142,3 +142,7 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     background-color: ##FFB2B8;
     border-color: #F40000;
 }
+
+.yui3-skin-sam .redtext {
+  color:#ff0000;
+}

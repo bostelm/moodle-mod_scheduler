@@ -1,18 +1,21 @@
 YUI.add('moodle-mod_scheduler-calpane', function (Y, NAME) {
 
+var MOD;
+
 M.mod_scheduler = M.mod_scheduler || {};
-M.mod_scheduler.calpane = {
-  init: function(langconf) {
+MOD = M.mod_scheduler.calpane = {};
+
+MOD.init = function(langconf) {
     Y.Intl.add("datatype-date-format", "uk-UK", {
         "a":["Нд","Пн","Вт","Ср","Чт","Пт","Сб"],
         "A":["Неділя","Понеділок","Вівторк","Середа","Четвер","П'ятниця","Субота"],
         "B":["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"]
     });
-//    Y.Intl.add("datatype-date-format", "ru-RU", {
-//        "a":["Вс","Пн","Вт","Ср","Чт","Пт","Сб"],
-//        "A":["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
-//        "B":["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-//    });
+    Y.Intl.add("datatype-date-format", "ru-RU", {
+        "a":["Вс","Пн","Вт","Ср","Чт","Пт","Сб"],
+        "A":["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
+        "B":["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
+    });
     Y.CalendarBase.CONTENT_TEMPLATE = Y.CalendarBase.THREE_PANE_TEMPLATE;
     // Setup basic calendar parameters
     var calend = new Y.Calendar({
@@ -29,7 +32,9 @@ M.mod_scheduler.calpane = {
         Y.Intl.setLang("datatype-date-format", "uk-UK");
     } else if (langconf === "ru") {
         calend.set("strings.very_short_weekdays", ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]);
-        Y.Intl.setLang("datatype-date-format", "ru");//not working
+        Y.Intl.setLang("datatype-date-format", "ru-RU");
+    } else {
+        Y.Intl.setLang("datatype-date-format", "en-US");
     }
     // Draw calendar instance
     calend.render();
@@ -78,7 +83,6 @@ M.mod_scheduler.calpane = {
         //set dates to HTML control
         Y.one(document.getElementsByName('getlistdates')[0]).set('value', listdates);
     });
-  }
-};
+  };
 
-}, '@VERSION@', {"requires": ["base", "calendar", "datatype-date", "node", "intl"]});
+}, '@VERSION@', {"requires": ["base", "calendar", "datatype-date", "datatype-date-format", "node", "intl"]});

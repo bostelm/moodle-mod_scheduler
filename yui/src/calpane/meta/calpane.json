@@ -4,6 +4,7 @@
         "base",
         "calendar",
         "datatype-date",
+        "datatype-date-format",
         "node",
         "intl"
     ]
