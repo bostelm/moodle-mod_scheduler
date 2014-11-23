@@ -197,7 +197,7 @@ if ($action == 'updateslot') {
     }
 
 }
-/************************************ Add session multiple slots form ****************************************/
+/************************************ Add session multiple slots (weekly) form ****************************************/
 if ($action == 'addsession') {
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
@@ -217,6 +217,43 @@ if ($action == 'addsession') {
         scheduler_action_doaddsession($scheduler, $formdata);
     } else {
         echo $output->heading(get_string('addsession', 'scheduler'));
+        $mform->display();
+        echo $output->footer($course);
+        die;
+    }
+}
+
+/************************************ Add session multiple slots (aperiodically) form ************************************/
+if ($action == 'addaperiodsession') {
+        //TODO: remove? it was the jquery localization option
+        $courselang = substr($COURSE->lang, 0, 2); 
+//        if ($courselang == 'en'){
+//            $courselang = '';
+//        }
+
+    $actionurl = new moodle_url('/mod/scheduler/view.php',
+                    array('what' => 'addaperiodsession', 'id' => $cm->id, 'subpage' => $subpage));
+    $returnurl = new moodle_url('/mod/scheduler/view.php',
+                    array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage));
+
+    if (!scheduler_has_teachers($context)) {
+        print_error('needteachers', 'scheduler', $returnurl);
+    }                    
+    //create form
+    $mform = new scheduler_addaperiodsession_form($actionurl, $scheduler, $cm, $usergroups);
+    //process form responce
+    if ($mform->is_cancelled()) {
+        redirect($returnurl);
+    } else if ($formdata = $mform->get_data()) {
+        scheduler_action_doaddaperiodsession($scheduler, $formdata);
+    } else {
+        //prepare and load the YUI module
+        $calconfig=array($courselang);
+        $calfunction ='M.mod_scheduler.calpane.init';
+        $calmodule   = 'moodle-mod_scheduler-calpane';
+        $PAGE->requires->yui_module($calmodule, $calfunction, $calconfig);    
+        //display form
+        echo $output->heading(get_string('addaperiodsession', 'scheduler'));
         $mform->display();
         echo $output->footer($course);
         die;
