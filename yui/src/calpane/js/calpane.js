@@ -5,12 +5,10 @@ MOD = M.mod_scheduler.calpane = {};
 
 MOD.init = function(langconf) {
     Y.Intl.add("datatype-date-format", "uk-UK", {
-        "a":["Нд","Пн","Вт","Ср","Чт","Пт","Сб"],
         "A":["Неділя","Понеділок","Вівторк","Середа","Четвер","П'ятниця","Субота"],
         "B":["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"]
     });
     Y.Intl.add("datatype-date-format", "ru-RU", {
-        "a":["Вс","Пн","Вт","Ср","Чт","Пт","Сб"],
         "A":["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
         "B":["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
     });
@@ -18,26 +16,26 @@ MOD.init = function(langconf) {
     // Setup basic calendar parameters
     var calend = new Y.Calendar({
         contentBox: "#calContainer",
-        width:'750px',
+        width:'760px',
         showPrevMonth: true,
         showNextMonth: true,
         selectionMode: 'multiple-sticky',
         minimumDate: new Date(),
         date: new Date()});
-    //Localization
+    //Localization. Have some troubles
     if (langconf === "uk") {
         calend.set("strings.very_short_weekdays", ["Нд","Пн","Вт","Ср","Чт","Пт","Сб"]);
-        Y.Intl.setLang("datatype-date-format", "uk-UK");
     } else if (langconf === "ru") {
         calend.set("strings.very_short_weekdays", ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]);
-        Y.Intl.setLang("datatype-date-format", "ru-RU");
+    }
+    if (langconf === "en") {
+        Y.Intl.setLang("datatype-date-format", langconf + "-US");
     } else {
-        Y.Intl.setLang("datatype-date-format", "en-US");
+        Y.Intl.setLang("datatype-date-format", langconf + "-" + langconf.toUpperCase());
     }
     // Draw calendar instance
     calend.render();
-    // Create a set of rules to match specific dates. In this case,
-    // the "all_weekends" rule will match any Saturday or Sunday.
+    // Create a set of rules to match specific dates. In this case, the "all_weekends" rule will match any Saturday or Sunday.
     var rules = {
         "all": {
             "all": {
@@ -56,8 +54,7 @@ MOD.init = function(langconf) {
             }
         }
     });
-    // Set a custom header renderer with a callback function,
-    // which receives the current date and outputs a string.
+    // Set a custom header renderer with a callback function, which receives the current date and outputs a string.
     calend.set("headerRenderer", function (curDate) {
         var ydate = Y.DataType.Date,
             output = ydate.format(curDate, {
