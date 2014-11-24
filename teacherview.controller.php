@@ -162,8 +162,7 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
                 
         while ($slot->starttime <= $data->timeend - $data->duration * 60) {
             //TDMU exclusivity check-out
-            //if ($scheduler->allowmulticourseappointment) {
-            if ($data->ignoreconflicts) {
+            if (isset($data->ignoreconflicts)) {
                 $exclusive_condition = true;
             }
             else {
@@ -189,7 +188,8 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
                 }
                 else { // we force, so delete all conflicting before inserting
                     foreach($conflicts as $conflict){
-                        scheduler_delete_slot($conflict->id);
+                        $cslot = $scheduler->get_slot($conflict->id);
+                        $cslot->delete();
                     }
                 }
             } 
