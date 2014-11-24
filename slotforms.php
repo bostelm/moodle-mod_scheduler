@@ -580,55 +580,6 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
 
         // TODO conflict checks
 
-        /*
-
-        /// make a base slot for generating
-        $slot = new stdClass();
-        $slot->appointmentlocation = $data->appointmentlocation;
-        $slot->exclusivity = $data->exclusivity;
-        $slot->reuse = $data->reuse;
-        $slot->duration = $data->duration;
-        $slot->schedulerid = $scheduler->id;
-        $slot->timemodified = time();
-        $slot->teacherid = $data->teacherid;
-
-        /// check if overlaps. Check also if some slots are in allowed day range
-        $startfrom = $data->rangestart;
-        $noslotsallowed = true;
-        for ($d = 0; $d <= $fordays; $d ++){
-        $starttime = $startfrom + ($d * DAYSECS);
-        $eventdate = usergetdate($starttime);
-        $dayofweek = $eventdate['wday'];
-        if ((($dayofweek == 1) && ($data->monday == 1)) ||
-                        (($dayofweek == 2) && ($data->tuesday == 1)) ||
-                        (($dayofweek == 3) && ($data->wednesday == 1)) ||
-                        (($dayofweek == 4) && ($data->thursday == 1)) ||
-                        (($dayofweek == 5) && ($data->friday == 1)) ||
-                        (($dayofweek == 6) && ($data->saturday == 1)) ||
-                        (($dayofweek == 0) && ($data->sunday == 1))){
-                        $noslotsallowed = false;
-                        $data->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->starthour, $data->startminute);
-                        $conflicts = scheduler_get_conflicts($scheduler->id, $data->starttime, $data->starttime + $data->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
-                        if (!$data->forcewhenoverlap){
-                        if ($conflicts){
-                        unset($erroritem);
-                        $erroritem->message = get_string('overlappings', 'scheduler');
-                        $erroritem->on = 'range';
-                        $errors[] = $erroritem;
-                        }
-                        }
-                        }
-                        }
-
-                        /// Finally check if some slots are allowed (an error is thrown to ask care to this situation)
-                        if ($noslotsallowed){
-                        unset($erroritem);
-                        $erroritem->message = get_string('allslotsincloseddays', 'scheduler');
-                        $erroritem->on = 'days';
-                        $errors[] = $erroritem;
-                        }
-         */
-
         return $errors;
     }
 }

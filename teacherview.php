@@ -225,11 +225,8 @@ if ($action == 'addsession') {
 
 /************************************ Add session multiple slots (aperiodically) form ************************************/
 if ($action == 'addaperiodsession') {
-        //TODO: remove? it was the jquery localization option
-        $courselang = substr($COURSE->lang, 0, 2); 
-//        if ($courselang == 'en'){
-//            $courselang = '';
-//        }
+    //need to localization option
+    $courselang = substr($COURSE->lang, 0, 2); 
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'addaperiodsession', 'id' => $cm->id, 'subpage' => $subpage));

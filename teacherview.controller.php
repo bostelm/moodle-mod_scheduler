@@ -78,10 +78,6 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                         print_string('conflictingslots', 'scheduler');
                         echo '<ul>';
                         foreach ($conflicts as $aconflict) {
-                            //$sql = 'SELECT c.fullname, c.shortname, s.name as schedname, sl.starttime '
-                            //        .'FROM {course} c, {scheduler} s, {scheduler_slots} sl '
-                            //        .'WHERE s.course = c.id AND sl.schedulerid = s.id AND sl.id = :conflictid';
-                            //$conflictinfo = $DB->get_record_sql($sql, array('conflictid' => $aconflict->id));
                             $conflictinfo = scheduler_get_courseinfobyslotid($aconflict->id);//TDMU
                             $msg = $output->userdate($conflictinfo->starttime) . ', ' . $output->usertime($conflictinfo->starttime) . ': ';
                             $msg .= s($conflictinfo->schedname). ' '.get_string('incourse', 'scheduler') . ' ';
@@ -115,13 +111,9 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
 
     $data = (object) $formdata;
 
-//    $fordays = (($data->rangeend - $data->rangestart) / DAYSECS);
-
     // Create as many slots of $duration on the given dates list $listdates and that do not conflict.
     $countslots = 0;
     $couldnotcreateslots = '';
-//    $startfrom = $data->rangestart+($data->starthour*60+$data->startminute)*60;
-//    $endat = $data->rangestart+($data->endhour*60+$data->endminute)*60;
     $slot = new stdClass();
     $slot->schedulerid = $scheduler->id;
     $slot->teacherid = $data->teacherid;
@@ -133,7 +125,6 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
     $slot->notesformat = FORMAT_HTML;
     $slot->timemodified = time();
 
-///    $listdatesarr = json_decode($data->listdates, true);
     $listdatesarr = json_decode($data->getlistdates, true);
     
     for ($d = 0; $d <= count($listdatesarr[0])-1; $d ++){
