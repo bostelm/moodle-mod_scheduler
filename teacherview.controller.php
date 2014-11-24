@@ -160,7 +160,7 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
                 $exclusive_condition = false;
             }          
             $conflictsRemote = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $data->duration * 60, $data->teacherid, 0, SCHEDULER_OTHERS, $exclusive_condition);
-            $conflictsLocal = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $data->duration * 60, $data->teacherid, 0, SCHEDULER_SELF, false);
+            $conflictsLocal = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $data->duration * 60, $data->teacherid, 0, SCHEDULER_SELF, true);
             if (!$conflictsRemote) $conflictsRemote = array();
             if (!$conflictsLocal) $conflictsLocal = array();
             $conflicts = $conflictsRemote + $conflictsLocal;                    
