@@ -22,16 +22,17 @@ MOD.init = function(langconf) {
         selectionMode: 'multiple-sticky',
         minimumDate: new Date(),
         date: new Date()});
-    //Localization. Have some troubles
-    if (langconf === "uk") {
-        calend.set("strings.very_short_weekdays", ["Нд","Пн","Вт","Ср","Чт","Пт","Сб"]);
-    } else if (langconf === "ru") {
-        calend.set("strings.very_short_weekdays", ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]);
-    }
-    if (langconf === "en") {
-        Y.Intl.setLang("datatype-date-format", langconf + "-US");
+    //Set localization options
+    if (langconf === false || langconf === "en") {
+        Y.Intl.setLang("datatype-date-format", "en-US");
     } else {
         Y.Intl.setLang("datatype-date-format", langconf + "-" + langconf.toUpperCase());
+        //set additional calendar options for the Ukrainian and Russian
+        if (langconf === "uk") {
+            calend.set("strings.very_short_weekdays", ["Нд","Пн","Вт","Ср","Чт","Пт","Сб"]);
+        } else if (langconf === "ru") {
+            calend.set("strings.very_short_weekdays", ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]);
+        }
     }
     // Draw calendar instance
     calend.render();
