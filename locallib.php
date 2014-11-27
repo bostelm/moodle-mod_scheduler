@@ -134,6 +134,33 @@ function scheduler_get_appointed($slotid){
     return $DB->get_records_sql($sql, array($slotid));
 }
 
+/**
+* Get a course info by the sheduler slot id
+* @param int $slotid the any sheduler slot id
+* @return a course shortname, fullname and selected slot starttime
+*/
+function scheduler_get_courseinfobyslotid($slotid) {
+	global $CFG, $DB;
+	
+    $sql = "
+       SELECT
+          c.id,
+          c.fullname,
+          c.shortname,
+          sl.starttime
+       FROM
+          {course} c,
+          {scheduler} s,
+          {scheduler_slots} sl
+       WHERE
+          s.course = c.id AND
+          sl.schedulerid = s.id AND
+          sl.id = {$slotid}                                 
+    ";
+    $courseshortinfo = $DB->get_record_sql($sql);
+	
+	return $courseshortinfo;
+}
 
 /// Events related functions
 

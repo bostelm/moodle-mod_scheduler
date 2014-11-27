@@ -76,6 +76,18 @@ if ($action == 'savechoice') {
                     }
                     break;
                 }
+                //TODO: check remote conflict
+                $RemoteConflict = scheduler_get_conflicts($slot->schedulerid, $slot->starttime, $slot->starttime+HOURSECS, 0, $USER->id, SCHEDULER_OTHERS, false);
+                var_dump($RemoteConflict);
+                if ($RemoteConflict) {
+                    $errormessage = 'You have booking into another course(s):<ul>';
+                    foreach ($RemoteConflict as $aConflict){
+                        $conflictinfo = scheduler_get_courseinfobyslotid($aConflict->id);
+                        $errormessage .= '<li> ' . userdate($aConflict->starttime) . ' [' . $aConflict->duration .' '.get_string('minutes') . '] ' . get_string('incourse', 'scheduler') . ': ' . $conflictinfo->shortname . ' - ' . $conflictinfo->fullname . "</li>\n";
+                    }
+                    $errormessage .= '</ul><br/>';
+                    break;
+                }
                 $slotidstoadd[$index] = $slotid;
             }
             $slotidsvalidated[$index] = $slotid;
