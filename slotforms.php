@@ -47,7 +47,15 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->addElement('select', 'exclusivity', get_string('multiplestudents', 'scheduler'), $exclusivemenu);
         $mform->setDefault('exclusivity', 1);
         $mform->addHelpButton('exclusivity', 'exclusivity', 'scheduler');
-
+        
+        // Check conflict and Force Owerlap NEW
+        $conflictmenu = array();
+        $conflictmenu[SLOT_CONFLICT_PROHIBIT] = 'Prohibit all conflicts!';
+        $conflictmenu[SLOT_CONFLICT_IGNORE] = get_string('ignoreconflicts', 'scheduler');
+        $conflictmenu[SLOT_CONFLICT_FORCE_OVERLAP] = get_string('forcewhenoverlap', 'scheduler');
+        $mform->addElement('select', 'conflictoptions', 'Conflict vs. Overlap (New)', $conflictmenu);
+        $mform->setDefault('conflictoptions', SLOT_CONFLICT_PROHIBIT);
+        
         // location of the appointment
         $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size'=>'30'));
         $mform->setType('appointmentlocation', PARAM_TEXT);

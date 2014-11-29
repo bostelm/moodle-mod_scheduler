@@ -18,6 +18,10 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
+define("SLOT_CONFLICT_PROHIBIT", 0);
+define("SLOT_CONFLICT_IGNORE", 10);
+define("SLOT_CONFLICT_FORCE_OVERLAP", 20);
+
 class scheduler_slot extends mvc_child_record_model {
 
     protected $appointments;
