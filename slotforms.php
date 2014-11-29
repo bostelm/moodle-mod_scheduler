@@ -250,8 +250,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 }
             }
         }
-
-        if (!isset($data['ignoreconflicts'])) {
+var_dump(intval($data['conflictoptions']));
+var_dump(SLOT_CONFLICT_PROHIBIT);
+$ttt=intval($data['conflictoptions'])==SLOT_CONFLICT_PROHIBIT;
+var_dump($ttt);
+        //if (!isset($data['ignoreconflicts'])) {
+        if (intval($data['conflictoptions'])==SLOT_CONFLICT_PROHIBIT) {
             // Avoid overlapping slots, by asking the user if they'd like to overwrite the existing ones...
             // for other scheduler, we check independently of exclusivity. Any slot here conflicts
             // for this scheduler, we check against exclusivity. Any complete slot here conflicts
