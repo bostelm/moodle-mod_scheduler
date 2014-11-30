@@ -53,7 +53,7 @@ abstract class scheduler_slotform_base extends moodleform {
         $conflictmenu[SLOT_CONFLICT_PROHIBIT] = 'Prohibit all conflicts!';
         $conflictmenu[SLOT_CONFLICT_IGNORE] = get_string('ignoreconflicts', 'scheduler');
         $conflictmenu[SLOT_CONFLICT_FORCE_OVERLAP] = get_string('forcewhenoverlap', 'scheduler');
-        $mform->addElement('select', 'conflictoptions', 'Conflict vs. Overlap (New)', $conflictmenu);
+        $mform->addElement('select', 'conflictoptions', 'Scheduling conflict(s) behavior (New):', $conflictmenu);
         $mform->setDefault('conflictoptions', SLOT_CONFLICT_PROHIBIT);
         
         // location of the appointment
@@ -141,9 +141,9 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $this->add_duration_field();
 
         // Ignore conflict checkbox
-        $mform->addElement('checkbox', 'ignoreconflicts', get_string('ignoreconflicts', 'scheduler'));
-        $mform->setDefault('ignoreconflicts', false);
-        $mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
+        //$mform->addElement('checkbox', 'ignoreconflicts', get_string('ignoreconflicts', 'scheduler'));
+        //$mform->setDefault('ignoreconflicts', false);
+        //$mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
 
         // Common fields
         $this->add_base_fields();
@@ -365,8 +365,8 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $this->add_minutes_field('break', 'break', 0, 'minutes');
 
         // Force when overlap?
-        $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
-        $mform->addHelpButton('forcewhenoverlap', 'forcewhenoverlap', 'scheduler');
+        //$mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
+        //$mform->addHelpButton('forcewhenoverlap', 'forcewhenoverlap', 'scheduler');
 
         // Common fields
         $this->add_base_fields();

@@ -74,7 +74,6 @@ var_dump($data);
             while ($slot->starttime <= $data->timeend - $slot->duration * 60) {
                 $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $slot->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
                 if ($conflicts) {
-                    //if (!$data->forcewhenoverlap) {
                     var_dump(intval($data->conflictoptions));
                     var_dump(SLOT_CONFLICT_PROHIBIT);
                     if (intval($data->conflictoptions)==SLOT_CONFLICT_PROHIBIT) {
@@ -95,12 +94,12 @@ var_dump($data);
                     if (intval($data->conflictoptions)==SLOT_CONFLICT_FORCE_OVERLAP) { 
                         // we force, so delete all conflicting before inserting
                         foreach ($conflicts as $conflict) {
+                            //TODO: bug there. Cannot delete another course scheduled slots
                         	$cslot = $scheduler->get_slot($conflict->id);
                             $cslot->delete();
                         }
                     }
                 }
-                //if (!$conflicts || $data->forcewhenoverlap) {
                 if (!$conflicts || intval($data->conflictoptions)!=SLOT_CONFLICT_PROHIBIT) {
                     $DB->insert_record('scheduler_slots', $slot, false, true);
                     $countslots++;
