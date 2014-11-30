@@ -17,7 +17,7 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     global $DB, $output;
 
     $data = (object) $formdata;
-var_dump($data);
+
     $fordays = 0;
     if ($data->rangeend > 0){
         $fordays = ($data->rangeend - $data->rangestart) / DAYSECS;

@@ -140,11 +140,6 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         // Duration of the slot
         $this->add_duration_field();
 
-        // Ignore conflict checkbox
-        //$mform->addElement('checkbox', 'ignoreconflicts', get_string('ignoreconflicts', 'scheduler'));
-        //$mform->setDefault('ignoreconflicts', false);
-        //$mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
-
         // Common fields
         $this->add_base_fields();
 
@@ -250,12 +245,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 }
             }
         }
-var_dump(intval($data['conflictoptions']));
-var_dump(SLOT_CONFLICT_PROHIBIT);
-$ttt=intval($data['conflictoptions'])==SLOT_CONFLICT_PROHIBIT;
-var_dump($ttt);
-        //if (!isset($data['ignoreconflicts'])) {
-        if (intval($data['conflictoptions'])==SLOT_CONFLICT_PROHIBIT) {
+
             // Avoid overlapping slots, by asking the user if they'd like to overwrite the existing ones...
             // for other scheduler, we check independently of exclusivity. Any slot here conflicts
             // for this scheduler, we check against exclusivity. Any complete slot here conflicts
@@ -277,7 +267,9 @@ var_dump($ttt);
             }
 
             if (count($conflicts)) {
-                $msg = get_string('slotwarning', 'scheduler');
+                // Prohibit conflicts - generate error message
+                if (intval($data['conflictoptions'])==SLOT_CONFLICT_PROHIBIT) {
+                    $msg = get_string('slotwarning', 'scheduler');
 
                 foreach ($conflicts as $conflict) {
                     $students = scheduler_get_appointed($conflict->id);
@@ -303,9 +295,18 @@ var_dump($ttt);
                     $msg .= html_writer::div($slotmsg);
                 }
 
-                $errors['starttime'] = $msg;
+                    $errors['starttime'] = $msg;
+                }
+                // Force overlap - delete overlapped slots
+                if (intval($data['conflictoptions'])==SLOT_CONFLICT_FORCE_OVERLAP) {
+                    // we force, so delete all conflicting before inserting
+                    foreach ($conflicts as $conflict) {
+                        //TODO: bug there. Cannot delete ANY scheduled slots
+                        $cslot = $this->$scheduler->get_slot($conflict->id);
+                        $cslot->delete();
+                    }                
+                }
             }
-        }
         return $errors;
     }
 }
@@ -363,10 +364,6 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         // Break between slots
         $this->add_minutes_field('break', 'break', 0, 'minutes');
-
-        // Force when overlap?
-        //$mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
-        //$mform->addHelpButton('forcewhenoverlap', 'forcewhenoverlap', 'scheduler');
 
         // Common fields
         $this->add_base_fields();
