@@ -156,12 +156,13 @@ if ($numrecords){
     $whenmem = '';
     $whomem = '';
     $whatmem = '';
+    $datetimeformat = get_string('strftimedatetimeshort');
     foreach($results as $id => $row){
         $coursedata = ($coursemem != $row->courseshort) ? "<a href=\"{$CFG->wwwroot}/course/view.php?id={$row->courseid}\">".$row->courseshort.'</a>' : '';
         $coursemem = $row->courseshort;
         $schedulerdata = ($schedulermem != $row->name) ? "<a href=\"{$CFG->wwwroot}/mod/scheduler/view.php?a={$row->schedulerid}\">".$row->name.'</a>' : '';
         $schedulermem = $row->name;
-        $whendata = ($whenmem != "$row->starttime $row->duration") ? '<strong>'.date("d M Y G:i", $row->starttime).' '.get_string('for','scheduler')." $row->duration ".get_string('mins', 'scheduler').'</strong>' : '';
+        $whendata = ($whenmem != "$row->starttime $row->duration") ? '<strong>'.userdate($row->starttime, $datetimeformat).' '.get_string('for','scheduler')." $row->duration ".get_string('mins', 'scheduler').'</strong>' : '';
         $whenmem = "$row->starttime $row->duration";
         $whodata = ($whomem != $row->studentemail) ? "<a href=\"{$CFG->wwwroot}/mod/scheduler/view.php?what=viewstudent&a={$row->schedulerid}&amp;studentid=$row->studentid&amp;course=$row->courseid\">".$row->studentfirstname.' '.$row->studentlastname.'</a>' : '';
         $whomem = $row->studentemail;
