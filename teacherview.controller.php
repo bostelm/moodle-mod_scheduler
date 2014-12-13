@@ -74,8 +74,6 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
             while ($slot->starttime <= $data->timeend - $slot->duration * 60) {
                 $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $slot->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
                 if ($conflicts) {
-                    var_dump(intval($data->conflictoptions));
-                    var_dump(SLOT_CONFLICT_PROHIBIT);
                     if (intval($data->conflictoptions)==SLOT_CONFLICT_PROHIBIT) {
                         print_string('conflictingslots', 'scheduler');
                         echo '<ul>';

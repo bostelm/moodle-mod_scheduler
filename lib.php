@@ -23,6 +23,9 @@ define('SCHEDULER_ALL', 2); // Used for setting conflict search scope
 define ('MEAN_GRADE', 0); // Used for grading strategy
 define ('MAX_GRADE', 1); // Used for grading strategy
 
+define("SLOT_CONFLICT_PROHIBIT", 0);
+define("SLOT_CONFLICT_IGNORE", 10);
+define("SLOT_CONFLICT_FORCE_OVERLAP", 20);
 /**
  * Given an object containing all the necessary data,
  * will create a new instance and return the id number
