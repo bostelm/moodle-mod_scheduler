@@ -1,0 +1,12 @@
+{
+  "moodle-mod_scheduler-calpane": {
+    "requires": [
+        "base",
+        "calendar",
+        "datatype-date",
+        "datatype-date-format",
+        "node",
+        "intl"
+    ]
+  }
+}
