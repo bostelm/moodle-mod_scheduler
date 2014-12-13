@@ -50,6 +50,10 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
             $data->scale = -($this->get_mappingid('scale', abs($data->scale)));
         }
 
+        if (is_null($data->gradingstrategy)) { // catch inconsistent data created by pre-1.9 DB schema
+            $data->gradingstrategy = 0;
+        }
+
         // insert the scheduler record
         $newitemid = $DB->insert_record('scheduler', $data);
         // immediately after inserting "activity" record, call this
