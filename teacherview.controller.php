@@ -74,7 +74,7 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
             while ($slot->starttime <= $data->timeend - $slot->duration * 60) {
                 $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $slot->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
                 if ($conflicts) {
-                    if (!$data->forcewhenoverlap) {
+                    if (intval($data->conflictoptions)==SLOT_CONFLICT_PROHIBIT) {
                         print_string('conflictingslots', 'scheduler');
                         echo '<ul>';
                         foreach ($conflicts as $aconflict) {
@@ -88,14 +88,27 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                             echo html_writer::tag('li', $msg);
                         }
                         echo '</ul><br/>';
-                    } else { // we force, so delete all conflicting before inserting
+                    } 
+                    if (intval($data->conflictoptions)==SLOT_CONFLICT_FORCE_OVERLAP) { 
+                        // we force, so delete all conflicting before inserting
                         foreach ($conflicts as $conflict) {
-                        	$cslot = $scheduler->get_slot($conflict->id);
-                            $cslot->delete();
+                            if ($conflict->schedulerid == $scheduler->id) {
+                                //scheduler "local" conflict
+                                $cslot = $scheduler->get_slot($conflict->id);
+                                $cslot->delete();
+                            } else {
+                                //scheduler "remote" conflict
+                                $remote_sceduler = new StdClass;
+                                $remote_sceduler = scheduler_instance::load_by_id($conflict->schedulerid);
+                                $cslot = $remote_sceduler->get_slot($conflict->id);
+                                $cslot->delete();
+                                unset($remote_sceduler);
+                            }
+                            
                         }
                     }
                 }
-                if (!$conflicts || $data->forcewhenoverlap) {
+                if (!$conflicts || intval($data->conflictoptions)!=SLOT_CONFLICT_PROHIBIT) {
                     $DB->insert_record('scheduler_slots', $slot, false, true);
                     $countslots++;
                 }

@@ -18,6 +18,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
+
 class scheduler_slot extends mvc_child_record_model {
 
     protected $appointments;
