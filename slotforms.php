@@ -301,9 +301,18 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 if (intval($data['conflictoptions'])==SLOT_CONFLICT_FORCE_OVERLAP) {
                     // we force, so delete all conflicting before inserting
                     foreach ($conflicts as $conflict) {
-                        //TODO: bug there. Cannot delete ANY scheduled slots
-                        $cslot = $this->$scheduler->get_slot($conflict->id);
-                        $cslot->delete();
+                            if ($conflict->schedulerid == $scheduler->id) {
+                                //scheduler "local" conflict
+                                $cslot = $scheduler->get_slot($conflict->id);
+                                $cslot->delete();
+                            } else {
+                                //scheduler "remote" conflict
+                                $remote_sceduler = new StdClass;
+                                $remote_sceduler = scheduler_instance::load_by_id($conflict->schedulerid);
+                                $cslot = $remote_sceduler->get_slot($conflict->id);
+                                $cslot->delete();
+                                unset($remote_sceduler);
+                            }
                     }                
                 }
             }
