@@ -249,7 +249,7 @@ if ($slots = scheduler_get_available_slots($USER->id, $scheduler->id, true)) {
                     $collegues .= " $picture $name<br/>";
                 }
                 $collegues .= '</div>';
-                $aSlot->groupsession .= " <a href=\"javascript:toggleVisibility('{$aSlot->id}')\"><img name=\"group<?php p($aSlot->id) ?>\" src=\"{$CFG->wwwroot}/pix/t/switch_plus.gif\" border=\"0\" title=\"".get_string('whosthere', 'scheduler')."\"></a> {$collegues}";
+                $aSlot->groupsession .= " <a href=\"javascript:toggleVisibility('{$aSlot->id}')\"><img name=\"group<?php p($aSlot->id) ?>\" src=\"{$CFG->wwwroot}/pix/t/switch_plus.png\" border=\"0\" title=\"".get_string('whosthere', 'scheduler')."\"></a> {$collegues}";
             }
             $canappoint = true;
             $canusegroup = ($aSlot->appointed) ? 0 : 1;
@@ -294,11 +294,11 @@ echo html_writer::table($table);
                             if (obj.style.visibility == "hidden"){
                                 obj.style.visibility = "visible";
                                 obj.style.display = "block";
-                                document.images["group"+id].src='<?php echo $CFG->wwwroot."/pix/t/switch_minus.gif" ?>';
+                                document.images["group"+id].src='<?php echo $CFG->wwwroot."/pix/t/switch_minus.png" ?>';
                             } else {
                                 obj.style.visibility = "hidden";
                                 obj.style.display = "none";
-                                document.images["group"+id].src='<?php echo $CFG->wwwroot."/pix/t/switch_plus.gif" ?>';
+                                document.images["group"+id].src='<?php echo $CFG->wwwroot."/pix/t/switch_plus.png" ?>';
                             }
                         }
                      </script>
