@@ -80,8 +80,8 @@ $sqlcount = "
     SELECT
     COUNT(*)
     FROM
-    {course} as c,
-    {scheduler} as sc,
+    {course} c,
+    {scheduler} sc,
     {scheduler_appointment} a,
     {scheduler_slots} s,
     {user} u1,

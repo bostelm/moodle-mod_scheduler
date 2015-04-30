@@ -109,7 +109,7 @@ if ($action == 'savechoice') {
     if ($oldslotowners) {
         // Cleans up old slots if not attended and within rebookable time limits
         $sql = 'SELECT a.id as appointmentid, s.* '.
-                        'FROM {scheduler_slots} AS s, {scheduler_appointment} AS a '.
+                        'FROM {scheduler_slots} s, {scheduler_appointment} a '.
                         'WHERE s.id = a.slotid AND s.schedulerid = :schedulerid '.
                         "AND a.studentid IN ('$oldslotownerlist') ".
                         'AND a.attended = 0 '.
