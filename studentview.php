@@ -23,19 +23,42 @@ $mygroups = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->grouping
 // Print intro.
 echo $output->mod_intro($scheduler);
 
+
+$showowngrades = $scheduler->uses_grades();
+// Print total grade (if any)
+if ($showowngrades) {
+    $totalgrade = $scheduler->get_user_grade($USER->id);
+    $gradebookinfo = $scheduler->get_gradebook_info($USER->id);
+
+    $showowngrades = !$gradebookinfo->hidden;
+
+    if ($gradebookinfo && !$gradebookinfo->hidden && ($totalgrade || $gradebookinfo->overridden) ) {
+        $grademsg = '';
+        if ($gradebookinfo->overridden) {
+            $grademsg = html_writer::tag('p',
+                            get_string('overriddennotice', 'grades'),  array('class' => 'overriddennotice')
+                        );
+        } else {
+            $grademsg = get_string('yourtotalgrade', 'scheduler', $output->format_grade($scheduler, $totalgrade));
+        }
+        echo html_writer::div($grademsg, 'totalgrade');
+    }
+}
+
 // Get past (attended) slots.
 
 $pastslots = $scheduler->get_attended_slots_for_student($USER->id);
 
 if (count($pastslots) > 0) {
-    $slottable = new scheduler_slot_table($scheduler, $scheduler->uses_grades());
+    $slottable = new scheduler_slot_table($scheduler, $showowngrades);
     foreach ($pastslots as $pastslot) {
         $appointment = $pastslot->get_student_appointment($USER->id);
 
         if ($pastslot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
-            $others = new scheduler_student_list($scheduler, $scheduler->uses_grades());
+            $others = new scheduler_student_list($scheduler, true);
             foreach ($pastslot->get_appointments() as $otherapp) {
-                $others->add_student($otherapp, $otherapp->studentid == $USER->id);
+                $gradehidden = ($scheduler->get_gradebook_info($otherapp->studentid)->hidden <> 0);
+                $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
         } else {
             $others = null;
@@ -51,14 +74,16 @@ if (count($pastslots) > 0) {
 $upcomingslots = $scheduler->get_upcoming_slots_for_student($USER->id);
 
 if (count($upcomingslots) > 0) {
-    $slottable = new scheduler_slot_table($scheduler, $scheduler->uses_grades());
+    $slottable = new scheduler_slot_table($scheduler, $showowngrades);
     foreach ($upcomingslots as $slot) {
         $appointment = $slot->get_student_appointment($USER->id);
 
-        if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
-            $others = new scheduler_student_list($scheduler, $scheduler->uses_grades());
+        if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+            $showgrades = has_capability('mod/scheduler:seeotherstudentsresults', $context);
+            $others = new scheduler_student_list($scheduler, $showgrades);
             foreach ($slot->get_appointments() as $otherapp) {
-                $others->add_student($otherapp, $otherapp->studentid == $USER->id);
+                $gradehidden = ($scheduler->get_gradebook_info($otherapp->studentid)->hidden <> 0);
+                $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
         } else {
             $others = null;

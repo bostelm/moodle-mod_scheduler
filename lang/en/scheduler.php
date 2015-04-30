@@ -134,6 +134,7 @@ $string['forcourses'] = 'Choose students in courses';
 $string['friday'] = 'Friday';
 $string['generalconfig'] = 'General configuration';
 $string['grade'] = 'Grade';
+$string['gradeingradebook'] = 'Grade in gradebook';
 $string['gradingstrategy'] = 'Grading strategy';
 $string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated.
     The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
@@ -273,6 +274,7 @@ $string['tab-otherappointments'] = 'All appointments of this student';
 $string['tab-otherstudents'] = 'Students in this slot';
 $string['teacher'] = 'Teacher';
 $string['thursday'] = 'Thursday';
+$string['totalgrade'] = 'Total grade';
 $string['tuesday'] = 'Tuesday';
 $string['unattended'] = 'Unattended';
 $string['unlimited'] = 'Unlimited';
@@ -296,6 +298,7 @@ $string['xdaysbefore'] = '{$a} days before slot';
 $string['xweeksbefore'] = '{$a} weeks before slot';
 $string['yourappointmentnote'] = 'Comments for your eyes';
 $string['yourslotnotes'] = 'Comments on the meeting';
+$string['yourtotalgrade'] = 'Your total grade in this activity is <strong>{$a}</strong>.';
 
 
 /* ***********  Help strings from here on ************ */

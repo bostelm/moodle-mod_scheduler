@@ -332,7 +332,7 @@ if ($action == 'downloadcsv'){
             foreach($finals as $studentid => $final){
                 $stream .= fullname($final) . $csvfieldseparator;
                 $stream .= $final->count . $csvfieldseparator;
-                if ($scheduler->gradingstrategy == MEAN_GRADE){
+                if ($scheduler->gradingstrategy == SCHEDULER_MEAN_GRADE){
                     $stream .= $final->sum / $final->count . $csvfieldseparator;
                 }
                 else{

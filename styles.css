@@ -142,3 +142,19 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     background-color: ##FFB2B8;
     border-color: #F40000;
 }
+
+.path-mod-scheduler div.totalgrade {
+    padding-bottom: 25px;
+}
+.path-mod-scheduler dl.totalgrade dl {
+    width: 100%;
+}
+.path-mod-scheduler dl.totalgrade dt {
+    float:left;
+    clear:left;
+    width: 30%;
+}
+.path-mod-scheduler dl.totalgrade dd {
+    float:left;
+    width: 60%;
+}

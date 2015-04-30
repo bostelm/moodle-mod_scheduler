@@ -83,6 +83,8 @@ if (count($pages) > 1) {
     print_tabs($tabrows, $subpage);
 }
 
+$totalgradeinfo = new scheduler_totalgrade_info($scheduler, $scheduler->get_gradebook_info($appointment->studentid));
+
 if ($subpage == 'thisappointment') {
     // Print editable appointment description.
     require_once($CFG->dirroot.'/mod/scheduler/appointmentforms.php');
@@ -113,6 +115,10 @@ if ($subpage == 'thisappointment') {
         $mform->display();
     }
 
+    if ($scheduler->uses_grades()) {
+        echo $output->render($totalgradeinfo);
+    }
+
 } else if ($subpage == 'otherappointments') {
     // Print table of other appointments of the same student.
 
@@ -139,6 +145,12 @@ if ($subpage == 'thisappointment') {
     }
     echo html_writer::table($table);
 
+    if ($scheduler->uses_grades()) {
+        $totalgradeinfo->showtotalgrade = true;
+        $totalgradeinfo->totalgrade = $scheduler->get_user_grade($appointment->studentid);
+        echo $output->render($totalgradeinfo);
+    }
+
 } else if ($subpage == 'otherstudents') {
     // Print table of other students in the same slot.
 
@@ -164,6 +176,6 @@ if ($subpage == 'thisappointment') {
     echo html_writer::table($table);
 }
 
-echo $OUTPUT->continue_button(new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid)));
-echo $OUTPUT->footer($course);
+echo $output->continue_button(new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid)));
+echo $output->footer($course);
 exit;

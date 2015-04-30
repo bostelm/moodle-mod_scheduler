@@ -61,11 +61,13 @@ class scheduler_student_list implements renderable {
     public $actionurl = null;
     public $linkappointment = false;
 
-    public function add_student(scheduler_appointment $appointmentmodel, $highlight, $checked = false) {
+    public function add_student(scheduler_appointment $appointmentmodel, $highlight, $checked = false, $showgrade = true) {
         $student = new stdClass();
         $student->user = $appointmentmodel->get_student();
-        if ($this->showgrades) {
+        if ($this->showgrades && $showgrade) {
             $student->grade = $appointmentmodel->grade;
+        } else {
+            $student->grade = null;
         }
         $student->highlight = $highlight;
         $student->checked = $checked;
@@ -257,6 +259,35 @@ class scheduler_scheduling_list implements renderable {
     public function __construct(scheduler_instance $scheduler, array $extraheaders) {
         $this->scheduler = $scheduler;
         $this->extraheaders = $extraheaders;
+    }
+
+}
+
+
+/**
+ * Represents information about a student's total grade in the scheduler, plus gradebook information.
+ * To be used in teacher screens.
+ */
+class scheduler_totalgrade_info implements renderable {
+
+    public $gbgrade;
+    public $scheduler;
+    public $showtotalgrade;
+    public $totalgrade;
+
+    /**
+     * Constructs a grade info object
+     *
+     * @param scheduler_instance $scheduler the scheduler in question
+     * @param stdClass $gbgrade information about the grade in the gradebook (may be null)
+     * @param string $showtotalgrade whether the total grade in the scheduler should be shown
+     * @param int $totalgrade the total grade of the student in this scheduler
+     */
+    public function __construct(scheduler_instance $scheduler, $gbgrade, $showtotalgrade = false, $totalgrade = 0) {
+        $this->scheduler = $scheduler;
+        $this->gbgrade = $gbgrade;
+        $this->showtotalgrade = $showtotalgrade;
+        $this->totalgrade = $totalgrade;
     }
 
 }

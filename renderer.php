@@ -19,11 +19,11 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
 */
 class mod_scheduler_renderer extends plugin_renderer_base {
 
-	/**
-	 * Format a date in the current user's timezone.
-	 * @param int $date a timestamp
-	 * @return string printable date
- 	 */
+    /**
+     * Format a date in the current user's timezone.
+     * @param int $date a timestamp
+     * @return string printable date
+     */
     public static function userdate($date) {
         if ($date == 0) {
             return '';
@@ -71,15 +71,15 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             }
         } else {
             if ($scheduler->scale > 0) {
-                // numeric grades
+                // Numeric grade.
                 $result .= $grade;
                 if (strlen($grade) > 0) {
                     $result .= '/' . $scheduler->scale;
                 }
             } else {
-                // grade on scale
+                // Grade on scale.
                 if ($grade > 0) {
-                    $result .= $scheduler->get_scale_levels()[$grade];
+                    $result .= $scheduler->get_scale_levels()[(int) $grade];
                 }
             }
             if ($short && (strlen($result) > 0)) {
@@ -110,6 +110,14 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         }
         $scalegrades = array(-1 => get_string('nograde')) + $scalegrades;
         return $scalegrades;
+    }
+
+    public function format_grading_strategy($strategy) {
+        if ($strategy == SCHEDULER_MAX_GRADE) {
+            return get_string('maxgrade', 'scheduler');
+        } else {
+            return get_string('meangrade', 'scheduler');
+        }
     }
 
     public function user_profile_link(scheduler_instance $scheduler, stdClass $user) {
@@ -445,7 +453,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $controls .= ' ';
         if ($booker->candisengage) {
             $disengagelink = new moodle_url('/mod/scheduler/view.php',
-                              array('what' => 'disengage',
+                            array('what' => 'disengage',
                                             'id' => $booker->scheduler->cmid,
                                             'sesskey' => sesskey() ));
             $controls .= $this->action_link($disengagelink, get_string('disengage', 'scheduler'));
@@ -638,6 +646,43 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $mtable->data[] = $data;
         }
         return html_writer::table($mtable);
+    }
+
+    public function render_scheduler_totalgrade_info(scheduler_totalgrade_info $gradeinfo) {
+        $items = array();
+
+        if ($gradeinfo->showtotalgrade) {
+            $items[] = array('gradingstrategy', $this->format_grading_strategy($gradeinfo->scheduler->gradingstrategy));
+            $items[] = array('totalgrade', $this->format_grade($gradeinfo->scheduler, $gradeinfo->totalgrade));
+        }
+
+        if (!is_null($gradeinfo->gbgrade)) {
+            $gbgradeinfo = $this->format_grade($gradeinfo->scheduler, $gradeinfo->gbgrade->grade);
+            $attributes = array();
+            if ($gradeinfo->gbgrade->hidden) {
+                $attributes[] = get_string('hidden', 'grades');
+            }
+            if ($gradeinfo->gbgrade->locked) {
+                $attributes[] = get_string('locked', 'grades');
+            }
+            if ($gradeinfo->gbgrade->overridden) {
+                $attributes[] = get_string('overridden', 'grades');
+            }
+            if (count($attributes) > 0) {
+                $gbgradeinfo .= ' ('.implode(', ', $attributes) .')';
+            }
+            $items[] = array('gradeingradebook', $gbgradeinfo);
+        }
+
+        $o = html_writer::start_div('totalgrade');
+        $o .= html_writer::start_tag('dl', array('class' => 'totalgrade'));
+        foreach ($items as $item) {
+            $o .= html_writer::tag('dt', get_string($item[0], 'scheduler'));
+            $o .= html_writer::tag('dd', $item[1]);
+        }
+        $o .= html_writer::end_tag('dl');
+        $o .= html_writer::end_div('totalgrade');
+        return $o;
     }
 
 }
