@@ -468,7 +468,7 @@ class scheduler_instance extends mvc_record_model {
         }
         $schedstuds = array();
         foreach ($studs as $stud) {
-            if ($this->count_bookable_appointments($stud->id, false) > 0) {
+            if ($this->count_bookable_appointments($stud->id, false) != 0) {
                 $schedstuds[] = $stud;
             }
         }
