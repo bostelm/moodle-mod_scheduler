@@ -121,7 +121,7 @@ $string['enddate'] = 'Repeat time slots until';
 $string['endtime'] = 'End time';
 $string['exclusive'] = 'Exclusive';
 $string['exclusivity'] = 'Exclusivity';
-$string['exclusivitylockedto'] = 'You cannot change the slot mode when scheduling. The current limit of the destination slot will apply. If the slot is new, a default limit of 1 will apply.';
+$string['exclusivitypositive'] = 'The number of students per slot needs to be 1 or more.';
 $string['exclusivityoverload'] = 'The slot has {$a} appointed students, more than allowed by this setting.';
 $string['explaingeneralconfig'] = 'These options can only be setup at site level and will apply to all schedulers of this Moodle installation.';
 $string['exportinstructions'] = 'You should better save the generated export file on your hard drive before using it.';
@@ -181,7 +181,6 @@ $string['modeoneatatime'] = 'at a time';
 $string['monday'] = 'Monday';
 $string['move'] = 'Change';
 $string['moveslot'] = 'Move slot';
-$string['multiplestudents'] = 'Allow multiple students per slot?';
 $string['myappointments'] = 'My appointments';
 $string['name'] = 'Scheduler name';
 $string['needteachers'] = 'Slots cannot be added as this course has no teachers';
@@ -332,10 +331,10 @@ $string['choosingslotstart_help']='Change (or choose) the appointment start time
 if this slot replaces all conflicting appointments. Note that the new slot parameters will override all previous
 settings.';
 
-$string['exclusivity_help']='<p>You can set a limit on the amount of students that can apply for a given slot. </p>
-<p>Setting a limit of 1 (default) will toggle the slot in exclusive mode.</p>
-<p>If the slot is set to unlimited number (0), this slot will never be considered in constraints evaluation, even if other slots are exclusive or limited in the same time range.
-</p>';
+$string['exclusivity_help']='<p>You can set a limit on the number of students that can apply for a given slot. </p>
+<p>Setting a limit of 1 (default) will mean that the slot is exclusive to a single student.</p>
+<p>Setting a limit of, e.g., 3  will mean that up to three students can book into the slot.</p>
+<p>If disabled, any number of students can book the slot; it will never be considered "full".</p>';
 
 $string['location_help']='Specify the scheduled location of the meeting.';
 

@@ -32,7 +32,7 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     $slot->schedulerid = $scheduler->id;
     $slot->teacherid = $data->teacherid;
     $slot->appointmentlocation = $data->appointmentlocation;
-    $slot->exclusivity = $data->exclusivity;
+    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
     if($data->divide) {
         $slot->duration = $data->duration;
     } else {

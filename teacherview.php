@@ -14,6 +14,8 @@ defined('MOODLE_INTERNAL') || die();
 function scheduler_prepare_formdata(scheduler_slot $slot) {
 
     $data = $slot->get_data();
+    $data->exclusivityenable = ($data->exclusivity > 0);
+
     $data->notes = array();
     $data->notes['text'] = $slot->notes;
     $data->notes['format'] = $slot->notesformat;
@@ -46,7 +48,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     // Set data fields from input form.
     $slot->starttime = $data->starttime;
     $slot->duration = $data->duration;
-    $slot->exclusivity = $data->exclusivity;
+    $slot->exclusivity = $data->exclusivityenable? $data->exclusivity : 0;
     $slot->teacherid = $data->teacherid;
     $slot->notes = $data->notes['text'];
     $slot->notesformat = $data->notes['format'];
