@@ -172,7 +172,7 @@ class scheduler_instance extends mvc_record_model {
      */
     public function is_group_scheduling_enabled() {
         global $CFG;
-        $globalenable = (bool) $CFG->scheduler_groupscheduling;
+        $globalenable = (bool) get_config('mod_scheduler', 'groupscheduling');
         $localenable = $this->groupmode > 0;
         return $globalenable && $localenable;
     }

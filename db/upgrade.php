@@ -1,5 +1,11 @@
 <?php
 
+function scheduler_migrate_config_setting($name) {
+    $oldval = get_config('core', 'scheduler_'.$name);
+    set_config($name, $oldval, 'mod_scheduler');
+    unset_config('scheduler_'.$name);
+}
+
 function xmldb_scheduler_upgrade($oldversion=0) {
     // This function does anything necessary to upgrade older versions to match current functionality.
 
@@ -151,6 +157,20 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
         // Savepoint reached.
         upgrade_mod_savepoint(true, 2014071300, 'scheduler');
+    }
+
+    /* ******************* 2.9 upgrade line ********************** */
+
+    if ($oldversion < 2015050400) {
+
+		// Migrate config settings to config_plugins table.
+		scheduler_migrate_config_setting('allteachersgrading');
+		scheduler_migrate_config_setting('showemailplain');
+		scheduler_migrate_config_setting('groupscheduling');
+		scheduler_migrate_config_setting('maxstudentlistsize');
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2015050400, 'scheduler');
     }
 
     return true;

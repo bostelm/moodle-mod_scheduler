@@ -93,7 +93,7 @@ if ($subpage == 'thisappointment') {
     $returnurl = new moodle_url($taburl, array('page' => 'thisappointment'));
 
     $distribute = ($slot->get_appointment_count() > 1);
-    $gradeedit = ($slot->teacherid == $USER->id) || $CFG->scheduler_allteachersgrading;
+    $gradeedit = ($slot->teacherid == $USER->id) || get_config('mod_scheduler', 'allteachersgrading');
     $mform = new scheduler_editappointment_form($appointment, $actionurl, $gradeedit, $distribute);
     $mform->set_data($mform->prepare_appointment_data($appointment));
 
