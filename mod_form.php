@@ -24,14 +24,27 @@ class mod_scheduler_mod_form extends moodleform_mod {
         global $CFG, $COURSE, $OUTPUT;
         $mform    =& $this->_form;
 
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
-        $mform->setType('name', PARAM_TEXT);
+        // -------------------------------------------------------------------------------
+        // General introduction.
+        $mform->addElement('header', 'general', get_string('general', 'form'));
+
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT);
+        } else {
+            $mform->setType('name', PARAM_CLEANHTML);
+        }
         $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        // Introduction.
-        $this->add_intro_editor(false, get_string('introduction', 'scheduler'));
+        $this->standard_intro_elements(get_string('introduction', 'scheduler'));
 
-        $mform->addElement('text', 'staffrolename', get_string('staffrolename', 'scheduler'), array('size'=>'48'));
+        // -------------------------------------------------------------------------------
+        // Scheduler options.
+        $mform->addElement('header', 'optionhdr', get_string('options', 'scheduler'));
+        $mform->setExpanded('optionhdr');
+
+        $mform->addElement('text', 'staffrolename', get_string('staffrolename', 'scheduler'), array('size' => '48'));
         $mform->setType('staffrolename', PARAM_TEXT);
         $mform->addRule('staffrolename', get_string('error'), 'maxlength', 255);
         $mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
@@ -57,11 +70,10 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addGroup($modegroup, 'modegrp', get_string('mode', 'scheduler'), ' ', false);
         $mform->addHelpButton('modegrp', 'appointmentmode', 'scheduler');
 
-
         $mform->addElement('duration', 'guardtime', get_string('guardtime', 'scheduler'), array('optional' => true));
         $mform->addHelpButton('guardtime', 'guardtime', 'scheduler');
 
-        $mform->addElement('text', 'defaultslotduration', get_string('defaultslotduration', 'scheduler'), array('size'=>'2'));
+        $mform->addElement('text', 'defaultslotduration', get_string('defaultslotduration', 'scheduler'), array('size' => '2'));
         $mform->setType('defaultslotduration', PARAM_INT);
         $mform->addHelpButton('defaultslotduration', 'defaultslotduration', 'scheduler');
         $mform->setDefault('defaultslotduration', 15);

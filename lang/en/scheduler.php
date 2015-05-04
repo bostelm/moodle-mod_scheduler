@@ -210,6 +210,7 @@ $string['occurrences'] = 'Occurrences';
 $string['on'] = 'on';
 $string['oneslotadded'] = '1 slot added';
 $string['onthemorningofappointment'] = 'On the morning of the appointment';
+$string['options'] = 'Options';
 $string['otherstudents'] = 'Other participants';
 $string['overall'] = 'Overall';
 $string['overlappings'] = 'Some other slots are overlapping';
