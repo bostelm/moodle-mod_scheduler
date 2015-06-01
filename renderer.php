@@ -61,7 +61,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      * not used, or no grade is available; parantheses are put around the grade if it is present)
      * @return string the formatted grade
      */
-    public function format_grade($scheduler, $grade, $short = false) {
+    public static function format_grade($scheduler, $grade, $short = false) {
 
         $result = '';
         if ($scheduler->scale == 0 || is_null($grade) ) {
@@ -170,7 +170,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                         $this->teacherview_tab($baseurl, 'allappointments', 'view', 'allappointments'),
                         $this->teacherview_tab($baseurl, 'datelist', 'datelist'),
                         $statstab,
-                        $this->teacherview_tab($baseurl, 'downloads', 'downloads')
+                        $this->teacherview_tab($baseurl, 'export', 'export')
         );
 
         return $this->tabtree($level1, $selected, $inactive);

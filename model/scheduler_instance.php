@@ -442,13 +442,13 @@ class scheduler_instance extends mvc_record_model {
     }
 
     public function get_all_slots($limitfrom='', $limitnum='') {
-        return $this->fetch_slots('', '', array(), $limitfrom, $limitnum);
+        return $this->fetch_slots('', '', array(), $limitfrom, $limitnum, 's.starttime ASC');
     }
 
     public function get_slots_for_teacher($teacherid) {
         $wherecond = 'teacherid = :teacherid';
         $paras = array('teacherid' => $teacherid);
-        return $this->fetch_slots($wherecond, '', $paras, '', '');
+        return $this->fetch_slots($wherecond, '', $paras, '', '', 's.starttime ASC');
     }
 
     /**
@@ -524,6 +524,8 @@ class scheduler_instance extends mvc_record_model {
 
     /* ************** End of slot retrieveal routines ******************** */
 
+
+
     /**
      * retrieves an appointment and the corresponding slot
      */
@@ -583,6 +585,18 @@ class scheduler_instance extends mvc_record_model {
             return $allowed - $booked;
         }
 
+    }
+
+    /**
+     * get list of teachers that have slots in the scheduler
+     */
+    public function get_teachers() {
+        global $DB;
+        $sql =   'SELECT DISTINCT u.* '
+                .' FROM {scheduler_slots} s, {user} u'
+                .' WHERE s.teacherid = u.id AND schedulerid = ?';
+        $teachers = $DB->get_records_sql($sql, array($this->id));
+        return $teachers;
     }
 
 

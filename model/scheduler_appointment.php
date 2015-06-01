@@ -56,7 +56,8 @@ class scheduler_appointment extends mvc_child_record_model {
     }
 
     /**
-     * Return the student object
+     * Return the student object.
+     * May be null if no student is assigned to this appointment (this _should_ never happen).
      */
     public function get_student() {
         global $DB;

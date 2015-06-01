@@ -20,6 +20,8 @@ $scheduler->free_late_unused_slots();
 
 $mygroups = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->groupingid, 'g.id, g.name');
 
+echo $output->header();
+
 // Print intro.
 echo $output->mod_intro($scheduler);
 
@@ -180,3 +182,4 @@ if ($bookablecnt == 0) {
     echo $output->render($booker);
 }
 
+echo $output->footer($course);

@@ -17,6 +17,8 @@ if (!has_capability('mod/scheduler:manage', $context)) {
     require_capability('mod/scheduler:manageallappointments', $context);
 }
 
+echo $output->header();
+
 $appointmentid = required_param('appointmentid', PARAM_INT);
 list($slot, $appointment) = $scheduler->get_slot_appointment($appointmentid);
 $studentid = $appointment->studentid;

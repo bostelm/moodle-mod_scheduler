@@ -22,6 +22,8 @@ function byName($a, $b){
 $groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
 $usergroups = array_keys($groups);
 
+echo $OUTPUT->header();
+
 // Display navigation tabs.
 
 $taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid));

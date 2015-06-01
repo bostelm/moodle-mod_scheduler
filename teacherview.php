@@ -148,6 +148,8 @@ if ($action != 'view') {
 }
 
 
+echo $output->header();
+
 /************************************ View : New single slot form ****************************************/
 if ($action == 'addslot') {
     $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'addslot', 'subpage' => $subpage, 'id' => $cm->id));
@@ -611,3 +613,4 @@ if ($students === 0) {
 } else {
     echo $output->notification(get_string('nostudents', 'scheduler'));
 }
+echo $output->footer($course);

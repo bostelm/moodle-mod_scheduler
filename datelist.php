@@ -13,6 +13,7 @@ defined('MOODLE_INTERNAL') || die();
 
 include_once $CFG->libdir.'/tablelib.php';
 
+echo $output->header();
 
 // Print top tabs.
 
@@ -191,3 +192,5 @@ if ($numrecords){
 else{
     notice(get_string('noresults', 'scheduler'), $CFG->wwwroot."/mod/scheduler/view.php?id=".$cm->id);
 }
+
+echo $OUTPUT->footer($course);
