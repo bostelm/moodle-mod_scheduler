@@ -86,6 +86,13 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
+     * Retrieve the course module record of this scheduler
+     */
+    public function get_cm() {
+        return $this->cm;
+    }
+
+    /**
      * Retrieve the course id of this scheduler
      */
     public function get_courseid() {
