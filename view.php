@@ -28,7 +28,7 @@ if ($id) {
 } else {
     $a = required_param('a', PARAM_INT);     // Scheduler ID.
     $scheduler = scheduler_instance::load_by_id($a);
-    $cm = get_coursemodule_from_id('scheduler', $scheduler->id, 0, false, MUST_EXIST);
+    $cm = $scheduler->get_cm();
 }
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 

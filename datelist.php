@@ -170,7 +170,7 @@ if ($numrecords){
         $schedulermem = $row->name;
         $whendata = ($whenmem != "$row->starttime $row->duration") ? '<strong>'.userdate($row->starttime, $datetimeformat).' '.get_string('for','scheduler')." $row->duration ".get_string('mins', 'scheduler').'</strong>' : '';
         $whenmem = "$row->starttime $row->duration";
-        $whodata = ($whomem != $row->studentemail) ? "<a href=\"{$CFG->wwwroot}/mod/scheduler/view.php?what=viewstudent&a={$row->schedulerid}&amp;studentid=$row->studentid&amp;course=$row->courseid\">".$row->studentfirstname.' '.$row->studentlastname.'</a>' : '';
+        $whodata = ($whomem != $row->studentemail) ? "<a href=\"{$CFG->wwwroot}/mod/scheduler/view.php?what=viewstudent&a={$row->schedulerid}&amp;appointmentid=$row->id&amp;course=$row->courseid\">".$row->studentfirstname.' '.$row->studentlastname.'</a>' : '';
         $whomem = $row->studentemail;
         $whatdata = ($whatmem != $row->notes) ? format_string($row->notes) : '';
         $whatmem = $row->notes;
