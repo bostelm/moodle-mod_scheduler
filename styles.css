@@ -159,6 +159,15 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     width: 60%;
 }
 
+.path-mod-scheduler div.dropdownmenu {
+    display: inline-block;
+    padding-right: 1em;
+}
+
+.path-mod-scheduler div.dropdownmenu select {
+    vertical-align: middle;
+}
+
 // Format data fields in vertical rather than horizontal list.
 .path-mod-scheduler #id_datafieldhdr .fitem {
     width: 30%;

@@ -31,6 +31,7 @@ if ($data) {
         $inputid = 'field-'.$field->get_id();
         if (isset($data->{$inputid}) && $data->{$inputid} == 1) {
             $selectedfields[] = $field;
+            $field->set_renderer($output);
         }
     }
     $userid = $USER->id;

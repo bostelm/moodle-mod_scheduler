@@ -19,6 +19,7 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
 */
 class mod_scheduler_renderer extends plugin_renderer_base {
 
+
     /**
      * Format a date in the current user's timezone.
      * @param int $date a timestamp
@@ -52,34 +53,81 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         }
     }
 
+    /**
+     * Format a slot date and time, for use as a parameter in a language string.
+     * @param int $slotdate a timestamp, start time of the slot
+     * @param int $duration length of the slot in minutes
+     * @return stdClass date and time formatted for usage in language strings
+     */
+    public static function slotdatetime($slotdate, $duration) {
+
+    	$shortformat = get_string('strftimedatetimeshort');
+
+    	$a = new stdClass();
+    	$a->date = self::userdate($slotdate);
+    	$a->starttime = self::usertime($slotdate);
+    	$a->shortdatetime = userdate($slotdate, $shortformat);
+    	$a->endtime = self::usertime($slotdate + $duration * MINSECS);
+    	$a->duration = $duration;
+
+		return $a;
+    }
+
+    protected $scalecache = array();
+
+    public function get_scale_levels($scaleid) {
+        global $DB;
+
+        if (!array_key_exists($scaleid, $this->scalecache)) {
+            $this->scalecache[$scaleid] = array();
+            if ($scale = $DB->get_record('scale', array('id' => $scaleid))) {
+                $levels = explode(',', $scale->scale);
+                foreach ($levels as $levelid => $value) {
+                    $this->scalecache[$scaleid][$levelid+1] = $value;
+                }
+            }
+        }
+        return $this->scalecache[$scaleid];
+    }
+
 
     /**
      * Formats a grade in a specific scheduler for display
-     * @param scheduler_instance $scheduler
+     * @param mixed $subject either a scheduler instance or a scale id
      * @param string $grade the grade to be displayed
      * @param boolean $short formats the grade in short form (result empty if grading is
      * not used, or no grade is available; parantheses are put around the grade if it is present)
      * @return string the formatted grade
      */
-    public static function format_grade($scheduler, $grade, $short = false) {
+    public function format_grade($subject, $grade, $short = false) {
+
+		if ($subject instanceof scheduler_instance) {
+		    $scaleid = $subject->scale;
+		} else {
+		    $scaleid = (int) $subject;
+		}
 
         $result = '';
-        if ($scheduler->scale == 0 || is_null($grade) ) {
+        if ($scaleid == 0 || is_null($grade) ) {
             // Scheduler doesn't allow grading, or no grade entered.
             if (!$short) {
                 $result = get_string('nograde');
             }
         } else {
-            if ($scheduler->scale > 0) {
+            $grade = (int) $grade;
+            if ($scaleid > 0) {
                 // Numeric grade.
                 $result .= $grade;
                 if (strlen($grade) > 0) {
-                    $result .= '/' . $scheduler->scale;
+                    $result .= '/' . $scaleid;
                 }
             } else {
                 // Grade on scale.
                 if ($grade > 0) {
-                    $result .= $scheduler->get_scale_levels()[(int) $grade];
+                	$levels = $this->get_scale_levels(-$scaleid);
+                	if (array_key_exists($grade, $levels)) {
+                    	$result .= $levels[$grade];
+                	}
                 }
             }
             if ($short && (strlen($result) > 0)) {
@@ -106,7 +154,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             }
         } else {
             $scaleid = - ($scheduler->scale);
-            $scalegrades = $scheduler->get_scale_levels();
+            $scalegrades = $this->get_scale_levels($scaleid);
         }
         $scalegrades = array(-1 => get_string('nograde')) + $scalegrades;
         return $scalegrades;

@@ -22,7 +22,6 @@ class scheduler_instance extends mvc_record_model {
     protected $context = null;
     protected $groupmode;
     protected $slots;
-    protected $scalecache = null;
 
     protected function get_table() {
         return 'scheduler';
@@ -216,24 +215,6 @@ class scheduler_instance extends mvc_record_model {
      */
     public function uses_grades() {
         return ($this->scale != 0);
-    }
-
-    public function get_scale_levels() {
-        global $DB;
-
-        if (is_null($this->scalecache)) {
-            $this->scalecache = array();
-            if ($this->scale < 0) {
-                $scaleid = -($this->scale);
-                if ($scale = $DB->get_record('scale', array('id' => $scaleid))) {
-                    $levels = explode(',', $scale->scale);
-                    foreach ($levels as $id => $value) {
-                        $this->scalecache[$id+1] = $value;
-                    }
-                }
-            }
-        }
-        return $this->scalecache;
     }
 
     /**

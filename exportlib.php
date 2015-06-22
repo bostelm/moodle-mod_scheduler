@@ -13,6 +13,12 @@ require_once($CFG->dirroot.'/lib/pdflib.php');
  */
 abstract class scheduler_export_field {
 
+	protected $renderer;
+
+	public function set_renderer(mod_scheduler_renderer $renderer) {
+	    $this->renderer = $renderer;
+	}
+
     /**
      * Is the field available in this scheduler?
      * @return boolean whether the field is available
@@ -398,7 +404,7 @@ class scheduler_grade_field extends scheduler_export_field {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
-        return mod_scheduler_renderer::format_grade($slot->get_scheduler(), $appointment->grade);
+        return $this->renderer->format_grade($slot->get_scheduler(), $appointment->grade);
     }
 
 }
