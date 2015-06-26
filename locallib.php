@@ -21,13 +21,19 @@ require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
 /**
  * get list of attendants for slot form
  * @param int $cmid the course module
+ * @param mixed $groupid id number of the group to select from, 0 or '' if all groups
  * @return array of moodle user records
  */
-function scheduler_get_attendants($cmid){
+function scheduler_get_attendants($cmid, $groupid='') {
     $context = context_module::instance($cmid);
+    if (!$groupid) {
+        $groupkeys = '';
+    } else {
+        $groupkeys = array($groupid);
+    }
     $attendants = get_users_by_capability ($context, 'mod/scheduler:attend',
         user_picture::fields('u'), 'u.lastname, u.firstname',
-        '', '', '', '', false, false, false);
+        '', '', $groupkeys, '', false, false, false);
     return $attendants;
 }
 

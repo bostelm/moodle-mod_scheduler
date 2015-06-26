@@ -193,9 +193,12 @@ $string['gradingstrategy_help'] = 'In a scheduler where students can have severa
     The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
 $string['groupbreakdown'] = 'By group size';
+$string['groupbookings'] = 'Booking in groups';
+$string['groupbookings_help'] = 'Allow students to book a slot for all members of their group.
+		(Note that this is separate from the "group mode" setting, which controls the slots a student can see.)';
 $string['groupscheduling'] = 'Enable group scheduling';
 $string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once.
-(Apart from the global option, the activity group mode must be set to "Visible groups" or "Separate groups" in order to enable this feature.)';
+(Apart from the global option, the setting "Booking in groups" must be enabled in the respective scheduler instance.)';
 $string['groupsession'] = 'Group session';
 $string['groupsize'] = 'Group size';
 $string['guardtime'] = 'Guard time';
@@ -372,6 +375,8 @@ $string['who'] = 'With whom?';
 $string['whosthere'] = 'Who\'s there ?';
 $string['xdaysbefore'] = '{$a} days before slot';
 $string['xweeksbefore'] = '{$a} weeks before slot';
+$string['yesallgroups'] = 'Yes, for all groups';
+$string['yesingrouping'] = 'Yes, in grouping {$a}';
 $string['yourappointmentnote'] = 'Comments for your eyes';
 $string['yourslotnotes'] = 'Comments on the meeting';
 $string['yourtotalgrade'] = 'Your total grade in this activity is <strong>{$a}</strong>.';

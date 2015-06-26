@@ -83,10 +83,11 @@ if ($action == 'savechoice') {
     }
 
     if ($errormessage) {
+        echo $output->header();
         echo $output->box($errormessage, 'error');
         $returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
         echo $output->continue_button($returnurl);
-        echo $output->footer($course);
+        echo $output->footer();
         exit();
     }
 

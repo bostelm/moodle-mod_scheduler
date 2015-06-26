@@ -46,9 +46,21 @@ echo $output->header();
 
 echo $output->teacherview_tabs($scheduler, $taburl, 'datelist');
 
+
+// Find active group in case that group mode is in use.
+$currentgroupid = 0;
+$groupmode = groups_get_activity_groupmode($scheduler->cm);
+if ($groupmode) {
+	$currentgroupid = groups_get_activity_group($scheduler->cm, true);
+
+	echo html_writer::start_div('dropdownmenu');
+	groups_print_activity_menu($scheduler->cm, $taburl);
+	echo html_writer::end_div();
+}
+
 $scopemenukey = 'scopemenuself';
 if (has_capability('mod/scheduler:canseeotherteachersbooking', $scopecontext)) {
-    $teachers = scheduler_get_attendants($cm->id);
+    $teachers = scheduler_get_attendants($cm->id, $currentgroupid);
     $teachermenu = array();
     foreach ($teachers as $teacher) {
         $teachermenu[$teacher->id] = fullname($teacher);

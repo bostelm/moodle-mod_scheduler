@@ -70,6 +70,20 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addGroup($modegroup, 'modegrp', get_string('mode', 'scheduler'), ' ', false);
         $mform->addHelpButton('modegrp', 'appointmentmode', 'scheduler');
 
+        if (get_config('mod_scheduler', 'groupscheduling')) {
+            $selopt = array(
+                            -1 => get_string('no'),
+                             0 => get_string('yesallgroups', 'scheduler')
+                           );
+            $groupings = groups_get_all_groupings($COURSE->id);
+            foreach ($groupings as $grouping) {
+                $selopt[$grouping->id] = get_string('yesingrouping', 'scheduler', $grouping->name);
+            }
+            $mform->addElement('select', 'bookingrouping', get_string('groupbookings', 'scheduler'), $selopt);
+	        $mform->addHelpButton('bookingrouping', 'groupbookings', 'scheduler');
+	        $mform->setDefault('bookingrouping', '-1');
+        }
+
         $mform->addElement('duration', 'guardtime', get_string('guardtime', 'scheduler'), array('optional' => true));
         $mform->addHelpButton('guardtime', 'guardtime', 'scheduler');
 
@@ -78,9 +92,7 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addHelpButton('defaultslotduration', 'defaultslotduration', 'scheduler');
         $mform->setDefault('defaultslotduration', 15);
 
-        $yesno[0] = get_string('no');
-        $yesno[1] = get_string('yes');
-        $mform->addElement('select', 'allownotifications', get_string('notifications', 'scheduler'), $yesno);
+        $mform->addElement('selectyesno', 'allownotifications', get_string('notifications', 'scheduler'));
         $mform->addHelpButton('allownotifications', 'notifications', 'scheduler');
 
         // -------------------------------------------------------------------------------

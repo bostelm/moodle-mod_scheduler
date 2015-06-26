@@ -19,6 +19,9 @@ require_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 $scheduler->free_late_unused_slots();
 
 $mygroups = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->groupingid, 'g.id, g.name');
+if ($scheduler->is_group_scheduling_enabled()) {
+	$mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $scheduler->bookingrouping, 'g.id, g.name');
+}
 
 echo $output->header();
 
@@ -99,7 +102,7 @@ if (count($upcomingslots) > 0) {
 }
 
 $bookablecnt = $scheduler->count_bookable_appointments($USER->id, true);
-$bookableslots = $scheduler->get_slots_available_to_student($USER->id, true);
+$bookableslots = $scheduler->get_slots_available_to_student($USER->id, true, array_keys($mygroups));
 
 if ($bookablecnt == 0) {
     echo html_writer::div(get_string('canbooknofurtherappointments', 'scheduler'), 'studentbookingmessage');
@@ -157,7 +160,7 @@ if ($bookablecnt == 0) {
 
     if ($scheduler->is_group_scheduling_enabled()) {
         $booker->groupchoice = array();
-        foreach ($mygroups as $group) {
+        foreach ($mygroupsforscheduling as $group) {
             $booker->groupchoice[$group->id] = $group->name;
         }
     }
