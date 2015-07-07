@@ -669,6 +669,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $mtable = new html_table();
 
+        $mtable->id = $list->id;
         $mtable->head  = array ('', get_string('name'));
         $mtable->align = array ('center', 'left');
         foreach ($list->extraheaders as $field) {

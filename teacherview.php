@@ -532,6 +532,7 @@ if ($students === 0) {
         $fieldtitles[] = $f->title;
     }
     $studtable = new scheduler_scheduling_list($scheduler, $fieldtitles);
+    $studtable->id = 'studentstoschedule';
 
     foreach ($students as $student) {
         $picture = $output->user_picture($student);
@@ -573,6 +574,7 @@ if ($students === 0) {
             echo $output->notification(get_string('nogroups', 'scheduler'));
         } else {
             $grouptable = new scheduler_scheduling_list($scheduler, array());
+            $grouptable->id = 'groupstoschedule';
 
             $groupcnt = 0;
             foreach ($groups as $group) {

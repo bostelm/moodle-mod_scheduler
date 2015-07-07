@@ -238,7 +238,7 @@ class scheduler_scheduling_list implements renderable {
     public $lines = array();
     public $scheduler;
     public $extraheaders;
-
+    public $id = 'schedulinglist';
 
     public function add_line($pix, $name, array $extrafields, $actions) {
         $line = new stdClass();
