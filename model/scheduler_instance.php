@@ -654,11 +654,15 @@ class scheduler_instance extends mvc_record_model {
         $attendees = get_users_by_capability($this->get_context(), 'mod/scheduler:appoint', '',
             'lastname, firstname', '', '', $groups, '', false, false, false);
 
+        $modinfo = get_fast_modinfo($this->courseid);
+        $info = new \core_availability\info_module($modinfo->get_cm($this->cmid));
+        $attendees = $info->filter_user_list($attendees);
+
         return $attendees;
     }
 
     /**
-     * Get a list of students that can still mae an appointment
+     * Get a list of students that can still make an appointment
      *
      * @param $groups - single group or array of groups - only return
      *                  users who are in one of these group(s).
