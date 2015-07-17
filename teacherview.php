@@ -48,7 +48,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     // Set data fields from input form.
     $slot->starttime = $data->starttime;
     $slot->duration = $data->duration;
-    $slot->exclusivity = $data->exclusivityenable? $data->exclusivity : 0;
+    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
     $slot->teacherid = $data->teacherid;
     $slot->notes = $data->notes['text'];
     $slot->notesformat = $data->notes['format'];
@@ -136,34 +136,34 @@ function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, 
 // Load group restrictions.
 $groupmode = groups_get_activity_groupmode($cm);
 if ($groupmode && $subpage == 'allappointments') {
-	$currentgroup = groups_get_activity_group($cm, true);
-	if ($currentgroup > 0) {
-		$usergroups = array($currentgroup);
-		$groups = array($currentgroup => groups_get_group($currentgroup));
-	} else {
-		$usergroups = '';
-		$groups = groups_get_all_groups($COURSE->id, 0, 0);
-	}
+    $currentgroup = groups_get_activity_group($cm, true);
+    if ($currentgroup > 0) {
+        $usergroups = array(
+            $currentgroup
+        );
+        $groups = array($currentgroup => groups_get_group($currentgroup));
+    } else {
+        $usergroups = '';
+        $groups = groups_get_all_groups($COURSE->id, 0, 0);
+    }
 } else if ($groupmode) {
-	$currentgroup = 0;
-	$groups = groups_get_all_groups($COURSE->id, $USER->id, $cm->groupingid);
-	$usergroups = array_keys($groups);
+    $currentgroup = 0;
+    $groups = groups_get_all_groups($COURSE->id, $USER->id, $cm->groupingid);
+    $usergroups = array_keys($groups);
 } else {
-	$currentgroup = 0; // Show all groups by default.
-	$usergroups = '';
-	$groups = groups_get_all_groups($COURSE->id, 0, 0);
+    $currentgroup = 0; // Show all groups by default.
+    $usergroups = '';
+    $groups = groups_get_all_groups($COURSE->id, 0, 0);
 }
 
 // Find groups that we can schedule as such.
 if ($scheduler->is_group_scheduling_enabled()) {
-	$userfilter = $USER->id;
-	if (has_capability('moodle/site:accessallgroups', $context) || $groupmode == 0) {
-		$userfilter = 0;
-	}
-	$schedgroups = groups_get_all_groups($COURSE->id, $userfilter, $scheduler->bookingrouping);
+    $userfilter = $USER->id;
+    if (has_capability('moodle/site:accessallgroups', $context) || $groupmode == 0) {
+        $userfilter = 0;
+    }
+    $schedgroups = groups_get_all_groups($COURSE->id, $userfilter, $scheduler->bookingrouping);
 }
-
-
 
 if ($action != 'view') {
     include_once($CFG->dirroot.'/mod/scheduler/slotforms.php');
@@ -375,7 +375,8 @@ $taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cm
 $actionurl = new moodle_url($taburl, array('offset' => $offset, 'sesskey' => sesskey()));
 
 $inactive = array();
-if ($DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id)) <= $DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id, 'teacherid' => $USER->id))) {
+if ($DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id)) <=
+         $DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id, 'teacherid' => $USER->id)) ) {
     // We are alone in this scheduler.
     $inactive[] = 'allappointments';
     if ($subpage = 'allappointments') {
@@ -385,7 +386,7 @@ if ($DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id)
 
 echo $output->teacherview_tabs($scheduler, $taburl, $subpage, $inactive);
 if ($groupmode && $subpage == 'allappointments') {
-	groups_print_activity_menu($cm, $taburl);
+    groups_print_activity_menu($cm, $taburl);
 }
 
 // Print intro.
