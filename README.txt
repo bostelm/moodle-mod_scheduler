@@ -74,6 +74,10 @@ migrated to "Booking in groups" and the "Group mode" set to "None".
 If you have used group scheduling in previous versions, please check your data
 after migration.
 
+The student view has been redesigned. Bookable appointments are now displayed 
+in pages of 25, and student select a slot by clicking a button "Book slot"
+rather then selecting with a radio button and clicking "Save choice".  
+
 --- Version 2.7 ---
 
 Intended for Moodle 2.7 and later. 

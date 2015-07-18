@@ -167,12 +167,6 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $studentsmenu = array('0' => get_string('choosedots'));
         if ($students) {
             foreach ($students as $astudent) {
-/*                if ($this->scheduler->schedulermode == 'oneonly' && scheduler_has_slot($astudent->id, $this->scheduler, true, false, $this->slotid)) {
-                    continue;
-                }
-                if ($this->scheduler->schedulermode == 'onetime' && scheduler_has_slot($astudent->id, $this->scheduler, true, true, $this->slotid)) {
-                    continue;
-                }*/
                 $studentsmenu[$astudent->id] = fullname($astudent);
             }
         }

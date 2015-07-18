@@ -91,6 +91,17 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
+     * Is this slot bookable in its bookable period for students.
+     * This checks for the availability time of the slot and for the "guard time" restriction,
+     * but not for the number of actualy booked appointments.
+     */
+    public function is_in_bookable_period() {
+        $available = $this->hideuntil <= time();
+        $beforeguardtime = $this->starttime > time() + $this->parent->guardtime;
+        return $available && $beforeguardtime;
+    }
+
+    /**
      * Is this a group slot (i.e., more than one student is permitted)
      */
     public function is_groupslot() {

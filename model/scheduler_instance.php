@@ -469,18 +469,14 @@ class scheduler_instance extends mvc_record_model {
 
     /**
      * Retrieves upcoming slots booked by a student. These will be sorted by start time.
-     * A slot is "upcoming" if it is not attended, but can no longer be rebooked;
-     * because it is closer than the "guard time" to the current time.
+     * A slot is "upcoming" if it as been booked but is not attended.
      *
      * @param int $studentid
      */
     public function get_upcoming_slots_for_student($studentid) {
 
         $params = array();
-        $wherecond = '(s.starttime <= :guard)';
-        $params['guard'] = time() + $this->guardtime;
-        $wherecond .= ' AND '.$this->student_in_slot_condition($params, $studentid, false, true);
-
+        $wherecond = $this->student_in_slot_condition($params, $studentid, false, true);
         $slots = $this->fetch_slots($wherecond, '', $params, '', '', 's.starttime');
 
         return $slots;
@@ -526,6 +522,13 @@ class scheduler_instance extends mvc_record_model {
         $slots = $this->fetch_slots($wherecond, '', $params, '', '', $order);
 
         return $slots;
+    }
+
+    public function has_slots_for_student($studentid, $mustbeattended, $mustbeunattended) {
+        $params = array();
+        $where = $this->student_in_slot_condition($params, $studentid, $mustbeattended, $mustbeunattended);
+        $cnt = $this->count_slots($where, $params);
+        return $cnt > 0;
     }
 
     /**
