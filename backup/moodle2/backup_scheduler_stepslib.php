@@ -26,7 +26,7 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
         $scheduler = new backup_nested_element('scheduler', array('id'), array(
             'name', 'intro', 'introformat', 'schedulermode', 'maxbookings',
             'guardtime', 'defaultslotduration', 'allownotifications', 'staffrolename',
-            'scale', 'gradingstrategy', 'timemodified'));
+            'scale', 'gradingstrategy', 'bookingrouping', 'timemodified'));
 
         $slots = new backup_nested_element('slots');
 
@@ -52,6 +52,7 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
 
         // Define sources
         $scheduler->set_source_table('scheduler', array('id' => backup::VAR_ACTIVITYID));
+		$scheduler->annotate_ids('grouping', 'bookingrouping');
 
         // Include appointments only if we back up user information
         if ($userinfo) {

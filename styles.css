@@ -142,3 +142,66 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     background-color: ##FFB2B8;
     border-color: #F40000;
 }
+
+.path-mod-scheduler div.totalgrade {
+    padding-bottom: 25px;
+}
+.path-mod-scheduler dl.totalgrade dl {
+    width: 100%;
+}
+.path-mod-scheduler dl.totalgrade dt {
+    float:left;
+    clear:left;
+    width: 30%;
+}
+.path-mod-scheduler dl.totalgrade dd {
+    float:left;
+    width: 60%;
+}
+
+.path-mod-scheduler div.dropdownmenu {
+    display: inline-block;
+    padding-right: 1em;
+}
+
+.path-mod-scheduler div.dropdownmenu select {
+    vertical-align: middle;
+}
+
+// Format data fields in vertical rather than horizontal list.
+.path-mod-scheduler #id_datafieldhdr .fitem {
+    width: 30%;
+    margin-left: 10px;
+}
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
+    width: 100%;
+    text-align: left;
+    margin-left: 0;
+}
+.path-mod-scheduler #id_datafieldhdr .fitem {
+    float: left;
+    width: 30%;
+    clear: none;
+}
+
+.path-mod-scheduler #id_datafieldhdr .fitemtitle {
+    width: 100%;
+    font-weight: bold;
+    text-align: left;
+    height: 2.5em;
+    margin-left: 0;
+}
+
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
+    clear: left;
+    margin: 0 0 1em;
+}
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup > span {
+    float: left;
+    clear: left;
+    line-height: 1.7;
+}
+
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup span label {
+    margin-left: 0.4em;
+}

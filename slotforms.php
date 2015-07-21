@@ -39,17 +39,21 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform = $this->_form;
 
         // exclusivity
-        $maxexclusive = $CFG->scheduler_maxstudentsperslot;
-        $exclusivemenu['0'] = get_string('unlimited', 'scheduler');
-        for ($i = 1; $i <= $maxexclusive; $i++) {
-            $exclusivemenu[(string)$i] = $i;
-        }
-        $mform->addElement('select', 'exclusivity', get_string('multiplestudents', 'scheduler'), $exclusivemenu);
+        $exclgroup = array();
+
+        $exclgroup[] = $mform->createElement('text', 'exclusivity', '', array('size' => '10'));
+        $mform->setType('exclusivity', PARAM_INTEGER);
         $mform->setDefault('exclusivity', 1);
-        $mform->addHelpButton('exclusivity', 'exclusivity', 'scheduler');
+
+        $exclgroup[] = $mform->createElement('advcheckbox', 'exclusivityenable', '', get_string('enable'));
+        $mform->setDefault('exclusivityenable', 1);
+        $mform->disabledIf('exclusivity', 'exclusivityenable', 'eq', 0);
+
+        $mform->addGroup($exclgroup, 'exclusivitygroup', get_string('maxstudentsperslot', 'scheduler'), ' ', false);
+        $mform->addHelpButton('exclusivitygroup', 'exclusivity', 'scheduler');
 
         // location of the appointment
-        $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size'=>'30'));
+        $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size' => '30'));
         $mform->setType('appointmentlocation', PARAM_TEXT);
         $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 255);
         $mform->setDefault('appointmentlocation', $this->scheduler->get_last_location($USER));
@@ -224,8 +228,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 $numappointments++;
             }
         }
-        if ($data['exclusivity'] > 0 && $numappointments > $data['exclusivity']) {
-            $errors['exclusivity'] = get_string('exclusivityoverload', 'scheduler', $numappointments);
+        if ($data['exclusivityenable'] && $data['exclusivity'] <= 0) {
+            $errors['exclusivitygroup'] = get_string('exclusivitypositive', 'scheduler');
+        } else if ($data['exclusivityenable'] && $numappointments > $data['exclusivity']) {
+            $errors['exclusivitygroup'] = get_string('exclusivityoverload', 'scheduler', $numappointments);
         }
 
         // Avoid empty slots starting in the past

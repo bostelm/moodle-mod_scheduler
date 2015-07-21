@@ -19,11 +19,12 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
 */
 class mod_scheduler_renderer extends plugin_renderer_base {
 
-	/**
-	 * Format a date in the current user's timezone.
-	 * @param int $date a timestamp
-	 * @return string printable date
- 	 */
+
+    /**
+     * Format a date in the current user's timezone.
+     * @param int $date a timestamp
+     * @return string printable date
+     */
     public static function userdate($date) {
         if ($date == 0) {
             return '';
@@ -52,34 +53,81 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         }
     }
 
+    /**
+     * Format a slot date and time, for use as a parameter in a language string.
+     * @param int $slotdate a timestamp, start time of the slot
+     * @param int $duration length of the slot in minutes
+     * @return stdClass date and time formatted for usage in language strings
+     */
+    public static function slotdatetime($slotdate, $duration) {
+
+    	$shortformat = get_string('strftimedatetimeshort');
+
+    	$a = new stdClass();
+    	$a->date = self::userdate($slotdate);
+    	$a->starttime = self::usertime($slotdate);
+    	$a->shortdatetime = userdate($slotdate, $shortformat);
+    	$a->endtime = self::usertime($slotdate + $duration * MINSECS);
+    	$a->duration = $duration;
+
+		return $a;
+    }
+
+    protected $scalecache = array();
+
+    public function get_scale_levels($scaleid) {
+        global $DB;
+
+        if (!array_key_exists($scaleid, $this->scalecache)) {
+            $this->scalecache[$scaleid] = array();
+            if ($scale = $DB->get_record('scale', array('id' => $scaleid))) {
+                $levels = explode(',', $scale->scale);
+                foreach ($levels as $levelid => $value) {
+                    $this->scalecache[$scaleid][$levelid+1] = $value;
+                }
+            }
+        }
+        return $this->scalecache[$scaleid];
+    }
+
 
     /**
      * Formats a grade in a specific scheduler for display
-     * @param scheduler_instance $scheduler
+     * @param mixed $subject either a scheduler instance or a scale id
      * @param string $grade the grade to be displayed
      * @param boolean $short formats the grade in short form (result empty if grading is
      * not used, or no grade is available; parantheses are put around the grade if it is present)
      * @return string the formatted grade
      */
-    public function format_grade($scheduler, $grade, $short = false) {
+    public function format_grade($subject, $grade, $short = false) {
+
+		if ($subject instanceof scheduler_instance) {
+		    $scaleid = $subject->scale;
+		} else {
+		    $scaleid = (int) $subject;
+		}
 
         $result = '';
-        if ($scheduler->scale == 0 || is_null($grade) ) {
+        if ($scaleid == 0 || is_null($grade) ) {
             // Scheduler doesn't allow grading, or no grade entered.
             if (!$short) {
                 $result = get_string('nograde');
             }
         } else {
-            if ($scheduler->scale > 0) {
-                // numeric grades
+            $grade = (int) $grade;
+            if ($scaleid > 0) {
+                // Numeric grade.
                 $result .= $grade;
                 if (strlen($grade) > 0) {
-                    $result .= '/' . $scheduler->scale;
+                    $result .= '/' . $scaleid;
                 }
             } else {
-                // grade on scale
+                // Grade on scale.
                 if ($grade > 0) {
-                    $result .= $scheduler->get_scale_levels()[$grade];
+                	$levels = $this->get_scale_levels(-$scaleid);
+                	if (array_key_exists($grade, $levels)) {
+                    	$result .= $levels[$grade];
+                	}
                 }
             }
             if ($short && (strlen($result) > 0)) {
@@ -106,10 +154,18 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             }
         } else {
             $scaleid = - ($scheduler->scale);
-            $scalegrades = $scheduler->get_scale_levels();
+            $scalegrades = $this->get_scale_levels($scaleid);
         }
         $scalegrades = array(-1 => get_string('nograde')) + $scalegrades;
         return $scalegrades;
+    }
+
+    public function format_grading_strategy($strategy) {
+        if ($strategy == SCHEDULER_MAX_GRADE) {
+            return get_string('maxgrade', 'scheduler');
+        } else {
+            return get_string('meangrade', 'scheduler');
+        }
     }
 
     public function user_profile_link(scheduler_instance $scheduler, stdClass $user) {
@@ -162,7 +218,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                         $this->teacherview_tab($baseurl, 'allappointments', 'view', 'allappointments'),
                         $this->teacherview_tab($baseurl, 'datelist', 'datelist'),
                         $statstab,
-                        $this->teacherview_tab($baseurl, 'downloads', 'downloads')
+                        $this->teacherview_tab($baseurl, 'export', 'export')
         );
 
         return $this->tabtree($level1, $selected, $inactive);
@@ -445,7 +501,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $controls .= ' ';
         if ($booker->candisengage) {
             $disengagelink = new moodle_url('/mod/scheduler/view.php',
-                              array('what' => 'disengage',
+                            array('what' => 'disengage',
                                             'id' => $booker->scheduler->cmid,
                                             'sesskey' => sesskey() ));
             $controls .= $this->action_link($disengagelink, get_string('disengage', 'scheduler'));
@@ -613,6 +669,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $mtable = new html_table();
 
+        $mtable->id = $list->id;
         $mtable->head  = array ('', get_string('name'));
         $mtable->align = array ('center', 'left');
         foreach ($list->extraheaders as $field) {
@@ -638,6 +695,43 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $mtable->data[] = $data;
         }
         return html_writer::table($mtable);
+    }
+
+    public function render_scheduler_totalgrade_info(scheduler_totalgrade_info $gradeinfo) {
+        $items = array();
+
+        if ($gradeinfo->showtotalgrade) {
+            $items[] = array('gradingstrategy', $this->format_grading_strategy($gradeinfo->scheduler->gradingstrategy));
+            $items[] = array('totalgrade', $this->format_grade($gradeinfo->scheduler, $gradeinfo->totalgrade));
+        }
+
+        if (!is_null($gradeinfo->gbgrade)) {
+            $gbgradeinfo = $this->format_grade($gradeinfo->scheduler, $gradeinfo->gbgrade->grade);
+            $attributes = array();
+            if ($gradeinfo->gbgrade->hidden) {
+                $attributes[] = get_string('hidden', 'grades');
+            }
+            if ($gradeinfo->gbgrade->locked) {
+                $attributes[] = get_string('locked', 'grades');
+            }
+            if ($gradeinfo->gbgrade->overridden) {
+                $attributes[] = get_string('overridden', 'grades');
+            }
+            if (count($attributes) > 0) {
+                $gbgradeinfo .= ' ('.implode(', ', $attributes) .')';
+            }
+            $items[] = array('gradeingradebook', $gbgradeinfo);
+        }
+
+        $o = html_writer::start_div('totalgrade');
+        $o .= html_writer::start_tag('dl', array('class' => 'totalgrade'));
+        foreach ($items as $item) {
+            $o .= html_writer::tag('dt', get_string($item[0], 'scheduler'));
+            $o .= html_writer::tag('dd', $item[1]);
+        }
+        $o .= html_writer::end_tag('dl');
+        $o .= html_writer::end_div('totalgrade');
+        return $o;
     }
 
 }

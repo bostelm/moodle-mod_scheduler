@@ -54,6 +54,10 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
             $data->gradingstrategy = 0;
         }
 
+        if ($data->bookingrouping > 0) {
+            $data->bookingrouping = $this->get_mappingid('grouping', $data->bookingrouping);
+        }
+
         // insert the scheduler record
         $newitemid = $DB->insert_record('scheduler', $data);
         // immediately after inserting "activity" record, call this

@@ -17,18 +17,26 @@ function byName($a, $b){
     return strcasecmp($a[0],$b[0]);
 }
 
-// precompute groups in case partial popuation is considered by grouping
+$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'viewstatistics', 'subpage' => $subpage));
+$PAGE->set_url($taburl);
 
-$groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
-$usergroups = array_keys($groups);
+echo $OUTPUT->header();
 
 // Display navigation tabs.
 
-$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid));
 echo $output->teacherview_tabs($scheduler, $taburl, $subpage);
+
+// Find active group in case that group mode is in use.
+$currentgroupid = 0;
+$groupmode = groups_get_activity_groupmode($scheduler->cm);
+if ($groupmode) {
+	$currentgroupid = groups_get_activity_group($scheduler->cm, true);
+	groups_print_activity_menu($scheduler->cm, $taburl);
+}
 
 //display correct type of statistics by request
 
+$usergroups = ($currentgroupid > 0) ? array($currentgroupid) : '';
 $attendees = $scheduler->get_possible_attendees($usergroups);
 
 switch ($subpage) {
@@ -133,9 +141,10 @@ switch ($subpage) {
                 ';
             if ($statrecords = $DB->get_records_sql($sql, array($scheduler->id))) {
                 foreach($statrecords as $aRecord){
-                    $table->data[] = array (fullname($attendees[$aRecord->studentid]), $aRecord->totaltime); // BUGFIX
+                    if (array_key_exists($aRecord->studentid, $attendees)) {
+                        $table->data[] = array (fullname($attendees[$aRecord->studentid]), $aRecord->totaltime);
+                    }
                 }
-
                 uasort($table->data, 'byName');
             }
             echo html_writer::table($table);
@@ -146,30 +155,27 @@ switch ($subpage) {
         break;
     case 'staffbreakdown':
         //display break down by member of staff
-        $sql = '
-            SELECT
-            s.teacherid,
-            SUM(s.duration) as totaltime
-            FROM
-            {scheduler_slots} s
-            LEFT JOIN
-            {scheduler_appointment} a
-            ON
-            a.slotid = s.id
-            WHERE
-            s.schedulerid = ? AND
-
-            a.studentid IS NOT NULL
-            GROUP BY
-            s.teacherid
-            ';
-        if ($statrecords = $DB->get_records_sql($sql, array($scheduler->id))) {
+        $sql = "SELECT s.teacherid,
+                       SUM(s.duration) as totaltime
+                  FROM {scheduler_slots} s
+             LEFT JOIN {scheduler_appointment} a
+                    ON a.slotid = s.id
+                 WHERE
+                       s.schedulerid = :sid
+                       AND a.studentid IS NOT NULL";
+        $params = array('sid' => $scheduler->id);
+        if ($currentgroupid > 0) {
+            $sql .= " AND EXISTS (SELECT 1 FROM {groups_members} gm WHERE gm.userid = a.studentid AND gm.groupid = :gid)";
+            $params['gid'] = $currentgroupid;
+        }
+        $sql .= " GROUP BY s.teacherid";
+        if ($statrecords = $DB->get_records_sql($sql, $params)) {
         	$table = new html_table();
             $table->width = '70%';
             $table->head  = array (s($scheduler->get_teacher_name()), get_string('cumulatedduration', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER');
             foreach($statrecords as $aRecord){
-                $aTeacher = $DB->get_record('user', array('id'=>$aRecord->teacherid));
+                $aTeacher = $DB->get_record('user', array('id' =>$aRecord->teacherid));
                 $table->data[] = array (fullname($aTeacher), $aRecord->totaltime);
             }
             uasort($table->data, 'byName');
@@ -191,13 +197,14 @@ switch ($subpage) {
             a.slotid = s.id
             WHERE
             a.studentid IS NOT NULL AND
-            schedulerid = ?
-            GROUP BY
-            s.starttime
-            ORDER BY
-            groupsize DESC
-            ';
-        if ($groupslots = $DB->get_records_sql($sql, array($scheduler->id))){
+            schedulerid = :sid';
+        $params = array('sid' => $scheduler->id);
+        if ($currentgroupid > 0) {
+            $sql .= " AND EXISTS (SELECT 1 FROM {groups_members} gm WHERE gm.userid = a.studentid AND gm.groupid = :gid)";
+            $params['gid'] = $currentgroupid;
+        }
+        $sql .= " GROUP BY s.starttime ORDER BY groupsize DESC";
+        if ($groupslots = $DB->get_records_sql($sql, $params)){
         	$table = new html_table();
             $table->head  = array (get_string('duration', 'scheduler'), get_string('appointments', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER');
@@ -232,13 +239,15 @@ switch ($subpage) {
             a.slotid = s.id
             WHERE
             a.studentid IS NOT NULL AND
-            schedulerid = ?
-            GROUP BY
-            s.starttime
-            ORDER BY
-            groupsize DESC
-            ";
-        if ($groupslots = $DB->get_records_sql($sql,array($scheduler->id))){
+            s.schedulerid = :sid";
+        $params = array('sid' => $scheduler->id);
+        if ($currentgroupid > 0) {
+            $sql .= " AND EXISTS (SELECT 1 FROM {groups_members} gm WHERE gm.userid = s.teacherid AND gm.groupid = :gid)";
+            $params['gid'] = $currentgroupid;
+        }
+        $sql .= " GROUP BY s.starttime
+                  ORDER BY groupsize DESC";
+        if ($groupslots = $DB->get_records_sql($sql, $params)){
         	$table = new html_table();
             $table->head  = array (get_string('groupsize', 'scheduler'), get_string('occurrences', 'scheduler'), get_string('cumulatedduration', 'scheduler'));
             $table->align = array ('LEFT', 'CENTER', 'CENTER');

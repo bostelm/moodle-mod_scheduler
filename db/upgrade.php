@@ -1,5 +1,27 @@
 <?php
 
+function scheduler_migrate_config_setting($name) {
+    $oldval = get_config('core', 'scheduler_'.$name);
+    set_config($name, $oldval, 'mod_scheduler');
+    unset_config('scheduler_'.$name);
+}
+
+function scheduler_migrate_groupmode($sid) {
+	global $DB;
+	$globalenable = (bool) get_config('mod_scheduler', 'groupscheduling');
+	$cm = get_coursemodule_from_instance('scheduler', $sid, 0, false, IGNORE_MISSING);
+	if ($cm) {
+		if ((groups_get_activity_groupmode($cm) > 0) && $globalenable) {
+			$g = $cm->groupingid;
+		} else {
+			$g = -1;
+		}
+		$DB->set_field('scheduler', 'bookingrouping', $g, array('id' => $sid));
+		$DB->set_field('course_modules', 'groupmode', 0, array('id' => $cm->id));
+		$DB->set_field('course_modules', 'groupingid', 0, array('id' => $cm->id));
+	}
+}
+
 function xmldb_scheduler_upgrade($oldversion=0) {
     // This function does anything necessary to upgrade older versions to match current functionality.
 
@@ -153,5 +175,39 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014071300, 'scheduler');
     }
 
+    /* ******************* 2.9 upgrade line ********************** */
+
+    if ($oldversion < 2015050400) {
+
+		// Migrate config settings to config_plugins table.
+		scheduler_migrate_config_setting('allteachersgrading');
+		scheduler_migrate_config_setting('showemailplain');
+		scheduler_migrate_config_setting('groupscheduling');
+		scheduler_migrate_config_setting('maxstudentlistsize');
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2015050400, 'scheduler');
+    }
+
+    if ($oldversion < 2015062601) {
+
+        // Define field bookingrouping to be added to scheduler.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('bookingrouping', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '-1', 'gradingstrategy');
+
+        // Conditionally launch add field bookingrouping.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Convert old group mode into instance setting for scheduler.
+        $sids = $DB->get_fieldset_select('scheduler', 'id', '');
+        foreach ($sids as $sid) {
+            scheduler_migrate_groupmode($sid);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2015062601, 'scheduler');
+    }
     return true;
 }

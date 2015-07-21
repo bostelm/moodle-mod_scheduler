@@ -28,7 +28,7 @@ if ($id) {
 } else {
     $a = required_param('a', PARAM_INT);     // Scheduler ID.
     $scheduler = scheduler_instance::load_by_id($a);
-    $cm = get_coursemodule_from_id('scheduler', $scheduler->id, 0, false, MUST_EXIST);
+    $cm = $scheduler->get_cm();
 }
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
@@ -40,14 +40,6 @@ $context = context_module::instance($cm->id);
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
 
 $output = $PAGE->get_renderer('mod_scheduler');
-
-// This is a pre-header selector for downloded documents generation.
-
-if (has_capability('mod/scheduler:manage', $context) || has_capability('mod/scheduler:attend', $context)) {
-    if (preg_match('/downloadexcel|^downloadcsv|downloadods/', $action)) {
-        include($CFG->dirroot.'/mod/scheduler/downloads.php');
-    }
-}
 
 // Print the page header.
 
@@ -69,7 +61,6 @@ $title = $course->shortname . ': ' . format_string($scheduler->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
-echo $OUTPUT->header();
 
 // route to screen
 
@@ -79,8 +70,8 @@ if (has_capability('mod/scheduler:manage', $context)) {
         include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
     } else if ($action == 'viewstudent') {
         include($CFG->dirroot.'/mod/scheduler/viewstudent.php');
-    } else if ($action == 'downloads' || $action == 'dodownloadcsv') {
-        include($CFG->dirroot.'/mod/scheduler/downloads.php');
+    } else if ($action == 'export') {
+        include($CFG->dirroot.'/mod/scheduler/export.php');
     } else if ($action == 'datelist') {
         include($CFG->dirroot.'/mod/scheduler/datelist.php');
     } else {
@@ -93,7 +84,7 @@ if (has_capability('mod/scheduler:manage', $context)) {
 
     // for guests
 } else {
+    echo $OUTPUT->header();
     echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');
+    echo $OUTPUT->footer($course);
 }
-
-echo $OUTPUT->footer($course);

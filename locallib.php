@@ -21,13 +21,19 @@ require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
 /**
  * get list of attendants for slot form
  * @param int $cmid the course module
+ * @param mixed $groupid id number of the group to select from, 0 or '' if all groups
  * @return array of moodle user records
  */
-function scheduler_get_attendants($cmid){
+function scheduler_get_attendants($cmid, $groupid='') {
     $context = context_module::instance($cmid);
+    if (!$groupid) {
+        $groupkeys = '';
+    } else {
+        $groupkeys = array($groupid);
+    }
     $attendants = get_users_by_capability ($context, 'mod/scheduler:attend',
         user_picture::fields('u'), 'u.lastname, u.firstname',
-        '', '', '', '', false, false, false);
+        '', '', $groupkeys, '', false, false, false);
     return $attendants;
 }
 
@@ -161,41 +167,6 @@ function scheduler_delete_calendar_events($slot) {
     //this return may not be meaningful if the delete records functions do not return anything meaningful.
 }
 
-/**
- * Returns a float or a string which denotes a given user's timezone.
- *
- * A float value means that a simple offset from GMT is used, while a string (it will be the name of a timezone in the database)
- * means that for this timezone there are also DST rules to be taken into account.
- * Checks various settings and picks the most dominant of those which have a value.
- *
- * This is mainly a copy of lib/moodlelib.php, function get_user_timezone(),
- * but with an additional parameter to specify a user (other than the current one)
- * for whom the setting is computed.
- *
- * @param float|int|string $tz timezone to calculate GMT time offset before
- *        calculating user timezone, 99 is default user timezone
- *        {@link http://docs.moodle.org/dev/Time_API#Timezone}
- * @return float|string
- */
-function scheduler_get_user_timezone(stdClass $user, $tz = 99) {
-    global $CFG;
-
-    $timezones = array(
-        $tz,
-        isset($CFG->forcetimezone) ? $CFG->forcetimezone : 99,
-        isset($user->timezone) ? $user->timezone : 99,
-        isset($CFG->timezone) ? $CFG->timezone : 99,
-        );
-
-    $tz = 99;
-
-    // Loop while $tz is, empty but not zero, or 99, and there is another timezone is the array.
-    while (((empty($tz) && !is_numeric($tz)) || $tz == 99) && $next = each($timezones)) {
-        $tz = $next['value'];
-    }
-    return is_numeric($tz) ? (float) $tz : $tz;
-}
-
 
 /**
  * Construct an array with subtitution rules for mail templates, relating to
@@ -216,7 +187,7 @@ function scheduler_get_mail_variables (scheduler_instance $scheduler, scheduler_
     // Force any string formatting to happen in the target language.
     $oldlang = force_current_language($lang);
 
-    $tz = scheduler_get_user_timezone($recipient);
+    $tz = core_date::get_user_timezone($recipient);
 
     $vars = array();
 
