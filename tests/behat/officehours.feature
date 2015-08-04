@@ -59,9 +59,8 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I follow "Test scheduler"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
-    When I click on "slotid" "radio" in the "2:00 AM" "table_row" 
-    And I click on "Save my choice" "button"
-    Then I should see "Booked" in the "2:00 AM" "table_row"
+    When I click on "Book slot" "button" in the "2:00 AM" "table_row"
+    Then "Cancel booking" "button" should exist
     And I should see "Meeting with your Teacher, Teacher 1" in the "Upcoming events" "block"
     And I log out
     
@@ -71,9 +70,8 @@ Feature: Office hours bookings with Scheduler, one booking per student
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should not see "2:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
-    When I click on "slotid" "radio" in the "5:00 AM" "table_row" 
-    And I click on "Save my choice" "button"
-    Then I should see "Booked" in the "5:00 AM" "table_row"
+    When I click on "Book slot" "button" in the "5:00 AM" "table_row" 
+    Then "Cancel booking" "button" should exist
     And I should see "Meeting with your Teacher, Teacher 1" in the "Upcoming events" "block"
     And I log out
     
@@ -102,5 +100,6 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I follow "Test scheduler"
     Then I should see "Attended slots"
     And "slotbookertable" "table" should not exist
+    And I should not see "Cancel booking"
     And I should not see "Meeting with your" in the "Upcoming events" "block"
     And I log out

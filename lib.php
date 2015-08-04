@@ -36,7 +36,7 @@ function scheduler_add_instance($scheduler) {
     global $DB;
 
     $scheduler->timemodified = time();
-    $scheduler->scale = $scheduler->grade;
+    $scheduler->scale = isset($scheduler->grade) ? $scheduler->grade : 0;
 
     $id = $DB->insert_record('scheduler', $scheduler);
     $scheduler->id = $id;
