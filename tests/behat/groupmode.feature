@@ -149,7 +149,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler none"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "4 students still need to make an appointment"
+    Then I should see "5 students still need to make an appointment"
     When I follow "All appointments"
     Then I should see "Editingteacher 1" in the "slotmanager" "table" 
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
@@ -197,16 +197,16 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
     # In the "My appointments" tab, the teacher should only see students to schedule from their groups,
-    # i.e., group 1.
-    # Students in group 2 and outside any group should not be visible.
+    # i.e., group B (and C).
+    # Students in group 1 and outside any group should not be visible.
     When I follow "Course 1"
     And I follow "Test scheduler separate"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "Student 1" in the "studentstoschedule" "table"
-    And I should see "Student 2" in the "studentstoschedule" "table"
-    And I should not see "Student 3" in the "studentstoschedule" "table"
-    And I should not see "Student 4" in the "studentstoschedule" "table"
+    Then I should not see "Student 1" in the "studentstoschedule" "table"
+    And I should not see "Student 2" in the "studentstoschedule" "table"
+    And I should see "Student 3" in the "studentstoschedule" "table"
+    And I should see "Student 4" in the "studentstoschedule" "table"
     Then I should not see "Student 5" in the "studentstoschedule" "table"
     And I log out
 
@@ -217,19 +217,19 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler none"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "4 students still need to make an appointment"
+    Then I should see "5 students still need to make an appointment"
 
     When I follow "Course 1"
     And I follow "Test scheduler visible"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "No students available for scheduling"
+    Then I should see "No existing students"
 
     When I follow "Course 1"
     And I follow "Test scheduler separate"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "No students available for scheduling"    
+    Then I should see "No existing students"
     
   @javascript
   Scenario: Students can see slots available to their own groups, or a slots if group mode is off
@@ -270,8 +270,8 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should see "Nonedteacher 1"
     When I follow "Course 1"
     And I follow "Test scheduler visible"
-    Then I should see "No appointment required"
+    Then I should see "No slots are available"
     When I follow "Course 1"
     And I follow "Test scheduler separate"
-    Then I should see "No appointment required"
+    Then I should see "No slots are available"
     And I log out

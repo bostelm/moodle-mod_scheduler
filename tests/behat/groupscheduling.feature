@@ -125,16 +125,15 @@ Feature: Entire groups can be booked into slots at once
     When I log in as "student1"
     And I follow "Course 1"
     And I follow "Test scheduler no grouping"
-    Then the "appointgroup" select box should contain "just me"       
+    Then the "appointgroup" select box should contain "Myself"
     And the "appointgroup" select box should contain "Group A1"       
     And the "appointgroup" select box should contain "Group B1"       
     And the "appointgroup" select box should not contain "Group A2"       
     And the "appointgroup" select box should not contain "Group B2"       
    
     When I set the field "appointgroup" to "Group A1"
-    And I click on "slotid" "radio" in the "8:00 AM" "table_row"
-    And I click on "Save my choice" "button"
-    Then I should see "Booked" in the "8:00 AM" "table_row"
+    And I click on "Book slot" "button" in the "8:00 AM" "table_row"
+    Then I should see "8:00 AM" in the "Large office" "table_row"
     And I log out
 
     When I log in as "edteacher1"

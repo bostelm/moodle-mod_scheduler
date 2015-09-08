@@ -135,35 +135,32 @@ function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, 
 
 // Load group restrictions.
 $groupmode = groups_get_activity_groupmode($cm);
+$currentgroup = 0;
 if ($groupmode && $subpage == 'allappointments') {
     $currentgroup = groups_get_activity_group($cm, true);
-    if ($currentgroup > 0) {
-        $usergroups = array(
-            $currentgroup
-        );
-        $groups = array($currentgroup => groups_get_group($currentgroup));
-    } else {
-        $usergroups = '';
-        $groups = groups_get_all_groups($COURSE->id, 0, 0);
-    }
-} else if ($groupmode) {
-    $currentgroup = 0;
-    $groups = groups_get_all_groups($COURSE->id, $USER->id, $cm->groupingid);
-    $usergroups = array_keys($groups);
-} else {
-    $currentgroup = 0; // Show all groups by default.
-    $usergroups = '';
-    $groups = groups_get_all_groups($COURSE->id, 0, 0);
 }
 
-// Find groups that we can schedule as such.
-if ($scheduler->is_group_scheduling_enabled()) {
-    $userfilter = $USER->id;
-    if (has_capability('moodle/site:accessallgroups', $context) || $groupmode == 0) {
-        $userfilter = 0;
-    }
-    $schedgroups = groups_get_all_groups($COURSE->id, $userfilter, $scheduler->bookingrouping);
+// Find groups in which we can schedule appointments.
+$userfilter = $USER->id;
+if (has_capability('moodle/site:accessallgroups', $context) || $groupmode == 0) {
+    $userfilter = 0;
 }
+$groupingfilter = $scheduler->is_group_scheduling_enabled() ? $scheduler->bookingrouping : 0;
+$schedgroups = groups_get_all_groups($COURSE->id, $userfilter, $groupingfilter);
+if ($currentgroup > 0) {
+    if (array_key_exists($currentgroup, $schedgroups)) {
+        $schedgroups = array($currentgroup => $schedgroups[$currentgroup]);
+    } else {
+        $schedgroups = array();
+    }
+}
+if ($userfilter || $groupmode) {
+    $schedstudgroups = array_keys($schedgroups);
+} else {
+    $schedstudgroups = '';
+}
+
+$usergroups = $schedstudgroups;
 
 if ($action != 'view') {
     include_once($CFG->dirroot.'/mod/scheduler/slotforms.php');
@@ -496,8 +493,12 @@ if ($slots) {
 
 }
 
+if ($subpage = 'myappointments' && $groupmode && !$schedgroups) {
+    $students = 0;
+} else {
+    $students = $scheduler->get_students_for_scheduling($schedstudgroups, get_config('mod_scheduler', 'maxstudentlistsize'));
+}
 
-$students = $scheduler->get_students_for_scheduling($usergroups, get_config('mod_scheduler', 'maxstudentlistsize'));
 if ($students === 0) {
     $nostudentstr = get_string('noexistingstudents', 'scheduler');
     if ($COURSE->id == SITEID) {
@@ -607,7 +608,7 @@ if ($students === 0) {
                 if (!scheduler_has_slot(implode(',', array_keys($members)), $scheduler, true, $scheduler->schedulermode == 'onetime')) {
 
                     $picture = print_group_picture($group, $course->id, false, true, true);
-                    $name = $groups[$group->id]->name;
+                    $name = $group->name;
                     $groupmembers = array();
                     foreach ($members as $member) {
                         $groupmembers[] = fullname($member);

@@ -33,7 +33,6 @@ $actionurl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 // General permissions check.
 require_capability('mod/scheduler:appoint', $context);
 
-$mygroups = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->groupingid, 'g.id, g.name');
 if ($scheduler->is_group_scheduling_enabled()) {
     $mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $scheduler->bookingrouping, 'g.id, g.name');
     if ($appointgroup && !array_key_exists($appointgroup, $mygroupsforscheduling)) {
@@ -137,7 +136,7 @@ if (count($upcomingslots) > 0) {
 }
 
 $bookablecnt = $scheduler->count_bookable_appointments($USER->id, false);
-$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, false, array_keys($mygroups)));
+$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, false));
 
 if ($bookablecnt == 0) {
     echo html_writer::div(get_string('canbooknofurtherappointments', 'scheduler'), 'studentbookingmessage');

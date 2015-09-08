@@ -30,8 +30,8 @@ echo $output->teacherview_tabs($scheduler, $taburl, $subpage);
 $currentgroupid = 0;
 $groupmode = groups_get_activity_groupmode($scheduler->cm);
 if ($groupmode) {
-	$currentgroupid = groups_get_activity_group($scheduler->cm, true);
-	groups_print_activity_menu($scheduler->cm, $taburl);
+    $currentgroupid = groups_get_activity_group($scheduler->cm, true);
+    groups_print_activity_menu($scheduler->cm, $taburl);
 }
 
 //display correct type of statistics by request
