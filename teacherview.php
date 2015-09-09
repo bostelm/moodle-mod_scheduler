@@ -141,8 +141,8 @@ if ($groupmode && $subpage == 'allappointments') {
 }
 
 // Find groups in which we can schedule appointments.
-$userfilter = $USER->id;
-if (has_capability('moodle/site:accessallgroups', $context) || $groupmode == 0) {
+$userfilter = $groupmode ? $USER->id : 0;
+if (has_capability('moodle/site:accessallgroups', $context) && $subpage == 'allappointments') {
     $userfilter = 0;
 }
 $groupingfilter = $scheduler->is_group_scheduling_enabled() ? $scheduler->bookingrouping : 0;
@@ -154,7 +154,9 @@ if ($currentgroup > 0) {
         $schedgroups = array();
     }
 }
-if ($userfilter || $groupmode) {
+if ($subpage == 'allappointments' && $currentgroup == 0) {
+    $schedstudgroups = '';
+} else if ($userfilter || $groupmode) {
     $schedstudgroups = array_keys($schedgroups);
 } else {
     $schedstudgroups = '';

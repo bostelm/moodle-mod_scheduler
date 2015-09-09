@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod_scheduler @wip
 Feature: Users can only see their own groups if the scheduler is in group mode
   In order to see slots
   As a user
@@ -15,6 +15,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
       | student3   | Student        | 3        | student3@example.com   |
       | student4   | Student        | 4        | student4@example.com   |
       | student5   | Student        | 5        | student5@example.com   |
+      | student6   | Student        | 6        | student5@example.com   |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
@@ -28,11 +29,13 @@ Feature: Users can only see their own groups if the scheduler is in group mode
       | student3   | C1     | student        |
       | student4   | C1     | student        |
       | student5   | C1     | student        |
+      | student6   | C1     | student        |
     And the following "groups" exist:
       | name    | course | idnumber |
       | Group A | C1     | GA       |
       | Group B | C1     | GB       |
       | Group C | C1     | GC       |
+      | Group D | C1     | GD       |
     And the following "group members" exist:
       | user       | group |
       | edteacher1 | GA    |
@@ -43,6 +46,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
       | student2   | GA    |
       | student3   | GB    |  
       | student4   | GB    |
+      | student5   | GD    |
     And the following "activities" exist:
       | activity  | name                    | intro | course | idnumber   | groupmode |
       | scheduler | Test scheduler none     | n     | C1     | schedulern | 0         |
@@ -84,6 +88,10 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "All appointments"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
+    And I should see "Student 1" in the "studentstoschedule" "table"
+    And I should see "Student 3" in the "studentstoschedule" "table"
+    And I should see "Student 5" in the "studentstoschedule" "table"
+    And I should see "Student 6" in the "studentstoschedule" "table"
 
     When I follow "Course 1"
     And I follow "Test scheduler visible"
@@ -94,6 +102,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And the "group" select box should contain "Group A"
     And the "group" select box should contain "Group B"
     And the "group" select box should contain "Group C"
+    And the "group" select box should contain "Group D"
     When I set the field "group" to "All participants"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
@@ -116,21 +125,34 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And the "group" select box should contain "Group A"
     And the "group" select box should contain "Group B"
     And the "group" select box should contain "Group C"
+    And the "group" select box should contain "Group D"
     When I set the field "group" to "All participants"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
+    And I should see "Student 1" in the "studentstoschedule" "table"
+    And I should see "Student 3" in the "studentstoschedule" "table"
+    And I should see "Student 5" in the "studentstoschedule" "table"
+    And I should see "Student 6" in the "studentstoschedule" "table"
     When I set the field "group" to "Group A"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should not see "Nonedteacher 1" in the "slotmanager" "table"
+    And I should see "Student 1" in the "studentstoschedule" "table"
+    And I should not see "Student 3" in the "studentstoschedule" "table"
+    And I should not see "Student 5" in the "studentstoschedule" "table"
+    And I should not see "Student 6" in the "studentstoschedule" "table"
     When I set the field "group" to "Group B"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
+    And I should not see "Student 1" in the "studentstoschedule" "table"
+    And I should see "Student 3" in the "studentstoschedule" "table"
+    And I should not see "Student 5" in the "studentstoschedule" "table"
+    And I should not see "Student 6" in the "studentstoschedule" "table"
     When I set the field "group" to "Group C"
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
     # In the "My appointments" tab, the teacher should only see students to schedule from their groups,
-    # i.e., groups 1 and 2.
+    # i.e., groups A and B.
     # Students outside any group should not be visible.
     When I follow "Course 1"
     And I follow "Test scheduler separate"
@@ -138,7 +160,8 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "My appointments"
     Then I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
-    Then I should not see "Student 5" in the "studentstoschedule" "table"
+    And I should not see "Student 5" in the "studentstoschedule" "table"
+    And I should not see "Student 6" in the "studentstoschedule" "table"
     And I log out
     
   @javascript
@@ -149,7 +172,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler none"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "5 students still need to make an appointment"
+    Then I should see "6 students still need to make an appointment"
     When I follow "All appointments"
     Then I should see "Editingteacher 1" in the "slotmanager" "table" 
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
@@ -165,6 +188,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And the "group" select box should contain "Group A"
     And the "group" select box should contain "Group B"
     And the "group" select box should contain "Group C"
+    And the "group" select box should contain "Group D"
     When I set the field "group" to "All participants"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
@@ -189,6 +213,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And the "group" select box should not contain "Group A"
     And the "group" select box should contain "Group B"
     And the "group" select box should contain "Group C"
+    And the "group" select box should not contain "Group D"
     When I set the field "group" to "Group B"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
@@ -207,7 +232,8 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should not see "Student 2" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
     And I should see "Student 4" in the "studentstoschedule" "table"
-    Then I should not see "Student 5" in the "studentstoschedule" "table"
+    And I should not see "Student 5" in the "studentstoschedule" "table"
+    And I should not see "Student 6" in the "studentstoschedule" "table"
     And I log out
 
     # neteacher2 sees no students for scheduling in group mode, since he's not member of a group
@@ -217,7 +243,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler none"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "5 students still need to make an appointment"
+    Then I should see "6 students still need to make an appointment"
 
     When I follow "Course 1"
     And I follow "Test scheduler visible"
@@ -275,3 +301,17 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler separate"
     Then I should see "No slots are available"
     And I log out
+
+    When I log in as "student6"
+    And I follow "Course 1"
+    And I follow "Test scheduler none"
+    Then I should see "Editingteacher 1"
+    And I should see "Nonedteacher 1"
+    When I follow "Course 1"
+    And I follow "Test scheduler visible"
+    Then I should see "No slots are available"
+    When I follow "Course 1"
+    And I follow "Test scheduler separate"
+    Then I should see "No slots are available"
+    And I log out
+    
