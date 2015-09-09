@@ -571,6 +571,11 @@ class scheduler_instance extends mvc_record_model {
         return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC');
     }
 
+    public function get_slots_for_group($groupid, $limitfrom = '', $limitnum = '') {
+        list($where, $params) = $this->slots_for_teacher_cond(0, $groupid, false);
+        return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC');
+    }
+
     /* ************** End of slot retrieveal routines ******************** */
 
 

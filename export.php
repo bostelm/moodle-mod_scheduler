@@ -15,6 +15,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $PAGE->set_docs_path('mod/scheduler/export');
 
+// Find active group in case that group mode is in use.
+$currentgroupid = 0;
+$groupmode = groups_get_activity_groupmode($scheduler->cm);
+if ($groupmode) {
+    $currentgroupid = groups_get_activity_group($scheduler->cm, true);
+}
+
 $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'export', 'id' => $scheduler->cmid));
 $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $scheduler->cmid));
 $mform = new scheduler_export_form($actionurl, $scheduler);
@@ -52,6 +59,10 @@ if (!$data || $preview) {
     $taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'export'));
     echo $output->teacherview_tabs($scheduler, $taburl, 'export');
 
+    if ($groupmode) {
+        groups_print_activity_menu($scheduler->cm, $taburl);
+    }
+
     echo $output->heading(get_string('exporthdr', 'scheduler'), 2);
 
     $mform->display();
@@ -64,6 +75,7 @@ if (!$data || $preview) {
                         $selectedfields,
                         $data->content,
                         $userid,
+                        $currentgroupid,
                         $data->includeemptyslots,
                         $pageperteacher);
 
@@ -96,6 +108,7 @@ $export->build($scheduler,
                $selectedfields,
                $data->content,
                $userid,
+               $currentgroupid,
                $data->includeemptyslots,
                $pageperteacher);
 
