@@ -175,8 +175,16 @@ class scheduler_slot extends mvc_child_record_model {
     /**
      *  Get an array of all appointments
      */
-    public function get_appointments() {
-        return array_values($this->appointments->get_children());
+    public function get_appointments($userfilter = null) {
+        $apps = $this->appointments->get_children();
+        if ($userfilter) {
+            foreach ($apps as $key => $app) {
+                if (!in_array($app->studentid, $userfilter)) {
+                    unset($apps[$key]);
+                }
+            }
+        }
+        return array_values($apps);
     }
 
     /**

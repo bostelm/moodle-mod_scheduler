@@ -941,6 +941,7 @@ class scheduler_pdf_canvas extends scheduler_cached_text_canvas {
 class scheduler_export {
 
     protected $canvas;
+    protected $studfilter = null;
 
     public function __construct(scheduler_canvas $canvas) {
         $this->canvas = $canvas;
@@ -948,6 +949,9 @@ class scheduler_export {
 
 
     public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $groupid, $includeempty, $pageperteacher) {
+        if ($groupid) {
+            $this->studfilter = array_keys(groups_get_members($groupid, 'u.id'));
+        }
         $this->canvas->set_title(format_string($scheduler->name));
         if ($userid) {
             $slots = $scheduler->get_slots_for_teacher($userid, $groupid);
@@ -983,7 +987,7 @@ class scheduler_export {
 
         // Output the data rows.
         foreach ($slots as $slot) {
-            $appts = $slot->get_appointments();
+            $appts = $slot->get_appointments($this->studfilter);
             if ($mode == 'appointmentsgrouped') {
                 if ($appts || $includeempty) {
                     $this->write_row_summary($row, $slot, $fields);
