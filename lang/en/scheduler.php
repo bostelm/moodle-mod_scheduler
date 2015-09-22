@@ -194,7 +194,9 @@ $string['group'] = 'group ';
 $string['groupbreakdown'] = 'By group size';
 $string['groupbookings'] = 'Booking in groups';
 $string['groupbookings_help'] = 'Allow students to book a slot for all members of their group.
-		(Note that this is separate from the "group mode" setting, which controls the slots a student can see.)';
+(Note that this is separate from the "group mode" setting, which controls the slots a student can see.)';
+$string['groupmodeyourgroups'] = 'Group mode: {$a->groupmode}. Only students in {$a->grouplist} can book appointments with you.';
+$string['groupmodeyourgroupsempty'] = 'Group mode: {$a->groupmode}. You are not member of any group, therefore students cannot book appointments with you.';
 $string['groupscheduling'] = 'Enable group scheduling';
 $string['groupscheduling_desc'] = 'Allow entire groups to be scheduled at once.
 (Apart from the global option, the setting "Booking in groups" must be enabled in the respective scheduler instance.)';

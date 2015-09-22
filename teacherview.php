@@ -384,8 +384,21 @@ if ($DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id)
 }
 
 echo $output->teacherview_tabs($scheduler, $taburl, $subpage, $inactive);
-if ($groupmode && $subpage == 'allappointments') {
-    groups_print_activity_menu($cm, $taburl);
+if ($groupmode) {
+    if ($subpage == 'allappointments') {
+        groups_print_activity_menu($cm, $taburl);
+    } else {
+        $a = new stdClass();
+        $a->groupmode = get_string($groupmode == VISIBLEGROUPS ? 'groupsvisible' : 'groupsseparate');
+        $groupnames = array();
+        foreach ($schedgroups as $group) {
+            $groupnames[] = $group->name;
+        }
+        $a->grouplist = implode(', ', $groupnames);
+        $messagekey = $schedstudgroups ? 'groupmodeyourgroups' : 'groupmodeyourgroupsempty';
+        $message = get_string($messagekey, 'scheduler', $a);
+        echo html_writer::div($message, 'groupmodeyourgroups');
+    }
 }
 
 // Print intro.

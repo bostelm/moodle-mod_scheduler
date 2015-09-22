@@ -39,7 +39,7 @@ class behat_mod_scheduler extends behat_base {
             new Given('I follow "' . $this->escape($activityname) . '"'),
             new Given('I click on "Add slots" "link"'),
             new Given('I follow "Add repeated slots"'),
-            new Given('I set the field "rangestart[day]" to "' . date("d", $startdate) . '"'),
+            new Given('I set the field "rangestart[day]" to "' . date("j", $startdate) . '"'),
             new Given('I set the field "rangestart[month]" to "' . date("F", $startdate) . '"'),
             new Given('I set the field "rangestart[year]" to "' . date("Y", $startdate) . '"'),
             new Given('I set the field "Saturday" to "1"'),

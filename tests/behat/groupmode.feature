@@ -1,4 +1,4 @@
-@mod_scheduler @wip
+@mod_scheduler
 Feature: Users can only see their own groups if the scheduler is in group mode
   In order to see slots
   As a user
@@ -158,7 +158,9 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler separate"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "Student 1" in the "studentstoschedule" "table"
+    Then I should see "Group mode: Separate groups"
+    And I should see "Only students in Group A, Group B can book"
+    And I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
     And I should not see "Student 5" in the "studentstoschedule" "table"
     And I should not see "Student 6" in the "studentstoschedule" "table"
@@ -228,7 +230,9 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler separate"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should not see "Student 1" in the "studentstoschedule" "table"
+    Then I should see "Group mode: Separate groups"
+    And I should see "Only students in Group B, Group C can book"
+    And I should not see "Student 1" in the "studentstoschedule" "table"
     And I should not see "Student 2" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
     And I should see "Student 4" in the "studentstoschedule" "table"
@@ -250,12 +254,16 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "No existing students"
+    And I should see "Group mode: Visible groups"
+    And I should see "students cannot book appointments with you"
 
     When I follow "Course 1"
     And I follow "Test scheduler separate"
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "No existing students"
+    And I should see "Group mode: Separate groups"
+    And I should see "students cannot book appointments with you"
     
   @javascript
   Scenario: Students can see slots available to their own groups, or a slots if group mode is off
