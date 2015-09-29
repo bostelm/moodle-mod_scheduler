@@ -532,7 +532,7 @@ if ($students === 0) {
         $maillist[] = trim($student->email);
     }
 
-    $mailto = 'mailto:'.s(implode($maillist, ', '));
+    $mailto = 'mailto:'.s(implode($maillist, ',%20'));
 
     $subject = get_string('invitation', 'scheduler'). ': ' . $scheduler->name;
     $body = $subject."\n\n";
