@@ -253,7 +253,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler visible"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "No existing students"
+    Then I should see "No students available for scheduling"
     And I should see "Group mode: Visible groups"
     And I should see "students cannot book appointments with you"
 
@@ -261,7 +261,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler separate"
     And I follow "Statistics"
     And I follow "My appointments"
-    Then I should see "No existing students"
+    Then I should see "No students available for scheduling"
     And I should see "Group mode: Separate groups"
     And I should see "students cannot book appointments with you"
     

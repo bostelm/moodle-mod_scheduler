@@ -19,7 +19,6 @@ require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 $id = optional_param('id', '', PARAM_INT);    // Course Module ID - if it's not specified, must specify 'a', see below.
 $action = optional_param('what', 'view', PARAM_ALPHA);
 $subaction = optional_param('subaction', '', PARAM_ALPHA);
-$subpage = optional_param('subpage', 'allappointments', PARAM_ALPHA);
 $offset = optional_param('offset', -1, PARAM_INT);
 
 if ($id) {
@@ -31,6 +30,9 @@ if ($id) {
     $cm = $scheduler->get_cm();
 }
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+
+$defaultsubpage = groups_get_activity_groupmode($cm) ? 'myappointments' : 'allappointments';
+$subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
 require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
