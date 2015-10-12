@@ -452,10 +452,13 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         }
 
         $o = '';
-        $o .= html_writer::start_tag('form', array('action' => $booker->actionurl,
+        $actionurl = new moodle_url($booker->actionurl);
+        $actionurl->remove_all_params();
+        $actionurl->param('id', $booker->actionurl->get_param('id'));
+        $o .= html_writer::start_tag('form', array('action' => $actionurl,
                         'method' => 'post', 'class' => 'bookerform'));
 
-        $o .= html_writer::input_hidden_params($booker->actionurl);
+        $o .= html_writer::input_hidden_params($booker->actionurl, array('id'));
 
         $o .= html_writer::table($table);
 
