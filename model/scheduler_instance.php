@@ -662,6 +662,12 @@ class scheduler_instance extends mvc_record_model {
      */
     public function get_possible_attendees($groups = '') {
         // TODO does this need to go to the controller?
+
+        // If full group objects are given, reduce the array to only group ids.
+        if (is_array($groups) && is_object(array_values($groups)[0])) {
+            $groups = array_keys($groups);
+        }
+
         $attendees = get_users_by_capability($this->get_context(), 'mod/scheduler:appoint', '',
             'lastname, firstname', '', '', $groups, '', false, false, false);
 
