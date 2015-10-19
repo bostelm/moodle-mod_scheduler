@@ -13,6 +13,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
 
+$returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
 
 /************************************************ Book a slot  ************************************************/
 
@@ -67,7 +68,6 @@ if ($action == 'bookslot') {
     if ($errormessage) {
         echo $output->header();
         echo $output->box($errormessage, 'error');
-        $returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
         echo $output->continue_button($returnurl);
         echo $output->footer();
         exit();
@@ -92,6 +92,7 @@ if ($action == 'bookslot') {
         }
     }
     $slot->save();
+    redirect($returnurl);
 }
 
 
@@ -134,5 +135,6 @@ if ($action == 'cancelbooking') {
             \mod_scheduler\event\booking_removed::create_from_slot($slot)->trigger();
         }
     }
+    redirect($returnurl);
 
 }
