@@ -58,7 +58,7 @@ With further contributions taken from:
 
 === Release notes ===
 
---- Upcoming version in development ---
+--- Version 2.9 ---
 
 Intended for Moodle 2.9 and later.
 
@@ -139,8 +139,9 @@ No major functional changes over 1.9; bug fixes and API migration only. Requires
 === Technical notes ===
 
 The code of this module is rather old, much of it predates even Moodle 1.9.
-It has partially been adapted to the new APIs. The following aspects have been migrated,
-that is, malfunction in this respect should be considered a bug:
+It has now largely, but not compltely, been adapted to the new APIs. 
+The following aspects have been migrated, that is, malfunction in this respect 
+should be considered a bug:
 
 * Gradebook integration
 * Moodle 2 backup
