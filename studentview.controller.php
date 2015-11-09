@@ -42,7 +42,7 @@ if ($action == 'bookslot') {
 
     $errormessage = '';
 
-    $bookinglimit = $scheduler->count_bookable_appointments($USER->id, true);
+    $bookinglimit = $scheduler->count_bookable_appointments($USER->id, false);
     if ($bookinglimit == 0) {
         $errormessage = get_string('selectedtoomany', 'scheduler', $bookinglimit);
     }
