@@ -194,6 +194,7 @@ function scheduler_get_mail_variables (scheduler_instance $scheduler, scheduler_
     if ($scheduler) {
         $vars['MODULE']     = $scheduler->name;
         $vars['STAFFROLE']  = $scheduler->get_teacher_name();
+        $vars['SCHEDULER_URL'] = $CFG->wwwroot.'/mod/scheduler/view.php?id='.$scheduler->cmid;
     }
     if ($slot) {
         $vars ['DATE']     = userdate($slot->starttime, get_string('strftimedate'), $tz);
