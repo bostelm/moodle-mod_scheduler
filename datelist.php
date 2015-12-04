@@ -96,6 +96,7 @@ $sql = "SELECT a.id AS id, ".
                user_picture::fields('u1', array('email', 'department'), 'studentid', 'student').", ".
                $DB->sql_fullname('u1.firstname', 'u1.lastname')." AS studentfullname,
                a.appointmentnote,
+               a.appointmentnoteformat,
                a.grade,
                sc.name,
                sc.id AS schedulerid,
@@ -214,7 +215,7 @@ if ($numrecords) {
                         $row->studentdepartment,
                         $whatdata,
                         $gradedata,
-                        $row->appointmentnote);
+                        format_text($row->appointmentnote, $row->appointmentnoteformat) );
         $table->add_data($dataset);
     }
     $table->print_html();
