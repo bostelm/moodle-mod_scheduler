@@ -30,6 +30,7 @@ a.id as appid,
 a.studentid,
 a.attended,
 a.appointmentnote,
+a.appointmentnoteformat,
 a.grade,
 a.timemodified as apptimemodified
 FROM
@@ -139,11 +140,12 @@ if ($subpage == 'thisappointment') {
         $iconhelp = $otherslot->attended ? 'seen' : 'notseen';
         $attendedpix = $output->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
 
-        $otherslot->appointmentnote .= "<br/><span class=\"timelabel\">[".userdate($otherslot->apptimemodified)."]</span>";
+        $appnote = format_text($otherslot->appointmentnote, $otherslot->appointmentnoteformat);
+        $appnote .= "<br/><span class=\"timelabel\">[".userdate($otherslot->apptimemodified)."]</span>";
         $grade = $output->format_grade($scheduler, $otherslot->grade);
         $teacher = $DB->get_record('user', array('id' => $otherslot->teacherid));
         $table->data[] = array ($datelink, $starttime, $endtime, $attendedpix,
-                                 $otherslot->appointmentnote, $grade, fullname($teacher));
+                                 $appnote, $grade, fullname($teacher));
     }
     echo html_writer::table($table);
 
@@ -169,7 +171,7 @@ if ($subpage == 'thisappointment') {
         $iconid = $otherappointment->attended ? 'ticked' : 'unticked';
         $iconhelp = $otherappointment->attended ? 'seen' : 'notseen';
         $icon = $OUTPUT->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
-        $note = $otherappointment->appointmentnote;
+        $note = format_text($otherappointment->appointmentnote, $otherappointment->appointmentnoteformat);
         if ($note) {
             $note .= '<br/><span class="timelabel">['.userdate($otherappointment->timemodified).']</span>';
         }
