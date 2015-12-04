@@ -445,7 +445,7 @@ by the student <a href="{$a->attendee_url}">{$a->attendee}</a> for the course:
 
 <p>{$a->course_short}: <a href="{$a->course_url}">{$a->course}</a></p>
 
-<p>using the scheduler titled "<em>{$a->module}</em>" on the website: <a href="{$a->site_url}">{$a->site}</a>.</p>';
+<p>using the scheduler titled "<em><a href="{$a->scheduler_url}">{$a->module}</a></em>" on the website: <a href="{$a->site_url}">{$a->site}</a>.</p>';
 
 $string['email_cancelled_subject'] = '{$a->course_short}: Appointment cancelled or moved by a student';
 
@@ -463,7 +463,7 @@ with the student <strong><a href="{$a->attendee_url}">{$a->attendee}</a></strong
 
 <p><strong>{$a->course_short} : <a href="{$a->course_url}">{$a->course}</a></strong></p>
 
-<p>in the scheduler titled "<em>{$a->module}</em>" on the website : <strong><a href="{$a->site_url}">{$a->site}</a></strong></p>
+<p>in the scheduler titled "<em><a href="{$a->scheduler_url}">{$a->module}</a></em>" on the website : <strong><a href="{$a->site_url}">{$a->site}</a></strong></p>
 
 <p><strong><span class="error">has been cancelled or moved</span></strong>.</p>';
 
@@ -497,6 +497,6 @@ with the {$a->staffrole} <strong><a href="{$a->attendant_url}">{$a->attendant}</
 
 <p><strong>{$a->course_short}: <a href="{$a->course_url}">{$a->course}</a></strong></p>
 
-<p>in the scheduler "<em>{$a->module}</em>" on the website: <strong><a href="{$a->site_url}">{$a->site}</a></strong></p>
+<p>in the scheduler "<em><a href="{$a->scheduler_url}">{$a->module}</a></em>" on the website: <strong><a href="{$a->site_url}">{$a->site}</a></strong></p>
 
 <p><strong><span class="error">has been cancelled</span></strong>. Please apply for a new slot.</p>';
