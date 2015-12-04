@@ -149,13 +149,16 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     public function teacherview_tabs(scheduler_instance $scheduler, moodle_url $baseurl, $selected, $inactive = null) {
 
         $statstab = $this->teacherview_tab($baseurl, 'statistics', 'viewstatistics', 'overall');
-        $statstab->subtree = array(
+        if ($selected == 'overall' || $selected == 'studentbreakdown' || $selected == 'staffbreakdown' ||
+            $selected == 'lengthbreakdown' || $selected == 'groupbreakdown') {
+            $statstab->subtree = array(
                         $this->teacherview_tab($baseurl, 'overall', 'viewstatistics', 'overall'),
                         $this->teacherview_tab($baseurl, 'studentbreakdown', 'viewstatistics', 'studentbreakdown'),
                         $this->teacherview_tab($baseurl, 'staffbreakdown', 'viewstatistics', 'staffbreakdown', $scheduler->get_teacher_name()),
                         $this->teacherview_tab($baseurl, 'lengthbreakdown', 'viewstatistics', 'lengthbreakdown'),
                         $this->teacherview_tab($baseurl, 'groupbreakdown', 'viewstatistics', 'groupbreakdown')
-        );
+            );
+        }
 
         $level1 = array(
                         $this->teacherview_tab($baseurl, 'myappointments', 'view', 'myappointments'),
