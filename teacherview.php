@@ -135,7 +135,7 @@ function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, 
 $modinfo = get_fast_modinfo($course);
 
 $usergroups = '';
-if ($cm->groupmode > 0) {
+if (groups_get_activity_groupmode($cm, $course) > 0) {
     $groups = groups_get_all_groups($COURSE->id, 0, $cm->groupingid);
     $usergroups = array_keys($groups);
 }
