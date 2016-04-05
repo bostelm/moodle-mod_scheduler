@@ -1,4 +1,4 @@
-@mod_scheduler @wip
+@mod_scheduler
 Feature: Booking of appointments with individual tutors per group
   In order to organize appointments with the students in my group
   As a tutor

@@ -329,4 +329,22 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Test scheduler separate"
     Then I should see "No slots are available"
     And I log out
-    
+
+  @javascript
+  Scenario: Students can see slots available to their own groups in forced group mode
+    When I log in as "edteacher1"
+    And I follow "Course 1"
+    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I expand all fieldsets
+    And I set the field "Group mode" to "Separate groups"
+    And I set the field "Force group mode" to "Yes"
+    And I press "Save and display"
+    Then I should see "Test scheduler none"
+    And I log out
+
+    When I log in as "student1"
+    And I follow "Course 1"
+    And I follow "Test scheduler none"
+    Then I should see "Editingteacher 1"
+    And I should not see "Nonedteacher 1"
+    And I log out

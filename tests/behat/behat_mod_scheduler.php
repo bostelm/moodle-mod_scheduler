@@ -66,20 +66,23 @@ class behat_mod_scheduler extends behat_base {
      */
     public function i_add_the_upcoming_events_block_globally() {
         $steps = array(
-            new Given('the following "users" exist:', new TableNode(
-                         ' | username | firstname | lastname | email |
-                           | globalmanager1 | GlobalManager | 1 | globalmanager1@example.com |')),
-            new Given('the following "system role assigns" exist:', new TableNode(
-                          '| user | role |
-                           | globalmanager1 | manager |')),
+            new Given('the following "users" exist:', new TableNode(array(
+                         array('username', 'firstname', 'lastname', 'email'),
+                         array('globalmanager1', 'GlobalManager', '1', 'globalmanager1@example.com')
+                     ))),
+            new Given('the following "system role assigns" exist:', new TableNode(array(
+                         array('user', 'role'),
+                         array('globalmanager1', 'manager')
+                     ))),
             new Given('I log in as "globalmanager1"'),
             new Given('I follow "Site home"'),
             new Given('I follow "Turn editing on"'),
             new Given('I add the "Upcoming events" block'),
             new Given('I click on "Actions" "link_or_button" in the "Upcoming events" "block"'),
             new Given('I follow "Configure Upcoming events block"'),
-            new Given('I set the following fields to these values:', new TableNode(
-                        '| Page contexts | Display throughout the entire site |')),
+            new Given('I set the following fields to these values:', new TableNode(array(
+                         array('Page contexts', 'Display throughout the entire site')
+                     ))),
             new Given('I click on "Save changes" "button"'),
             new Given('I log out')
         );
