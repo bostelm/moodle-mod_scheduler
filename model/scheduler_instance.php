@@ -502,7 +502,7 @@ class scheduler_instance extends mvc_record_model {
         $params['cutofftime'] = time() + $this->guardtime;
         $subcond = '(s.exclusivity = 0 OR s.exclusivity > '.$this->appointment_count_query().')'
             . ' AND NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
-        if ($this->cm->groupmode != NOGROUPS) {
+        if ($this->groupmode != NOGROUPS) {
             $groups = groups_get_all_groups($this->cm->course, $studentid, $this->cm->groupingid);
             if ($groups) {
                 $groupids = array();
