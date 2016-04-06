@@ -165,7 +165,7 @@ if ($action == 'savechoice') {
             // Notify the teacher.
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id' => $appointment->studentid));
-                $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
+                $teacher = $DB->get_record('user', array('id' => $newslot->teacherid));
                 $vars = scheduler_get_mail_variables($scheduler, $newslot, $teacher, $student, $course, $teacher);
                 scheduler_send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
             }
