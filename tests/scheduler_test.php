@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Unit tests for the MVC model classes
+ * Unit tests for the scheduler_instance class.
  *
  * @package    mod
  * @subpackage scheduler
@@ -16,7 +16,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
-
+/**
+ * Unit tests for the scheduler_instance class.
+ *
+ * @group mod_scheduler
+ */
 class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     protected $moduleid;  // course_modules id used for testing
@@ -113,7 +117,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
             }
             $this->assertEquals($expectedapp, $slot->get_appointment_count());
 
-            $apps = $slot->get_appointments($slot->get_appointments());
+            $apps = $slot->get_appointments();
             $this->assertEquals($expectedapp, count($apps));
 
             foreach ($apps as $app) {
@@ -173,14 +177,14 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
-	private function assert_slot_times($expected, $actual, $options) {
-        $this->assertEquals(count($expected), count($actual));
+	private function assert_slot_times($expected, $actual, $options, $message) {
+        $this->assertEquals(count($expected), count($actual), "Slot count - $message");
         $slottimes = array();
         foreach ($expected as $e) {
             $slottimes[] = $options['slottimes'][$e];
         }
         foreach ($actual as $a) {
-            $this->assertTrue( in_array($a->starttime, $slottimes));
+            $this->assertTrue( in_array($a->starttime, $slottimes), "Slot at {$a->starttime} - $message");
         }
 	}
 
@@ -189,16 +193,16 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         $sched = scheduler_instance::load_by_id($schedulerid);
 
         $attended = $sched->get_attended_slots_for_student($studentid);
-        $this->assert_slot_times($expAttended, $attended, $slotoptions);
+        $this->assert_slot_times($expAttended, $attended, $slotoptions, 'Attended slots');
 
         $upcoming = $sched->get_upcoming_slots_for_student($studentid);
-        $this->assert_slot_times($expUpcoming, $upcoming, $slotoptions);
+        $this->assert_slot_times($expUpcoming, $upcoming, $slotoptions, 'Upcoming slots');
 
         $available = $sched->get_slots_available_to_student($studentid, false);
-        $this->assert_slot_times($expAvailable, $available, $slotoptions);
+        $this->assert_slot_times($expAvailable, $available, $slotoptions, 'Available slots (incl. booked)');
 
         $bookable = $sched->get_slots_available_to_student($studentid, true);
-        $this->assert_slot_times($expBookable, $bookable, $slotoptions);
+        $this->assert_slot_times($expBookable, $bookable, $slotoptions, 'Booked slots');
 
 	}
 
@@ -248,7 +252,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
 	    $this->check_timed_slots($schedid, $currentstud, $options,
 	     			array(7, 8),
-	     			array(6),
+                    array(0, 1, 2, 3, 4 ,5, 6),
 	     			array(10, 11, 12, 13, 14),
 	     			array(10, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5) );
 
@@ -257,17 +261,17 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
 	    $this->check_timed_slots($schedid, $currentstud, $options,
 	     			array(7, 8),
-	     			array(6, 0),
-	     			array(11, 12, 13, 14),
-	     			array(11, 12, 13, 14, 1, 2, 3, 4, 5) );
+                    array(0, 1, 2, 3, 4 ,5, 6),
+                    array(11, 12, 13, 14),
+                    array(11, 12, 13, 14, 1, 2, 3, 4, 5) );
 
 		$schedrec->guardtime = 4*DAYSECS;
 		$DB->update_record('scheduler', $schedrec);
 
 	    $this->check_timed_slots($schedid, $currentstud, $options,
 	     			array(7, 8),
-	     			array(6, 0, 1, 2, 3),
-	     			array(14),
+                    array(0, 1, 2, 3, 4 ,5, 6),
+                    array(14),
 	     			array(14, 4, 5) );
 
 		$schedrec->guardtime = 20*DAYSECS;
@@ -275,7 +279,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
 	    $this->check_timed_slots($schedid, $currentstud, $options,
 	     			array(7, 8),
-	     			array(6, 0, 1, 2, 3, 4, 5),
+                    array(0, 1, 2, 3, 4, 5, 6),
 	     			array(),
 	     			array() );
 

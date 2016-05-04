@@ -15,7 +15,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
-
+/**
+ * Unit tests for the scheduler_slots class.
+ *
+ * @group mod_scheduler
+ */
 class mod_scheduler_slot_testcase extends advanced_testcase {
 
     protected $moduleid;  // Course_modules id used for testing.
