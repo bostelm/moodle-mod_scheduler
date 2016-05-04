@@ -16,8 +16,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 $plugin->component = 'mod_scheduler'; // Full name of the plugin (used for diagnostics)
-$plugin->version   = 2014090103;      // The current module version (Date: YYYYMMDDXX)
-$plugin->release   = '2.7.1+';        // Human-friendly version name
+$plugin->version   = 2014090104;      // The current module version (Date: YYYYMMDDXX)
+$plugin->release   = '2.7.2';        // Human-friendly version name
 $plugin->requires  = 2014050600;      // Requires Moodle 2.7
 $plugin->maturity  = MATURITY_STABLE; // Alpha development code - not for production sites
 
