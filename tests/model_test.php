@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Unit tests for the scheduler_instance class.
+ * Unit tests for the MVC model classes
  *
  * @package    mod
  * @subpackage scheduler
@@ -16,7 +16,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
-
+/**
+ * Unit tests for the MVC model classes
+ *
+ * @group mod_scheduler
+ */
 class mod_scheduler_model_testcase extends advanced_testcase {
 
     protected $moduleid;  // Course_modules id used for testing.
@@ -61,48 +65,6 @@ class mod_scheduler_model_testcase extends advanced_testcase {
 
     }
 
-    public function test_scheduler_loadslots() {
-        global $DB;
-
-        $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
-
-        /* test slot retrieval */
-
-        $slotcount = $instance->get_slot_count();
-        $this->assertEquals(6, $slotcount);
-
-        $slots = $instance->get_all_slots(2, 3);
-        $this->assertEquals(3, count($slots));
-
-        $slots = $instance->get_slots_without_appointment();
-        $this->assertEquals(1, count($slots));
-
-        $allslots = $instance->get_all_slots();
-        $this->assertEquals(6, count($allslots));
-
-        $cnt = 0;
-        foreach ($allslots as $slot) {
-            $this->assertTrue($slot instanceof scheduler_slot);
-
-            if ($cnt == 5) {
-                $expectedapp = 2;
-            } else if ($cnt == 4) {
-                $expectedapp = 0;
-            } else {
-                $expectedapp = 1;
-            }
-            $this->assertEquals($expectedapp, $slot->get_appointment_count());
-
-            $apps = $slot->get_appointments($slot->get_appointments());
-            $this->assertEquals($expectedapp, count($apps));
-
-            foreach ($apps as $app) {
-                $this->assertTrue($app instanceof scheduler_appointment);
-            }
-            $cnt++;
-        }
-
-    }
 
     /**
      * Test the "appointment" data object
