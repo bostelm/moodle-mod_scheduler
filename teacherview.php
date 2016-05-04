@@ -88,6 +88,10 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     }
 
     $slot->save();
+
+    $slot = $scheduler->get_slot($slot->id);
+
+    return $slot;
 }
 
 
@@ -175,13 +179,12 @@ if ($groupmode) {
     $groupsthatcanseeme = groups_get_all_groups($COURSE->id, $USER->id, $cm->groupingid);
 }
 
+echo $output->header();
+
 if ($action != 'view') {
     require_once($CFG->dirroot.'/mod/scheduler/slotforms.php');
     include($CFG->dirroot.'/mod/scheduler/teacherview.controller.php');
 }
-
-
-echo $output->header();
 
 /************************************ View : New single slot form ****************************************/
 if ($action == 'addslot') {
@@ -197,7 +200,8 @@ if ($action == 'addslot') {
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } else if ($formdata = $mform->get_data()) {
-        scheduler_save_slotform ($scheduler, $course, 0, $formdata);
+        $slot = scheduler_save_slotform ($scheduler, $course, 0, $formdata);
+        \mod_scheduler\event\slot_added::create_from_slot($slot)->trigger();
         echo $output->action_message(get_string('oneslotadded', 'scheduler'));
     } else {
         echo $output->heading(get_string('addsingleslot', 'scheduler'));

@@ -536,10 +536,18 @@ class scheduler_instance extends mvc_record_model {
 
     /**
      * retrieves slots without any appointment made
+     *
+     * @param int $teacherid if given, will return only slots for this teacher
+     * @return array list of unused slots
      */
-    public function get_slots_without_appointment() {
-        $wherecond = $this->appointment_count_query().' = 0';
-        $slots = $this->fetch_slots($wherecond, '', array());
+    public function get_slots_without_appointment($teacherid = 0) {
+        $wherecond = '('.$this->appointment_count_query().' = 0)';
+        $params = array();
+        if ($teacherid > 0) {
+            list($twhere, $params) = $this->slots_for_teacher_cond($teacherid, 0, false);
+            $wherecond .= " AND $twhere";
+        }
+        $slots = $this->fetch_slots($wherecond, '', $params);
         return $slots;
     }
 

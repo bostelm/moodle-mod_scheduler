@@ -28,7 +28,8 @@ abstract class slot_base extends \core\event\base {
     protected static function base_data(\scheduler_slot $slot) {
         return array(
             'context' => $slot->get_scheduler()->get_context(),
-            'objectid' => $slot->id
+            'objectid' => $slot->id,
+            'relateduserid' => $slot->teacherid
         );
     }
 

@@ -29,6 +29,8 @@ $string['event_bookingformviewed'] = 'Scheduler booking form viewed';
 $string['event_bookingadded'] = 'Scheduler booking added';
 $string['event_bookingremoved'] = 'Scheduler booking removed';
 $string['event_appointmentlistviewed'] = 'Scheduler appointment list viewed';
+$string['event_slotadded'] = 'Scheduler slot added';
+$string['event_slotdeleted'] = 'Scheduler slot deleted';
 
 /* ***** Interface strings ****** */
 
@@ -274,6 +276,7 @@ $string['on'] = 'on';
 $string['onelineperappointment'] = 'One line per appointment';
 $string['onelineperslot'] = 'One line per slot';
 $string['oneslotadded'] = '1 slot added';
+$string['oneslotdeleted'] = '1 slot deleted';
 $string['onthemorningofappointment'] = 'On the morning of the appointment';
 $string['options'] = 'Options';
 $string['otherstudents'] = 'Other participants';
@@ -328,6 +331,7 @@ $string['slotdescription'] = '{$a->status} on {$a->startdate} from {$a->starttim
 $string['slot'] = 'Slot';
 $string['slots'] = 'Slots';
 $string['slotsadded'] = '{$a} slots have been added';
+$string['slotsdeleted'] = '{$a} slots have been deleted';
 $string['slottype'] = 'Slot type';
 $string['slotupdated'] = '1 slot updated';
 $string['slotwarning'] = '<strong>Warning: </strong>Moving this slot to the selected time conflicts with the slot(s) listed below. Tick "Ignore scheduling conflicts" if you want to move the slot nevertheless.';

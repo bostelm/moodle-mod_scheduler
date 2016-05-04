@@ -91,12 +91,15 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                     } else { // we force, so delete all conflicting before inserting
                         foreach ($conflicts as $conflict) {
                         	$cslot = $scheduler->get_slot($conflict->id);
+                        	\mod_scheduler\event\slot_deleted::create_from_slot($cslot, 'addsession-conflict')->trigger();
                             $cslot->delete();
                         }
                     }
                 }
                 if (!$conflicts || $data->forcewhenoverlap) {
-                    $DB->insert_record('scheduler_slots', $slot, false, true);
+                    $slotid = $DB->insert_record('scheduler_slots', $slot, true, true);
+                    $slotobj = $scheduler->get_slot($slotid);
+                    \mod_scheduler\event\slot_added::create_from_slot($slotobj)->trigger();
                     $countslots++;
                 }
                 $slot->starttime += ($slot->duration + $data->break) * 60;
@@ -107,6 +110,23 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     echo $output->action_message(get_string('slotsadded', 'scheduler', $countslots));
 }
 
+function scheduler_delete_slots_from_ui(array $slots, $action) {
+    global $output;
+
+    $cnt = 0;
+    foreach ($slots as $slot) {
+        \mod_scheduler\event\slot_deleted::create_from_slot($slot, $action)->trigger();
+        $slot->delete();
+        $cnt++;
+    }
+
+    if ($cnt == 1) {
+        $msg = get_string('oneslotdeleted', 'scheduler');
+    } else {
+        $msg = get_string('slotsdeleted', 'scheduler', $cnt);
+    }
+    echo $output->action_message($msg);
+}
 
 // Require valid session key for all actions.
 require_sesskey();
@@ -117,17 +137,18 @@ switch ($action) {
     case 'deleteslot': {
         $slotid = required_param('slotid', PARAM_INT);
         $slot = $scheduler->get_slot($slotid);
-        $slot->delete();
+        scheduler_delete_slots_from_ui(array($slot), $action);
         break;
     }
     /************************************ Deleting multiple slots ***********************************************/
     case 'deleteslots': {
         $slotids = required_param('items', PARAM_SEQUENCE);
-        $slots = explode(",", $slotids);
-        foreach ($slots as $slotid) {
-            $slot = $scheduler->get_slot($slotid);
-            $slot->delete();
+        $slotids = explode(",", $slotids);
+        $slots = array();
+        foreach ($slotids as $slotid) {
+            $slots[] = $scheduler->get_slot($slotid);
         }
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Students were seen ***************************************************/
@@ -196,46 +217,27 @@ switch ($action) {
     /************************************ Deleting all slots ***************************************************/
     case 'deleteall':{
         require_capability('mod/scheduler:manageallappointments', $context);
-        foreach ($scheduler->get_all_slots() as $slot) {
-            $slot->delete();
-        }
+        $slots = $scheduler->get_all_slots();
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Deleting unused slots *************************************************/
-    // MUST STAY HERE, JUST BEFORE deleteallunused
     case 'deleteunused':{
-        $teacherClause = " AND s.teacherid = {$USER->id} ";
+        $slots = $scheduler->get_slots_without_appointment($USER->id);
+        scheduler_delete_slots_from_ui($slots, $action);
+        break;
     }
     /************************************ Deleting unused slots (all teachers) ************************************/
     case 'deleteallunused': {
-        if (!isset($teacherClause)) $teacherClause = '';
-        if (has_capability('mod/scheduler:manageallappointments', $context)) {
-            $sql = "
-            SELECT
-            s.id,
-            s.id
-            FROM
-            {scheduler_slots} s
-            LEFT JOIN
-            {scheduler_appointment} a
-            ON
-            s.id = a.slotid
-            WHERE
-            s.schedulerid = ? AND a.studentid IS NULL
-            {$teacherClause}
-            ";
-            if ($unappointed = $DB->get_records_sql($sql, array($scheduler->id))) {
-                list($usql, $params) = $DB->get_in_or_equal(array_keys($unappointed));
-                $DB->delete_records_select('scheduler_slots', "schedulerid = $cm->instance AND id $usql ", $params);
-            }
-        }
+        require_capability('mod/scheduler:manageallappointments', $context);
+        $slots = $scheduler->get_slots_without_appointment();
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Deleting current teacher's slots ***************************************/
     case 'deleteonlymine': {
-        foreach ($scheduler->get_slots_for_teacher($USER->id) as $slot) {
-            $slot->delete();
-        }
+        $slots = $scheduler->get_slots_for_teacher($USER->id);
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Mark as seen now *******************************************************/
@@ -263,6 +265,9 @@ switch ($action) {
         $appointment->timecreated = time();
         $appointment->timemodified = time();
         $DB->insert_record('scheduler_appointment', $appointment);
+
+        $slot = $scheduler->get_slot($slotid);
+        \mod_scheduler\event\slot_added::create_from_slot($slot)->trigger();
 
         break;
     }
