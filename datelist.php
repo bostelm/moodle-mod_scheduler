@@ -60,7 +60,7 @@ if ($groupmode) {
 
 $scopemenukey = 'scopemenuself';
 if (has_capability('mod/scheduler:canseeotherteachersbooking', $scopecontext)) {
-    $teachers = scheduler_get_attendants($cm->id, $currentgroupid);
+    $teachers = $scheduler->get_available_teachers($currentgroupid);
     $teachermenu = array();
     foreach ($teachers as $teacher) {
         $teachermenu[$teacher->id] = fullname($teacher);

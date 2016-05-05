@@ -35,7 +35,7 @@ if ($action == 'bookslot') {
     $requiredcapacity = 1;
     $userstobook = array($USER->id);
     if ($appointgroup) {
-        $groupmembers = $scheduler->get_possible_attendees(array($appointgroup));
+        $groupmembers = $scheduler->get_available_students($appointgroup);
         $requiredcapacity = count($groupmembers);
         $userstobook = array_keys($groupmembers);
     }
@@ -117,7 +117,7 @@ if ($action == 'cancelbooking') {
 
     $userstocancel = array($USER->id);
     if ($appointgroup) {
-        $userstocancel = array_keys($scheduler->get_possible_attendees(array($appointgroup)));
+        $userstocancel = array_keys($scheduler->get_available_students($appointgroup));
     }
 
     foreach ($userstocancel as $userid) {

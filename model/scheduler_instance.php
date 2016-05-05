@@ -661,29 +661,77 @@ class scheduler_instance extends mvc_record_model {
         return $teachers;
     }
 
-
     /**
-     * get list of possible attendees (i.e., users that can make an appointment)
-     * @param $groups - single group or array of groups - only return
-     *                  users who are in one of these group(s).
+     * get list of available users with a certain capability
+     * @param string $capability the capabilty to look for
+     * @param int|array $groupids - group id or array of group ids; if set, will only return users who are in these groups.
+     *                             (for legacy processing, allow also group objects and arrays of these)
      * @return array of moodle user records
      */
-    public function get_possible_attendees($groups = '') {
-        // TODO does this need to go to the controller?
+    protected function get_available_users($capability, $groupids = 0) {
 
         // If full group objects are given, reduce the array to only group ids.
-        if (is_array($groups) && is_object(array_values($groups)[0])) {
-            $groups = array_keys($groups);
+        if (is_array($groupids) && is_object(array_values($groupids)[0])) {
+            $groupids = array_keys($groupids);
+        } else if (is_object($groupids)) {
+            $groupids = $groupids->id;
         }
 
-        $attendees = get_users_by_capability($this->get_context(), 'mod/scheduler:appoint', '',
-            'lastname, firstname', '', '', $groups, '', false, false, false);
+        // Legacy: empty string amounts to no group filter
+        if ($groupids === '') {
+            $groupids = 0;
+        }
+
+        $users = array();
+        if (is_integer($groupids)) {
+            $users = get_enrolled_users($this->get_context(), $capability, $groupids, 'u.*', null, 0, 0, true);
+
+        } else if (is_array($groupids)) {
+            foreach ($groupids as $groupid) {
+                $groupusers = get_enrolled_users($this->get_context(), 'mod/scheduler:appoint', $groupid,
+                                                 'u.*', null, 0, 0, true);
+                foreach ($groupusers as $user) {
+                    if (!array_key_exists($user->id, $users)) {
+                        $users[$user->id] = $user;
+                    }
+                }
+            }
+        }
 
         $modinfo = get_fast_modinfo($this->courseid);
         $info = new \core_availability\info_module($modinfo->get_cm($this->cmid));
-        $attendees = $info->filter_user_list($attendees);
+        $users = $info->filter_user_list($users);
 
-        return $attendees;
+        return $users;
+    }
+
+    /**
+     * get list of available students (i.e., users that can book slots)
+     * @param mixed $groupids - group id or array of group ids; if set, will only return users who are in these groups.
+     * @return array of moodle user records
+     */
+    public function get_available_students($groupids = 0) {
+
+        return $this->get_available_users('mod/scheduler:appoint', $groupids);
+    }
+
+    /**
+     * get list of available teachers (i.e., users that can offer slots)
+     * @param mixed $groupids - only return users who are in this group.
+     * @return array of moodle user records
+     */
+    public function get_available_teachers($groupids = 0) {
+
+        return $this->get_available_users('mod/scheduler:attend', $groupids);
+    }
+
+    /**
+     * Checks whether there are any possible teachers for the scheduler
+     * @return boolean whether teachers are present
+     */
+    public function has_available_teachers() {
+        $teachers = $this->get_available_teachers();
+        return count($teachers) > 0;
     }
 
     /**
@@ -698,7 +746,7 @@ class scheduler_instance extends mvc_record_model {
      *            or the number of students if there are too many students
      */
     public function get_students_for_scheduling($groups = '', $cutoff = 0) {
-        $studs = $this->get_possible_attendees($groups);
+        $studs = $this->get_available_students($groups);
         if (($cutoff > 0 && count($studs) > $cutoff) || count($studs) == 0) {
             return count($studs);
         }

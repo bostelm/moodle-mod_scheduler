@@ -37,7 +37,7 @@ if ($groupmode) {
 //display correct type of statistics by request
 
 $usergroups = ($currentgroupid > 0) ? array($currentgroupid) : '';
-$attendees = $scheduler->get_possible_attendees($usergroups);
+$attendees = $scheduler->get_available_students($usergroups);
 
 switch ($subpage) {
     case 'overall':
