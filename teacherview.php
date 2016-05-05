@@ -143,22 +143,27 @@ if ($groupmode) {
 // All group arrays in the following are in the format used by groups_get_all_groups.
 // The special value '' (empty string) is used to signal "all groups" (no restrictions)
 
-// Find groups which the current teacher can see ($groupsicansee).
+// Find groups which the current teacher can see ($groupsicansee, $groupsicurrentlysee).
+// $groupsicansee contains all groups that a teacher potentially has access to.
+// $groupsicurrentlysee may be restricted by the user to one group, using the drop-down box.
 $userfilter = $USER->id;
 if (has_capability('moodle/site:accessallgroups', $context)) {
     $userfilter = 0;
 }
 $groupsicansee = '';
+$groupsicurrentlysee = '';
 if ($groupmode) {
+    if ($userfilter) {
+        $groupsicansee = groups_get_all_groups($COURSE->id, $userfilter, $cm->groupingid);
+    }
+    $groupsicurrentlysee = $groupsicansee;
     if ($currentgroup) {
         if ($userfilter && !groups_is_member($currentgroup, $userfilter)) {
-            $groupsicansee = array();
+            $groupsicurrentlysee = array();
         } else {
             $cgobj = groups_get_group($currentgroup);
-            $groupsicansee = array($currentgroup => $cgobj);
+            $groupsicurrentlysee = array($currentgroup => $cgobj);
         }
-    } else if ($userfilter) {
-        $groupsicansee = groups_get_all_groups($COURSE->id, $userfilter, $cm->groupingid);
     }
 }
 
@@ -519,7 +524,7 @@ if ($slots) {
 
 }
 
-$groupfilter = ($subpage == 'myappointments') ? $groupsthatcanseeme : $groupsicansee;
+$groupfilter = ($subpage == 'myappointments') ? $groupsthatcanseeme : $groupsicurrentlysee;
 $maxlistsize = get_config('mod_scheduler', 'maxstudentlistsize');
 $students = array();
 if ($groupfilter === '') {
