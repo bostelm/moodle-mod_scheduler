@@ -123,6 +123,7 @@ $string['date'] = 'Date';
 $string['datelist'] = 'Overview';
 $string['defaultslotduration'] = 'Default slot duration';
 $string['defaultslotduration_help'] = 'The default length (in minutes) for appointment slots that you set up';
+$string['deleteslotconfirm'] = 'Delete slot?';
 $string['deleteallslots'] = 'Delete all slots';
 $string['deleteallunusedslots'] = 'Delete unused slots';
 $string['deletecommands'] = 'Delete slots';
