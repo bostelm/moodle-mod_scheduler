@@ -174,8 +174,7 @@ function scheduler_cron () {
         foreach ($appointments as $appointment) {
             $student = $DB->get_record('user', array('id'=>$appointment->studentid));
             cron_setup_user($student, $course);
-            $vars = scheduler_get_mail_variables ($scheduler, $slotm, $teacher, $student, $course, $student);
-            scheduler_send_email_from_template ($student, $teacher, $course, 'remindtitle', 'reminder', $vars, 'scheduler');
+            scheduler_messenger::send_slot_notification($slotm, 'reminder', 'reminder', $teacher, $student, $teacher, $student, $course);
         }
         // mark as sent
         $slot->emaildate = -1;

@@ -110,6 +110,38 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     echo $output->action_message(get_string('slotsadded', 'scheduler', $countslots));
 }
 
+function scheduler_action_dosendmessage($scheduler, $formdata) {
+
+    global $DB, $USER, $output;
+
+    $data = (object) $formdata;
+
+    $recipients = $data->recipient;
+    if ($data->copytomyself) {
+        $recipients[$USER->id] = 1;
+    }
+
+    $cnt = 0;
+    foreach ($recipients as $recipientid => $value) {
+        if ($value) {
+            $message = new \core\message\message();
+            $message->component = 'mod_scheduler';
+            $message->name = 'invitation';
+            $message->userfrom = $USER;
+            $message->userto = $recipientid;
+            $message->subject = $data->subject;
+            $message->fullmessage = $data->body['text'];
+            $message->fullmessageformat = $data->body['format'];
+            $message->notification = '0';
+
+            message_send($message);
+            $cnt++;
+        }
+    }
+
+    echo $output->action_message(get_string('messagesent', 'scheduler', $cnt));
+}
+
 function scheduler_delete_slots_from_ui(array $slots, $action) {
     global $output;
 
@@ -185,8 +217,7 @@ switch ($action) {
                 $student = $DB->get_record('user', array('id' => $oldstudent));
                 $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
 
-                $vars = scheduler_get_mail_variables($scheduler, $slot, $teacher, $student, $COURSE, $student);
-                scheduler_send_email_from_template($student, $teacher, $COURSE, 'cancelledbyteacher', 'teachercancelled', $vars, 'scheduler');
+                scheduler_messenger::send_slot_notification($slot, 'bookingnotification',  'teachercancelled', $teacher, $student, $teacher, $student, $COURSE);
             }
         }
 

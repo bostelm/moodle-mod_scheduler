@@ -87,8 +87,8 @@ if ($action == 'bookslot') {
         if ($scheduler->allownotifications) {
             $student = $DB->get_record('user', array('id' => $appointment->studentid));
             $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-            $vars = scheduler_get_mail_variables($scheduler, $slot, $teacher, $student, $course, $teacher);
-            scheduler_send_email_from_template($teacher, $student, $course, 'newappointment', 'applied', $vars, 'scheduler');
+            scheduler_messenger::send_slot_notification($slot, 'bookingnotification', 'applied',
+                                                        $student, $teacher, $teacher, $student, $course);
         }
     }
     $slot->save();
@@ -128,9 +128,8 @@ if ($action == 'cancelbooking') {
             if ($scheduler->allownotifications) {
                 $student = $DB->get_record('user', array('id' => $USER->id));
                 $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-                $vars = scheduler_get_mail_variables($scheduler, $slot, $teacher, $student, $course, $teacher);
-                scheduler_send_email_from_template($teacher, $student, $COURSE,
-                                                   'cancelledbystudent', 'cancelled', $vars, 'scheduler');
+                scheduler_messenger::send_slot_notification($slot, 'bookingnotification', 'cancelled',
+                                                            $student, $teacher, $teacher, $student, $COURSE);
             }
             \mod_scheduler\event\booking_removed::create_from_slot($slot)->trigger();
         }

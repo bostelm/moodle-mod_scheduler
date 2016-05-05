@@ -1,4 +1,5 @@
 <?php
+
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';
@@ -31,6 +32,11 @@ $string['event_bookingremoved'] = 'Scheduler booking removed';
 $string['event_appointmentlistviewed'] = 'Scheduler appointment list viewed';
 $string['event_slotadded'] = 'Scheduler slot added';
 $string['event_slotdeleted'] = 'Scheduler slot deleted';
+
+/* ***** Message types ***** */
+$string['messageprovider:invitation'] = 'Invitation to book a slot';
+$string['messageprovider:bookingnotification'] = 'Notification when a booking is made or cancelled';
+$string['messageprovider:reminder'] = 'Reminder of an upcoming appointment';
 
 /* ***** Interface strings ****** */
 
@@ -78,8 +84,6 @@ $string['bookwithteacher'] = 'Teacher';
 $string['break'] = 'Break between slots';
 $string['breaknotnegative'] = 'Length of the break must not be negative';
 $string['cancelbooking'] = 'Cancel booking';
-$string['cancelledbystudent'] = '{$a} : Appointment cancelled or moved by a student';
-$string['cancelledbyteacher'] = '{$a} : Appointment cancelled by the teacher';
 $string['canbooksingleappointment'] = 'You can book one appointment in this scheduler.';
 $string['canbook1appointment'] = 'You can book one more appointment in this scheduler.';
 $string['canbooknappointments'] = 'You can book {$a} more appointments in this scheduler.';
@@ -111,7 +115,6 @@ $string['contentformat_help'] = '<p>There are three basic choices for the export
     </dl>
     You can explore the effect of these options using the "Preview" button.</p>';
 $string['complete'] = 'Booked';
-$string['composeemail'] = 'Compose email:';
 $string['confirmdelete-all'] = 'This will delete <b>all</b> slots in this scheduler. Deletion cannot be undone. Continue anyway?';
 $string['confirmdelete-mine'] = 'This will delete all your slots in this scheduler. Deletion cannot be undone. Continue anyway?';
 $string['confirmdelete-myunused'] = 'This will delete all your unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
@@ -119,6 +122,7 @@ $string['confirmdelete-selected'] = 'This will delete the selected slots. Deleti
 $string['confirmdelete-one'] = 'Delete slot?';
 $string['confirmdelete-unused'] = 'This will delete all unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
 $string['conflictingslots'] = 'Conflicting';
+$string['copytomyself'] = 'Send a copy to myself';
 $string['course'] = 'Course';
 $string['createexport'] = 'Create export file';
 $string['csvformat'] = 'CSV';
@@ -219,8 +223,6 @@ $string['includeemptyslots'] = 'Include empty slots';
 $string['includeslotsfor'] = 'Include slots for';
 $string['incourse'] = ' in course ';
 $string['introduction'] = 'Introduction';
-$string['invitation'] = 'Invitation';
-$string['invitationtext'] = 'Please choose a time-slot for an appointment at ';
 $string['isnonexclusive'] = 'Non-exclusive';
 $string['landscape'] = 'Landscape';
 $string['lengthbreakdown'] = 'By slot duration';
@@ -236,6 +238,9 @@ $string['maxstudentlistsize_desc'] = 'The maximum length of the list of students
 $string['meangrade'] = 'Take the mean grade';
 $string['meetingwith'] = 'Meeting with your';
 $string['meetingwithplural'] = 'Meeting with your';
+$string['messagesent'] = 'Message sent to {$a} recipients';
+$string['messagesubject'] = 'Subject';
+$string['messagebody'] = 'Message body';
 $string['minutes'] = 'minutes';
 $string['minutesperslot'] = 'minutes per slot';
 $string['missingstudents'] = '{$a} students still need to make an appointment';
@@ -255,7 +260,6 @@ $string['name'] = 'Scheduler name';
 $string['needteachers'] = 'Slots cannot be added as this course has no teachers';
 $string['negativerange'] = 'Range is negative. This can\'t be.';
 $string['never'] = 'Never';
-$string['newappointment'] = '{$a} : New appointment';
 $string['noappointments'] = 'No appointments';
 $string['noexistingstudents'] = 'No students available for scheduling';
 $string['nogroups'] = 'No group available for scheduling.';
@@ -295,12 +299,9 @@ $string['pdforientation'] = 'PDF page orientation';
 $string['portrait'] = 'Portrait';
 $string['preview'] = 'Preview';
 $string['previewlimited'] = '(Preview is limited to {$a} rows.)';
+$string['recipients'] = 'Recipients';
 $string['registeredlbl'] = 'Student appointed';
 $string['reminder'] = 'Reminder';
-$string['remindertext'] = 'This is just a reminder that you have not yet set up your appointment. Please choose a time-slot as soon as possible at ';
-$string['remindtitle'] = '{$a}: Appointment reminder';
-$string['remindwhere'] = 'Location of the appointment: ';
-$string['remindwithwhom'] = 'Scheduled appointment with ';
 $string['resetslots'] = 'Delete scheduler slots';
 $string['resetappointments'] = 'Delete appointments and grades';
 $string['return'] = 'Back to course';
@@ -322,6 +323,9 @@ $string['scopemenu'] = 'Show slots in: {$a}';
 $string['scopemenuself'] = 'Show my slots in: {$a}';
 $string['seen'] = 'Seen';
 $string['selectedtoomany'] = 'You have selected too many slots. You can select no more than {$a}.';
+$string['sendmessage'] = 'Send message';
+$string['sendinvitation'] = 'Send invitation';
+$string['sendreminder'] = 'Send reminder';
 $string['sepcolon'] = 'Colon';
 $string['sepcomma'] = 'Comma';
 $string['sepsemicolon'] = 'Semicolon';
@@ -509,3 +513,9 @@ with the {$a->staffrole} <strong><a href="{$a->attendant_url}">{$a->attendant}</
 <p>in the scheduler "<em><a href="{$a->scheduler_url}">{$a->module}</a></em>" on the website: <strong><a href="{$a->site_url}">{$a->site}</a></strong></p>
 
 <p><strong><span class="error">has been cancelled</span></strong>. Please apply for a new slot.</p>';
+
+$string['email_invite_subject'] = 'Invitation: {$a->module}';
+$string['email_invite_html'] = '<p>Please choose a time slot for an appointment at:</p> <p>{$a->scheduler_url}</p>';
+
+$string['email_invitereminder_subject'] = 'Reminder: {$a->module}';
+$string['email_invitereminder_html'] = '<p>This is just a reminder that you have not yet set up your appointment. Please choose a time slot as soon as possible at:</p><p>{$a->scheduler_url}</p>';

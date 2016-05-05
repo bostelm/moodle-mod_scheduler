@@ -743,7 +743,7 @@ class scheduler_instance extends mvc_record_model {
      *            the routine will return the number of students rather than a list
      *            (this is for performance reasons).
      * @return int|array of moodle user records; or integer 0 if there are no students in the course;
-     *            or the number of students if there are too many students
+     *            or the number of students if there are too many students. Array keys are student ids.
      */
     public function get_students_for_scheduling($groups = '', $cutoff = 0) {
         $studs = $this->get_available_students($groups);
@@ -753,7 +753,7 @@ class scheduler_instance extends mvc_record_model {
         $schedstuds = array();
         foreach ($studs as $stud) {
             if ($this->count_bookable_appointments($stud->id, false) != 0) {
-                $schedstuds[] = $stud;
+                $schedstuds[$stud->id] = $stud;
             }
         }
         return $schedstuds;

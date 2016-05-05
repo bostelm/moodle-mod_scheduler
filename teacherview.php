@@ -379,6 +379,42 @@ if ($action == 'schedulegroup') {
     die();
 }
 
+/************************************ Send message to students ****************************************/
+if ($action == 'sendmessage') {
+    require_once($CFG->dirroot.'/mod/scheduler/message_form.php');
+
+    $template = optional_param('template', 'none', PARAM_ALPHA);
+    $recipientids = required_param('recipients', PARAM_SEQUENCE);
+
+    $actionurl = new moodle_url('/mod/scheduler/view.php',
+            array('what' => 'sendmessage', 'id' => $cm->id, 'subpage' => $subpage,
+                  'template' => $template, 'recipients' => $recipientids));
+    $returnurl = new moodle_url('/mod/scheduler/view.php',
+            array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage));
+
+    $templatedata = array();
+    if ($template != 'none') {
+        $vars = scheduler_messenger::get_scheduler_variables($scheduler, null, $USER, null, $COURSE, null);
+        $templatedata['subject'] = scheduler_messenger::compile_mail_template($template, 'subject', $vars);
+        $templatedata['body'] = scheduler_messenger::compile_mail_template($template, 'html', $vars);
+    }
+    $templatedata['recipients'] = $DB->get_records_list('user', 'id', explode(',', $recipientids), 'lastname,firstname');
+
+    $mform = new scheduler_message_form($actionurl, $scheduler, $templatedata);
+
+    if ($mform->is_cancelled()) {
+        redirect($returnurl);
+    } else if ($formdata = $mform->get_data()) {
+        scheduler_action_dosendmessage($scheduler, $formdata);
+    } else {
+        echo $output->heading(get_string('sendmessage', 'scheduler'));
+        $mform->display();
+        echo $output->footer();
+        die;
+    }
+}
+
+
 //****************** Standard view ***********************************************//
 
 // Clean all late slots (for everybody).
@@ -550,33 +586,16 @@ if ($students === 0) {
 
 } else if (count($students) > 0) {
 
-    $maillist = array();
-    foreach ($students as $student) {
-        $maillist[] = trim($student->email);
-    }
+    $studids = implode(',', array_keys($students));
 
-    $mailto = 'mailto:'.s(implode($maillist, ',%20'));
-
-    $subject = get_string('invitation', 'scheduler'). ': ' . $scheduler->name;
-    $body = $subject."\n\n";
-    $body .= get_string('invitationtext', 'scheduler');
-    $body .= "\n\n{$CFG->wwwroot}/mod/scheduler/view.php?id={$cm->id}";
-    $invitationurl = new moodle_url($mailto, array('subject' => $subject, 'body' => $body));
-
-    $subject = get_string('reminder', 'scheduler'). ': ' . $scheduler->name;
-    $body = $subject."\n\n";
-    $body .= get_string('remindertext', 'scheduler');
-    $body .= "\n\n{$CFG->wwwroot}/mod/scheduler/view.php?id={$cm->id}";
-    $reminderurl = new moodle_url($mailto, array('subject' => $subject, 'body' => $body));
+    $messageurl = new moodle_url($actionurl, array('what' => 'sendmessage', 'recipients' => $studids));
+    $invitationurl = new moodle_url($messageurl, array('template' => 'invite'));
+    $reminderurl = new moodle_url($messageurl, array('template' => 'invitereminder'));
 
     $maildisplay = '';
-    if (get_config('mod_scheduler', 'showemailplain')) {
-        $maildisplay .= html_writer::div(implode(', ', $maillist));
-    }
-    $maildisplay .= get_string('composeemail', 'scheduler').' ';
-    $maildisplay .= html_writer::link($invitationurl, get_string('invitation', 'scheduler'));
+    $maildisplay .= html_writer::link($invitationurl, get_string('sendinvitation', 'scheduler'));
     $maildisplay .= ' &mdash; ';
-    $maildisplay .= html_writer::link($reminderurl, get_string('reminder', 'scheduler'));
+    $maildisplay .= html_writer::link($reminderurl, get_string('sendreminder', 'scheduler'));
 
     echo $output->box_start('maildisplay');
     // Print number of students who still have to make an appointment.
