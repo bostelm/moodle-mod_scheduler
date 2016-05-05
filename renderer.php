@@ -568,7 +568,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $actions = '';
             if ($slot->editable) {
                 $url = new moodle_url($slotman->actionurl, array('what' => 'deleteslot', 'slotid' => $slot->slotid));
-				$confirmdelete = new confirm_action(get_string('deleteslotconfirm', 'scheduler'));
+				$confirmdelete = new confirm_action(get_string('confirmdelete-one', 'scheduler'));
                 $actions .= $this->action_icon($url, new pix_icon('t/delete', get_string('delete')), $confirmdelete);
 
                 $url = new moodle_url($slotman->actionurl, array('what' => 'updateslot', 'slotid' => $slot->slotid));

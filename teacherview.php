@@ -462,24 +462,24 @@ if ($slots) {
     $delselectedurl = new moodle_url($actionurl, array('what' => 'deleteslots'));
     $PAGE->requires->yui_module('moodle-mod_scheduler-delselected', 'M.mod_scheduler.delselected.init',
                                 array($delselectedurl->out(false)) );
-    $delselected = $commandbar->action_link($delselectedurl, 'deleteselection', 't/delete', 'confirmdelete', 'delselected');
+    $delselected = $commandbar->action_link($delselectedurl, 'deleteselection', 't/delete', 'confirmdelete-selected', 'delselected');
     $delselected->formid = 'delselected';
     $delbuttons[] = $delselected;
 
     if (has_capability('mod/scheduler:manageallappointments', $context) && $subpage == 'allappointments') {
         $delbuttons[] = $commandbar->action_link(
                         new moodle_url($actionurl, array('what' => 'deleteall')),
-                        'deleteallslots', 't/delete', 'confirmdelete');
+                        'deleteallslots', 't/delete', 'confirmdelete-all');
         $delbuttons[] = $commandbar->action_link(
                         new moodle_url($actionurl, array('what' => 'deleteallunused')),
-                        'deleteallunusedslots', 't/delete', 'confirmdelete');
+                        'deleteallunusedslots', 't/delete', 'confirmdelete-unused');
     }
     $delbuttons[] = $commandbar->action_link(
                     new moodle_url($actionurl, array('what' => 'deleteunused')),
-                    'deleteunusedslots', 't/delete', 'confirmdelete');
+                    'deleteunusedslots', 't/delete', 'confirmdelete-myunused');
     $delbuttons[] = $commandbar->action_link(
                     new moodle_url($actionurl, array('what' => 'deleteonlymine')),
-                    'deletemyslots', 't/delete', 'confirmdelete');
+                    'deletemyslots', 't/delete', 'confirmdelete-mine');
 
     $commandbar->add_group(get_string('deletecommands', 'scheduler'), $delbuttons);
 }
