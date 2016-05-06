@@ -1,4 +1,5 @@
-<?PHP
+<?php
+
 /**
  * Slot-related forms of the scheduler module
  * (using Moodle formslib)
@@ -22,7 +23,7 @@ abstract class scheduler_slotform_base extends moodleform {
     protected $cm;
     protected $context;
     protected $usergroups;
-    protected $has_duration = false;
+    protected $hasduration = false;
 
     public function __construct($action, scheduler_instance $scheduler, $cm, $usergroups, $customdata=null) {
         $this->scheduler = $scheduler;
@@ -95,16 +96,15 @@ abstract class scheduler_slotform_base extends moodleform {
 
     protected function add_duration_field($minuteslabel = 'minutes') {
         $this->add_minutes_field('duration', 'duration', $this->scheduler->defaultslotduration, $minuteslabel);
-        $this->has_duration = true;
+        $this->hasduration = true;
     }
-
 
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         // Check duration for valid range
-        if ($this->has_duration) {
-            $limits = array('min' => 1, 'max' => 24*60);
+        if ($this->hasduration) {
+            $limits = array('min' => 1, 'max' => 24 * 60);
             if ($data['duration'] < $limits['min'] || $data['duration'] > $limits['max']) {
                 $errors['durationgroup'] = get_string('durationrange', 'scheduler', $limits);
             }
@@ -315,32 +315,33 @@ class scheduler_addsession_form extends scheduler_slotform_base {
                             array('optional'  => true) );
 
         // Weekdays selection
+        $checkboxes = array();
         $weekdays = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday');
         foreach ($weekdays as $day) {
-            $label = ($day == 'monday') ? get_string('addondays', 'scheduler') : '';
-            $mform->addElement('advcheckbox', $day, $label, get_string($day, 'scheduler'));
+            $checkboxes[] = $mform->createElement('advcheckbox', $day, '', get_string($day, 'scheduler'));
             $mform->setDefault($day, true);
         }
-        $mform->addElement('advcheckbox', 'saturday', '', get_string('saturday', 'scheduler'));
-        $mform->addElement('advcheckbox', 'sunday', '', get_string('sunday', 'scheduler'));
+        $checkboxes[] = $mform->createElement('advcheckbox', 'saturday', '', get_string('saturday', 'scheduler'));
+        $checkboxes[] = $mform->createElement('advcheckbox', 'sunday', '', get_string('sunday', 'scheduler'));
+        $mform->addGroup($checkboxes, 'weekdays', get_string('addondays', 'scheduler'), null, false);
 
         // Start and end time
         $hours = array();
         $minutes = array();
-        for ($i=0; $i<=23; $i++) {
+        for ($i = 0; $i <= 23; $i++) {
             $hours[$i] = sprintf("%02d", $i);
         }
-        for ($i=0; $i<60; $i+=5) {
+        for ($i = 0; $i < 60; $i += 5) {
             $minutes[$i] = sprintf("%02d", $i);
         }
-        $starttimegroup = array();
-        $starttimegroup[] = $mform->createElement('select', 'starthour', get_string('hour', 'form'), $hours);
-        $starttimegroup[] = $mform->createElement('select', 'startminute', get_string('minute', 'form'), $minutes);
-        $mform->addGroup ($starttimegroup, 'starttime', get_string('starttime', 'scheduler'), null, false);
-        $endtimegroup = array();
-        $endtimegroup[] = $mform->createElement('select', 'endhour', get_string('hour', 'form'), $hours);
-        $endtimegroup[] = $mform->createElement('select', 'endminute', get_string('minute', 'form'), $minutes);
-        $mform->addGroup ($endtimegroup, 'endtime', get_string('endtime', 'scheduler'), null, false);
+        $timegroup = array();
+        $timegroup[] = $mform->createElement('static', 'timefrom', '', get_string('timefrom', 'scheduler'));
+        $timegroup[] = $mform->createElement('select', 'starthour', get_string('hour', 'form'), $hours);
+        $timegroup[] = $mform->createElement('select', 'startminute', get_string('minute', 'form'), $minutes);
+        $timegroup[] = $mform->createElement('static', 'timeto', '', get_string('timeto', 'scheduler'));
+        $timegroup[] = $mform->createElement('select', 'endhour', get_string('hour', 'form'), $hours);
+        $timegroup[] = $mform->createElement('select', 'endminute', get_string('minute', 'form'), $minutes);
+        $mform->addGroup($timegroup, 'timerange', get_string('timerange', 'scheduler'), null, false);
 
         // Divide into slots?
         $mform->addElement('selectyesno', 'divide', get_string('divide', 'scheduler'));
@@ -348,9 +349,11 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         // Duration of the slot
         $this->add_duration_field('minutesperslot');
+        $mform->disabledIf('duration', 'divide', 'eq', '0');
 
         // Break between slots
         $this->add_minutes_field('break', 'break', 0, 'minutes');
+        $mform->disabledIf('break', 'divide', 'eq', '0');
 
         // Force when overlap?
         $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
@@ -361,14 +364,14 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         // Display slot from date - relative
         $hideuntilsel = array();
-        $hideuntilsel[0] =  get_string('now', 'scheduler');
+        $hideuntilsel[0] = get_string('now', 'scheduler');
         $hideuntilsel[DAYSECS] = get_string('onedaybefore', 'scheduler');
         for ($i = 2; $i < 7; $i++) {
-            $hideuntilsel[DAYSECS*$i] = get_string('xdaysbefore', 'scheduler', $i);
+            $hideuntilsel[DAYSECS * $i] = get_string('xdaysbefore', 'scheduler', $i);
         }
         $hideuntilsel[WEEKSECS] = get_string('oneweekbefore', 'scheduler');
         for ($i = 2; $i < 7; $i++) {
-            $hideuntilsel[WEEKSECS*$i] = get_string('xweeksbefore', 'scheduler', $i);
+            $hideuntilsel[WEEKSECS * $i] = get_string('xweeksbefore', 'scheduler', $i);
         }
         $mform->addElement('select', 'hideuntilrel', get_string('displayfrom', 'scheduler'), $hideuntilsel);
         $mform->setDefault('hideuntilsel', 0);
@@ -383,7 +386,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         }
         $remindersel[WEEKSECS] = get_string('oneweekbefore', 'scheduler');
         for ($i = 2; $i < 7; $i++) {
-            $remindersel[WEEKSECS*$i] = get_string('xweeksbefore', 'scheduler', $i);
+            $remindersel[WEEKSECS * $i] = get_string('xweeksbefore', 'scheduler', $i);
         }
 
         $mform->addElement('select', 'emaildaterel', get_string('emailreminder', 'scheduler'), $remindersel);
@@ -396,7 +399,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Range is negative
+        // Range is negative.
         $fordays = 0;
         if ($data['rangeend'] > 0) {
             $fordays = ($data['rangeend'] - $data['rangestart']) / DAYSECS;
@@ -405,19 +408,19 @@ class scheduler_addsession_form extends scheduler_slotform_base {
             }
         }
 
-        // Time range is negative
-        $starttime = $data['starthour']*60+$data['startminute'];
-        $endtime = $data['endhour']*60+$data['endminute'];
-        if ($starttime > $endtime)  {
+        // Time range is negative.
+        $starttime = $data['starthour'] * 60 + $data['startminute'];
+        $endtime = $data['endhour'] * 60 + $data['endminute'];
+        if ($starttime > $endtime) {
             $errors['endtime'] = get_string('negativerange', 'scheduler');
         }
 
-        // First slot is in the past
+        // First slot is in the past.
         if ($data['rangestart'] < time() - DAYSECS) {
             $errors['rangestart'] = get_string('startpast', 'scheduler');
         }
 
-        // Break must be nonnegative
+        // Break must be nonnegative.
         if ($data['break'] < 0) {
             $errors['breakgroup'] = get_string('breaknotnegative', 'scheduler');
         }
