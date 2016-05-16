@@ -58,46 +58,6 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
     return $conflicting;
 }
 
-
-/**
- * checks if user has an appointment in this scheduler
- * @param object $userlist
- * @param object $scheduler
- * @param boolean $student, if true, is a student, a teacher otherwise
- * @param boolean $unattended, if true, only checks for unattended slots
- * @param string $otherthan giving a slotid, excludes this slot from the search
- * @uses $CFG
- * @uses $DB
- * @return the count of records
- */
-function scheduler_has_slot($userlist, &$scheduler, $student=true, $unattended = false, $otherthan = 0){
-    global $CFG, $DB;
-
-    $userlist = str_replace(',', "','", $userlist);
-
-    $unattendedClause = ($unattended) ? ' AND a.attended = 0 ' : '' ;
-    $otherthanClause = ($otherthan) ? " AND a.slotid != $otherthan " : '' ;
-
-    if ($student){
-        $sql = "
-            SELECT
-            COUNT(*)
-            FROM
-            {scheduler_slots} s,
-            {scheduler_appointment} a
-            WHERE
-            a.slotid = s.id AND
-            s.schedulerid = ? AND
-            a.studentid IN ('{$userlist}')
-            $unattendedClause
-            $otherthanClause
-            ";
-        return $DB->count_records_sql($sql, array($scheduler->id));
-    } else {
-        return $DB->count_records('scheduler_slots', array('teacherid' => $userlist, 'schedulerid' => $scheduler->id));
-    }
-}
-
 /**
  * returns an array of appointed user records for a certain slot.
  * @param int $slotid

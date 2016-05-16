@@ -659,8 +659,7 @@ if ($students === 0) {
                 if (empty($members)) {
                     continue;
                 }
-                // TODO refactor query
-                if (!scheduler_has_slot(implode(',', array_keys($members)), $scheduler, true, $scheduler->schedulermode == 'onetime')) {
+                if (!$scheduler->has_slots_booked_for_group($group->id, false, $scheduler->schedulermode == 'onetime')) {
 
                     $picture = print_group_picture($group, $course->id, false, true, true);
                     $name = $group->name;

@@ -430,6 +430,7 @@ class scheduler_instance extends mvc_record_model {
         return $cond;
     }
 
+
     public function get_slot($id) {
 
         global $DB;
@@ -533,6 +534,27 @@ class scheduler_instance extends mvc_record_model {
         $cnt = $this->count_slots($where, $params);
         return $cnt > 0;
     }
+
+    public function has_slots_booked_for_group($groupid, $mustbeattended = false, $mustbeunattended = false) {
+        global $DB;
+        $attendcond = '';
+        if ($mustbeattended) {
+            $attendcond .= " AND a.attended = 1";
+        }
+        if ($mustbeunattended) {
+            $attendcond .= " AND a.attended = 0";
+        }
+        $sql = "SELECT COUNT(*)
+                  FROM {scheduler_slots} s
+                  JOIN {scheduler_appointment} a ON a.slotid = s.id
+                  JOIN {groups_members} gm ON a.studentid = gm.userid
+                 WHERE s.schedulerid = :schedulerid
+                       AND gm.groupid = :groupid
+                       $attendcond";
+        $params = array('schedulerid' => $this->id, 'groupid' => $groupid);
+        return $DB->count_records_sql($sql, $params) > 0;
+    }
+
 
     /**
      * retrieves slots without any appointment made
