@@ -55,6 +55,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
       | moodle/site:accessallgroups | Prevent    | teacher | Course       | C1        |
+    And I add the upcoming events block globally
     And I log in as "edteacher1"
     And I follow "Course 1"
     And I add 5 slots 10 days ahead in "Test scheduler none" scheduler and I fill the form with:
@@ -77,7 +78,6 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I add 5 slots 12 days ahead in "Test scheduler separate" scheduler and I fill the form with:
       | Location  | There |
     And I log out
-    And I add the upcoming events block globally
     
   @javascript
   Scenario: Editing teachers can see all slots and all groups
