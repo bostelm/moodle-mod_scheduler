@@ -141,52 +141,6 @@ function scheduler_print_recent_activity($course, $isteacher, $timestart) {
     return false;
 }
 
-/**
- * Function to be run periodically according to the moodle
- * This function searches for things that need to be done, such
- * as sending out mail, toggling flags etc ...
- * @return boolean always true
- * @uses $CFG
- * @uses $DB
- */
-function scheduler_cron () {
-    global $CFG, $DB;
-
-    $date = make_timestamp(date('Y'), date('m'), date('d'), date('H'), date('i'));
-
-    // for every appointment in all schedulers
-    $select = 'emaildate > 0 AND emaildate <= ? AND starttime > ?';
-    $slots = $DB->get_records_select('scheduler_slots', $select, array($date, $date), 'starttime');
-
-    foreach ($slots as $slot) {
-        // get teacher
-        $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-
-        // get scheduler, slot and course
-        $scheduler = scheduler_instance::load_by_id($slot->schedulerid);
-        $slotm = $scheduler->get_slot($slot->id);
-        $course = $DB->get_record('course', array('id' => $scheduler->course));
-
-        // get appointed student list
-        $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id), '', 'id, studentid');
-
-        //if no email previously sent and one is required
-        foreach ($appointments as $appointment) {
-            $student = $DB->get_record('user', array('id'=>$appointment->studentid));
-            cron_setup_user($student, $course);
-            scheduler_messenger::send_slot_notification($slotm, 'reminder', 'reminder', $teacher, $student, $teacher, $student, $course);
-        }
-        // mark as sent
-        $slot->emaildate = -1;
-        $DB->update_record('scheduler_slots', $slot);
-    }
-
-    cron_setup_user();
-
-    return true;
-}
-
-
 
 /**
  * Returns the users with data in one scheduler

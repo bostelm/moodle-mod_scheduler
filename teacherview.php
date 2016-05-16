@@ -417,8 +417,6 @@ if ($action == 'sendmessage') {
 
 //****************** Standard view ***********************************************//
 
-// Clean all late slots (for everybody).
-$scheduler->free_late_unused_slots();
 
 // Trigger view event.
 \mod_scheduler\event\appointment_list_viewed::create_from_scheduler($scheduler)->trigger();

@@ -785,18 +785,21 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
-     * frees all empty slots that are in the past, hance no longer bookable
+     * Frees all empty slots that are in the past, hance no longer bookable.
+     * This applies to all schedulers in the system.
      * @uses $CFG
      * @uses $DB
      */
-    public function free_late_unused_slots() {
-        global $CFG, $DB;
+    public static function free_late_unused_slots() {
+        global $DB;
 
+        $sql = "SELECT DISTINCT s.id
+                           FROM {scheduler_slots} s
+                LEFT OUTER JOIN {scheduler_appointment} a ON s.id = a.slotid
+                          WHERE a.studentid IS NULL
+                            AND starttime < ?";
         $now = time();
-        $sql =  'SELECT DISTINCT s.id FROM {scheduler_slots} s '
-               .'LEFT JOIN {scheduler_appointment} a ON s.id = a.slotid '
-               .'WHERE a.studentid IS NULL AND s.schedulerid = ? AND starttime < ?';
-        $todelete = $DB->get_records_sql($sql, array($this->id, $now));
+        $todelete = $DB->get_records_sql($sql, array($now));
         if ($todelete) {
             list($usql, $params) = $DB->get_in_or_equal(array_keys($todelete));
             $DB->delete_records_select('scheduler_slots', " id $usql ", $params);

@@ -15,9 +15,6 @@ $appointgroup = optional_param('appointgroup', 0, PARAM_INT);
 
 \mod_scheduler\event\booking_form_viewed::create_from_scheduler($scheduler)->trigger();
 
-// Clean all late slots (for everybody).
-$scheduler->free_late_unused_slots();
-
 $PAGE->set_docs_path('mod/scheduler/studentview');
 
 $urlparas = array(
