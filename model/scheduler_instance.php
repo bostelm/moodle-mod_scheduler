@@ -3,9 +3,8 @@
 /**
  * A class for representing a scheduler instance.
  *
- * @package    mod
- * @subpackage scheduler
- * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -199,6 +198,22 @@ class scheduler_instance extends mvc_record_model {
             $lastlocation = '';
         }
         return $lastlocation;
+    }
+
+    /**
+     * Whether this scheduler uses "appointment notes" visible to teachers and students
+     * @return whether appointment notes are used
+     */
+    public function uses_appointmentnotes() {
+        return ($this->data->usenotes % 2 == 1);
+    }
+
+    /**
+     * Whether this scheduler uses "teacher notes" visible to teachers only
+     * @return whether appointment notes are used
+     */
+    public function uses_teachernotes() {
+        return (floor($this->data->usenotes / 2) % 2 == 1);
     }
 
     /**

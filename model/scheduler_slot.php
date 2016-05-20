@@ -46,16 +46,6 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
-     * Create a scheduler slot from an already loaded record
-     */
-    /*  public static function load_from_record(stdClass $record, scheduler_instance $scheduler) {
-     $slot = new scheduler_slot($scheduler);
-    $slot->data = $record;
-    return $slot;
-    }
-
-    */
-    /**
      * Save any changes to the database
      */
     public function save() {
@@ -65,7 +55,61 @@ class scheduler_slot extends mvc_child_record_model {
         $this->update_calendar();
     }
 
+    /**
+     * Sets appointment-related data (grade, comments) for all student in this slot.
+     *
+     *  @param scheduler_appointment $template appointment from which the data will be read
+     */
+    public function distribute_appointment_data(scheduler_appointment $template) {
+        $scheduler = $this->get_scheduler();
+        foreach ($this->appointments->get_children() as $appointment) {
+            if ($appointment->id != $template->id) {
+                if ($scheduler->uses_grades()) {
+                    $appointment->grade = $template->grade;
+                }
+                if ($scheduler->uses_appointmentnotes()) {
+                    $appointment->appointmentnote = $template->appointmentnote;
+                    $appointment->appointmentnoteformat = $template->appointmentnoteformat;
+                    $this->distribute_file_area('appointmentnote', $template->id, $appointment->id);
+                }
+                if ($scheduler->uses_teachernotes()) {
+                    $appointment->teachernote = $template->teachernote;
+                    $appointment->teachernoteformat = $template->teachernoteformat;
+                    $this->distribute_file_area('teachernote', $template->id, $appointment->id);
+                }
+                $appointment->save();
+            }
+        }
+    }
 
+    private function distribute_file_area($area, $sourceid, $targetid) {
+
+        if ($sourceid == $targetid) {
+            return;
+        }
+
+        $fs = get_file_storage();
+        $component = 'mod_scheduler';
+        $ctxid = $this->get_scheduler()->context->id;
+
+        // Delete old files in the target area.
+        $files = $fs->get_area_files($ctxid, $component, $area, $targetid);
+        foreach ($files as $f) {
+            $f->delete();
+        }
+
+        // Copy files from the source to the target.
+        $files = $fs->get_area_files($ctxid, $component, $area, $sourceid);
+        foreach ($files as $f) {
+            $fs->create_file_from_storedfile(array('itemid' => $targetid), $f);
+        }
+    }
+
+    /**
+     * Retrieve the scheduler associated with this appointment.
+     *
+     * @return the scheduler
+     */
     public function get_scheduler() {
         return $this->get_parent();
     }

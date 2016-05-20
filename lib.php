@@ -473,3 +473,193 @@ function scheduler_grade_item_delete($scheduler) {
     return grade_update('mod/scheduler', $scheduler->courseid, 'mod', 'scheduler', $scheduler->id, 0, null, array('deleted' => 1));
 }
 
+
+/*
+ * File API
+ */
+
+/**
+ * Lists all browsable file areas
+ *
+ * @package  mod_scheduler
+ * @category files
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @return array
+ */
+function scheduler_get_file_areas($course, $cm, $context) {
+    return array(
+            'slotnote' => get_string('areaslotnote', 'scheduler'),
+            'appointmentnote' => get_string('areaappointmentnote', 'scheduler'),
+            'teachernote' => get_string('areateachernote', 'scheduler')
+    );
+}
+
+/**
+ * File browsing support for scheduler module.
+ *
+ * @param file_browser $browser
+ * @param array $areas
+ * @param stdClass $course
+ * @param cm_info $cm
+ * @param context $context
+ * @param string $filearea
+ * @param int $itemid
+ * @param string $filepath
+ * @param string $filename
+ * @return file_info_stored file_info_stored instance or null if not found
+ */
+function scheduler_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+    global $CFG, $DB, $USER;
+
+    // Note: 'intro' area is handled in file_browser automatically.
+
+    if (!has_any_capability(array('mod/scheduler:appoint', 'mod/scheduler:attend'), $context)) {
+        return null;
+    }
+
+    require_once(dirname(__FILE__).'/locallib.php');
+
+    $validareas = array_keys(scheduler_get_file_areas($course, $cm, $context));
+    if (!in_array($filearea, $validareas)) {
+        return null;
+    }
+
+    if (is_null($itemid)) {
+        return new scheduler_file_info($browser, $course, $cm, $context, $areas, $filearea);
+    }
+
+    try {
+        $scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
+
+        if ($filearea === 'slotnote') {
+            $slot = $scheduler->get_slot($itemid);
+
+            $cansee = true;
+            $canwrite = $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $name = get_string('slot', 'scheduler'). ' '.$itemid;
+
+        } else if ($filearea === 'appointmentnote') {
+            if (!$scheduler->uses_appointmentnotes()) {
+                return null;
+            }
+            list($slot, $app) = $scheduler->get_slot_appointment($itemid);
+            $cansee = $USER->id == $app->studentid || $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $canwrite = $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $name = get_string('appointment', 'scheduler'). ' '.$itemid;
+
+        } else if ($filearea === 'teachernote') {
+            if (!$scheduler->uses_teachernotes()) {
+                return null;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($itemid);
+            $cansee = $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $canwrite = $cansee;
+            $name = get_string('appointment', 'scheduler'). ' '.$itemid;
+        }
+
+        $fs = get_file_storage();
+        $filepath = is_null($filepath) ? '/' : $filepath;
+        $filename = is_null($filename) ? '.' : $filename;
+        if (!$storedfile = $fs->get_file($context->id, 'mod_scheduler', $filearea, $itemid, $filepath, $filename)) {
+            return null;
+        }
+
+        $urlbase = $CFG->wwwroot.'/pluginfile.php';
+        return new file_info_stored($browser, $context, $storedfile, $urlbase, $name, true, true, $canwrite, false);
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
+ * Serves the files embedded in various notes fields
+ *
+ * @package  mod_scheduler
+ * @category files
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClsss $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - justsend the file
+ */
+function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $CFG, $DB;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    require_course_login($course, true, $cm);
+    if (!has_any_capability(array('mod/scheduler:appoint', 'mod/scheduler:attend'), $context)) {
+        return false;
+    }
+
+    try {
+        $scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
+
+        $entryid = (int)array_shift($args);
+        $relativepath = implode('/', $args);
+
+        if ($filearea === 'slotnote') {
+            if (!$scheduler->get_slot($entryid)) {
+                return false;
+            }
+            // No further access control required - everyone can see slots notes.
+
+        } else if ($filearea === 'appointmentnote') {
+            if (!$scheduler->uses_appointmentnotes()) {
+                return false;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($entryid);
+            if (!$app) {
+                return false;
+            }
+
+            if (!($USER->id == $app->studentid || $USER->id == $slot->teacherid)) {
+                require_capability('mod/scheduler:manageallappointments', $context);
+            }
+
+        } else if ($filearea === 'teachernote') {
+            if (!$scheduler->uses_teachernotes()) {
+                return false;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($entryid);
+            if (!$app) {
+                return false;
+            }
+
+            if (!($USER->id == $slot->teacherid)) {
+                require_capability('mod/scheduler:manageallappointments', $context);
+            }
+
+        } else {
+            // Unknown file area.
+            return false;
+        }
+    } catch (Exception $e) {
+        // Typically, records that are not found in the database.
+        return false;
+    }
+
+    $fullpath = "/$context->id/mod_scheduler/$filearea/$entryid/$relativepath";
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, $forcedownload, $options);
+}
+

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Library for export functions
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/excellib.class.php');
@@ -13,11 +21,11 @@ require_once($CFG->dirroot.'/lib/pdflib.php');
  */
 abstract class scheduler_export_field {
 
-	protected $renderer;
+    protected $renderer;
 
-	public function set_renderer(mod_scheduler_renderer $renderer) {
-	    $this->renderer = $renderer;
-	}
+    public function set_renderer(mod_scheduler_renderer $renderer) {
+        $this->renderer = $renderer;
+    }
 
     /**
      * Is the field available in this scheduler?
@@ -118,7 +126,8 @@ function scheduler_get_export_fields() {
 
     $result[] = new scheduler_attended_field();
     $result[] = new scheduler_grade_field();
-    $result[] = new scheduler_appointmentnotes_field();
+    $result[] = new scheduler_appointmentnote_field();
+    $result[] = new scheduler_teachernote_field();
 
     return $result;
 }
@@ -356,10 +365,10 @@ class scheduler_slotnotes_field extends scheduler_export_field {
 /**
  * Export field: Appointment notes
  */
-class scheduler_appointmentnotes_field extends scheduler_export_field {
+class scheduler_appointmentnote_field extends scheduler_export_field {
 
     public function get_id() {
-        return 'appointmentnotes';
+        return 'appointmentnote';
     }
 
     public function get_group() {
@@ -374,11 +383,49 @@ class scheduler_appointmentnotes_field extends scheduler_export_field {
         return true;
     }
 
+    public function is_available(scheduler_instance $scheduler) {
+        return $scheduler->uses_appointmentnotes();
+    }
+
     public function get_value(scheduler_slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
         return strip_tags($appointment->appointmentnote);
+    }
+
+}
+
+/**
+ * Export field: Teacher notes
+ */
+class scheduler_teachernote_field extends scheduler_export_field {
+
+    public function get_id() {
+        return 'teachernote';
+    }
+
+    public function get_group() {
+        return 'appointment';
+    }
+
+    public function get_typical_width(scheduler_instance $scheduler) {
+        return 30;
+    }
+
+    public function is_wrapping() {
+        return true;
+    }
+
+    public function is_available(scheduler_instance $scheduler) {
+        return $scheduler->uses_teachernotes();
+    }
+
+    public function get_value(scheduler_slot $slot, $appointment) {
+        if (! $appointment instanceof scheduler_appointment) {
+            return '';
+        }
+        return strip_tags($appointment->teachernote);
     }
 
 }
@@ -650,7 +697,7 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
                 }
             }
         }
-        return $maxcol+1;
+        return $maxcol + 1;
     }
 
     protected function get_row_count($page) {
@@ -660,7 +707,7 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
                 $maxrow = $rownum;
             }
         }
-        return $maxrow+1;
+        return $maxrow + 1;
     }
 
     protected function compute_relative_widths($page) {
@@ -1047,7 +1094,7 @@ class scheduler_export {
         }
         $str = implode(' - ', $strs);
         $this->canvas->write_string($row, 0, $str, $this->canvas->format_boldit);
-        $this->canvas->merge_cells($row, 0, $cols-1);
+        $this->canvas->merge_cells($row, 0, $cols - 1);
     }
 
 }

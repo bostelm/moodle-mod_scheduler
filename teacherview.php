@@ -3,97 +3,12 @@
 /**
  * Contains various sub-screens that a teacher can see.
  *
- * @package    mod
- * @subpackage scheduler
- * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
-function scheduler_prepare_formdata(scheduler_slot $slot) {
-
-    $data = $slot->get_data();
-    $data->exclusivityenable = ($data->exclusivity > 0);
-
-    $data->notes = array();
-    $data->notes['text'] = $slot->notes;
-    $data->notes['format'] = $slot->notesformat;
-    if ($slot->emaildate < 0) {
-        $data->emaildate = 0;
-    }
-
-    $i = 0;
-    foreach ($slot->get_appointments() as $appointment) {
-        $data->studentid[$i] = $appointment->studentid;
-        $data->attended[$i] = $appointment->attended;
-        $data->appointmentnote[$i]['text'] = $appointment->appointmentnote;
-        $data->appointmentnote[$i]['format'] = $appointment->appointmentnoteformat;
-        $data->grade[$i] = $appointment->grade;
-        $i++;
-    }
-    return $data;
-}
-
-function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid, $data) {
-
-    global $DB;
-
-    if ($slotid) {
-        $slot = scheduler_slot::load_by_id($slotid, $scheduler);
-    } else {
-        $slot = new scheduler_slot($scheduler);
-    }
-
-    // Set data fields from input form.
-    $slot->starttime = $data->starttime;
-    $slot->duration = $data->duration;
-    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
-    $slot->teacherid = $data->teacherid;
-    $slot->notes = $data->notes['text'];
-    $slot->notesformat = $data->notes['format'];
-    $slot->appointmentlocation = $data->appointmentlocation;
-    $slot->hideuntil = $data->hideuntil;
-    $slot->emaildate = $data->emaildate;
-    $slot->timemodified = time();
-
-    $currentapps = $slot->get_appointments();
-    $processedstuds = array();
-    for ($i = 0; $i < $data->appointment_repeats; $i++) {
-        if ($data->studentid[$i] > 0) {
-            $app = null;
-            foreach ($currentapps as $currentapp) {
-                if ($currentapp->studentid == $data->studentid[$i]) {
-                    $app = $currentapp;
-                    $processedstuds[] = $currentapp->studentid;
-                }
-            }
-            if ($app == null) {
-                $app = $slot->create_appointment();
-                $app->studentid = $data->studentid[$i];
-            }
-            $app->attended = isset($data->attended[$i]);
-            $app->appointmentnote = $data->appointmentnote[$i]['text'];
-            $app->appointmentnoteformat = $data->appointmentnote[$i]['format'];
-            if (isset($data->grade)) {
-                $selgrade = $data->grade[$i];
-                $app->grade = ($selgrade >= 0) ? $selgrade : null;
-            }
-        }
-    }
-    foreach ($currentapps as $currentapp) {
-        if (!in_array($currentapp->studentid, $processedstuds)) {
-            $slot->remove_appointment($currentapp);
-        }
-    }
-
-    $slot->save();
-
-    $slot = $scheduler->get_slot($slot->id);
-
-    return $slot;
-}
-
 
 function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
     global $output;
@@ -205,7 +120,7 @@ if ($action == 'addslot') {
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } else if ($formdata = $mform->get_data()) {
-        $slot = scheduler_save_slotform ($scheduler, $course, 0, $formdata);
+        $slot = $mform->save_slot(0, $formdata);
         \mod_scheduler\event\slot_added::create_from_slot($slot)->trigger();
         echo $output->action_message(get_string('oneslotadded', 'scheduler'));
     } else {
@@ -220,7 +135,6 @@ if ($action == 'updateslot') {
 
     $slotid = required_param('slotid', PARAM_INT);
     $slot = $scheduler->get_slot($slotid);
-    $data = scheduler_prepare_formdata($slot);
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid, 'subpage' => $subpage, 'offset' => $offset));
@@ -228,12 +142,13 @@ if ($action == 'updateslot') {
                     array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
 
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array('slotid' => $slotid));
+    $data = $mform->prepare_formdata($slot);
     $mform->set_data($data);
 
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } else if ($formdata = $mform->get_data()) {
-        scheduler_save_slotform ($scheduler, $course, $slotid, $formdata);
+        $mform->save_slot($slotid, $formdata);
         echo $output->action_message(get_string('slotupdated', 'scheduler'));
     } else {
         echo $output->heading(get_string('updatesingleslot', 'scheduler'));
@@ -273,20 +188,18 @@ if ($action == 'addsession') {
 if ($action == 'schedule') {
     if ($subaction == 'dochooseslot') {
         $slotid = required_param('slotid', PARAM_INT);
+        $slot = $scheduler->get_slot($slotid);
         $studentid = required_param('studentid', PARAM_INT);
 
         $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid));
         $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id));
 
-        $data = scheduler_prepare_formdata($scheduler->get_slot($slotid));
-        $i = 0;
-        while (isset($data->studentid[$i])) {
-            $i++;
-        }
-        $data->studentid[$i] = $studentid;
-        $i++;
 
-        $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array('slotid' => $slotid, 'repeats' => $i));
+        $repeats = $slot->get_appointment_count() + 1;
+        $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee,
+                                             array('slotid' => $slotid, 'repeats' => $repeats));
+        $data = $mform->prepare_formdata($slot);
+        $data->studentid[] = $studentid;
         $mform->set_data($data);
 
         echo $output->heading(get_string('updatesingleslot', 'scheduler'), 2);
@@ -328,22 +241,18 @@ if ($action == 'schedulegroup') {
 
         $slotid = required_param('slotid', PARAM_INT);
         $groupid = required_param('groupid', PARAM_INT);
+        $slot = $scheduler->get_slot($slotid);
 
         $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid));
         $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id));
 
-        $data = scheduler_prepare_formdata($scheduler->get_slot($slotid));
-        $i = 0;
-        while (isset($data->studentid[$i])) {
-            $i++;
-        }
-        foreach ($members as $member) {
-            $data->studentid[$i] = $member->id;
-            $i++;
-        }
-
+        $repeats = $slot->get_appointment_count() + count($members);
         $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee,
-                        array('slotid' => $slotid, 'repeats' => $i));
+                                             array('slotid' => $slotid, 'repeats' => $repeats));
+        $data = $mform->prepare_formdata($slot);
+        foreach ($members as $member) {
+            $data->studentid[] = $member->id;
+        }
         $mform->set_data($data);
 
         echo $output->heading(get_string('updatesingleslot', 'scheduler'), 3);

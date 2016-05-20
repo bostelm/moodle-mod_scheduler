@@ -76,7 +76,7 @@ class mod_scheduler_generator extends testing_module_generator {
                 $slot->appointmentlocation = 'Test Loc';
                 $slot->timemodified = time();
                 $slot->notes = '';
-                $slot->appointmentnote = '';
+                $slot->slotnote = '';
                 $slot->exclusivity = 0;
                 $slot->emaildate = 0;
                 $slot->hideuntil = 0;
@@ -91,6 +91,7 @@ class mod_scheduler_generator extends testing_module_generator {
                         $appointment->attended = isset($options['slotattended'][$slotkey]) && $options['slotattended'][$slotkey];
                         $appointment->grade = 0;
                         $appointment->appointmentnote = '';
+                        $appointment->teachernote = '';
                         $appointment->timecreated = time();
                         $appointment->timemodified = time();
                         $appointmentid = $DB->insert_record('scheduler_appointment', $appointment);

@@ -35,6 +35,7 @@ class scheduler_appointment extends mvc_child_record_model {
         $this->data->slotid = $slot->get_id();
         $this->data->attended = 0;
         $this->data->appointmentnoteformat = FORMAT_HTML;
+        $this->data->teachernoteformat = FORMAT_HTML;
     }
 
     public function save() {
@@ -49,6 +50,10 @@ class scheduler_appointment extends mvc_child_record_model {
         parent::delete();
         $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $studid);
+    }
+
+    public function get_slot() {
+        return $this->get_parent();
     }
 
     public function get_scheduler() {

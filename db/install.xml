@@ -21,6 +21,7 @@
         <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="gradingstrategy" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="bookingrouping" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="-1" SEQUENCE="false" COMMENT="Groups can be scheduled from this grouping, -1 if none, 0 if all"/>
+        <FIELD NAME="usenotes" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Which types of notes to show for appointments"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -40,7 +41,6 @@
         <FIELD NAME="notes" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="notesformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="exclusivity" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="appointmentnote" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="emaildate" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="hideuntil" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -58,8 +58,10 @@
         <FIELD NAME="studentid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="attended" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="appointmentnote" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="appointmentnote" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Notes visible to teacher and student"/>
         <FIELD NAME="appointmentnoteformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="teachernote" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Notes visible to teacher only"/>
+        <FIELD NAME="teachernoteformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>

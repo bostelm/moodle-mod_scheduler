@@ -3,9 +3,8 @@
 /**
  * This file contains a renderer for the scheduler module
  *
- * @package    mod
- * @subpackage scheduler
- * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -125,10 +124,10 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             } else {
                 // Grade on scale.
                 if ($grade > 0) {
-                	$levels = $this->get_scale_levels(-$scaleid);
-                	if (array_key_exists($grade, $levels)) {
-                    	$result .= $levels[$grade];
-                	}
+                    $levels = $this->get_scale_levels(-$scaleid);
+                    if (array_key_exists($grade, $levels)) {
+                        $result .= $levels[$grade];
+                    }
                 }
             }
             if ($short && (strlen($result) > 0)) {
@@ -167,6 +166,25 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         } else {
             return get_string('meangrade', 'scheduler');
         }
+    }
+
+    public function format_notes($content, $format, $context, $area, $itemid) {
+        $text = file_rewrite_pluginfile_urls($content, 'pluginfile.php', $context->id, 'mod_scheduler', $area, $itemid);
+        return format_text($text, $format);
+    }
+
+    public function format_appointment_notes(scheduler_instance $scheduler, $data, $idfield = 'id') {
+        $note = '';
+        $id = $data->{$idfield};
+        if ($scheduler->uses_appointmentnotes()) {
+            $note .= $this->format_notes($data->appointmentnote, $data->appointmentnoteformat, $scheduler->get_context(),
+                                         'appointmentnote', $id);
+        }
+        if ($scheduler->uses_teachernotes()) {
+            $note .= $this->format_notes($data->teachernote, $data->teachernoteformat, $scheduler->get_context(),
+                                         'teachernote', $id);
+        }
+        return $note;
     }
 
     public function user_profile_link(scheduler_instance $scheduler, stdClass $user) {
@@ -294,17 +312,18 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
             $studentnotes1 = '';
             $studentnotes2 = '';
-            $textoptions = array('context' => $slottable->scheduler->context);
-            if ($slot->slotnotes != '') {
+            if ($slot->slotnote != '') {
                 $studentnotes1 = html_writer::tag('strong', get_string('yourslotnotes', 'scheduler'));
                 $studentnotes1 .= html_writer::empty_tag('br');
-                $studentnotes1 .= format_text($slot->slotnotes, $slot->slotnotesformat, $textoptions);
+                $studentnotes1 .= $this->format_notes($slot->slotnote, $slot->slotnoteformat,
+                                                      $slottable->scheduler->get_context(), 'slotnote', $slot->slotid);
                 $studentnotes1 = html_writer::div($studentnotes1, 'slotnotes');
             }
-            if ($slot->appointmentnotes != '') {
+            if (isset($slot->appointmentnote) && $slot->appointmentnote != '') {
                 $studentnotes2 = html_writer::tag('strong', get_string('yourappointmentnote', 'scheduler'));
                 $studentnotes2 .= html_writer::empty_tag('br');
-                $studentnotes2 .= format_text($slot->appointmentnotes, $slot->appointmentnotesformat, $textoptions);
+                $studentnotes2 .= $this->format_notes($slot->appointmentnote, $slot->appointmentnoteformat,
+                                                      $slottable->scheduler->get_context(), 'appointmentnote', $slot->appointmentid);
                 $studentnotes2 = html_writer::div($studentnotes2, 'appointmentnotes');
             }
             $studentnotes = $studentnotes1.$studentnotes2;
@@ -460,8 +479,8 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
             $rowdata[] = format_string($slot->location);
 
-            $textoptions = array('context' => $booker->scheduler->context);
-            $rowdata[] = format_text($slot->notes, $slot->notesformat, $textoptions);
+            $rowdata[] = $this->format_notes($slot->notes, $slot->notesformat, $booker->scheduler->get_context(),
+                                             'slotnote', $slot->slotid);
 
             $rowdata[] = $this->user_profile_link($booker->scheduler, $slot->teacher);
 
@@ -568,7 +587,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $actions = '';
             if ($slot->editable) {
                 $url = new moodle_url($slotman->actionurl, array('what' => 'deleteslot', 'slotid' => $slot->slotid));
-				$confirmdelete = new confirm_action(get_string('confirmdelete-one', 'scheduler'));
+                $confirmdelete = new confirm_action(get_string('confirmdelete-one', 'scheduler'));
                 $actions .= $this->action_icon($url, new pix_icon('t/delete', get_string('delete')), $confirmdelete);
 
                 $url = new moodle_url($slotman->actionurl, array('what' => 'updateslot', 'slotid' => $slot->slotid));

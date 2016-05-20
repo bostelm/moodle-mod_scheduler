@@ -28,12 +28,14 @@ class scheduler_slot_table implements renderable {
         $slot->endtime = $slotmodel->endtime;
         $slot->attended = $appointmentmodel->attended;
         $slot->location = $slotmodel->appointmentlocation;
-        $slot->slotnotes = $slotmodel->notes;
-        $slot->slotnotesformat = $slotmodel->notesformat;
+        $slot->slotnote = $slotmodel->notes;
+        $slot->slotnoteformat = $slotmodel->notesformat;
         $slot->teacher = $slotmodel->get_teacher();
         $slot->appointmentid = $appointmentmodel->id;
-        $slot->appointmentnotes = $appointmentmodel->appointmentnote;
-        $slot->appointmentnotesformat = $appointmentmodel->appointmentnoteformat;
+        if ($this->scheduler->uses_appointmentnotes()) {
+            $slot->appointmentnote = $appointmentmodel->appointmentnote;
+            $slot->appointmentnoteformat = $appointmentmodel->appointmentnoteformat;
+        }
         $slot->otherstudents = $otherstudents;
         $slot->cancancel = $cancancel;
         if ($this->showgrades) {

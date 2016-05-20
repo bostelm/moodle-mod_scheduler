@@ -293,6 +293,8 @@ switch ($action) {
         $appointment->attended = 1;
         $appointment->appointmentnote = '';
         $appointment->appointmentnoteformat = FORMAT_HTML;
+        $appointment->teachernote = '';
+        $appointment->teachernoteformat = FORMAT_HTML;
         $appointment->timecreated = time();
         $appointment->timemodified = time();
         $DB->insert_record('scheduler_appointment', $appointment);

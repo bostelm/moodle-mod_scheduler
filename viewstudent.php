@@ -3,9 +3,8 @@
 /**
  * Prints the screen that displays a single student to a teacher.
  *
- * @package    mod
- * @subpackage scheduler
- * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,6 +30,8 @@ a.studentid,
 a.attended,
 a.appointmentnote,
 a.appointmentnoteformat,
+a.teachernote,
+a.teachernoteformat,
 a.grade,
 a.timemodified as apptimemodified
 FROM
@@ -103,16 +104,7 @@ if ($subpage == 'thisappointment') {
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } else if ($formdata = $mform->get_data()) {
-        $data = $mform->extract_appointment_data($formdata);
-        if ($distribute && isset($formdata->distribute)) {
-            foreach ($slot->get_appointments() as $otherapp) {
-                $otherapp->set_data($data);
-            }
-            $slot->save();
-        } else {
-            $appointment->set_data($data);
-            $appointment->save();
-        }
+        $mform->save_appointment_data($formdata, $appointment);
         redirect($returnurl);
     } else {
         $mform->display();
@@ -140,7 +132,7 @@ if ($subpage == 'thisappointment') {
         $iconhelp = $otherslot->attended ? 'seen' : 'notseen';
         $attendedpix = $output->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
 
-        $appnote = format_text($otherslot->appointmentnote, $otherslot->appointmentnoteformat);
+        $appnote = $output->format_appointment_notes($scheduler, $otherslot, 'appid');
         $appnote .= "<br/><span class=\"timelabel\">[".userdate($otherslot->apptimemodified)."]</span>";
         $grade = $output->format_grade($scheduler, $otherslot->grade);
         $teacher = $DB->get_record('user', array('id' => $otherslot->teacherid));
@@ -171,7 +163,7 @@ if ($subpage == 'thisappointment') {
         $iconid = $otherappointment->attended ? 'ticked' : 'unticked';
         $iconhelp = $otherappointment->attended ? 'seen' : 'notseen';
         $icon = $OUTPUT->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
-        $note = format_text($otherappointment->appointmentnote, $otherappointment->appointmentnoteformat);
+        $note = $output->format_appointment_notes($scheduler, $otherappointment);
         if ($note) {
             $note .= '<br/><span class="timelabel">['.userdate($otherappointment->timemodified).']</span>';
         }

@@ -86,6 +86,7 @@ class mod_scheduler_model_testcase extends advanced_testcase {
         $app0->attended = 0;
         $app0->grade = 0;
         $app0->appointmentnote = 'testnote';
+        $app0->teachernote = 'confidentialtestnote';
         $app0->timecreated = time();
         $app0->timemodified = time();
 

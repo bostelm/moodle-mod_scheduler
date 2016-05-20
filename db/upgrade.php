@@ -7,19 +7,19 @@ function scheduler_migrate_config_setting($name) {
 }
 
 function scheduler_migrate_groupmode($sid) {
-	global $DB;
-	$globalenable = (bool) get_config('mod_scheduler', 'groupscheduling');
-	$cm = get_coursemodule_from_instance('scheduler', $sid, 0, false, IGNORE_MISSING);
-	if ($cm) {
-		if ((groups_get_activity_groupmode($cm) > 0) && $globalenable) {
-			$g = $cm->groupingid;
-		} else {
-			$g = -1;
-		}
-		$DB->set_field('scheduler', 'bookingrouping', $g, array('id' => $sid));
-		$DB->set_field('course_modules', 'groupmode', 0, array('id' => $cm->id));
-		$DB->set_field('course_modules', 'groupingid', 0, array('id' => $cm->id));
-	}
+    global $DB;
+    $globalenable = (bool) get_config('mod_scheduler', 'groupscheduling');
+    $cm = get_coursemodule_from_instance('scheduler', $sid, 0, false, IGNORE_MISSING);
+    if ($cm) {
+        if ((groups_get_activity_groupmode($cm) > 0) && $globalenable) {
+            $g = $cm->groupingid;
+        } else {
+            $g = -1;
+        }
+        $DB->set_field('scheduler', 'bookingrouping', $g, array('id' => $sid));
+        $DB->set_field('course_modules', 'groupmode', 0, array('id' => $cm->id));
+        $DB->set_field('course_modules', 'groupingid', 0, array('id' => $cm->id));
+    }
 }
 
 function xmldb_scheduler_upgrade($oldversion=0) {
@@ -111,7 +111,6 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         $table = new xmldb_table('scheduler');
         $field = new xmldb_field('maxbookings', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'schedulermode');
 
-
         // Conditionally launch add field maxbookings.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -179,11 +178,11 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
     if ($oldversion < 2015050400) {
 
-		// Migrate config settings to config_plugins table.
-		scheduler_migrate_config_setting('allteachersgrading');
-		scheduler_migrate_config_setting('showemailplain');
-		scheduler_migrate_config_setting('groupscheduling');
-		scheduler_migrate_config_setting('maxstudentlistsize');
+        // Migrate config settings to config_plugins table.
+        scheduler_migrate_config_setting('allteachersgrading');
+        scheduler_migrate_config_setting('showemailplain');
+        scheduler_migrate_config_setting('groupscheduling');
+        scheduler_migrate_config_setting('maxstudentlistsize');
 
         // Savepoint reached.
         upgrade_mod_savepoint(true, 2015050400, 'scheduler');
@@ -208,6 +207,39 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
         // Scheduler savepoint reached.
         upgrade_mod_savepoint(true, 2015062601, 'scheduler');
+    }
+
+    /* ******************* 3.1 upgrade line ********************** */
+
+    if ($oldversion < 2016051700) {
+
+        // Add configuration field "usenotes" to scheduler table.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('usenotes', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1', 'bookingrouping');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add field "teachernote" (note visible to teachers only) and corresponding format field to scheduler_appointment.
+        $table = new xmldb_table('scheduler_appointment');
+        $field1 = new xmldb_field('teachernote', XMLDB_TYPE_TEXT, null, null, null, null, null, 'appointmentnoteformat');
+        if (!$dbman->field_exists($table, $field1)) {
+            $dbman->add_field($table, $field1);
+        }
+        $field2 = new xmldb_field('teachernoteformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'teachernote');
+        if (!$dbman->field_exists($table, $field2)) {
+            $dbman->add_field($table, $field2);
+        }
+
+        // Drop old unused field "appointmentnote" from scheduler_slots table.
+        $table = new xmldb_table('scheduler_slots');
+        $field = new xmldb_field('appointmentnote');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2016051700, 'scheduler');
     }
     return true;
 }

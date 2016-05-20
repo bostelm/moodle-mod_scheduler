@@ -80,8 +80,8 @@ class mod_scheduler_mod_form extends moodleform_mod {
                 $selopt[$grouping->id] = get_string('yesingrouping', 'scheduler', $grouping->name);
             }
             $mform->addElement('select', 'bookingrouping', get_string('groupbookings', 'scheduler'), $selopt);
-	        $mform->addHelpButton('bookingrouping', 'groupbookings', 'scheduler');
-	        $mform->setDefault('bookingrouping', '-1');
+            $mform->addHelpButton('bookingrouping', 'groupbookings', 'scheduler');
+            $mform->setDefault('bookingrouping', '-1');
         }
 
         $mform->addElement('duration', 'guardtime', get_string('guardtime', 'scheduler'), array('optional' => true));
@@ -94,6 +94,13 @@ class mod_scheduler_mod_form extends moodleform_mod {
 
         $mform->addElement('selectyesno', 'allownotifications', get_string('notifications', 'scheduler'));
         $mform->addHelpButton('allownotifications', 'notifications', 'scheduler');
+
+        $noteoptions['0'] = get_string('usenotesnone', 'scheduler');
+        $noteoptions['1'] = get_string('usenotesstudent', 'scheduler');
+        $noteoptions['2'] = get_string('usenotesteacher', 'scheduler');
+        $noteoptions['3'] = get_string('usenotesboth', 'scheduler');
+        $mform->addElement('select', 'usenotes', get_string('usenotes', 'scheduler'), $noteoptions);
+        $mform->setDefault('usenotes', '1');
 
         // -------------------------------------------------------------------------------
         // Grade settings.
