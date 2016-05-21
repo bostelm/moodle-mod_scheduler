@@ -3,8 +3,7 @@
 /**
  * A class for representing a scheduler appointment.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -20,7 +19,7 @@ require_once('modellib.php');
  *
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 class scheduler_appointment extends mvc_child_record_model {
 
 

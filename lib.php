@@ -3,8 +3,7 @@
 /**
  * Library (public API) of the scheduler module
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -109,7 +108,7 @@ function scheduler_delete_instance($id) {
  * @return object an information object as defined above
  */
 function scheduler_user_outline($course, $user, $mod, $scheduler) {
-    $return = NULL;
+    $return = null;
     return $return;
 }
 
@@ -141,61 +140,6 @@ function scheduler_print_recent_activity($course, $isteacher, $timestart) {
     return false;
 }
 
-
-/**
- * Returns the users with data in one scheduler
- * (users with records in journal_entries, students and teachers)
- * @param int $schedulerid the id of the activity module
- * @uses $CFG
- * @uses $DB
- */
-function scheduler_get_participants($schedulerid) {
-    global $CFG, $DB;
-
-    //Get students using slots they have
-    $sql = '
-        SELECT DISTINCT
-        u.*
-        FROM
-        {user} u,
-        {scheduler_slots} s,
-        {scheduler_appointment} a
-        WHERE
-        s.schedulerid = ? AND
-        s.id = a.slotid AND
-        u.id = a.studentid
-        ';
-    $students = $DB->get_records_sql($sql, array($schedulerid));
-
-    //Get teachers using slots they have
-    $sql = '
-        SELECT DISTINCT
-        u.*
-        FROM
-        {user} u,
-        {scheduler_slots} s
-        WHERE
-        s.schedulerid = ? AND
-        u.id = s.teacherid
-        ';
-    $teachers = $DB->get_records_sql($sql, array($schedulerid));
-
-    if ($students and $teachers){
-        $participants = array_merge(array_values($students), array_values($teachers));
-    }
-    elseif ($students) {
-        $participants = array_values($students);
-    }
-    elseif ($teachers){
-        $participants = array_values($teachers);
-    }
-    else{
-        $participants = array();
-    }
-
-    //Return students array (it contains an array of unique users)
-    return ($participants);
-}
 
 /**
  * This function returns if a scale is being used by one newmodule
@@ -255,7 +199,7 @@ function scheduler_reset_course_form_definition(&$mform) {
 
     $mform->addElement('header', 'schedulerheader', get_string('modulenameplural', 'scheduler'));
 
-    if($DB->record_exists('scheduler', array('course'=>$COURSE->id))){
+    if ($DB->record_exists('scheduler', array('course' => $COURSE->id))) {
 
         $mform->addElement('checkbox', 'reset_scheduler_slots', get_string('resetslots', 'scheduler'));
         $mform->addElement('checkbox', 'reset_scheduler_appointments', get_string('resetappointments', 'scheduler'));
@@ -267,7 +211,7 @@ function scheduler_reset_course_form_definition(&$mform) {
  * Default values for the reset form
  */
 function scheduler_reset_course_form_defaults($course) {
-    return array('reset_scheduler_slots'=>1, 'reset_scheduler_appointments'=>1);
+    return array('reset_scheduler_slots' => 1, 'reset_scheduler_appointments' => 1);
 }
 
 
@@ -288,7 +232,7 @@ function scheduler_reset_userdata($data) {
         '(SELECT sc.id FROM {scheduler} sc '.
         ' WHERE sc.course = :course)';
 
-    $params = array('course'=>$data->courseid);
+    $params = array('course' => $data->courseid);
 
     $strreset = get_string('reset');
 
@@ -297,11 +241,11 @@ function scheduler_reset_userdata($data) {
         $slots = $DB->get_recordset_sql('SELECT * '.$sqlfromslots, $params);
         $success = true;
         foreach ($slots as $slot) {
-            // delete calendar events
+            // Delete calendar events.
             $success = $success && scheduler_delete_calendar_events($slot);
 
-            // delete appointments
-            $success = $success && $DB->delete_records('scheduler_appointment', array('slotid'=>$slot->id));
+            // Delete appointments.
+            $success = $success && $DB->delete_records('scheduler_appointment', array('slotid' => $slot->id));
         }
         $slots->close();
 
@@ -311,11 +255,15 @@ function scheduler_reset_userdata($data) {
             scheduler_grade_item_update($scheduler, 'reset');
         }
 
-        $status[] = array('component' => $componentstr, 'item' => get_string('resetappointments','scheduler'), 'error' => !$success);
+        $status[] = array(
+                        'component' => $componentstr,
+                        'item' => get_string('resetappointments', 'scheduler'),
+                        'error' => !$success
+                    );
     }
     if (!empty($data->reset_scheduler_slots)) {
         if ($DB->execute('DELETE '.$sqlfromslots, $params)) {
-            $status[] = array('component' => $componentstr, 'item' => get_string('resetslots','scheduler'), 'error' => false);
+            $status[] = array('component' => $componentstr, 'item' => get_string('resetslots', 'scheduler'), 'error' => false);
         }
     }
     return $status;

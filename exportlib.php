@@ -462,10 +462,10 @@ class scheduler_grade_field extends scheduler_export_field {
 abstract class scheduler_canvas {
 
 
-    public $format_header;
-    public $format_bold;
-    public $format_boldit;
-    public $format_wrap;
+    public $formatheader;
+    public $formatbold;
+    public $formatboldit;
+    public $formatwrap;
 
     /**
      * Start a new page (tab, etc.) with an optional title.
@@ -553,16 +553,16 @@ class scheduler_excel_canvas extends scheduler_canvas {
         $this->workbook = new MoodleExcelWorkbook("-");
 
         // Set up formats.
-        $this->format_header = $this->workbook->add_format();
-        $this->format_bold = $this->workbook->add_format();
-        $this->format_bold = $this->workbook->add_format();
-        $this->format_boldit = $this->workbook->add_format();
-        $this->format_wrap = $this->workbook->add_format();
-        $this->format_header->set_bold();
-        $this->format_bold->set_bold();
-        $this->format_boldit->set_bold();
-        $this->format_boldit->set_italic();
-        $this->format_wrap->set_text_wrap();
+        $this->formatheader = $this->workbook->add_format();
+        $this->formatbold = $this->workbook->add_format();
+        $this->formatbold = $this->workbook->add_format();
+        $this->formatboldit = $this->workbook->add_format();
+        $this->formatwrap = $this->workbook->add_format();
+        $this->formatheader->set_bold();
+        $this->formatbold->set_bold();
+        $this->formatboldit->set_bold();
+        $this->formatboldit->set_italic();
+        $this->formatwrap->set_text_wrap();
 
     }
 
@@ -618,15 +618,15 @@ class scheduler_ods_canvas extends scheduler_canvas {
         $this->workbook = new MoodleODSWorkbook("-");
 
         // Set up formats.
-        $this->format_header = $this->workbook->add_format();
-        $this->format_bold = $this->workbook->add_format();
-        $this->format_boldit = $this->workbook->add_format();
-        $this->format_wrap = $this->workbook->add_format();
-        $this->format_header->set_bold();
-        $this->format_bold->set_bold();
-        $this->format_boldit->set_bold();
-        $this->format_boldit->set_italic();
-        $this->format_wrap->set_text_wrap();
+        $this->formatheader = $this->workbook->add_format();
+        $this->formatbold = $this->workbook->add_format();
+        $this->formatboldit = $this->workbook->add_format();
+        $this->formatwrap = $this->workbook->add_format();
+        $this->formatheader->set_bold();
+        $this->formatbold->set_bold();
+        $this->formatboldit->set_bold();
+        $this->formatboldit->set_italic();
+        $this->formatwrap->set_text_wrap();
 
     }
 
@@ -679,10 +679,10 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
 
     public function __construct() {
 
-        $this->format_header = 'header';
-        $this->format_bold = 'bold';
-        $this->format_boldit = 'boldit';
-        $this->format_wrap = 'wrap';
+        $this->formatheader = 'header';
+        $this->formatbold = 'bold';
+        $this->formatboldit = 'boldit';
+        $this->formatwrap = 'wrap';
 
         $this->start_page('');
 
@@ -1025,7 +1025,7 @@ class scheduler_export {
         foreach ($fields as $field) {
             if ($field->get_group() != 'slot' || $mode != 'appointmentsgrouped') {
                 $header = $field->get_header($scheduler);
-                $this->canvas->write_string($row, $col, $header, $this->canvas->format_header);
+                $this->canvas->write_string($row, $col, $header, $this->canvas->formatheader);
                 $this->canvas->set_column_width($col, $field->get_typical_width($scheduler));
                 $col++;
             }
@@ -1074,7 +1074,7 @@ class scheduler_export {
                 } else {
                     $value = $field->get_value($slot, $appointment);
                 }
-                $format = $field->is_wrapping() ? $this->canvas->format_wrap : null;
+                $format = $field->is_wrapping() ? $this->canvas->formatwrap : null;
                 $this->canvas->write_string($row, $col, $value, $format);
                 $col++;
             }
@@ -1093,7 +1093,7 @@ class scheduler_export {
             }
         }
         $str = implode(' - ', $strs);
-        $this->canvas->write_string($row, 0, $str, $this->canvas->format_boldit);
+        $this->canvas->write_string($row, 0, $str, $this->canvas->formatboldit);
         $this->canvas->merge_cells($row, 0, $cols - 1);
     }
 

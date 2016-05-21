@@ -16,11 +16,16 @@ if (!has_capability('mod/scheduler:manage', $context)) {
     require_capability('mod/scheduler:manageallappointments', $context);
 }
 
-echo $output->header();
-
 $appointmentid = required_param('appointmentid', PARAM_INT);
 list($slot, $appointment) = $scheduler->get_slot_appointment($appointmentid);
 $studentid = $appointment->studentid;
+
+$urlparas = array('what' => 'viewstudent',
+    'id' => $scheduler->cmid,
+    'appointmentid' => $appointmentid,
+    'course' => $scheduler->courseid);
+$taburl = new moodle_url('/mod/scheduler/view.php', $urlparas);
+$PAGE->set_url($taburl);
 
 $sql = "
 SELECT
@@ -47,6 +52,8 @@ starttime ASC
 
 $slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid));
 
+echo $output->header();
+
 scheduler_print_user($DB->get_record('user', array('id' => $appointment->studentid)), $course);
 
 $params = array(
@@ -60,11 +67,6 @@ echo html_writer::tag('p', get_string('appointmentsummary', 'scheduler', $params
 // Print tabs.
 $tabrows = array();
 $row  = array();
-$urlparas = array('what' => 'viewstudent',
-                  'id' => $scheduler->cmid,
-                  'appointmentid' => $appointmentid,
-                  'course' => $scheduler->courseid);
-$taburl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 
 $pages = array('thisappointment');
 if ($slot->get_appointment_count() > 1) {

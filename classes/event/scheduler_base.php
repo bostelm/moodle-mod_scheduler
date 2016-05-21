@@ -1,13 +1,12 @@
 <?php
+
 /**
  * Base class for scheduler events.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 namespace mod_scheduler\event;
 
@@ -16,8 +15,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_scheduler abstract base event class.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

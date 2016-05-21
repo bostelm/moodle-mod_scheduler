@@ -3,8 +3,7 @@
 /**
  * Shows a sortable list of appointments
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2015 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,6 +38,8 @@ if (!has_capability('mod/scheduler:canseeotherteachersbooking', $scopecontext)) 
 $taburl = new moodle_url('/mod/scheduler/view.php',
                 array('id' => $scheduler->cmid, 'what' => 'datelist', 'scope' => $scope, 'teacherid' => $teacherid));
 $returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid));
+
+$PAGE->set_url($taburl);
 
 echo $output->header();
 

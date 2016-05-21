@@ -4,8 +4,7 @@
  * Main file of the scheduler package.
  * It lists all the instances of scheduler in a particular course.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -13,7 +12,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // Course id.
 $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 $PAGE->set_url('/mod/scheduler/index.php', array('id' => $id));

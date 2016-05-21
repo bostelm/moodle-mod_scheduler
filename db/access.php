@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Scheduler module capability definition
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  */
 
 $capabilities = array(

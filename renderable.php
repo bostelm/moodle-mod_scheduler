@@ -3,8 +3,7 @@
 /**
  * This file contains the definition for the renderable classes for the assignment
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -21,7 +20,8 @@ class scheduler_slot_table implements renderable {
     public $showactions;
     public $actionurl;
 
-    public function add_slot(scheduler_slot $slotmodel, scheduler_appointment $appointmentmodel, $otherstudents, $cancancel = false) {
+    public function add_slot(scheduler_slot $slotmodel, scheduler_appointment $appointmentmodel,
+                             $otherstudents, $cancancel = false) {
         $slot = new stdClass();
         $slot->slotid = $slotmodel->id;
         $slot->starttime = $slotmodel->starttime;

@@ -3,8 +3,7 @@
 /**
  * General library for the scheduler module.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,33 +24,35 @@ require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
  * @param int $endtime end of time slot as a timestamp
  * @param int $teacher if not null, the id of the teacher constraint, 0 otherwise standas for "all teachers"
  * @param int $others selects where to search for conflicts, [SCHEDULER_SELF, SCHEDULER_OTHERS, SCHEDULER_ALL]
- * @param boolean $careexclusive if false, conflict will consider all slots wether exlusive or not. Use it for testing if user is appointed in the given scope.
+ * @param boolean $careexclusive if false, conflict will consider all slots wether exlusive or not. 
+ *              Use it for testing if user is appointed in the given scope.
  * @uses $CFG
  * @uses $DB
  * @return array array of conflicting slots
  */
-function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0, $student=0, $others=SCHEDULER_SELF, $careexclusive=true) {
+function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0, $student=0,
+                                 $others = SCHEDULER_SELF, $careexclusive = true) {
     global $CFG, $DB;
 
     switch ($others){
         case SCHEDULER_SELF:
-            $schedulerScope = "s.schedulerid = {$schedulerid} AND ";
+            $schedulerscope = "s.schedulerid = {$schedulerid} AND ";
             break;
         case SCHEDULER_OTHERS:
-            $schedulerScope = "s.schedulerid != {$schedulerid} AND ";
+            $schedulerscope = "s.schedulerid != {$schedulerid} AND ";
             break;
         default:
-            $schedulerScope = '';
+            $schedulerscope = '';
     }
-    $teacherScope = ($teacher != 0) ? "s.teacherid = {$teacher} AND " : '' ;
-    $studentJoin = ($student != 0) ? "JOIN {scheduler_appointment} a ON a.slotid = s.id AND a.studentid = {$student} " : '' ;
-    $exclusiveClause = ($careexclusive) ? "exclusivity != 0 AND " : '' ;
-    $timeClause = "( (s.starttime <= {$starttime} AND s.starttime + s.duration * 60 > {$starttime}) OR ".
+    $teachescope = ($teacher != 0) ? "s.teacherid = {$teacher} AND " : '';
+    $studentjoin = ($student != 0) ? "JOIN {scheduler_appointment} a ON a.slotid = s.id AND a.studentid = {$student} " : '';
+    $exclusiveclause = ($careexclusive) ? "exclusivity != 0 AND " : '';
+    $timeclause = "( (s.starttime <= {$starttime} AND s.starttime + s.duration * 60 > {$starttime}) OR ".
         "  (s.starttime < {$endtime} AND s.starttime + s.duration * 60 >= {$endtime}) OR ".
         "  (s.starttime >= {$starttime} AND s.starttime + s.duration * 60 <= {$endtime}) ) ";
 
-    $sql = 'SELECT s.* from {scheduler_slots} s '.$studentJoin.' WHERE '.
-        $schedulerScope.$teacherScope.$exclusiveClause.$timeClause;
+    $sql = 'SELECT s.* from {scheduler_slots} s '.$studentjoin.' WHERE '.
+        $schedulerscope.$teachescope.$exclusiveclause.$timeclause;
 
     $conflicting = $DB->get_records_sql($sql);
 
@@ -65,7 +66,7 @@ function scheduler_get_conflicts($schedulerid, $starttime, $endtime, $teacher=0,
  * @uses $DB
  * @return an array of users
  */
-function scheduler_get_appointed($slotid){
+function scheduler_get_appointed($slotid) {
     global $CFG, $DB;
 
     $sql = "
@@ -82,7 +83,7 @@ function scheduler_get_appointed($slotid){
 }
 
 
-/// Events related functions
+/* Events related functions */
 
 /**
  * Will delete calendar events for a given scheduler slot, and not complain if the record does not exist.
@@ -96,16 +97,18 @@ function scheduler_delete_calendar_events($slot) {
 
     $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
 
-    if (!$scheduler) return false ;
+    if (!$scheduler) {
+        return false;
+    }
 
-    $teacherEventType = "SSsup:{$slot->id}:{$scheduler->course}";
-    $studentEventType = "SSstu:{$slot->id}:{$scheduler->course}";
+    $teachereventtype = "SSsup:{$slot->id}:{$scheduler->course}";
+    $studenteventtype = "SSstu:{$slot->id}:{$scheduler->course}";
 
-    $teacherDeletionSuccess = $DB->delete_records('event', array('eventtype'=>$teacherEventType));
-    $studentDeletionSuccess = $DB->delete_records('event', array('eventtype'=>$studentEventType));
+    $teacherdeletionsuccess = $DB->delete_records('event', array('eventtype' => $teachereventtype));
+    $studentdeletionsuccess = $DB->delete_records('event', array('eventtype' => $studenteventtype));
 
-    return ($teacherDeletionSuccess && $studentDeletionSuccess);
-    //this return may not be meaningful if the delete records functions do not return anything meaningful.
+    return ($teacherdeletionsuccess && $studentdeletionsuccess);
+    // This return may not be meaningful if the delete records functions do not return anything meaningful.
 }
 
 
@@ -136,7 +139,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $usercontext = context_user::instance($user->id);
     }
 
-    if (empty($string)) {     // Cache all the strings for the rest of the page
+    if (empty($string)) {     // Cache all the strings for the rest of the page.
 
         $string = new stdClass();
         $string->email       = get_string('email');
@@ -162,7 +165,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
 
     }
 
-    /// Get the hidden field list
+    // Get the hidden field list.
     if (has_capability('moodle/course:viewhiddenuserfields', $context)) {
         $hiddenfields = array();
     } else {
@@ -172,7 +175,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
     $output .= '<table class="userinfobox">';
     $output .= '<tr>';
     $output .= '<td class="left side">';
-    $output .= $OUTPUT->user_picture($user, array('size'=>100));
+    $output .= $OUTPUT->user_picture($user, array('size' => 100));
     $output .= '</td>';
     $output .= '<td class="content">';
     $output .= '<div class="username">'.fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</div>';
@@ -186,7 +189,6 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $output .= $field->title . ': ' . $field->value . '<br />';
     }
 
-
     if (!isset($hiddenfields['lastaccess'])) {
         if ($user->lastaccess) {
             $output .= $string->lastaccess .': '. userdate($user->lastaccess);
@@ -196,17 +198,21 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         }
     }
     $output .= '</div></td><td class="links">';
-    //link to blogs
+    // Link to blogs.
     if ($CFG->bloglevel > 0) {
-        $output .= '<a href="'.$CFG->wwwroot.'/blog/index.php?userid='.$user->id.'">'.get_string('blogs','blog').'</a><br />';
+        $output .= '<a href="'.$CFG->wwwroot.'/blog/index.php?userid='.$user->id.'">'.get_string('blogs', 'blog').'</a><br />';
     }
-    //link to notes
-    if (!empty($CFG->enablenotes) and (has_capability('moodle/notes:manage', $context) || has_capability('moodle/notes:view', $context))) {
-        $output .= '<a href="'.$CFG->wwwroot.'/notes/index.php?course=' . $course->id. '&amp;user='.$user->id.'">'.get_string('notes','notes').'</a><br />';
+    // Link to notes.
+    if (!empty($CFG->enablenotes) and (has_capability('moodle/notes:manage', $context)
+            || has_capability('moodle/notes:view', $context))) {
+        $output .= '<a href="'.$CFG->wwwroot.'/notes/index.php?course=' . $course->id. '&amp;user='.$user->id.'">'.
+                    get_string('notes', 'notes').'</a><br />';
     }
 
-    if (has_capability('moodle/site:viewreports', $context) or has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
-        $output .= '<a href="'. $CFG->wwwroot .'/course/user.php?id='. $course->id .'&amp;user='. $user->id .'">'. $string->activity .'</a><br />';
+    if (has_capability('moodle/site:viewreports', $context) or
+            has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
+        $output .= '<a href="'. $CFG->wwwroot .'/course/user.php?id='. $course->id .'&amp;user='. $user->id .'">'.
+                    $string->activity .'</a><br />';
     }
     $output .= '<a href="'. $CFG->wwwroot .'/user/profile.php?id='. $user->id .'">'. $string->fullprofile .'...</a>';
 

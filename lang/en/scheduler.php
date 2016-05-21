@@ -411,19 +411,19 @@ $string['yourtotalgrade'] = 'Your total grade in this activity is <strong>{$a}</
 
 /* ***********  Help strings from here on ************ */
 
-$string['forcewhenoverlap_help']='
+$string['forcewhenoverlap_help'] = '
 <h3>Forcing slot creation when slots overlap</h3>
 <p>This setting determines how new slots will be handled if they overlap with other, already existing slots.</p>
 <p>If enabled, the overlapping existing slot will be deleted and the new slot created.</p>
 <p>If disabled, the overlapping existing slot will be kept and a new slot will <em>not</em> be created.</p>
 ';
 
-$string['addscheduled_help']='
+$string['addscheduled_help'] = '
 <h3>Adding an appointment on slot setup</h3>
 <p>Using this link, you will add a user to the appointment list defined by this slot information. It may be a simple and fast way to setup a collective appointment. </p>';
 
 $string['appointmentmode'] = 'Setting the appointment mode';
-$string['appointmentmode_help']='<p>You may choose here some variants in the way appointments can be taken. </p>
+$string['appointmentmode_help'] = '<p>You may choose here some variants in the way appointments can be taken. </p>
 <p><ul>
 <li><strong>"<emph>n</emph> appointments in this scheduler":</strong> The student can only book a fixed number of appointments in this activity. Even if the teacher marks them as "seen", they will not be allowed to book further meetings. The only way to reset ability of a student to book is to delete the old "seen" records.</li>
 <li><strong>"<emph>n</emph> appointments at a time":</strong> The student can book a fixed number of appointments. Once the meeting is over and the teacher has marked the student as "seen", the student can book further appointments. However the student is limited to <emph>n</emph> "open" (unseen) slots at any given time.
@@ -433,22 +433,22 @@ $string['appointmentmode_help']='<p>You may choose here some variants in the way
 
 $string['appointagroup_help'] = 'Choose whether you want to make the appointment only for yourself, or for an entire group.';
 
-$string['bookwithteacher_help']='Choose a teacher for the appointment.';
+$string['bookwithteacher_help'] = 'Choose a teacher for the appointment.';
 
-$string['choosingslotstart_help']='Change (or choose) the appointment start time. If this appointment collides with some other slots, you\'ll be asked
+$string['choosingslotstart_help'] = 'Change (or choose) the appointment start time. If this appointment collides with some other slots, you\'ll be asked
 if this slot replaces all conflicting appointments. Note that the new slot parameters will override all previous
 settings.';
 
-$string['exclusivity_help']='<p>You can set a limit on the number of students that can apply for a given slot. </p>
+$string['exclusivity_help'] = '<p>You can set a limit on the number of students that can apply for a given slot. </p>
 <p>Setting a limit of 1 (default) will mean that the slot is exclusive to a single student.</p>
 <p>Setting a limit of, e.g., 3  will mean that up to three students can book into the slot.</p>
 <p>If disabled, any number of students can book the slot; it will never be considered "full".</p>';
 
-$string['location_help']='Specify the scheduled location of the meeting.';
+$string['location_help'] = 'Specify the scheduled location of the meeting.';
 
-$string['notifications_help']='When this option is enabled, teachers and students will receive notifications when appointments are applied for or cancelled.';
+$string['notifications_help'] = 'When this option is enabled, teachers and students will receive notifications when appointments are applied for or cancelled.';
 
-$string['staffrolename_help']='
+$string['staffrolename_help'] = '
 The label for the role who attends students. This is not necessarily a "teacher".';
 
 $string['guardtime_help'] = 'A guard time prevents students from changing their booking shortly before the appointment.

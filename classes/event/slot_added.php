@@ -1,17 +1,17 @@
 <?php
+
 /**
  * The mod_scheduler slot added event.
  *
  * Indicates that a teacher has added a slot.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_scheduler\event;
+
 defined('MOODLE_INTERNAL') || die();
 
 class slot_added extends slot_base {

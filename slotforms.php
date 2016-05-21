@@ -4,8 +4,7 @@
  * Slot-related forms of the scheduler module
  * (using Moodle formslib)
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2013 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,7 +42,7 @@ abstract class scheduler_slotform_base extends moodleform {
 
         $mform = $this->_form;
 
-        // exclusivity
+        // Exclusivity.
         $exclgroup = array();
 
         $exclgroup[] = $mform->createElement('text', 'exclusivity', '', array('size' => '10'));
@@ -57,14 +56,14 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->addGroup($exclgroup, 'exclusivitygroup', get_string('maxstudentsperslot', 'scheduler'), ' ', false);
         $mform->addHelpButton('exclusivitygroup', 'exclusivity', 'scheduler');
 
-        // location of the appointment
+        // Location of the appointment.
         $mform->addElement('text', 'appointmentlocation', get_string('location', 'scheduler'), array('size' => '30'));
         $mform->setType('appointmentlocation', PARAM_TEXT);
         $mform->addRule('appointmentlocation', get_string('error'), 'maxlength', 255);
         $mform->setDefault('appointmentlocation', $this->scheduler->get_last_location($USER));
         $mform->addHelpButton('appointmentlocation', 'location', 'scheduler');
 
-        // Choose the teacher (if allowed)
+        // Choose the teacher (if allowed).
         if (has_capability('mod/scheduler:canscheduletootherteachers', $this->context)) {
             $teachername = s($this->scheduler->get_teacher_name());
             $teachers = $this->scheduler->get_available_teachers();
@@ -106,7 +105,7 @@ abstract class scheduler_slotform_base extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Check duration for valid range
+        // Check duration for valid range.
         if ($this->hasduration) {
             $limits = array('min' => 1, 'max' => 24 * 60);
             if ($data['duration'] < $limits['min'] || $data['duration'] > $limits['max']) {
@@ -133,10 +132,6 @@ class scheduler_editslot_form extends scheduler_slotform_base {
             $this->slotid = $this->_customdata['slotid'];
         }
 
-        $noteoptions = array('trusttext' => true, 'maxfiles' => -1, 'maxbytes' => 0,
-                'context' => $this->scheduler->get_context(),
-                'subdirs' => false, 'collapsed' => true);
-
         // Start date/time of the slot.
         $mform->addElement('date_time_selector', 'starttime', get_string('date', 'scheduler'));
         $mform->setDefault('starttime', time());
@@ -158,11 +153,13 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $mform->setDefault('hideuntil', time());
 
         // Send e-mail reminder?
-        $mform->addElement('date_selector', 'emaildate', get_string('emailreminderondate', 'scheduler'), array('optional'  => true));
+        $mform->addElement('date_selector', 'emaildate', get_string('emailreminderondate', 'scheduler'),
+                            array('optional'  => true));
         $mform->setDefault('remindersel', -1);
 
         // Slot comments.
-        $mform->addElement('editor', 'notes_editor', get_string('comments', 'scheduler'), array('rows' => 3, 'columns' => 60), $noteoptions);
+        $mform->addElement('editor', 'notes_editor', get_string('comments', 'scheduler'),
+                           array('rows' => 3, 'columns' => 60), $this->noteoptions);
         $mform->setType('notes', PARAM_RAW); // Must be PARAM_RAW for rich text editor content.
 
         // Appointments.
@@ -171,7 +168,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $grouparray = array();
         $repeatarray[] = $mform->createElement('header', 'appointhead', get_string('appointmentno', 'scheduler', '{no}'));
 
-        // Choose student
+        // Choose student.
         $students = $this->scheduler->get_available_students($this->usergroups);
         $studentsmenu = array('0' => get_string('choosedots'));
         if ($students) {
@@ -181,11 +178,11 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         }
         $grouparray[] = $mform->createElement('select', 'studentid', '', $studentsmenu);
 
-        // Seen tickbox
+        // Seen tickbox.
         $grouparray[] = $mform->createElement('static', 'attendedlabel', '', get_string('seen', 'scheduler'));
         $grouparray[] = $mform->createElement('checkbox', 'attended');
 
-        // Grade
+        // Grade.
         if ($this->scheduler->scale != 0) {
             $gradechoices = $output->grading_choices($this->scheduler);
             $grouparray[] = $mform->createElement('static', 'attendedlabel', '', get_string('grade', 'scheduler'));
@@ -198,11 +195,11 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         if ($this->scheduler->uses_appointmentnotes()) {
             $repeatarray[] = $mform->createElement('editor', 'appointmentnote_editor', get_string('appointmentnote', 'scheduler'),
-                                                   array('rows' => 3, 'columns' => 60), $noteoptions);
+                                                   array('rows' => 3, 'columns' => 60), $this->noteoptions);
         }
         if ($this->scheduler->uses_teachernotes()) {
             $repeatarray[] = $mform->createElement('editor', 'teachernote_editor', get_string('teachernote', 'scheduler'),
-                                                   array('rows' => 3, 'columns' => 60), $noteoptions);
+                                                   array('rows' => 3, 'columns' => 60), $this->noteoptions);
         }
 
         if (isset($this->_customdata['repeats'])) {
@@ -232,7 +229,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Check number of appointments vs exclusivity
+        // Check number of appointments vs exclusivity.
         $numappointments = 0;
         for ($i = 0; $i < $data['appointment_repeats']; $i++) {
             if ($data['studentid'][$i] > 0) {
@@ -245,12 +242,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
             $errors['exclusivitygroup'] = get_string('exclusivityoverload', 'scheduler', $numappointments);
         }
 
-        // Avoid empty slots starting in the past
+        // Avoid empty slots starting in the past.
         if ($numappointments == 0 && $data['starttime'] < time()) {
             $errors['starttime'] = get_string('startpast', 'scheduler');
         }
 
-        // Check whether students have been selected several times
+        // Check whether students have been selected several times.
         for ($i = 0; $i < $data['appointment_repeats']; $i++) {
             for ($j = 0; $j < $i; $j++) {
                 if ($data['studentid'][$i] > 0 && $data['studentid'][$i] == $data['studentid'][$j]) {
@@ -261,22 +258,24 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         }
 
         if (!isset($data['ignoreconflicts'])) {
-            // Avoid overlapping slots, by asking the user if they'd like to overwrite the existing ones...
-            // for other scheduler, we check independently of exclusivity. Any slot here conflicts
-            // for this scheduler, we check against exclusivity. Any complete slot here conflicts
-            $conflicts_remote = scheduler_get_conflicts($this->scheduler->id,
-                            $data['starttime'], $data['starttime'] + $data['duration'] * 60, $data['teacherid'], 0, SCHEDULER_OTHERS, false);
-            $conflicts_local = scheduler_get_conflicts($this->scheduler->id,
-                            $data['starttime'], $data['starttime'] + $data['duration'] * 60, $data['teacherid'], 0, SCHEDULER_SELF, true);
-            if (!$conflicts_remote) {
-                $conflicts_remote = array();
+            /* Avoid overlapping slots, by asking the user if they'd like to overwrite the existing ones...
+               for other scheduler, we check independently of exclusivity. Any slot here conflicts
+               for this scheduler, we check against exclusivity. Any complete slot here conflicts */
+            $conflictsremote = scheduler_get_conflicts($this->scheduler->id,
+                            $data['starttime'], $data['starttime'] + $data['duration'] * 60,
+                            $data['teacherid'], 0, SCHEDULER_OTHERS, false);
+            $conflictslocal = scheduler_get_conflicts($this->scheduler->id,
+                            $data['starttime'], $data['starttime'] + $data['duration'] * 60,
+                            $data['teacherid'], 0, SCHEDULER_SELF, true);
+            if (!$conflictsremote) {
+                $conflictsremote = array();
             }
-            if (!$conflicts_local) {
-                $conflicts_local = array();
+            if (!$conflictslocal) {
+                $conflictslocal = array();
             }
-            $conflicts = $conflicts_remote + $conflicts_local;
+            $conflicts = $conflictsremote + $conflictslocal;
 
-            // remove itself from conflicts when updating
+            // Remove itself from conflicts when updating.
             if (array_key_exists($this->slotid, $conflicts)) {
                 unset($conflicts[$this->slotid]);
             }
@@ -450,14 +449,14 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         $mform = $this->_form;
 
-        // Start and end of range
+        // Start and end of range.
         $mform->addElement('date_selector', 'rangestart', get_string('date', 'scheduler'));
         $mform->setDefault('rangestart', time());
 
         $mform->addElement('date_selector', 'rangeend', get_string('enddate', 'scheduler'),
                             array('optional'  => true) );
 
-        // Weekdays selection
+        // Weekdays selection.
         $checkboxes = array();
         $weekdays = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday');
         foreach ($weekdays as $day) {
@@ -468,7 +467,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $checkboxes[] = $mform->createElement('advcheckbox', 'sunday', '', get_string('sunday', 'scheduler'));
         $mform->addGroup($checkboxes, 'weekdays', get_string('addondays', 'scheduler'), null, false);
 
-        // Start and end time
+        // Start and end time.
         $hours = array();
         $minutes = array();
         for ($i = 0; $i <= 23; $i++) {
@@ -490,11 +489,11 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $mform->addElement('selectyesno', 'divide', get_string('divide', 'scheduler'));
         $mform->setDefault('divide', 1);
 
-        // Duration of the slot
+        // Duration of the slot.
         $this->add_duration_field('minutesperslot');
         $mform->disabledIf('duration', 'divide', 'eq', '0');
 
-        // Break between slots
+        // Break between slots.
         $this->add_minutes_field('break', 'break', 0, 'minutes');
         $mform->disabledIf('break', 'divide', 'eq', '0');
 
@@ -502,10 +501,10 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
         $mform->addHelpButton('forcewhenoverlap', 'forcewhenoverlap', 'scheduler');
 
-        // Common fields
+        // Common fields.
         $this->add_base_fields();
 
-        // Display slot from date - relative
+        // Display slot from date - relative.
         $hideuntilsel = array();
         $hideuntilsel[0] = get_string('now', 'scheduler');
         $hideuntilsel[DAYSECS] = get_string('onedaybefore', 'scheduler');
@@ -519,7 +518,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $mform->addElement('select', 'hideuntilrel', get_string('displayfrom', 'scheduler'), $hideuntilsel);
         $mform->setDefault('hideuntilsel', 0);
 
-        // E-mail reminder from
+        // E-mail reminder from.
         $remindersel = array();
         $remindersel[-1] = get_string('never', 'scheduler');
         $remindersel[0] = get_string('onthemorningofappointment', 'scheduler');

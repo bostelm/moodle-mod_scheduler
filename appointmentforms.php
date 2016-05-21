@@ -41,10 +41,10 @@ class scheduler_editappointment_form extends moodleform {
         $mform = $this->_form;
         $scheduler = $this->appointment->get_scheduler();
 
-        // Seen tickbox
+        // Seen tickbox.
         $mform->addElement('checkbox', 'attended', get_string('attended', 'scheduler'));
 
-        // Grade
+        // Grade.
         if ($scheduler->scale != 0) {
             if ($this->editgrade) {
                 $gradechoices = $output->grading_choices($scheduler);

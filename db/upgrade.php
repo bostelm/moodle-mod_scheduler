@@ -35,7 +35,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
     if ($oldversion < 2011081302) {
 
-        // Rename description field to intro, and define field introformat to be added to scheduler
+        // Rename description field to intro, and define field introformat to be added to scheduler.
         $table = new xmldb_table('scheduler');
         $introfield = new xmldb_field('description', XMLDB_TYPE_TEXT, 'small', null, XMLDB_NOTNULL, null, null, 'name');
         $dbman->rename_field($table, $introfield, 'intro', false);
@@ -47,7 +47,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
             $dbman->add_field($table, $formatfield);
         }
 
-        // conditionally migrate to html format in intro
+        // Conditionally migrate to html format in intro.
         if ($CFG->texteditors !== 'textarea') {
             $rs = $DB->get_recordset('scheduler', array('introformat' => FORMAT_MOODLE),
                 '', 'id, intro, introformat');
@@ -60,7 +60,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
             $rs->close();
         }
 
-        // savepoint reached
+        // Savepoint reached.
         upgrade_mod_savepoint(true, 2011081302, 'scheduler');
     }
 
@@ -68,7 +68,7 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
     if ($oldversion < 2012102903) {
 
-        // Define fields notesformat and appointmentnote in respective tables
+        // Define fields notesformat and appointmentnote in respective tables.
         $table = new xmldb_table('scheduler_slots');
         $formatfield = new xmldb_field('notesformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
             XMLDB_NOTNULL, null, '0', 'notes');
@@ -83,14 +83,14 @@ function xmldb_scheduler_upgrade($oldversion=0) {
             $dbman->add_field($table, $formatfield);
         }
 
-        // migrate html format
+        // Migrate html format.
         if ($CFG->texteditors !== 'textarea') {
             upgrade_set_timeout();
             $DB->set_field('scheduler_slots', 'notesformat', FORMAT_HTML);
             $DB->set_field('scheduler_appointment', 'appointmentnoteformat', FORMAT_HTML);
         }
 
-        // savepoint reached
+        // Savepoint reached.
         upgrade_mod_savepoint(true, 2012102903, 'scheduler');
     }
 

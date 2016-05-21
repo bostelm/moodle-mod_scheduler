@@ -3,12 +3,10 @@
 /**
  * A class for representing a scheduler slot.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -17,7 +15,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 class scheduler_slot extends mvc_child_record_model {
 
     protected $appointments;
@@ -58,7 +56,7 @@ class scheduler_slot extends mvc_child_record_model {
     /**
      * Sets appointment-related data (grade, comments) for all student in this slot.
      *
-     *  @param scheduler_appointment $template appointment from which the data will be read
+     * @param scheduler_appointment $template appointment from which the data will be read
      */
     public function distribute_appointment_data(scheduler_appointment $template) {
         $scheduler = $this->get_scheduler();
@@ -126,12 +124,11 @@ class scheduler_slot extends mvc_child_record_model {
         }
     }
 
-
     /**
      * Return the end time of the slot
      */
     public function get_endtime() {
-        return $this->data->starttime + $this->data->duration*MINSECS;
+        return $this->data->starttime + $this->data->duration * MINSECS;
     }
 
     /**

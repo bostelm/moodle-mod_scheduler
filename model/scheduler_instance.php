@@ -284,7 +284,8 @@ class scheduler_instance extends mvc_record_model {
             foreach ($grades as $grade) {
                 $gradesums[$grade->studentid]->sum = @$gradesums[$grade->studentid]->sum + $grade->grade;
                 $gradesums[$grade->studentid]->count = @$gradesums[$grade->studentid]->count + 1;
-                $gradesums[$grade->studentid]->max = (@$gradesums[$grade->studentid]->max < $grade->grade) ? $grade->grade : @$gradesums[$grade->studentid]->max;
+                $gradesums[$grade->studentid]->max = (@$gradesums[$grade->studentid]->max < $grade->grade) ?
+                                                     $grade->grade : @$gradesums[$grade->studentid]->max;
             }
 
             // Retrieve the adequate strategy.
@@ -307,7 +308,8 @@ class scheduler_instance extends mvc_record_model {
                 foreach ($grades as $grade) {
                     $gradesums[$grade->studentid]->sum = @$gradesums[$grade->studentid]->sum + $grade->grade;
                     $gradesums[$grade->studentid]->count = @$gradesums[$grade->studentid]->count + 1;
-                    $gradesums[$grade->studentid]->max = (@$gradesums[$grade->studentid]->max < $grade) ? $grade->grade : @$gradesums[$grade->studentid]->max;
+                    $gradesums[$grade->studentid]->max = (@$gradesums[$grade->studentid]->max < $grade) ?
+                                                         $grade->grade : @$gradesums[$grade->studentid]->max;
                 }
                 $maxgrade = $scale->name;
             }
@@ -427,12 +429,13 @@ class scheduler_instance extends mvc_record_model {
      * Only to be used in conjunction with fetch_slots()
      */
     protected function appointment_count_query() {
-        return '(SELECT COUNT(a.id) FROM {scheduler_appointment} a WHERE a.slotid=s.id)';
+        return "(SELECT COUNT(a.id) FROM {scheduler_appointment} a WHERE a.slotid = s.id)";
     }
 
     protected $studparno = 0;
     protected function student_in_slot_condition(&$params, $studentid, $mustbeattended, $mustbeunattended) {
-        $cond = 'EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.studentid = :studentid'.$this->studparno.' and a.slotid=s.id';
+        $cond = 'EXISTS (SELECT 1 FROM {scheduler_appointment} a WHERE a.studentid = :studentid'.
+                $this->studparno.' and a.slotid=s.id';
         if ($mustbeattended) {
             $cond .= ' AND a.attended = 1';
         }
@@ -450,7 +453,7 @@ class scheduler_instance extends mvc_record_model {
 
         global $DB;
 
-        $slotdata = $DB->get_record('scheduler_slots', array('id' => $id, 'schedulerid'=> $this->id), '*', MUST_EXIST);
+        $slotdata = $DB->get_record('scheduler_slots', array('id' => $id, 'schedulerid' => $this->id), '*', MUST_EXIST);
         $slot = new scheduler_slot($this);
         $slot->load_record($slotdata);
         return $slot;
@@ -659,7 +662,7 @@ class scheduler_instance extends mvc_record_model {
     public function count_bookable_appointments($studentid, $includechangeable = true) {
         global $DB;
 
-        // find how many slots have already been booked
+        // Find how many slots have already been booked.
         $sql = 'SELECT COUNT(*) FROM {scheduler_slots} s'
               .' JOIN {scheduler_appointment} a ON s.id = a.slotid'
               .' WHERE s.schedulerid = :schedulerid AND a.studentid=:studentid';
@@ -691,9 +694,10 @@ class scheduler_instance extends mvc_record_model {
      */
     public function get_teachers() {
         global $DB;
-        $sql =   'SELECT DISTINCT u.* '
-                .' FROM {scheduler_slots} s, {user} u'
-                .' WHERE s.teacherid = u.id AND schedulerid = ?';
+        $sql = "SELECT DISTINCT u.*
+                  FROM {scheduler_slots} s, {user} u
+                 WHERE s.teacherid = u.id
+                       AND schedulerid = ?";
         $teachers = $DB->get_records_sql($sql, array($this->id));
         return $teachers;
     }
@@ -714,7 +718,7 @@ class scheduler_instance extends mvc_record_model {
             $groupids = $groupids->id;
         }
 
-        // Legacy: empty string amounts to no group filter
+        // Legacy: empty string amounts to no group filter.
         if ($groupids === '') {
             $groupids = 0;
         }

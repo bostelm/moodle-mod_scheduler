@@ -3,8 +3,7 @@
 /**
  * Student scheduler screen (where students choose appointments).
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,7 +36,7 @@ if ($scheduler->is_group_scheduling_enabled()) {
     }
 }
 
-include_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
+include($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
 echo $output->header();
 

@@ -60,7 +60,7 @@ if ($groupmode) {
 }
 
 // All group arrays in the following are in the format used by groups_get_all_groups.
-// The special value '' (empty string) is used to signal "all groups" (no restrictions)
+// The special value '' (empty string) is used to signal "all groups" (no restrictions).
 
 // Find groups which the current teacher can see ($groupsicansee, $groupsicurrentlysee).
 // $groupsicansee contains all groups that a teacher potentially has access to.
@@ -98,6 +98,10 @@ $groupsthatcanseeme = '';
 if ($groupmode) {
     $groupsthatcanseeme = groups_get_all_groups($COURSE->id, $USER->id, $cm->groupingid);
 }
+
+
+$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'view', 'subpage' => $subpage));
+$PAGE->set_url($taburl);
 
 echo $output->header();
 
@@ -137,7 +141,8 @@ if ($action == 'updateslot') {
     $slot = $scheduler->get_slot($slotid);
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
-                    array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid, 'subpage' => $subpage, 'offset' => $offset));
+                    array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid,
+                          'subpage' => $subpage, 'offset' => $offset));
     $returnurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
 
@@ -324,7 +329,7 @@ if ($action == 'sendmessage') {
 }
 
 
-//****************** Standard view ***********************************************//
+/****************** Standard view ***********************************************/
 
 
 // Trigger view event.
@@ -333,7 +338,6 @@ if ($action == 'sendmessage') {
 
 // Print top tabs.
 
-$taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'view', 'subpage' => $subpage));
 $actionurl = new moodle_url($taburl, array('offset' => $offset, 'sesskey' => sesskey()));
 
 $inactive = array();
@@ -410,7 +414,8 @@ if ($slots) {
     $delselectedurl = new moodle_url($actionurl, array('what' => 'deleteslots'));
     $PAGE->requires->yui_module('moodle-mod_scheduler-delselected', 'M.mod_scheduler.delselected.init',
                                 array($delselectedurl->out(false)) );
-    $delselected = $commandbar->action_link($delselectedurl, 'deleteselection', 't/delete', 'confirmdelete-selected', 'delselected');
+    $delselected = $commandbar->action_link($delselectedurl, 'deleteselection', 't/delete',
+                                            'confirmdelete-selected', 'delselected');
     $delselected->formid = 'delselected';
     $delbuttons[] = $delselected;
 

@@ -3,8 +3,7 @@
 /**
  * Defines the scheduler module settings form.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +23,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
         global $CFG, $COURSE, $OUTPUT;
         $mform    =& $this->_form;
 
-        // -------------------------------------------------------------------------------
         // General introduction.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
@@ -39,7 +37,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('introduction', 'scheduler'));
 
-        // -------------------------------------------------------------------------------
         // Scheduler options.
         $mform->addElement('header', 'optionhdr', get_string('options', 'scheduler'));
         $mform->setExpanded('optionhdr');
@@ -102,7 +99,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addElement('select', 'usenotes', get_string('usenotes', 'scheduler'), $noteoptions);
         $mform->setDefault('usenotes', '1');
 
-        // -------------------------------------------------------------------------------
         // Grade settings.
         $this->standard_grading_coursemodule_elements();
 
@@ -114,7 +110,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addHelpButton('gradingstrategy', 'gradingstrategy', 'scheduler');
         $mform->disabledIf('gradingstrategy', 'grade[modgrade_type]', 'eq', 'none');
 
-        // -------------------------------------------------------------------------------
         // Common module settings.
         $this->standard_coursemodule_elements();
 

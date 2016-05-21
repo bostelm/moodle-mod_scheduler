@@ -46,7 +46,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $timeformat = get_config(null, 'calendar_site_timeformat'); // Get calendar config if above not exist.
             }
             if (empty($timeformat)) {
-                $timeformat = get_string('strftimetime'); //Get locale default format if both of the above do not exist.
+                $timeformat = get_string('strftimetime'); // Get locale default format if both of the above do not exist.
             }
             return userdate($date, $timeformat);
         }
@@ -84,7 +84,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             if ($scale = $DB->get_record('scale', array('id' => $scaleid))) {
                 $levels = explode(',', $scale->scale);
                 foreach ($levels as $levelid => $value) {
-                    $this->scalecache[$scaleid][$levelid+1] = $value;
+                    $this->scalecache[$scaleid][$levelid + 1] = $value;
                 }
             }
         }
@@ -227,7 +227,8 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $statstab->subtree = array(
                         $this->teacherview_tab($baseurl, 'overall', 'viewstatistics', 'overall'),
                         $this->teacherview_tab($baseurl, 'studentbreakdown', 'viewstatistics', 'studentbreakdown'),
-                        $this->teacherview_tab($baseurl, 'staffbreakdown', 'viewstatistics', 'staffbreakdown', $scheduler->get_teacher_name()),
+                        $this->teacherview_tab($baseurl, 'staffbreakdown', 'viewstatistics', 'staffbreakdown',
+                                               $scheduler->get_teacher_name()),
                         $this->teacherview_tab($baseurl, 'lengthbreakdown', 'viewstatistics', 'lengthbreakdown'),
                         $this->teacherview_tab($baseurl, 'groupbreakdown', 'viewstatistics', 'groupbreakdown')
         );
@@ -316,14 +317,14 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $studentnotes1 = html_writer::tag('strong', get_string('yourslotnotes', 'scheduler'));
                 $studentnotes1 .= html_writer::empty_tag('br');
                 $studentnotes1 .= $this->format_notes($slot->slotnote, $slot->slotnoteformat,
-                                                      $slottable->scheduler->get_context(), 'slotnote', $slot->slotid);
+                                          $slottable->scheduler->get_context(), 'slotnote', $slot->slotid);
                 $studentnotes1 = html_writer::div($studentnotes1, 'slotnotes');
             }
             if (isset($slot->appointmentnote) && $slot->appointmentnote != '') {
                 $studentnotes2 = html_writer::tag('strong', get_string('yourappointmentnote', 'scheduler'));
                 $studentnotes2 .= html_writer::empty_tag('br');
                 $studentnotes2 .= $this->format_notes($slot->appointmentnote, $slot->appointmentnoteformat,
-                                                      $slottable->scheduler->get_context(), 'appointmentnote', $slot->appointmentid);
+                                          $slottable->scheduler->get_context(), 'appointmentnote', $slot->appointmentid);
                 $studentnotes2 = html_writer::div($studentnotes2, 'appointmentnotes');
             }
             $studentnotes = $studentnotes1.$studentnotes2;

@@ -23,6 +23,7 @@ if ($groupmode) {
 
 $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'export', 'id' => $scheduler->cmid));
 $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $scheduler->cmid));
+$PAGE->set_url($actionurl);
 $mform = new scheduler_export_form($actionurl, $scheduler);
 
 if ($mform->is_cancelled()) {
