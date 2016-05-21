@@ -3,13 +3,11 @@
 /**
  * Unit tests for the MVC model classes
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,26 +36,29 @@ class mod_scheduler_model_testcase extends advanced_testcase {
         $options['slottimes'] = array();
         $options['slotstudents'] = array();
         for ($c = 0; $c < 4; $c++) {
-            $options['slottimes'][$c] = time() + ($c+1)*DAYSECS;
+            $options['slottimes'][$c] = time() + ($c + 1) * DAYSECS;
             $options['slotstudents'][$c] = array($this->getDataGenerator()->create_user()->id);
         }
-        $options['slottimes'][4] = time()+10*DAYSECS;
-        $options['slottimes'][5] = time()+11*DAYSECS;
-        $options['slotstudents'][5] = array($this->getDataGenerator()->create_user()->id, $this->getDataGenerator()->create_user()->id);
+        $options['slottimes'][4] = time() + 10 * DAYSECS;
+        $options['slottimes'][5] = time() + 11 * DAYSECS;
+        $options['slotstudents'][5] = array(
+                                            $this->getDataGenerator()->create_user()->id,
+                                            $this->getDataGenerator()->create_user()->id
+                                           );
 
-        $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course'=>$course->id), $options);
-        $coursemodule = $DB->get_record('course_modules', array('id'=>$scheduler->cmid));
+        $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course' => $course->id), $options);
+        $coursemodule = $DB->get_record('course_modules', array('id' => $scheduler->cmid));
 
         $this->schedulerid = $scheduler->id;
         $this->moduleid  = $coursemodule->id;
         $this->courseid  = $coursemodule->course;
-        $this->userid = 2;  // admin
+        $this->userid = 2;  // Admin user.
     }
 
     public function test_scheduler_instance() {
         global $DB;
 
-        $dbdata = $DB->get_record('scheduler', array('id'=>$this->schedulerid));
+        $dbdata = $DB->get_record('scheduler', array('id' => $this->schedulerid));
 
         $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
 
