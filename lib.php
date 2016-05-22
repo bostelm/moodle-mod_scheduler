@@ -14,6 +14,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 require_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
+require_once($CFG->dirroot.'/mod/scheduler/renderer.php');
+require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 
 define('SCHEDULER_TIMEUNKNOWN', 0);  // This is used for appointments for which no time is entered.
 define('SCHEDULER_SELF', 0); // Used for setting conflict search scope.
@@ -108,22 +110,67 @@ function scheduler_delete_instance($id) {
  * @return object an information object as defined above
  */
 function scheduler_user_outline($course, $user, $mod, $scheduler) {
-    $return = null;
+
+    $scheduler = scheduler_instance::load_by_coursemodule_id($mod->id);
+    $upcoming = count($scheduler->get_upcoming_slots_for_student($user->id));
+    $attended = count($scheduler->get_attended_slots_for_student($user->id));
+
+    $text = '';
+
+    if ($attended + $upcoming > 0) {
+        $a = array('attended' => $attended, 'upcoming' => $upcoming);
+        $text .= get_string('outlineappointments', 'scheduler', $a);
+    }
+
+    if ($scheduler->uses_grades()) {
+        $grade = $scheduler->get_gradebook_info($user->id);
+        if ($grade) {
+            $text .= get_string('outlinegrade', 'scheduler', $grade->str_long_grade);
+        }
+    }
+
+    $return = new stdClass();
+    $return->info = $text;
     return $return;
 }
 
 /**
- * Prints a detailed representation of what a  user has done with
+ * Prints a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  * @param object $course the course instance
  * @param object $user the concerned user instance
  * @param object $mod the current course module instance
  * @param object $scheduler the activity module behind the course module instance
- * @param boolean true if the user completed activity, false otherwise
  */
 function scheduler_user_complete($course, $user, $mod, $scheduler) {
 
-    return true;
+    global $PAGE;
+
+    $scheduler = scheduler_instance::load_by_coursemodule_id($mod->id);
+    $output = $PAGE->get_renderer('mod_scheduler', null, RENDERER_TARGET_GENERAL);
+
+    $appointments = $scheduler->get_appointments_for_student($user->id);
+
+    if (count($appointments) > 0) {
+        $table = new scheduler_slot_table($scheduler);
+        $table->showattended = true;
+        foreach ($appointments as $app) {
+            $table->add_slot($app->get_slot(), $app, null, false);
+        }
+
+        echo $output->render($table);
+    } else {
+        echo get_string('noappointments', 'scheduler');
+    }
+
+    if ($scheduler->uses_grades()) {
+        $grade = $scheduler->get_gradebook_info($user->id);
+        if ($grade) {
+            $info = new scheduler_totalgrade_info($scheduler, $grade);
+            echo $output->render($info);
+        }
+    }
+
 }
 
 /**

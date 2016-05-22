@@ -176,11 +176,11 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     public function format_appointment_notes(scheduler_instance $scheduler, $data, $idfield = 'id') {
         $note = '';
         $id = $data->{$idfield};
-        if ($scheduler->uses_appointmentnotes()) {
+        if (isset($data->appointmentnote) && $scheduler->uses_appointmentnotes()) {
             $note .= $this->format_notes($data->appointmentnote, $data->appointmentnoteformat, $scheduler->get_context(),
                                          'appointmentnote', $id);
         }
-        if ($scheduler->uses_teachernotes()) {
+        if (isset($data->teachernote) && $scheduler->uses_teachernotes()) {
             $note .= $this->format_notes($data->teachernote, $data->teachernoteformat, $scheduler->get_context(),
                                          'teachernote', $id);
         }
@@ -258,11 +258,29 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     public function render_scheduler_slot_table(scheduler_slot_table $slottable) {
         $table = new html_table();
 
-        $table->head  = array(get_string('date', 'scheduler'),
-                        $slottable->scheduler->get_teacher_name(),
-                        get_string('location', 'scheduler'),
-                        get_string('comments', 'scheduler'));
-        $table->align = array('left', 'left', 'left', 'left', 'left');
+        if ($slottable->showslot) {
+            $table->head  = array(get_string('date', 'scheduler'));
+            $table->align = array('left');
+        }
+        if ($slottable->showstudent) {
+            $table->head[]  = get_string('name');
+            $table->align[] = 'left';
+        }
+        if ($slottable->showattended) {
+            $table->head[] = get_string('seen', 'scheduler');
+            $table->align[] = 'center';
+        }
+        if ($slottable->showslot) {
+            $table->head[]  = $slottable->scheduler->get_teacher_name();
+            $table->align[] = 'left';
+        }
+        if ($slottable->showslot && $slottable->showlocation) {
+            $table->head[]  = get_string('location', 'scheduler');
+            $table->align[] = 'left';
+        }
+
+        $table->head[] = get_string('comments', 'scheduler');
+        $table->align[] = 'left';
 
         if ($slottable->showgrades) {
             $table->head[] = get_string('grade', 'scheduler');
@@ -275,61 +293,55 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $table->data = array();
 
-        $previousdate = '';
-        $previoustime = '';
-        $previousendtime = '';
-
         foreach ($slottable->slots as $slot) {
             $rowdata = array();
 
-            $startdate = $this->userdate($slot->starttime);
+            $studenturl = new moodle_url($slottable->actionurl, array('appointmentid' => $slot->appointmentid));
+
+            $timedata = $this->userdate($slot->starttime);
+            if ($slottable->showeditlink) {
+                $timedata = $this->action_link($studenturl, $timedata);
+            }
+            $timedata = html_writer::div($timedata, 'datelabel');
+
             $starttime = $this->usertime($slot->starttime);
             $endtime   = $this->usertime($slot->endtime);
-            // Simplify display of dates, start and end times.
-            if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
-                // If this row exactly matches previous, there's nothing to display.
-                $startdatestr = '';
-                $starttimestr = '';
-                $endtimestr = '';
-            } else if ($startdate == $previousdate) {
-                // If this date matches previous date, just display times.
-                $startdatestr = '';
-                $starttimestr = $starttime;
-                $endtimestr = $endtime;
-            } else {
-                // Otherwise, display all elements.
-                $startdatestr = $startdate;
-                $starttimestr = $starttime;
-                $endtimestr = $endtime;
+            $timedata .= html_writer::div("{$starttime} &ndash; {$endtime}", 'timelabel');
+
+            if ($slottable->showslot) {
+                $rowdata[] = $timedata;
             }
 
-            $timedata = html_writer::div($startdatestr, 'datelabel attended');
-            $timedata .= html_writer::div("[$starttimestr - $endtimestr]", 'timelabel');
-
-            $rowdata[] = $timedata;
-
-            $rowdata[] = $this->user_profile_link($slottable->scheduler, $slot->teacher);
-            $rowdata[] = format_string($slot->location);
-
-            $studentnotes1 = '';
-            $studentnotes2 = '';
-            if ($slot->slotnote != '') {
-                $studentnotes1 = html_writer::tag('strong', get_string('yourslotnotes', 'scheduler'));
-                $studentnotes1 .= html_writer::empty_tag('br');
-                $studentnotes1 .= $this->format_notes($slot->slotnote, $slot->slotnoteformat,
-                                          $slottable->scheduler->get_context(), 'slotnote', $slot->slotid);
-                $studentnotes1 = html_writer::div($studentnotes1, 'slotnotes');
+            if ($slottable->showstudent) {
+                $name = fullname($slot->student);
+                if ($slottable->showeditlink) {
+                    $name = $this->action_link($studenturl, $name);
+                }
+                $rowdata[] = $name;
             }
-            if (isset($slot->appointmentnote) && $slot->appointmentnote != '') {
-                $studentnotes2 = html_writer::tag('strong', get_string('yourappointmentnote', 'scheduler'));
-                $studentnotes2 .= html_writer::empty_tag('br');
-                $studentnotes2 .= $this->format_notes($slot->appointmentnote, $slot->appointmentnoteformat,
-                                          $slottable->scheduler->get_context(), 'appointmentnote', $slot->appointmentid);
-                $studentnotes2 = html_writer::div($studentnotes2, 'appointmentnotes');
-            }
-            $studentnotes = $studentnotes1.$studentnotes2;
 
-            $rowdata[] = $studentnotes;
+            if ($slottable->showattended) {
+                $iconid = $slot->attended ? 'ticked' : 'unticked';
+                $iconhelp = $slot->attended ? 'seen' : 'notseen';
+                $attendedpix = $this->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
+                $rowdata[] = $attendedpix;
+            }
+
+            if ($slottable->showslot) {
+                $rowdata[] = $this->user_profile_link($slottable->scheduler, $slot->teacher);
+            }
+
+            if ($slottable->showslot && $slottable->showlocation) {
+                $rowdata[] = format_string($slot->location);
+            }
+
+            $notes = '';
+            if ($slottable->showslot && isset($slot->slotnote)) {
+                $notes .= $this->format_notes($slot->slotnote, $slot->slotnoteformat,
+                                              $slottable->scheduler->get_context(), 'slotnote', $slot->slotid);
+            }
+            $notes .= $this->format_appointment_notes($slottable->scheduler, $slot, 'appointmentid');
+            $rowdata[] = $notes;
 
             if ($slottable->showgrades) {
                 if ($slot->otherstudents) {
@@ -349,12 +361,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 }
                 $rowdata[] = $actions;
             }
-
             $table->data[] = $rowdata;
-
-            $previoustime = $starttime;
-            $previousendtime = $endtime;
-            $previousdate = $startdate;
         }
 
         return html_writer::table($table);

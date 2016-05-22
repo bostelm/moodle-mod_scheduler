@@ -14,16 +14,26 @@ defined('MOODLE_INTERNAL') || die();
  * This class represents a table of slots associated with one student
  */
 class scheduler_slot_table implements renderable {
+
     public $slots = array();
     public $scheduler;
     public $showgrades;
-    public $showactions;
+    public $showslot = true;
+    public $showattended = false;
+    public $showactions = false;
+    public $showteachernotes = false;
+    public $showeditlink = false;
+    public $showlocation = true;
+    public $showstudent = false;
     public $actionurl;
 
     public function add_slot(scheduler_slot $slotmodel, scheduler_appointment $appointmentmodel,
                              $otherstudents, $cancancel = false) {
         $slot = new stdClass();
         $slot->slotid = $slotmodel->id;
+        if ($this->showstudent) {
+            $slot->student = $appointmentmodel->student;
+        }
         $slot->starttime = $slotmodel->starttime;
         $slot->endtime = $slotmodel->endtime;
         $slot->attended = $appointmentmodel->attended;
@@ -35,6 +45,10 @@ class scheduler_slot_table implements renderable {
         if ($this->scheduler->uses_appointmentnotes()) {
             $slot->appointmentnote = $appointmentmodel->appointmentnote;
             $slot->appointmentnoteformat = $appointmentmodel->appointmentnoteformat;
+        }
+        if ($this->scheduler->uses_teachernotes() && $this->showteachernotes) {
+            $slot->teachernote = $appointmentmodel->teachernote;
+            $slot->teachernoteformat = $appointmentmodel->teachernoteformat;
         }
         $slot->otherstudents = $otherstudents;
         $slot->cancancel = $cancancel;
@@ -48,9 +62,8 @@ class scheduler_slot_table implements renderable {
 
     public function __construct(scheduler_instance $scheduler, $showgrades=true, $actionurl = null) {
         $this->scheduler = $scheduler;
-        $this->showgrades = $showgrades;
+        $this->showgrades = $showgrades && $scheduler->uses_grades();
         $this->actionurl = $actionurl;
-        $this->showactions = false;
     }
 
 }

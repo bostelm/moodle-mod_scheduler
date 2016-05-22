@@ -553,6 +553,7 @@ class scheduler_instance extends mvc_record_model {
         return $cnt > 0;
     }
 
+
     public function has_slots_booked_for_group($groupid, $mustbeattended = false, $mustbeunattended = false) {
         global $DB;
         $attendcond = '';
@@ -643,6 +644,39 @@ class scheduler_instance extends mvc_record_model {
         $appointment->load_record($appointrec);
 
         return array($slot, $appointment);
+    }
+
+    /**
+     * Retrieves all appointments of a student. These will be sorted by start time.
+     *
+     * @param int $studentid
+     * @return array of scheduler_appointment objects
+     */
+    public function get_appointments_for_student($studentid) {
+
+        global $DB;
+
+        $sql = "SELECT s.*, a.id as appointmentid
+                  FROM {scheduler_slots} s, {scheduler_appointment} a
+                 WHERE s.schedulerid = :schedulerid
+                       AND s.id = a.slotid
+                       AND a.studentid = :studid
+              ORDER BY s.starttime";
+        $params = array('schedulerid' => $this->id, 'studid' => $studentid);
+
+        $slotrecs = $DB->get_records_sql($sql, $params);
+
+        $appointments = array();
+        foreach ($slotrecs as $rec) {
+            $slot = new scheduler_slot($this);
+            $slot->load_record($rec);
+            $appointrec = $DB->get_record('scheduler_appointment', array('id' => $rec->appointmentid), '*', MUST_EXIST);
+            $appointment = new scheduler_appointment($slot);
+            $appointment->load_record($appointrec);
+            $appointments[] = $appointment;
+        }
+
+        return $appointments;
     }
 
     /**

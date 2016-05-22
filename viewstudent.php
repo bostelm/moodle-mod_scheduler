@@ -27,30 +27,7 @@ $urlparas = array('what' => 'viewstudent',
 $taburl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 $PAGE->set_url($taburl);
 
-$sql = "
-SELECT
-s.*,
-a.id as appid,
-a.studentid,
-a.attended,
-a.appointmentnote,
-a.appointmentnoteformat,
-a.teachernote,
-a.teachernoteformat,
-a.grade,
-a.timemodified as apptimemodified
-FROM
-{scheduler_slots} s,
-{scheduler_appointment} a
-WHERE
-s.id = a.slotid AND
-schedulerid = ? AND
-studentid = ?
-ORDER BY
-starttime ASC
-";
-
-$slots = $DB->get_records_sql($sql, array($scheduler->id, $studentid));
+$appts = $scheduler->get_appointments_for_student($studentid);
 
 echo $output->header();
 
@@ -72,7 +49,7 @@ $pages = array('thisappointment');
 if ($slot->get_appointment_count() > 1) {
     $pages[] = 'otherstudents';
 }
-if (count($slots) > 1) {
+if (count($appts) > 1) {
     $pages[] = 'otherappointments';
 }
 
@@ -119,29 +96,18 @@ if ($subpage == 'thisappointment') {
 } else if ($subpage == 'otherappointments') {
     // Print table of other appointments of the same student.
 
-    $table = new html_table();
+    $studenturl = new moodle_url($taburl, array('page' => 'thisappointment'));
+    $table = new scheduler_slot_table($scheduler, true, $studenturl);
+    $table->showattended = true;
+    $table->showteachernotes = true;
+    $table->showeditlink = true;
+    $table->showlocation = false;
 
-    $table->head  = array ($strdate, $strstart, $strend, $strseen, $strnote, $strgrade, s($scheduler->get_teacher_name()));
-    $table->align = array ('LEFT', 'LEFT', 'CENTER', 'CENTER', 'LEFT', 'CENTER', 'CENTER');
-
-    foreach ($slots as $otherslot) {
-        $startdate = $output->userdate($otherslot->starttime);
-        $studenturl = new moodle_url($taburl, array('appointmentid' => $otherslot->appid, 'page' => 'thisappointment'));
-        $datelink = $output->action_link($studenturl, $startdate);
-        $starttime = $output->usertime($otherslot->starttime);
-        $endtime = $output->usertime($otherslot->starttime + $otherslot->duration * 60);
-        $iconid = $otherslot->attended ? 'ticked' : 'unticked';
-        $iconhelp = $otherslot->attended ? 'seen' : 'notseen';
-        $attendedpix = $output->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
-
-        $appnote = $output->format_appointment_notes($scheduler, $otherslot, 'appid');
-        $appnote .= "<br/><span class=\"timelabel\">[".userdate($otherslot->apptimemodified)."]</span>";
-        $grade = $output->format_grade($scheduler, $otherslot->grade);
-        $teacher = $DB->get_record('user', array('id' => $otherslot->teacherid));
-        $table->data[] = array ($datelink, $starttime, $endtime, $attendedpix,
-                                 $appnote, $grade, fullname($teacher));
+    foreach ($appts as $appt) {
+        $table->add_slot($appt->get_slot(), $appt, null, false);
     }
-    echo html_writer::table($table);
+
+    echo $output->render($table);
 
     if ($scheduler->uses_grades()) {
         $totalgradeinfo->showtotalgrade = true;
@@ -152,26 +118,19 @@ if ($subpage == 'thisappointment') {
 } else if ($subpage == 'otherstudents') {
     // Print table of other students in the same slot.
 
-    $table = new html_table();
-
-    $table->head  = array($strname, $strseen, $strnote, $strgrade);
-    $table->align = array('LEFT', 'CENTER', 'LEFT', 'CENTER');
+    $studenturl = new moodle_url($taburl, array('page' => 'thisappointment'));
+    $table = new scheduler_slot_table($scheduler, true, $studenturl);
+    $table->showattended = true;
+    $table->showslot = false;
+    $table->showstudent = true;
+    $table->showteachernotes = true;
+    $table->showeditlink = true;
 
     foreach ($slot->get_appointments() as $otherappointment) {
-        $studentname = fullname($otherappointment->student);
-        $studenturl = new moodle_url($taburl, array('appointmentid' => $otherappointment->id, 'page' => 'thisappointment'));
-        $studentlink = $OUTPUT->action_link($studenturl, $studentname);
-        $grade = $output->format_grade($scheduler, $otherappointment->grade);
-        $iconid = $otherappointment->attended ? 'ticked' : 'unticked';
-        $iconhelp = $otherappointment->attended ? 'seen' : 'notseen';
-        $icon = $OUTPUT->pix_icon($iconid, get_string($iconhelp, 'scheduler'), 'mod_scheduler');
-        $note = $output->format_appointment_notes($scheduler, $otherappointment);
-        if ($note) {
-            $note .= '<br/><span class="timelabel">['.userdate($otherappointment->timemodified).']</span>';
-        }
-        $table->data[] = array ($studentlink, $icon, $note, $grade);
+        $table->add_slot($otherappointment->get_slot(), $otherappointment, null, false);
     }
-    echo html_writer::table($table);
+
+    echo $output->render($table);
 }
 
 echo $output->continue_button(new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid)));

@@ -89,7 +89,8 @@ if (count($pastslots) > 0) {
         if ($pastslot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
             $others = new scheduler_student_list($scheduler, true);
             foreach ($pastslot->get_appointments() as $otherapp) {
-                $gradehidden = ($scheduler->get_gradebook_info($otherapp->studentid)->hidden <> 0);
+                $othermark = $scheduler->get_gradebook_info($otherapp->studentid);
+                $gradehidden = !is_null($othermark) && ($othermark->hidden <> 0);
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
         } else {
