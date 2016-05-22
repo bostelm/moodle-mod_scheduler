@@ -29,22 +29,6 @@ $PAGE->set_url($taburl);
 
 $appts = $scheduler->get_appointments_for_student($studentid);
 
-echo $output->header();
-
-scheduler_print_user($DB->get_record('user', array('id' => $appointment->studentid)), $course);
-
-$params = array(
-                'startdate' => $output->userdate($slot->starttime),
-                'starttime' => $output->usertime($slot->starttime),
-                'endtime' => $output->usertime($slot->endtime),
-                'teacher' => fullname($slot->get_teacher())
-                );
-echo html_writer::tag('p', get_string('appointmentsummary', 'scheduler', $params));
-
-// Print tabs.
-$tabrows = array();
-$row  = array();
-
 $pages = array('thisappointment');
 if ($slot->get_appointment_count() > 1) {
     $pages[] = 'otherstudents';
@@ -57,19 +41,8 @@ if (!in_array($subpage, $pages) ) {
     $subpage = 'thisappointment';
 }
 
-if (count($pages) > 1) {
-    foreach ($pages as $tabpage) {
-        $tabname = get_string('tab-'.$tabpage, 'scheduler');
-        $row[] = new tabobject($tabpage, new moodle_url($taburl, array('subpage' => $tabpage)), $tabname);
-    }
-    $tabrows[] = $row;
-    print_tabs($tabrows, $subpage);
-}
-
-$totalgradeinfo = new scheduler_totalgrade_info($scheduler, $scheduler->get_gradebook_info($appointment->studentid));
-
+// Process edit form before page output starts.
 if ($subpage == 'thisappointment') {
-    // Print editable appointment description.
     require_once($CFG->dirroot.'/mod/scheduler/appointmentforms.php');
 
     $actionurl = new moodle_url($taburl, array('page' => 'thisappointment'));
@@ -85,9 +58,41 @@ if ($subpage == 'thisappointment') {
     } else if ($formdata = $mform->get_data()) {
         $mform->save_appointment_data($formdata, $appointment);
         redirect($returnurl);
-    } else {
-        $mform->display();
     }
+}
+
+echo $output->header();
+
+// Print user summary.
+
+scheduler_print_user($DB->get_record('user', array('id' => $appointment->studentid)), $course);
+
+$params = array(
+                'startdate' => $output->userdate($slot->starttime),
+                'starttime' => $output->usertime($slot->starttime),
+                'endtime' => $output->usertime($slot->endtime),
+                'teacher' => fullname($slot->get_teacher())
+                );
+echo html_writer::tag('p', get_string('appointmentsummary', 'scheduler', $params));
+
+// Print tabs.
+$tabrows = array();
+$row  = array();
+
+if (count($pages) > 1) {
+    foreach ($pages as $tabpage) {
+        $tabname = get_string('tab-'.$tabpage, 'scheduler');
+        $row[] = new tabobject($tabpage, new moodle_url($taburl, array('subpage' => $tabpage)), $tabname);
+    }
+    $tabrows[] = $row;
+    print_tabs($tabrows, $subpage);
+}
+
+$totalgradeinfo = new scheduler_totalgrade_info($scheduler, $scheduler->get_gradebook_info($appointment->studentid));
+
+if ($subpage == 'thisappointment') {
+
+    $mform->display();
 
     if ($scheduler->uses_grades()) {
         echo $output->render($totalgradeinfo);
