@@ -1,22 +1,24 @@
 <?php
 
 /**
- * Unit tests for the scheduler_instance class.
+ * Unit tests for the MVC model classes
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
-
+/**
+ * Unit tests for the MVC model classes
+ *
+ * @group mod_scheduler
+ */
 class mod_scheduler_model_testcase extends advanced_testcase {
 
     protected $moduleid;  // Course_modules id used for testing.
@@ -34,26 +36,29 @@ class mod_scheduler_model_testcase extends advanced_testcase {
         $options['slottimes'] = array();
         $options['slotstudents'] = array();
         for ($c = 0; $c < 4; $c++) {
-            $options['slottimes'][$c] = time() + ($c+1)*DAYSECS;
+            $options['slottimes'][$c] = time() + ($c + 1) * DAYSECS;
             $options['slotstudents'][$c] = array($this->getDataGenerator()->create_user()->id);
         }
-        $options['slottimes'][4] = time()+10*DAYSECS;
-        $options['slottimes'][5] = time()+11*DAYSECS;
-        $options['slotstudents'][5] = array($this->getDataGenerator()->create_user()->id, $this->getDataGenerator()->create_user()->id);
+        $options['slottimes'][4] = time() + 10 * DAYSECS;
+        $options['slottimes'][5] = time() + 11 * DAYSECS;
+        $options['slotstudents'][5] = array(
+                                            $this->getDataGenerator()->create_user()->id,
+                                            $this->getDataGenerator()->create_user()->id
+                                           );
 
-        $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course'=>$course->id), $options);
-        $coursemodule = $DB->get_record('course_modules', array('id'=>$scheduler->cmid));
+        $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course' => $course->id), $options);
+        $coursemodule = $DB->get_record('course_modules', array('id' => $scheduler->cmid));
 
         $this->schedulerid = $scheduler->id;
         $this->moduleid  = $coursemodule->id;
         $this->courseid  = $coursemodule->course;
-        $this->userid = 2;  // admin
+        $this->userid = 2;  // Admin user.
     }
 
     public function test_scheduler_instance() {
         global $DB;
 
-        $dbdata = $DB->get_record('scheduler', array('id'=>$this->schedulerid));
+        $dbdata = $DB->get_record('scheduler', array('id' => $this->schedulerid));
 
         $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
 
@@ -61,48 +66,6 @@ class mod_scheduler_model_testcase extends advanced_testcase {
 
     }
 
-    public function test_scheduler_loadslots() {
-        global $DB;
-
-        $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
-
-        /* test slot retrieval */
-
-        $slotcount = $instance->get_slot_count();
-        $this->assertEquals(6, $slotcount);
-
-        $slots = $instance->get_all_slots(2, 3);
-        $this->assertEquals(3, count($slots));
-
-        $slots = $instance->get_slots_without_appointment();
-        $this->assertEquals(1, count($slots));
-
-        $allslots = $instance->get_all_slots();
-        $this->assertEquals(6, count($allslots));
-
-        $cnt = 0;
-        foreach ($allslots as $slot) {
-            $this->assertTrue($slot instanceof scheduler_slot);
-
-            if ($cnt == 5) {
-                $expectedapp = 2;
-            } else if ($cnt == 4) {
-                $expectedapp = 0;
-            } else {
-                $expectedapp = 1;
-            }
-            $this->assertEquals($expectedapp, $slot->get_appointment_count());
-
-            $apps = $slot->get_appointments($slot->get_appointments());
-            $this->assertEquals($expectedapp, count($apps));
-
-            foreach ($apps as $app) {
-                $this->assertTrue($app instanceof scheduler_appointment);
-            }
-            $cnt++;
-        }
-
-    }
 
     /**
      * Test the "appointment" data object
@@ -124,6 +87,7 @@ class mod_scheduler_model_testcase extends advanced_testcase {
         $app0->attended = 0;
         $app0->grade = 0;
         $app0->appointmentnote = 'testnote';
+        $app0->teachernote = 'confidentialtestnote';
         $app0->timecreated = time();
         $app0->timemodified = time();
 

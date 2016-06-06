@@ -3,8 +3,7 @@
 /**
  * Defines the scheduler module settings form.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +23,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
         global $CFG, $COURSE, $OUTPUT;
         $mform    =& $this->_form;
 
-        // -------------------------------------------------------------------------------
         // General introduction.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
@@ -39,7 +37,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('introduction', 'scheduler'));
 
-        // -------------------------------------------------------------------------------
         // Scheduler options.
         $mform->addElement('header', 'optionhdr', get_string('options', 'scheduler'));
         $mform->setExpanded('optionhdr');
@@ -80,8 +77,8 @@ class mod_scheduler_mod_form extends moodleform_mod {
                 $selopt[$grouping->id] = get_string('yesingrouping', 'scheduler', $grouping->name);
             }
             $mform->addElement('select', 'bookingrouping', get_string('groupbookings', 'scheduler'), $selopt);
-	        $mform->addHelpButton('bookingrouping', 'groupbookings', 'scheduler');
-	        $mform->setDefault('bookingrouping', '-1');
+            $mform->addHelpButton('bookingrouping', 'groupbookings', 'scheduler');
+            $mform->setDefault('bookingrouping', '-1');
         }
 
         $mform->addElement('duration', 'guardtime', get_string('guardtime', 'scheduler'), array('optional' => true));
@@ -95,7 +92,13 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addElement('selectyesno', 'allownotifications', get_string('notifications', 'scheduler'));
         $mform->addHelpButton('allownotifications', 'notifications', 'scheduler');
 
-        // -------------------------------------------------------------------------------
+        $noteoptions['0'] = get_string('usenotesnone', 'scheduler');
+        $noteoptions['1'] = get_string('usenotesstudent', 'scheduler');
+        $noteoptions['2'] = get_string('usenotesteacher', 'scheduler');
+        $noteoptions['3'] = get_string('usenotesboth', 'scheduler');
+        $mform->addElement('select', 'usenotes', get_string('usenotes', 'scheduler'), $noteoptions);
+        $mform->setDefault('usenotes', '1');
+
         // Grade settings.
         $this->standard_grading_coursemodule_elements();
 
@@ -107,7 +110,6 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addHelpButton('gradingstrategy', 'gradingstrategy', 'scheduler');
         $mform->disabledIf('gradingstrategy', 'grade[modgrade_type]', 'eq', 'none');
 
-        // -------------------------------------------------------------------------------
         // Common module settings.
         $this->standard_coursemodule_elements();
 

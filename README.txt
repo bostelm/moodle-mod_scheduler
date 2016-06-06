@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/27/en/Scheduler_module
+    http://docs.moodle.org/29/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 2.7 and above.
+This module is intended for Moodle 2.9 and above.
 
 
 === Authors ===
@@ -58,9 +58,21 @@ With further contributions taken from:
 
 === Release notes ===
 
---- Upcoming version in development ---
+--- Version 2.9 ---
 
 Intended for Moodle 2.9 and later.
+
+New features / improvements:
+
+The export screen now allows users to choose the format of the output file,
+as well as the data fields to include in the export. File format may
+slightly differ from previous versions.
+
+Improved gradebook integration: Grades overridden in the gradebook will now 
+show up as such in the scheduler.
+
+Lists of students to be scheduled now take availability conditions
+(groups and groupings) into account.
 
 Feature changes:
 
@@ -73,6 +85,18 @@ teachers in the same group. The old "Group mode" settings are automatically
 migrated to "Booking in groups" and the "Group mode" set to "None".
 If you have used group scheduling in previous versions, please check your data
 after migration.
+
+The student view has been redesigned. Bookable appointments are now displayed 
+in pages of 25, and student select a slot by clicking a button "Book slot"
+rather then selecting with a radio button and clicking "Save choice".  
+ 
+For using the Overview screen outside the current scheduler, e.g., for displaying
+all slots of a user across the site, users will now need extra permissions;
+see CONTRIB-5750 for details.
+
+Refactoring / API changes:
+
+Config settings have been migrated to the config_plugins table.
 
 --- Version 2.7 ---
 
@@ -115,8 +139,9 @@ No major functional changes over 1.9; bug fixes and API migration only. Requires
 === Technical notes ===
 
 The code of this module is rather old, much of it predates even Moodle 1.9.
-It has partially been adapted to the new APIs. The following aspects have been migrated,
-that is, malfunction in this respect should be considered a bug:
+It has now largely, but not compltely, been adapted to the new APIs. 
+The following aspects have been migrated, that is, malfunction in this respect 
+should be considered a bug:
 
 * Gradebook integration
 * Moodle 2 backup
@@ -124,5 +149,5 @@ that is, malfunction in this respect should be considered a bug:
 * Localization / language packs
 * Logging / event system
 
-The module does not use any deprecated API as of Moodle 2.7.
+The module does not use any deprecated API as of Moodle 2.9.
 

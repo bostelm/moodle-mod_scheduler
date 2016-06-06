@@ -1,11 +1,11 @@
 <?php
+
 /**
  * The mod_scheduler booking form removed event.
  *
  * Indicates that a student has removed their booking from a slot.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

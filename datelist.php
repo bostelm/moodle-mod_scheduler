@@ -3,8 +3,7 @@
 /**
  * Shows a sortable list of appointments
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2015 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,6 +39,8 @@ $taburl = new moodle_url('/mod/scheduler/view.php',
                 array('id' => $scheduler->cmid, 'what' => 'datelist', 'scope' => $scope, 'teacherid' => $teacherid));
 $returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid));
 
+$PAGE->set_url($taburl);
+
 echo $output->header();
 
 // Print top tabs.
@@ -51,16 +52,16 @@ echo $output->teacherview_tabs($scheduler, $taburl, 'datelist');
 $currentgroupid = 0;
 $groupmode = groups_get_activity_groupmode($scheduler->cm);
 if ($groupmode) {
-	$currentgroupid = groups_get_activity_group($scheduler->cm, true);
+    $currentgroupid = groups_get_activity_group($scheduler->cm, true);
 
-	echo html_writer::start_div('dropdownmenu');
-	groups_print_activity_menu($scheduler->cm, $taburl);
-	echo html_writer::end_div();
+    echo html_writer::start_div('dropdownmenu');
+    groups_print_activity_menu($scheduler->cm, $taburl);
+    echo html_writer::end_div();
 }
 
 $scopemenukey = 'scopemenuself';
 if (has_capability('mod/scheduler:canseeotherteachersbooking', $scopecontext)) {
-    $teachers = scheduler_get_attendants($cm->id, $currentgroupid);
+    $teachers = $scheduler->get_available_teachers($currentgroupid);
     $teachermenu = array();
     foreach ($teachers as $teacher) {
         $teachermenu[$teacher->id] = fullname($teacher);
@@ -96,6 +97,9 @@ $sql = "SELECT a.id AS id, ".
                user_picture::fields('u1', array('email', 'department'), 'studentid', 'student').", ".
                $DB->sql_fullname('u1.firstname', 'u1.lastname')." AS studentfullname,
                a.appointmentnote,
+               a.appointmentnoteformat,
+               a.teachernote,
+               a.teachernoteformat,
                a.grade,
                sc.name,
                sc.id AS schedulerid,
@@ -107,7 +111,8 @@ $sql = "SELECT a.id AS id, ".
                s.starttime,
                s.duration,
                s.appointmentlocation,
-               s.notes
+               s.notes,
+               s.notesformat
           FROM {course} c,
                {scheduler} sc,
                {scheduler_appointment} a,
@@ -132,7 +137,7 @@ $sqlcount =
                sc.id = s.schedulerid AND
                a.slotid = s.id AND
                s.teacherid = :teacherid ".
-                $scopecond;
+               $scopecond;
 
 $numrecords = $DB->count_records_sql($sqlcount, $params);
 
@@ -203,8 +208,9 @@ if ($numrecords) {
         $whourl = new moodle_url('/mod/scheduler/view.php',
                         array('what' => 'viewstudent', 'a' => $row->schedulerid, 'appointmentid' => $row->id));
         $whodata = html_writer::link($whourl, $row->studentfullname);
-        $whatdata = format_string($row->notes);
+        $whatdata = $output->format_notes($row->notes, $row->notesformat, $context, 'slotnote', $row->sid);
         $gradedata = $row->scale == 0 ? '' : $output->format_grade($row->scale, $row->grade);
+
         $dataset = array(
                         $coursedata,
                         $schedulerdata,
@@ -214,7 +220,7 @@ if ($numrecords) {
                         $row->studentdepartment,
                         $whatdata,
                         $gradedata,
-                        $row->appointmentnote);
+                        $output->format_appointment_notes($scheduler, $row) );
         $table->add_data($dataset);
     }
     $table->print_html();

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Library for export functions
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/excellib.class.php');
@@ -13,11 +21,11 @@ require_once($CFG->dirroot.'/lib/pdflib.php');
  */
 abstract class scheduler_export_field {
 
-	protected $renderer;
+    protected $renderer;
 
-	public function set_renderer(mod_scheduler_renderer $renderer) {
-	    $this->renderer = $renderer;
-	}
+    public function set_renderer(mod_scheduler_renderer $renderer) {
+        $this->renderer = $renderer;
+    }
 
     /**
      * Is the field available in this scheduler?
@@ -118,7 +126,8 @@ function scheduler_get_export_fields() {
 
     $result[] = new scheduler_attended_field();
     $result[] = new scheduler_grade_field();
-    $result[] = new scheduler_appointmentnotes_field();
+    $result[] = new scheduler_appointmentnote_field();
+    $result[] = new scheduler_teachernote_field();
 
     return $result;
 }
@@ -356,10 +365,10 @@ class scheduler_slotnotes_field extends scheduler_export_field {
 /**
  * Export field: Appointment notes
  */
-class scheduler_appointmentnotes_field extends scheduler_export_field {
+class scheduler_appointmentnote_field extends scheduler_export_field {
 
     public function get_id() {
-        return 'appointmentnotes';
+        return 'appointmentnote';
     }
 
     public function get_group() {
@@ -374,11 +383,49 @@ class scheduler_appointmentnotes_field extends scheduler_export_field {
         return true;
     }
 
+    public function is_available(scheduler_instance $scheduler) {
+        return $scheduler->uses_appointmentnotes();
+    }
+
     public function get_value(scheduler_slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
         return strip_tags($appointment->appointmentnote);
+    }
+
+}
+
+/**
+ * Export field: Teacher notes
+ */
+class scheduler_teachernote_field extends scheduler_export_field {
+
+    public function get_id() {
+        return 'teachernote';
+    }
+
+    public function get_group() {
+        return 'appointment';
+    }
+
+    public function get_typical_width(scheduler_instance $scheduler) {
+        return 30;
+    }
+
+    public function is_wrapping() {
+        return true;
+    }
+
+    public function is_available(scheduler_instance $scheduler) {
+        return $scheduler->uses_teachernotes();
+    }
+
+    public function get_value(scheduler_slot $slot, $appointment) {
+        if (! $appointment instanceof scheduler_appointment) {
+            return '';
+        }
+        return strip_tags($appointment->teachernote);
     }
 
 }
@@ -415,10 +462,10 @@ class scheduler_grade_field extends scheduler_export_field {
 abstract class scheduler_canvas {
 
 
-    public $format_header;
-    public $format_bold;
-    public $format_boldit;
-    public $format_wrap;
+    public $formatheader;
+    public $formatbold;
+    public $formatboldit;
+    public $formatwrap;
 
     /**
      * Start a new page (tab, etc.) with an optional title.
@@ -506,16 +553,16 @@ class scheduler_excel_canvas extends scheduler_canvas {
         $this->workbook = new MoodleExcelWorkbook("-");
 
         // Set up formats.
-        $this->format_header = $this->workbook->add_format();
-        $this->format_bold = $this->workbook->add_format();
-        $this->format_bold = $this->workbook->add_format();
-        $this->format_boldit = $this->workbook->add_format();
-        $this->format_wrap = $this->workbook->add_format();
-        $this->format_header->set_bold();
-        $this->format_bold->set_bold();
-        $this->format_boldit->set_bold();
-        $this->format_boldit->set_italic();
-        $this->format_wrap->set_text_wrap();
+        $this->formatheader = $this->workbook->add_format();
+        $this->formatbold = $this->workbook->add_format();
+        $this->formatbold = $this->workbook->add_format();
+        $this->formatboldit = $this->workbook->add_format();
+        $this->formatwrap = $this->workbook->add_format();
+        $this->formatheader->set_bold();
+        $this->formatbold->set_bold();
+        $this->formatboldit->set_bold();
+        $this->formatboldit->set_italic();
+        $this->formatwrap->set_text_wrap();
 
     }
 
@@ -571,15 +618,15 @@ class scheduler_ods_canvas extends scheduler_canvas {
         $this->workbook = new MoodleODSWorkbook("-");
 
         // Set up formats.
-        $this->format_header = $this->workbook->add_format();
-        $this->format_bold = $this->workbook->add_format();
-        $this->format_boldit = $this->workbook->add_format();
-        $this->format_wrap = $this->workbook->add_format();
-        $this->format_header->set_bold();
-        $this->format_bold->set_bold();
-        $this->format_boldit->set_bold();
-        $this->format_boldit->set_italic();
-        $this->format_wrap->set_text_wrap();
+        $this->formatheader = $this->workbook->add_format();
+        $this->formatbold = $this->workbook->add_format();
+        $this->formatboldit = $this->workbook->add_format();
+        $this->formatwrap = $this->workbook->add_format();
+        $this->formatheader->set_bold();
+        $this->formatbold->set_bold();
+        $this->formatboldit->set_bold();
+        $this->formatboldit->set_italic();
+        $this->formatwrap->set_text_wrap();
 
     }
 
@@ -632,10 +679,10 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
 
     public function __construct() {
 
-        $this->format_header = 'header';
-        $this->format_bold = 'bold';
-        $this->format_boldit = 'boldit';
-        $this->format_wrap = 'wrap';
+        $this->formatheader = 'header';
+        $this->formatbold = 'bold';
+        $this->formatboldit = 'boldit';
+        $this->formatwrap = 'wrap';
 
         $this->start_page('');
 
@@ -650,7 +697,7 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
                 }
             }
         }
-        return $maxcol+1;
+        return $maxcol + 1;
     }
 
     protected function get_row_count($page) {
@@ -660,7 +707,7 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
                 $maxrow = $rownum;
             }
         }
-        return $maxrow+1;
+        return $maxrow + 1;
     }
 
     protected function compute_relative_widths($page) {
@@ -941,27 +988,31 @@ class scheduler_pdf_canvas extends scheduler_cached_text_canvas {
 class scheduler_export {
 
     protected $canvas;
+    protected $studfilter = null;
 
     public function __construct(scheduler_canvas $canvas) {
         $this->canvas = $canvas;
     }
 
 
-    public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $includeempty, $pageperteacher) {
+    public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $groupid, $includeempty, $pageperteacher) {
+        if ($groupid) {
+            $this->studfilter = array_keys(groups_get_members($groupid, 'u.id'));
+        }
         $this->canvas->set_title(format_string($scheduler->name));
         if ($userid) {
-            $slots = $scheduler->get_slots_for_teacher($userid);
+            $slots = $scheduler->get_slots_for_teacher($userid, $groupid);
             $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
         } else if ($pageperteacher) {
             $teachers = $scheduler->get_teachers();
             foreach ($teachers as $teacher) {
-                $slots = $scheduler->get_slots_for_teacher($teacher->id);
+                $slots = $scheduler->get_slots_for_teacher($teacher->id, $groupid);
                 $title = fullname($teacher);
                 $this->canvas->start_page($title);
                 $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
             }
         } else {
-            $slots = $scheduler->get_all_slots();
+            $slots = $scheduler->get_slots_for_group($groupid);
             $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
         }
     }
@@ -974,7 +1025,7 @@ class scheduler_export {
         foreach ($fields as $field) {
             if ($field->get_group() != 'slot' || $mode != 'appointmentsgrouped') {
                 $header = $field->get_header($scheduler);
-                $this->canvas->write_string($row, $col, $header, $this->canvas->format_header);
+                $this->canvas->write_string($row, $col, $header, $this->canvas->formatheader);
                 $this->canvas->set_column_width($col, $field->get_typical_width($scheduler));
                 $col++;
             }
@@ -983,7 +1034,7 @@ class scheduler_export {
 
         // Output the data rows.
         foreach ($slots as $slot) {
-            $appts = $slot->get_appointments();
+            $appts = $slot->get_appointments($this->studfilter);
             if ($mode == 'appointmentsgrouped') {
                 if ($appts || $includeempty) {
                     $this->write_row_summary($row, $slot, $fields);
@@ -1023,7 +1074,7 @@ class scheduler_export {
                 } else {
                     $value = $field->get_value($slot, $appointment);
                 }
-                $format = $field->is_wrapping() ? $this->canvas->format_wrap : null;
+                $format = $field->is_wrapping() ? $this->canvas->formatwrap : null;
                 $this->canvas->write_string($row, $col, $value, $format);
                 $col++;
             }
@@ -1042,8 +1093,8 @@ class scheduler_export {
             }
         }
         $str = implode(' - ', $strs);
-        $this->canvas->write_string($row, 0, $str, $this->canvas->format_boldit);
-        $this->canvas->merge_cells($row, 0, $cols-1);
+        $this->canvas->write_string($row, 0, $str, $this->canvas->formatboldit);
+        $this->canvas->merge_cells($row, 0, $cols - 1);
     }
 
 }

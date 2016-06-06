@@ -10,7 +10,7 @@
  */
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
-require_once (__DIR__ . '/../../../../lib/behat/behat_base.php');
+require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Behat\Context\Step\Given as Given, Behat\Behat\Context\Step\When as When, Behat\Gherkin\Node\TableNode as TableNode;
 /**
@@ -21,37 +21,76 @@ use Behat\Behat\Context\Step\Given as Given, Behat\Behat\Context\Step\When as Wh
  */
 class behat_mod_scheduler extends behat_base {
 
-	/**
-	 * Adds a series of slots to the scheduler
-	 *
-	 * @Given /^I add (\d+) slots (\d+) days ahead in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler and I fill the form with:$/
-	 *
-	 * @param int $slotcount
-	 * @param int $daysahead
-	 * @param string $activityname
-	 * @param TableNode $fielddata
-	 * @return Given[]
-	 */
-	public function i_add_slots_days_ahead_in_scheduler_and_i_fill_the_form_with($slotcount, $daysahead, $activityname, TableNode $fielddata) {
-		$startdate = time () + $daysahead * DAYSECS;
+    /**
+     * Adds a series of slots to the scheduler
+     *
+     * @Given /^I add (\d+) slots (\d+) days ahead in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler and I fill the form with:$/
+     *
+     * @param int $slotcount
+     * @param int $daysahead
+     * @param string $activityname
+     * @param TableNode $fielddata
+     */
+    public function i_add_slots_days_ahead_in_scheduler_and_i_fill_the_form_with(
+                        $slotcount, $daysahead, $activityname, TableNode $fielddata) {
 
-		$steps = array (
-				new Given ('I follow "' . $this->escape($activityname) . '"'),
-				new Given ('I click on "Add slots" "link"'),
-				new Given ('I follow "Add repeated slots"'),
-				new Given ('I set the field "rangestart[day]" to "' . date ( "d", $startdate ) . '"'),
-				new Given ('I set the field "rangestart[month]" to "' . date ( "F", $startdate ) . '"'),
-				new Given ('I set the field "rangestart[year]" to "' . date ( "Y", $startdate ) . '"'),
-				new Given ('I set the field "Saturday" to "1"'),
-				new Given ('I set the field "Sunday" to "1"'),
-				new Given ('I set the field "starthour" to "1"'),
-				new Given ('I set the field "endhour" to "' . ($slotcount + 1) . '"'),
-				new Given ('I set the field "duration" to "45"'),
-				new Given ('I set the field "break" to "15"'),
-				new Given ('I set the following fields to these values:', $fielddata),
-				new Given ('I press "Save changes"')
-		);
+        $startdate = time() + $daysahead * DAYSECS;
 
-		return $steps;
-	}
+        $this->execute('behat_general::click_link', $this->escape($activityname));
+        $this->execute('behat_general::i_click_on', array('Add slots', 'link'));
+        $this->execute('behat_general::click_link', 'Add repeated slots');
+
+        $rows = array();
+        $rows[] = array('rangestart[day]', date("j", $startdate));
+        $rows[] = array('rangestart[month]', date("F", $startdate));
+        $rows[] = array('rangestart[year]', date("Y", $startdate));
+        $rows[] = array('Saturday', '1');
+        $rows[] = array('Sunday', '1');
+        $rows[] = array('starthour', '1');
+        $rows[] = array('endhour', $slotcount + 1);
+        $rows[] = array('duration', '45');
+        $rows[] = array('break', '15');
+        foreach ($fielddata->getRows() as $row) {
+            $rows[] = $row;
+        }
+
+        $this->execute('behat_forms::i_set_the_following_fields_to_these_values', new TableNode($rows));
+
+        $this->execute('behat_general::i_click_on', array('Save changes', 'button'));
+
+    }
+
+    /**
+     * Add the "upcoming events" block, globally on every page.
+     *
+     * This is useful as it provides an easy way of checking a user's calendar entries.
+     *
+     * @Given /^I add the upcoming events block globally$/
+     */
+    public function i_add_the_upcoming_events_block_globally() {
+
+        $this->execute('behat_data_generators::the_following_exist', array('users',
+                        new TableNode(array(
+                            array('username', 'firstname', 'lastname', 'email'),
+                            array('globalmanager1', 'GlobalManager', '1', 'globalmanager1@example.com')
+                        )) ) );
+
+        $this->execute('behat_data_generators::the_following_exist', array('system role assigns',
+                        new TableNode(array(
+                            array('user', 'role'),
+                            array('globalmanager1', 'manager')
+                        )) ) );
+        $this->execute('behat_auth::i_log_in_as', 'globalmanager1');
+        $this->execute('behat_general::click_link', 'Site home');
+        $this->execute('behat_general::click_link', 'Turn editing on');
+        $this->execute('behat_blocks::i_add_the_block', 'Upcoming events');
+        $this->execute('behat_general::i_click_on_in_the', array('Actions', 'link_or_button', 'Upcoming events', 'block'));
+        $this->execute('behat_general::click_link', 'Configure Upcoming events block');
+        $this->execute('behat_forms::i_set_the_following_fields_to_these_values', new TableNode(array(
+                            array('Page contexts', 'Display throughout the entire site')
+                        )) );
+        $this->execute('behat_general::i_click_on', array('Save changes', 'button'));
+        $this->execute('behat_auth::i_log_out');
+
+    }
 }

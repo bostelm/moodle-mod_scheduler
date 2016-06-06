@@ -3,12 +3,10 @@
 /**
  * A class for representing a scheduler slot.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -17,7 +15,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 class scheduler_slot extends mvc_child_record_model {
 
     protected $appointments;
@@ -46,16 +44,6 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
-     * Create a scheduler slot from an already loaded record
-     */
-    /*  public static function load_from_record(stdClass $record, scheduler_instance $scheduler) {
-     $slot = new scheduler_slot($scheduler);
-    $slot->data = $record;
-    return $slot;
-    }
-
-    */
-    /**
      * Save any changes to the database
      */
     public function save() {
@@ -65,7 +53,61 @@ class scheduler_slot extends mvc_child_record_model {
         $this->update_calendar();
     }
 
+    /**
+     * Sets appointment-related data (grade, comments) for all student in this slot.
+     *
+     * @param scheduler_appointment $template appointment from which the data will be read
+     */
+    public function distribute_appointment_data(scheduler_appointment $template) {
+        $scheduler = $this->get_scheduler();
+        foreach ($this->appointments->get_children() as $appointment) {
+            if ($appointment->id != $template->id) {
+                if ($scheduler->uses_grades()) {
+                    $appointment->grade = $template->grade;
+                }
+                if ($scheduler->uses_appointmentnotes()) {
+                    $appointment->appointmentnote = $template->appointmentnote;
+                    $appointment->appointmentnoteformat = $template->appointmentnoteformat;
+                    $this->distribute_file_area('appointmentnote', $template->id, $appointment->id);
+                }
+                if ($scheduler->uses_teachernotes()) {
+                    $appointment->teachernote = $template->teachernote;
+                    $appointment->teachernoteformat = $template->teachernoteformat;
+                    $this->distribute_file_area('teachernote', $template->id, $appointment->id);
+                }
+                $appointment->save();
+            }
+        }
+    }
 
+    private function distribute_file_area($area, $sourceid, $targetid) {
+
+        if ($sourceid == $targetid) {
+            return;
+        }
+
+        $fs = get_file_storage();
+        $component = 'mod_scheduler';
+        $ctxid = $this->get_scheduler()->context->id;
+
+        // Delete old files in the target area.
+        $files = $fs->get_area_files($ctxid, $component, $area, $targetid);
+        foreach ($files as $f) {
+            $f->delete();
+        }
+
+        // Copy files from the source to the target.
+        $files = $fs->get_area_files($ctxid, $component, $area, $sourceid);
+        foreach ($files as $f) {
+            $fs->create_file_from_storedfile(array('itemid' => $targetid), $f);
+        }
+    }
+
+    /**
+     * Retrieve the scheduler associated with this appointment.
+     *
+     * @return the scheduler
+     */
     public function get_scheduler() {
         return $this->get_parent();
     }
@@ -82,12 +124,22 @@ class scheduler_slot extends mvc_child_record_model {
         }
     }
 
-
     /**
      * Return the end time of the slot
      */
     public function get_endtime() {
-        return $this->data->starttime + $this->data->duration*MINSECS;
+        return $this->data->starttime + $this->data->duration * MINSECS;
+    }
+
+    /**
+     * Is this slot bookable in its bookable period for students.
+     * This checks for the availability time of the slot and for the "guard time" restriction,
+     * but not for the number of actualy booked appointments.
+     */
+    public function is_in_bookable_period() {
+        $available = $this->hideuntil <= time();
+        $beforeguardtime = $this->starttime > time() + $this->parent->guardtime;
+        return $available && $beforeguardtime;
     }
 
     /**
@@ -164,8 +216,16 @@ class scheduler_slot extends mvc_child_record_model {
     /**
      *  Get an array of all appointments
      */
-    public function get_appointments() {
-        return array_values($this->appointments->get_children());
+    public function get_appointments($userfilter = null) {
+        $apps = $this->appointments->get_children();
+        if ($userfilter) {
+            foreach ($apps as $key => $app) {
+                if (!in_array($app->studentid, $userfilter)) {
+                    unset($apps[$key]);
+                }
+            }
+        }
+        return array_values($apps);
     }
 
     /**

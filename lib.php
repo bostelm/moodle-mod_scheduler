@@ -3,8 +3,7 @@
 /**
  * Library (public API) of the scheduler module
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -15,6 +14,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 require_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
+require_once($CFG->dirroot.'/mod/scheduler/renderer.php');
+require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 
 define('SCHEDULER_TIMEUNKNOWN', 0);  // This is used for appointments for which no time is entered.
 define('SCHEDULER_SELF', 0); // Used for setting conflict search scope.
@@ -36,7 +37,7 @@ function scheduler_add_instance($scheduler) {
     global $DB;
 
     $scheduler->timemodified = time();
-    $scheduler->scale = $scheduler->grade;
+    $scheduler->scale = isset($scheduler->grade) ? $scheduler->grade : 0;
 
     $id = $DB->insert_record('scheduler', $scheduler);
     $scheduler->id = $id;
@@ -109,22 +110,67 @@ function scheduler_delete_instance($id) {
  * @return object an information object as defined above
  */
 function scheduler_user_outline($course, $user, $mod, $scheduler) {
-    $return = NULL;
+
+    $scheduler = scheduler_instance::load_by_coursemodule_id($mod->id);
+    $upcoming = count($scheduler->get_upcoming_slots_for_student($user->id));
+    $attended = count($scheduler->get_attended_slots_for_student($user->id));
+
+    $text = '';
+
+    if ($attended + $upcoming > 0) {
+        $a = array('attended' => $attended, 'upcoming' => $upcoming);
+        $text .= get_string('outlineappointments', 'scheduler', $a);
+    }
+
+    if ($scheduler->uses_grades()) {
+        $grade = $scheduler->get_gradebook_info($user->id);
+        if ($grade) {
+            $text .= get_string('outlinegrade', 'scheduler', $grade->str_long_grade);
+        }
+    }
+
+    $return = new stdClass();
+    $return->info = $text;
     return $return;
 }
 
 /**
- * Prints a detailed representation of what a  user has done with
+ * Prints a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  * @param object $course the course instance
  * @param object $user the concerned user instance
  * @param object $mod the current course module instance
  * @param object $scheduler the activity module behind the course module instance
- * @param boolean true if the user completed activity, false otherwise
  */
 function scheduler_user_complete($course, $user, $mod, $scheduler) {
 
-    return true;
+    global $PAGE;
+
+    $scheduler = scheduler_instance::load_by_coursemodule_id($mod->id);
+    $output = $PAGE->get_renderer('mod_scheduler', null, RENDERER_TARGET_GENERAL);
+
+    $appointments = $scheduler->get_appointments_for_student($user->id);
+
+    if (count($appointments) > 0) {
+        $table = new scheduler_slot_table($scheduler);
+        $table->showattended = true;
+        foreach ($appointments as $app) {
+            $table->add_slot($app->get_slot(), $app, null, false);
+        }
+
+        echo $output->render($table);
+    } else {
+        echo get_string('noappointments', 'scheduler');
+    }
+
+    if ($scheduler->uses_grades()) {
+        $grade = $scheduler->get_gradebook_info($user->id);
+        if ($grade) {
+            $info = new scheduler_totalgrade_info($scheduler, $grade);
+            echo $output->render($info);
+        }
+    }
+
 }
 
 /**
@@ -141,108 +187,6 @@ function scheduler_print_recent_activity($course, $isteacher, $timestart) {
     return false;
 }
 
-/**
- * Function to be run periodically according to the moodle
- * This function searches for things that need to be done, such
- * as sending out mail, toggling flags etc ...
- * @return boolean always true
- * @uses $CFG
- * @uses $DB
- */
-function scheduler_cron () {
-    global $CFG, $DB;
-
-    $date = make_timestamp(date('Y'), date('m'), date('d'), date('H'), date('i'));
-
-    // for every appointment in all schedulers
-    $select = 'emaildate > 0 AND emaildate <= ? AND starttime > ?';
-    $slots = $DB->get_records_select('scheduler_slots', $select, array($date, $date), 'starttime');
-
-    foreach ($slots as $slot) {
-        // get teacher
-        $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
-
-        // get scheduler, slot and course
-        $scheduler = scheduler_instance::load_by_id($slot->schedulerid);
-        $slotm = $scheduler->get_slot($slot->id);
-        $course = $DB->get_record('course', array('id' => $scheduler->course));
-
-        // get appointed student list
-        $appointments = $DB->get_records('scheduler_appointment', array('slotid'=>$slot->id), '', 'id, studentid');
-
-        //if no email previously sent and one is required
-        foreach ($appointments as $appointment) {
-            $student = $DB->get_record('user', array('id'=>$appointment->studentid));
-            cron_setup_user($student, $course);
-            $vars = scheduler_get_mail_variables ($scheduler, $slotm, $teacher, $student, $course, $student);
-            scheduler_send_email_from_template ($student, $teacher, $course, 'remindtitle', 'reminder', $vars, 'scheduler');
-        }
-        // mark as sent
-        $slot->emaildate = -1;
-        $DB->update_record('scheduler_slots', $slot);
-    }
-
-    cron_setup_user();
-
-    return true;
-}
-
-
-
-/**
- * Returns the users with data in one scheduler
- * (users with records in journal_entries, students and teachers)
- * @param int $schedulerid the id of the activity module
- * @uses $CFG
- * @uses $DB
- */
-function scheduler_get_participants($schedulerid) {
-    global $CFG, $DB;
-
-    //Get students using slots they have
-    $sql = '
-        SELECT DISTINCT
-        u.*
-        FROM
-        {user} u,
-        {scheduler_slots} s,
-        {scheduler_appointment} a
-        WHERE
-        s.schedulerid = ? AND
-        s.id = a.slotid AND
-        u.id = a.studentid
-        ';
-    $students = $DB->get_records_sql($sql, array($schedulerid));
-
-    //Get teachers using slots they have
-    $sql = '
-        SELECT DISTINCT
-        u.*
-        FROM
-        {user} u,
-        {scheduler_slots} s
-        WHERE
-        s.schedulerid = ? AND
-        u.id = s.teacherid
-        ';
-    $teachers = $DB->get_records_sql($sql, array($schedulerid));
-
-    if ($students and $teachers){
-        $participants = array_merge(array_values($students), array_values($teachers));
-    }
-    elseif ($students) {
-        $participants = array_values($students);
-    }
-    elseif ($teachers){
-        $participants = array_values($teachers);
-    }
-    else{
-        $participants = array();
-    }
-
-    //Return students array (it contains an array of unique users)
-    return ($participants);
-}
 
 /**
  * This function returns if a scale is being used by one newmodule
@@ -302,7 +246,7 @@ function scheduler_reset_course_form_definition(&$mform) {
 
     $mform->addElement('header', 'schedulerheader', get_string('modulenameplural', 'scheduler'));
 
-    if($DB->record_exists('scheduler', array('course'=>$COURSE->id))){
+    if ($DB->record_exists('scheduler', array('course' => $COURSE->id))) {
 
         $mform->addElement('checkbox', 'reset_scheduler_slots', get_string('resetslots', 'scheduler'));
         $mform->addElement('checkbox', 'reset_scheduler_appointments', get_string('resetappointments', 'scheduler'));
@@ -314,7 +258,7 @@ function scheduler_reset_course_form_definition(&$mform) {
  * Default values for the reset form
  */
 function scheduler_reset_course_form_defaults($course) {
-    return array('reset_scheduler_slots'=>1, 'reset_scheduler_appointments'=>1);
+    return array('reset_scheduler_slots' => 1, 'reset_scheduler_appointments' => 1);
 }
 
 
@@ -335,7 +279,7 @@ function scheduler_reset_userdata($data) {
         '(SELECT sc.id FROM {scheduler} sc '.
         ' WHERE sc.course = :course)';
 
-    $params = array('course'=>$data->courseid);
+    $params = array('course' => $data->courseid);
 
     $strreset = get_string('reset');
 
@@ -344,11 +288,11 @@ function scheduler_reset_userdata($data) {
         $slots = $DB->get_recordset_sql('SELECT * '.$sqlfromslots, $params);
         $success = true;
         foreach ($slots as $slot) {
-            // delete calendar events
+            // Delete calendar events.
             $success = $success && scheduler_delete_calendar_events($slot);
 
-            // delete appointments
-            $success = $success && $DB->delete_records('scheduler_appointment', array('slotid'=>$slot->id));
+            // Delete appointments.
+            $success = $success && $DB->delete_records('scheduler_appointment', array('slotid' => $slot->id));
         }
         $slots->close();
 
@@ -358,11 +302,15 @@ function scheduler_reset_userdata($data) {
             scheduler_grade_item_update($scheduler, 'reset');
         }
 
-        $status[] = array('component' => $componentstr, 'item' => get_string('resetappointments','scheduler'), 'error' => !$success);
+        $status[] = array(
+                        'component' => $componentstr,
+                        'item' => get_string('resetappointments', 'scheduler'),
+                        'error' => !$success
+                    );
     }
     if (!empty($data->reset_scheduler_slots)) {
         if ($DB->execute('DELETE '.$sqlfromslots, $params)) {
-            $status[] = array('component' => $componentstr, 'item' => get_string('resetslots','scheduler'), 'error' => false);
+            $status[] = array('component' => $componentstr, 'item' => get_string('resetslots', 'scheduler'), 'error' => false);
         }
     }
     return $status;
@@ -518,5 +466,195 @@ function scheduler_grade_item_delete($scheduler) {
     }
 
     return grade_update('mod/scheduler', $scheduler->courseid, 'mod', 'scheduler', $scheduler->id, 0, null, array('deleted' => 1));
+}
+
+
+/*
+ * File API
+ */
+
+/**
+ * Lists all browsable file areas
+ *
+ * @package  mod_scheduler
+ * @category files
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @return array
+ */
+function scheduler_get_file_areas($course, $cm, $context) {
+    return array(
+            'slotnote' => get_string('areaslotnote', 'scheduler'),
+            'appointmentnote' => get_string('areaappointmentnote', 'scheduler'),
+            'teachernote' => get_string('areateachernote', 'scheduler')
+    );
+}
+
+/**
+ * File browsing support for scheduler module.
+ *
+ * @param file_browser $browser
+ * @param array $areas
+ * @param stdClass $course
+ * @param cm_info $cm
+ * @param context $context
+ * @param string $filearea
+ * @param int $itemid
+ * @param string $filepath
+ * @param string $filename
+ * @return file_info_stored file_info_stored instance or null if not found
+ */
+function scheduler_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+    global $CFG, $DB, $USER;
+
+    // Note: 'intro' area is handled in file_browser automatically.
+
+    if (!has_any_capability(array('mod/scheduler:appoint', 'mod/scheduler:attend'), $context)) {
+        return null;
+    }
+
+    require_once(dirname(__FILE__).'/locallib.php');
+
+    $validareas = array_keys(scheduler_get_file_areas($course, $cm, $context));
+    if (!in_array($filearea, $validareas)) {
+        return null;
+    }
+
+    if (is_null($itemid)) {
+        return new scheduler_file_info($browser, $course, $cm, $context, $areas, $filearea);
+    }
+
+    try {
+        $scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
+
+        if ($filearea === 'slotnote') {
+            $slot = $scheduler->get_slot($itemid);
+
+            $cansee = true;
+            $canwrite = $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $name = get_string('slot', 'scheduler'). ' '.$itemid;
+
+        } else if ($filearea === 'appointmentnote') {
+            if (!$scheduler->uses_appointmentnotes()) {
+                return null;
+            }
+            list($slot, $app) = $scheduler->get_slot_appointment($itemid);
+            $cansee = $USER->id == $app->studentid || $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $canwrite = $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $name = get_string('appointment', 'scheduler'). ' '.$itemid;
+
+        } else if ($filearea === 'teachernote') {
+            if (!$scheduler->uses_teachernotes()) {
+                return null;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($itemid);
+            $cansee = $USER->id == $slot->teacherid
+                        || has_capability('mod/scheduler:manageallappointments', $context);
+            $canwrite = $cansee;
+            $name = get_string('appointment', 'scheduler'). ' '.$itemid;
+        }
+
+        $fs = get_file_storage();
+        $filepath = is_null($filepath) ? '/' : $filepath;
+        $filename = is_null($filename) ? '.' : $filename;
+        if (!$storedfile = $fs->get_file($context->id, 'mod_scheduler', $filearea, $itemid, $filepath, $filename)) {
+            return null;
+        }
+
+        $urlbase = $CFG->wwwroot.'/pluginfile.php';
+        return new file_info_stored($browser, $context, $storedfile, $urlbase, $name, true, true, $canwrite, false);
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
+ * Serves the files embedded in various notes fields
+ *
+ * @package  mod_scheduler
+ * @category files
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClsss $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - justsend the file
+ */
+function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $CFG, $DB;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    require_course_login($course, true, $cm);
+    if (!has_any_capability(array('mod/scheduler:appoint', 'mod/scheduler:attend'), $context)) {
+        return false;
+    }
+
+    try {
+        $scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
+
+        $entryid = (int)array_shift($args);
+        $relativepath = implode('/', $args);
+
+        if ($filearea === 'slotnote') {
+            if (!$scheduler->get_slot($entryid)) {
+                return false;
+            }
+            // No further access control required - everyone can see slots notes.
+
+        } else if ($filearea === 'appointmentnote') {
+            if (!$scheduler->uses_appointmentnotes()) {
+                return false;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($entryid);
+            if (!$app) {
+                return false;
+            }
+
+            if (!($USER->id == $app->studentid || $USER->id == $slot->teacherid)) {
+                require_capability('mod/scheduler:manageallappointments', $context);
+            }
+
+        } else if ($filearea === 'teachernote') {
+            if (!$scheduler->uses_teachernotes()) {
+                return false;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($entryid);
+            if (!$app) {
+                return false;
+            }
+
+            if (!($USER->id == $slot->teacherid)) {
+                require_capability('mod/scheduler:manageallappointments', $context);
+            }
+
+        } else {
+            // Unknown file area.
+            return false;
+        }
+    } catch (Exception $e) {
+        // Typically, records that are not found in the database.
+        return false;
+    }
+
+    $fullpath = "/$context->id/mod_scheduler/$filearea/$entryid/$relativepath";
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, $forcedownload, $options);
 }
 

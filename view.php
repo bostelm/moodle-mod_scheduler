@@ -4,8 +4,7 @@
  * This page prints a particular instance of scheduler and handles
  * top level interactions
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -19,7 +18,6 @@ require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
 $id = optional_param('id', '', PARAM_INT);    // Course Module ID - if it's not specified, must specify 'a', see below.
 $action = optional_param('what', 'view', PARAM_ALPHA);
 $subaction = optional_param('subaction', '', PARAM_ALPHA);
-$subpage = optional_param('subpage', 'allappointments', PARAM_ALPHA);
 $offset = optional_param('offset', -1, PARAM_INT);
 
 if ($id) {
@@ -31,6 +29,9 @@ if ($id) {
     $cm = $scheduler->get_cm();
 }
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+
+$defaultsubpage = groups_get_activity_groupmode($cm) ? 'myappointments' : 'allappointments';
+$subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
 require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
@@ -62,9 +63,9 @@ $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
 
-// route to screen
+// Route to screen.
 
-// teacher side
+// Teacher side.
 if (has_capability('mod/scheduler:manage', $context)) {
     if ($action == 'viewstatistics') {
         include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
@@ -78,11 +79,11 @@ if (has_capability('mod/scheduler:manage', $context)) {
         include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }
 
-    // student side
+    // Student side.
 } else if (has_capability('mod/scheduler:appoint', $context)) {
     include($CFG->dirroot.'/mod/scheduler/studentview.php');
 
-    // for guests
+    // For guests.
 } else {
     echo $OUTPUT->header();
     echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');

@@ -2,8 +2,7 @@
 
 /**
  * Unit tests for scheduler slots
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -15,7 +14,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
-
+/**
+ * Unit tests for the scheduler_slots class.
+ *
+ * @group mod_scheduler
+ */
 class mod_scheduler_slot_testcase extends advanced_testcase {
 
     protected $moduleid;  // Course_modules id used for testing.
@@ -41,16 +44,16 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $options = array();
         $options['slottimes'] = array();
         $options['slotstudents'] = array();
-        $options['slottimes'][0] = time()+DAYSECS;
+        $options['slottimes'][0] = time() + DAYSECS;
         $options['slotstudents'][0] = $this->students;
 
-        $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course'=>$course->id), $options);
-        $coursemodule = $DB->get_record('course_modules', array('id'=>$scheduler->cmid));
+        $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course' => $course->id), $options);
+        $coursemodule = $DB->get_record('course_modules', array('id' => $scheduler->cmid));
 
         $this->schedulerid = $scheduler->id;
         $this->moduleid  = $coursemodule->id;
         $this->courseid  = $coursemodule->course;
-        $this->teacherid = 2;  // admin
+        $this->teacherid = 2;  // Admin user.
         $this->slotid = $DB->get_field('scheduler_slots', 'id', array('schedulerid' => $scheduler->id), MUST_EXIST);
         $this->appointmentids = array_keys($DB->get_records('scheduler_appointment', array('slotid' => $this->slotid)));
     }
@@ -76,7 +79,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $scheduler = scheduler_instance::load_by_id($this->schedulerid);
         $slot = $scheduler->create_slot();
 
-        $slot->teacherid =  $this->getDataGenerator()->create_user()->id;
+        $slot->teacherid = $this->getDataGenerator()->create_user()->id;
         $slot->starttime = time();
         $slot->duration = 60;
 
@@ -174,7 +177,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
             $this->assert_event_exists($student, $slot->starttime, "Meeting with your Teacher");
         }
 
-        $newstart = time() + 3*DAYSECS;
+        $newstart = time() + 3 * DAYSECS;
         $slot->starttime = $newstart;
         $slot->save();
 

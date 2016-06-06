@@ -4,8 +4,7 @@
  * Export settings form
  * (using Moodle formslib)
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2015 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,10 +31,14 @@ class scheduler_export_form extends moodleform {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $radios = array();
-        $radios[] = $mform->createElement('radio', 'content', '', get_string('onelineperslot', 'scheduler'), 'onelineperslot');
-        $radios[] = $mform->createElement('radio', 'content', '', get_string('onelineperappointment', 'scheduler'),  'onelineperappointment');
-        $radios[] = $mform->createElement('radio', 'content', '', get_string('appointmentsgrouped', 'scheduler'), 'appointmentsgrouped');
-        $mform->addGroup($radios, 'contentgroup', get_string('contentformat', 'scheduler'), null, false);
+        $radios[] = $mform->createElement('radio', 'content', '',
+                                          get_string('onelineperslot', 'scheduler'), 'onelineperslot');
+        $radios[] = $mform->createElement('radio', 'content', '',
+                                          get_string('onelineperappointment', 'scheduler'),  'onelineperappointment');
+        $radios[] = $mform->createElement('radio', 'content', '',
+                                          get_string('appointmentsgrouped', 'scheduler'), 'appointmentsgrouped');
+        $mform->addGroup($radios, 'contentgroup',
+                                          get_string('contentformat', 'scheduler'), null, false);
         $mform->setDefault('content', 'onelineperappointment');
         $mform->addHelpButton('contentgroup', 'contentformat', 'scheduler');
 
@@ -96,7 +99,7 @@ class scheduler_export_form extends moodleform {
         $mform->addElement('select', 'pdforientation', get_string('pdforientation', 'scheduler'),  $selopt);
         $mform->disabledIf('pdforientation', 'outputformat', 'neq', 'pdf');
 
-        $buttonarray=array();
+        $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'preview', get_string('preview', 'scheduler'));
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('createexport', 'scheduler'));
         $buttonarray[] = $mform->createElement('cancel');
