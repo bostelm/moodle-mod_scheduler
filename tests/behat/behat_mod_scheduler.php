@@ -24,6 +24,44 @@ class behat_mod_scheduler extends behat_base {
     /**
      * Adds a series of slots to the scheduler
      *
+     * @Given /^I add a slot (\d+) days ahead at (\d+) in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler and I fill the form with:$/
+     *
+     * @param int $slotcount
+     * @param int $daysahead
+     * @param int $time
+     * @param string $activityname
+     * @param TableNode $fielddata
+     */
+    public function i_add_a_slot_days_ahead_at_in_scheduler_and_i_fill_the_form_with(
+                              $daysahead, $time, $activityname, TableNode $fielddata) {
+
+        $hours = floor($time / 100);
+        $mins  = $time - 100 * $hours;
+        $startdate = time() + $daysahead * DAYSECS;
+
+        $this->execute('behat_general::click_link', $this->escape($activityname));
+        $this->execute('behat_general::i_click_on', array('Add slots', 'link'));
+        $this->execute('behat_general::click_link', 'Add single slot');
+
+        $rows = array();
+        $rows[] = array('starttime[day]', date("j", $startdate));
+        $rows[] = array('starttime[month]', date("F", $startdate));
+        $rows[] = array('starttime[year]', date("Y", $startdate));
+        $rows[] = array('starttime[hour]', $hours);
+        $rows[] = array('starttime[minute]', $mins);
+        $rows[] = array('duration', '45');
+        foreach ($fielddata->getRows() as $row) {
+            $rows[] = $row;
+        }
+        $this->execute('behat_forms::i_set_the_following_fields_to_these_values', new TableNode($rows));
+
+        $this->execute('behat_general::i_click_on', array('Save changes', 'button'));
+    }
+
+
+    /**
+     * Adds a series of slots to the scheduler
+     *
      * @Given /^I add (\d+) slots (\d+) days ahead in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler and I fill the form with:$/
      *
      * @param int $slotcount

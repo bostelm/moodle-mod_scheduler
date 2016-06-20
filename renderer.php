@@ -499,9 +499,13 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
             $rowdata[] = $groupinfo;
 
-            $bookurl = new moodle_url($booker->actionurl, array('what' => 'bookslot', 'slotid' => $slot->slotid));
-            $button = new single_button($bookurl, get_string('bookslot', 'scheduler'));
-            $rowdata[] = $this->render($button);
+            if ($slot->canbook) {
+                $bookurl = new moodle_url($booker->actionurl, array('what' => 'bookslot', 'slotid' => $slot->slotid));
+                $button = new single_button($bookurl, get_string('bookslot', 'scheduler'));
+                $rowdata[] = $this->render($button);
+            } else {
+                $rowdata[] = '';
+            }
 
             $table->data[] = $rowdata;
 

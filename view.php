@@ -35,7 +35,6 @@ $subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
 require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
-// TODO require_capability('mod/scheduler:view', $context);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
@@ -65,8 +64,10 @@ $PAGE->set_heading($course->fullname);
 
 // Route to screen.
 
-// Teacher side.
-if (has_capability('mod/scheduler:manage', $context)) {
+$isteacher = has_capability('mod/scheduler:manage', $context);
+$isstudent = has_capability('mod/scheduler:viewslots', $context);
+if ($isteacher) {
+    // Teacher side.
     if ($action == 'viewstatistics') {
         include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
     } else if ($action == 'viewstudent') {
@@ -79,12 +80,12 @@ if (has_capability('mod/scheduler:manage', $context)) {
         include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }
 
+} else if ($isstudent) {
     // Student side.
-} else if (has_capability('mod/scheduler:appoint', $context)) {
     include($CFG->dirroot.'/mod/scheduler/studentview.php');
 
-    // For guests.
 } else {
+    // For guests.
     echo $OUTPUT->header();
     echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');
     echo $OUTPUT->footer($course);

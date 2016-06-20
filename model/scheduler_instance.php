@@ -508,19 +508,20 @@ class scheduler_instance extends mvc_record_model {
      * It does however check for group restrictions if group mode is enabled.
      *
      * @param int $studentid
-     * @param boolean $includebooked include slots that were booked by this student (but not yet attended)
-     * @uses $CFG
-     * @uses $DB
+     * @param boolean $includefullybooked include slots that are already fully booked
      */
-    public function get_slots_available_to_student($studentid, $includebooked = false) {
-        global $CFG, $DB;
+    public function get_slots_available_to_student($studentid, $includefullybooked = false) {
+
+        global $DB;
 
         $params = array();
-        $wherecond = '(s.starttime > :cutofftime) AND (s.hideuntil < :nowhide)';
+        $wherecond = "(s.starttime > :cutofftime) AND (s.hideuntil < :nowhide)";
         $params['nowhide'] = time();
         $params['cutofftime'] = time() + $this->guardtime;
-        $subcond = '(s.exclusivity = 0 OR s.exclusivity > '.$this->appointment_count_query().')'
-            . ' AND NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
+        $subcond = 'NOT ('.$this->student_in_slot_condition($params, $studentid, false, false).')';
+        if (!$includefullybooked) {
+            $subcond .= ' AND (s.exclusivity = 0 OR s.exclusivity > '.$this->appointment_count_query().')';
+        }
         if ($this->groupmode != NOGROUPS) {
             $groups = groups_get_all_groups($this->cm->course, $studentid, $this->cm->groupingid);
             if ($groups) {
@@ -536,10 +537,7 @@ class scheduler_instance extends mvc_record_model {
                 $subcond .= " AND FALSE";
             }
         }
-        if ($includebooked) {
-            $subcond = '('.$subcond.') OR ('.$this->student_in_slot_condition($params, $studentid, false, true).')';
-        }
-        $wherecond .= ' AND ('.$subcond.')';
+        $wherecond .= " AND ($subcond)";
         $order = 's.starttime ASC';
         $slots = $this->fetch_slots($wherecond, '', $params, '', '', $order);
 

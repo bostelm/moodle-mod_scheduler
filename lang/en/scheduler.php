@@ -14,15 +14,17 @@ $string['modulenameplural'] = 'Schedulers';
 
 /* ***** Capabilities ****** */
 $string['scheduler:addinstance'] = 'Add a new scheduler';
-$string['scheduler:appoint'] = 'Appoint';
+$string['scheduler:appoint'] = 'Book slots';
 $string['scheduler:attend'] = 'Attend students';
 $string['scheduler:canscheduletootherteachers'] = 'Schedule appointments for other staff members';
 $string['scheduler:canseeotherteachersbooking'] = 'See and browse other teachers booking';
 $string['scheduler:disengage'] = 'This capability is deprecated and does nothing';
 $string['scheduler:manage'] = 'Manage your slots and appointments';
 $string['scheduler:manageallappointments'] = 'Manage all scheduler data';
-$string['scheduler:seeotherstudentsbooking'] = 'See other student booking on the slot';
-$string['scheduler:seeotherstudentsresults'] = 'See other slot student\'s result';
+$string['scheduler:viewslots'] = 'See slots that are open for booking (in student screen)';
+$string['scheduler:viewfullslots'] = 'See slots even if they are fully booked (in student screen)';
+$string['scheduler:seeotherstudentsbooking'] = 'See other students booked on the slot';
+$string['scheduler:seeotherstudentsresults'] = 'See other slot student\'s results';
 $string['scheduler:seeoverviewoutsideactivity'] = 'Use the overview screen to see slots outside the current scheduler activity.';
 
 /* ***** Events ***** */
