@@ -43,20 +43,6 @@ $output = $PAGE->get_renderer('mod_scheduler');
 
 // Print the page header.
 
-$strschedulers = get_string('modulenameplural', 'scheduler');
-$strscheduler  = get_string('modulename', 'scheduler');
-$strtime = get_string('time');
-$strdate = get_string('date', 'scheduler');
-$strstart = get_string('start', 'scheduler');
-$strend = get_string('end', 'scheduler');
-$strname = get_string('name');
-$strseen = get_string('seen', 'scheduler');
-$strnote = get_string('comments', 'scheduler');
-$strgrade = get_string('grade', 'scheduler');
-$straction = get_string('action', 'scheduler');
-$strduration = get_string('duration', 'scheduler');
-$stremail = get_string('email');
-
 $title = $course->shortname . ': ' . format_string($scheduler->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
