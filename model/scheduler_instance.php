@@ -623,9 +623,82 @@ class scheduler_instance extends mvc_record_model {
         return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC');
     }
 
+
     /* ************** End of slot retrieveal routines ******************** */
 
+    /**
+     * Returns an array of slots that would overlap with this one.
+     *
+     * @param int $starttime the start of time slot as a timestamp
+     * @param int $endtime end of time slot as a timestamp
+     * @param int $teacher the id of the teacher constraint, or 0 for "all teachers"
+     * @param int $student the id of the student constraint, or 0 for "all students"
+     * @param int $others selects where to search for conflicts, [SCHEDULER_SELF, SCHEDULER_OTHERS, SCHEDULER_ALL]
+     * @param int $excludeslot exclude slot with this id (useful to exclude present slot when saving)
+     * @uses $DB
+     * @return array conflicting slots
+     */
+    function get_conflicts($starttime, $endtime, $teacher = 0, $student = 0,
+                           $others = SCHEDULER_SELF, $excludeslot = 0) {
+        global $DB;
 
+        $params = array();
+
+        $slotscope = ($excludeslot == 0) ? "" : "sl.id != :excludeslot AND ";
+        $params['excludeslot'] = $excludeslot;
+
+        switch ($others) {
+            case SCHEDULER_SELF:
+                $schedulerscope = "sl.schedulerid = :schedulerid AND ";
+                $params['schedulerid'] = $this->id;
+                break;
+            case SCHEDULER_OTHERS:
+                $schedulerscope = "sl.schedulerid != :schedulerid AND ";
+                $params['schedulerid'] = $this->id;
+                break;
+            default:
+                $schedulerscope = '';
+        }
+        if ($teacher != 0) {
+            $teacherscope = "sl.teacherid = :teacherid AND ";
+            $params['teacherid'] = $teacher;
+        } else {
+            $teacherscope = "";
+        }
+
+        $studentjoin = ($student != 0) ? "JOIN {scheduler_appointment} a ON a.slotid = sl.id AND a.studentid = :studentid " : '';
+        $params['studentid'] = $student;
+
+        $timeclause = "( (sl.starttime <= :starttime1 AND sl.starttime + sl.duration * 60 > :starttime2) OR
+                         (sl.starttime < :endtime1 AND sl.starttime + sl.duration * 60 >= :endtime2) OR
+                         (sl.starttime >= :starttime3 AND sl.starttime + sl.duration * 60 <= :endtime3) )
+                       AND sl.starttime + sl.duration * 60 > :nowtime";
+        $params['starttime1'] = $starttime;
+        $params['starttime2'] = $starttime;
+        $params['starttime3'] = $starttime;
+        $params['endtime1'] = $endtime;
+        $params['endtime2'] = $endtime;
+        $params['endtime3'] = $endtime;
+        $params['nowtime'] = time();
+
+        $sql = "SELECT sl.*,
+                       s.name AS schedulername,
+                       (s.id = :thisid) as isself,
+                       c.id AS courseid, c.shortname AS courseshortname, c.fullname AS coursefullname,
+                       (SELECT COUNT(*) FROM {scheduler_appointment} ac WHERE sl.id = ac.slotid) AS numstudents
+                  FROM {scheduler_slots} sl
+                       $studentjoin
+                  JOIN {scheduler} s ON sl.schedulerid = s.id
+                  JOIN {course} c ON c.id = s.course
+                 WHERE $slotscope $schedulerscope $teacherscope $timeclause
+              ORDER BY sl.starttime ASC, sl.duration ASC";
+
+        $params['thisid'] = $this->id;
+
+        $conflicting = $DB->get_records_sql($sql, $params);
+
+        return $conflicting;
+    }
 
     /**
      * retrieves an appointment and the corresponding slot

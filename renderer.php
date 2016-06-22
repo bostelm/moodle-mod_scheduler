@@ -730,4 +730,28 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $o;
     }
 
+    public function render_scheduler_conflict_list(scheduler_conflict_list $cl) {
+
+        $o = html_writer::start_tag('ul');
+
+        foreach ($cl->conflicts as $conflict) {
+            $a = new stdClass();
+            $a->datetime = userdate($conflict->starttime);
+            $a->duration = $conflict->duration;
+            if ($conflict->isself) {
+                $entry = get_string('conflictlocal', 'scheduler', $a);
+            } else {
+                $a->courseshortname = $conflict->courseshortname;
+                $a->coursefullname = $conflict->coursefullname;
+                $a->schedulername = format_string($conflict->schedulername);
+                $entry = get_string('conflictremote', 'scheduler', $a);
+            }
+            $o .= html_writer::tag('li', $entry);
+        }
+
+        $o .= html_writer::end_tag('ul');
+
+        return $o;
+    }
+
 }

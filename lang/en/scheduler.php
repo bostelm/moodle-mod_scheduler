@@ -97,6 +97,8 @@ $string['canbookunlimitedappointments'] = 'You can book any number of appointmen
 $string['chooseexisting'] = 'Choose existing';
 $string['choosingslotstart'] = 'Choosing the start time';
 $string['comments'] = 'Comments';
+$string['conflictlocal'] = '{$a->datetime} ({$a->duration} minutes) in this scheduler';
+$string['conflictremote'] = '{$a->datetime} ({$a->duration} minutes) in course {$a->courseshortname}, scheduler {$a->schedulername}';
 $string['contentformat'] = 'Format';
 $string['contentformat_help'] = '<p>There are three basic choices for the export format,
      differing in how slots with several appointments are handled.
@@ -126,7 +128,7 @@ $string['confirmdelete-myunused'] = 'This will delete all your unused slots in t
 $string['confirmdelete-selected'] = 'This will delete the selected slots. Deletion cannot be undone. Continue anyway?';
 $string['confirmdelete-one'] = 'Delete slot?';
 $string['confirmdelete-unused'] = 'This will delete all unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
-$string['conflictingslots'] = 'Conflicting';
+$string['conflictingslots'] = 'The slot on {$a} cannot be created due to conflicting slots:';
 $string['copytomyself'] = 'Send a copy to myself';
 $string['course'] = 'Course';
 $string['createexport'] = 'Create export file';
@@ -146,9 +148,10 @@ $string['deletemyslots'] = 'Delete all my slots';
 $string['deleteselection'] = 'Delete selected slots';
 $string['deletetheseslots'] = 'Delete these slots';
 $string['deleteunusedslots'] = 'Delete my unused slots';
+$string['deletedconflictingslots'] = 'For the slot on {$a}, conflicting slots have been deleted:';
 $string['department'] = 'From where?';
 $string['disengage'] = 'Drop my appointments';
-$string['displayfrom'] = 'Display appointment to students from';
+$string['displayfrom'] = 'Display slot to students from';
 $string['distributetoslot'] = 'Distribute to the whole group';
 $string['divide'] = 'Divide into slots?';
 $string['dontforgetsaveadvice'] = 'You have changed the list of appointed people. Don\'t forget saving this form to commit the changes definitively.';
@@ -224,6 +227,7 @@ $string['htmlformat'] = 'HTML';
 $string['howtoaddstudents'] = 'For adding students to a global scoped scheduler, use the role setting for the module.<br/>You may also use module role definitions to define the attenders of your students.';
 $string['ignoreconflicts'] = 'Ignore scheduling conflicts';
 $string['ignoreconflicts_help'] = 'If this box is ticked, then the slot will be moved to the requested date and time, even if other slots exist at the same time. This may lead to overlapping appointments for some teachers or students, and should therefore be used with care.';
+$string['ignoreconflicts_link'] = 'mod/scheduler/conflict';
 $string['includeemptyslots'] = 'Include empty slots';
 $string['includeslotsfor'] = 'Include slots for';
 $string['incourse'] = ' in course ';
@@ -421,6 +425,8 @@ $string['forcewhenoverlap_help'] = '
 <p>If enabled, the overlapping existing slot will be deleted and the new slot created.</p>
 <p>If disabled, the overlapping existing slot will be kept and a new slot will <em>not</em> be created.</p>
 ';
+$string['forcewhenoverlap_link'] = 'mod/scheduler/conflict';
+
 
 $string['addscheduled_help'] = '
 <h3>Adding an appointment on slot setup</h3>

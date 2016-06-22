@@ -75,33 +75,34 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                                     $data->emaildaterel;
             }
             while ($slot->starttime <= $data->timeend - $slot->duration * 60) {
-                $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $slot->duration * 60,
-                                                     $data->teacherid, 0, SCHEDULER_ALL, false);
+                $conflicts = $scheduler->get_conflicts($data->timestart, $data->timestart + $slot->duration * 60,
+                                                       $data->teacherid, 0, SCHEDULER_ALL);
+                $resolvable = (boolean) $data->forcewhenoverlap;
+                foreach ($conflicts as $conflict) {
+                    $resolvable = $resolvable
+                                     && $conflict->isself == 1       // Do not delete slots outside the current scheduler.
+                                     && $conflict->numstudents == 0; // Do not delete slots with bookings.
+                }
+
                 if ($conflicts) {
-                    if (!$data->forcewhenoverlap) {
-                        print_string('conflictingslots', 'scheduler');
-                        echo '<ul>';
-                        foreach ($conflicts as $aconflict) {
-                            $sql = 'SELECT c.fullname, c.shortname, s.name as schedname, sl.starttime '
-                                    .'FROM {course} c, {scheduler} s, {scheduler_slots} sl '
-                                    .'WHERE s.course = c.id AND sl.schedulerid = s.id AND sl.id = :conflictid';
-                            $conflictinfo = $DB->get_record_sql($sql, array('conflictid' => $aconflict->id));
-                            $msg = $output->userdate($conflictinfo->starttime) . ', '
-                                   . $output->usertime($conflictinfo->starttime) . ': ';
-                            $msg .= s($conflictinfo->schedname). ' '.get_string('incourse', 'scheduler') . ' ';
-                            $msg .= $conflictinfo->shortname . ' - ' . $conflictinfo->fullname;
-                            echo html_writer::tag('li', $msg);
-                        }
-                        echo '</ul><br/>';
+                    $cl = new scheduler_conflict_list();
+                    $cl->add_conflicts($conflicts);
+                    if (!$resolvable) {
+                        print_string('conflictingslots', 'scheduler', userdate($data->timestart));
+                        echo $output->doc_link('mod/scheduler/conflict', '', true);
+                        echo $output->render($cl);
                     } else { // We force, so delete all conflicting before inserting.
                         foreach ($conflicts as $conflict) {
                             $cslot = $scheduler->get_slot($conflict->id);
                             \mod_scheduler\event\slot_deleted::create_from_slot($cslot, 'addsession-conflict')->trigger();
                             $cslot->delete();
                         }
+                        print_string('deletedconflictingslots', 'scheduler', userdate($data->timestart));
+                        echo $output->doc_link('mod/scheduler/conflict', '', true);
+                        echo $output->render($cl);
                     }
                 }
-                if (!$conflicts || $data->forcewhenoverlap) {
+                if (!$conflicts || $resolvable) {
                     $slotid = $DB->insert_record('scheduler_slots', $slot, true, true);
                     $slotobj = $scheduler->get_slot($slotid);
                     \mod_scheduler\event\slot_added::create_from_slot($slotobj)->trigger();
