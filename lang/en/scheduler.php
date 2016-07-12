@@ -40,6 +40,9 @@ $string['messageprovider:invitation'] = 'Invitation to book a slot';
 $string['messageprovider:bookingnotification'] = 'Notification when a booking is made or cancelled';
 $string['messageprovider:reminder'] = 'Reminder of an upcoming appointment';
 
+/* ***** Search areas ***** */
+$string['search:activity'] = 'Scheduler - activity information';
+
 /* ***** Interface strings ****** */
 
 $string['onedaybefore'] = '1 day before slot';
