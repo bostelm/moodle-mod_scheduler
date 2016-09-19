@@ -47,7 +47,7 @@ class scheduler_message_form extends moodleform {
         }
 
         $mform->addElement('selectyesno', 'copytomyself', get_string('copytomyself', 'scheduler'));
-        $mform->setDefault('copytomyself', 0);
+        $mform->setDefault('copytomyself', true);
 
         $mform->addElement('text', 'subject', get_string('messagesubject', 'scheduler'), array('size' => '60'));
         $mform->setType('subject', PARAM_TEXT);

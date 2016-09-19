@@ -126,6 +126,13 @@ function scheduler_action_dosendmessage($scheduler, $formdata) {
     if ($data->copytomyself) {
         $recipients[$USER->id] = 1;
     }
+    $rawmessage = $data->body['text'];
+    $format = $data->body['format'];
+    $textmessage = format_text_email($rawmessage, $format);
+    $htmlmessage = null;
+    if ($format == FORMAT_HTML) {
+        $htmlmessage = $rawmessage;
+    }
 
     $cnt = 0;
     foreach ($recipients as $recipientid => $value) {
@@ -136,8 +143,11 @@ function scheduler_action_dosendmessage($scheduler, $formdata) {
             $message->userfrom = $USER;
             $message->userto = $recipientid;
             $message->subject = $data->subject;
-            $message->fullmessage = $data->body['text'];
-            $message->fullmessageformat = $data->body['format'];
+            $message->fullmessage = $textmessage;
+            $message->fullmessageformat = $format;
+            if ($htmlmessage) {
+                $message->fullmessagehtml = $htmlmessage;
+            }
             $message->notification = '0';
 
             message_send($message);
