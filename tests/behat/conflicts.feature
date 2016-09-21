@@ -145,7 +145,7 @@ Feature: Teachers are warned about scheduling conflicts
     When I follow "Course 1"
     And I add 10 slots 5 days ahead in "Test scheduler A" scheduler and I fill the form with:
       | Location | Lecture hall |    
-    Then I should see "Conflicting slots"
+    Then I should see "conflicting slots"
     And I should not see "deleted"
     And I should see "4 slots have been added"
     And  "1:25 AM" "table_row" should exist
@@ -169,7 +169,7 @@ Feature: Teachers are warned about scheduling conflicts
     And I add 10 slots 5 days ahead in "Test scheduler A" scheduler and I fill the form with:
       | Location | Lecture hall |    
       | Force when overlap | 1  |    
-    Then I should see "Conflicting slots"
+    Then I should see "conflicting slots"
     And I should see "deleted"
     And I should see "8 slots have been added"
     And  "1:25 AM" "table_row" should not exist
