@@ -77,7 +77,7 @@ class mod_scheduler_generator extends testing_module_generator {
                 $slot->timemodified = time();
                 $slot->notes = '';
                 $slot->slotnote = '';
-                $slot->exclusivity = 0;
+                $slot->exclusivity = isset($options['slotexclusivity'][$slotkey]) ? $options['slotexclusivity'][$slotkey] : 0;
                 $slot->emaildate = 0;
                 $slot->hideuntil = 0;
                 $slotid = $DB->insert_record('scheduler_slots', $slot);

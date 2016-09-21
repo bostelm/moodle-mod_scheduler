@@ -214,6 +214,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         global $DB;
 
         $currentstud = $this->getDataGenerator()->create_user()->id;
+        $otherstud   = $this->getDataGenerator()->create_user()->id;
 
         $options = array();
         $options['slottimes'] = array();
@@ -238,9 +239,15 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         $options['slotattended'][7] = true;
 
         // Create slot 8, located less than one day in the future but marked attended.
-        $options['slottimes'][8] = time() + 9 * HOURSECS;
+        $options['slottimes'][8] = time() + 8 * HOURSECS;
         $options['slotstudents'][8] = $currentstud;
         $options['slotattended'][8] = true;
+
+        // Create slot 9, located in the future but already booked by another student.
+        $options['slottimes'][9] = time() + 10 * DAYSECS + 9 * HOURSECS;
+        $options['slotstudents'][9] = $otherstud;
+        $options['slotattended'][9] = false;
+        $options['slotexclusivity'][9] = 1;
 
         // Create slots 10 to 14, (n-10) days in the future, open for booking.
         for ($c = 10; $c <= 14; $c++) {
@@ -257,7 +264,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
                      array(7, 8),
                      array(0, 1, 2, 3, 4, 5, 6),
                      array(10, 11, 12, 13, 14),
-                     array(10, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5) );
+                     array(10, 11, 12, 13, 14, 9) );
 
         $schedrec->guardtime = DAYSECS;
         $DB->update_record('scheduler', $schedrec);
@@ -266,7 +273,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
                      array(7, 8),
                      array(0, 1, 2, 3, 4, 5, 6),
                      array(11, 12, 13, 14),
-                     array(11, 12, 13, 14, 1, 2, 3, 4, 5) );
+                     array(11, 12, 13, 14, 9) );
 
         $schedrec->guardtime = 4 * DAYSECS;
         $DB->update_record('scheduler', $schedrec);
@@ -275,7 +282,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
                      array(7, 8),
                      array(0, 1, 2, 3, 4, 5, 6),
                      array(14),
-                     array(14, 4, 5) );
+                     array(14, 9) );
 
         $schedrec->guardtime = 20 * DAYSECS;
         $DB->update_record('scheduler', $schedrec);
