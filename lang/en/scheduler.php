@@ -156,6 +156,7 @@ $string['displayfrom'] = 'Display slot to students from';
 $string['distributetoslot'] = 'Distribute to the whole group';
 $string['divide'] = 'Divide into slots?';
 $string['duration'] = 'Duration';
+$string['durationrange'] = 'Slot duration must be between {$a->min} and {$a->max} minutes.';
 $string['emailreminder'] = 'Email a reminder';
 $string['emailreminderondate'] = 'Email a reminder on';
 $string['end'] = 'End';
