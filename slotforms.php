@@ -539,7 +539,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         return $errors;
     }
 }
-//TDMU
+
 class scheduler_addaperiodsession_form extends scheduler_slotform_base {
 
     protected function definition() {
@@ -547,9 +547,10 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
         global $DB, $CFG, $COURSE;
 
         $mform = $this->_form;
-
+  
         $listdates = "";
         $mform->addElement('hidden', 'getlistdates', $listdates);
+      
         // Define Calendar panel
         $mform->addElement('html', '<div id="calendar" class="yui3-skin-sam">');
         $mform->addElement('html', '<div id="calContainer"></div>');     
@@ -563,15 +564,16 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
         for ($i=0; $i<60; $i+=5) {
             $minutes[$i] = sprintf("%02d", $i);
         }
-        $starttimegroup = array();
-        $starttimegroup[] = $mform->createElement('select', 'starthour', get_string('hour', 'form'), $hours);
-        $starttimegroup[] = $mform->createElement('select', 'startminute', get_string('minute', 'form'), $minutes);
-        $mform->addGroup ($starttimegroup, 'starttime', get_string('starttime', 'scheduler'), null, false);
-        $endtimegroup = array();
-        $endtimegroup[] = $mform->createElement('select', 'endhour', get_string('hour', 'form'), $hours);
-        $endtimegroup[] = $mform->createElement('select', 'endminute', get_string('minute', 'form'), $minutes);
-        $mform->addGroup ($endtimegroup, 'endtime', get_string('endtime', 'scheduler'), null, false);
 
+        $timegroup = array();
+        $timegroup[] = $mform->createElement('static', 'timefrom', '', get_string('timefrom', 'scheduler'));
+        $timegroup[] = $mform->createElement('select', 'starthour', get_string('hour', 'form'), $hours);
+        $timegroup[] = $mform->createElement('select', 'startminute', get_string('minute', 'form'), $minutes);
+        $timegroup[] = $mform->createElement('static', 'timeto', '', get_string('timeto', 'scheduler'));
+        $timegroup[] = $mform->createElement('select', 'endhour', get_string('hour', 'form'), $hours);
+        $timegroup[] = $mform->createElement('select', 'endminute', get_string('minute', 'form'), $minutes);
+        $mform->addGroup($timegroup, 'timerange', get_string('timerange', 'scheduler'), null, false);
+        
         // Divide into slots?
         $mform->addElement('selectyesno', 'divide', get_string('divide', 'scheduler'));
         $mform->setDefault('divide', 1);
@@ -579,17 +581,17 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
         // Duration of the slot
         $this->add_duration_field('minutesperslot');
 
+        // Break between slots
+        $this->add_minutes_field('break', 'break', 0, 'minutes');
+        
+        // Force when overlap?
+        $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
+        
         // Ignore conflict checkbox
         $mform->addElement('checkbox', 'ignoreconflicts', get_string('ignoreconflicts', 'scheduler'));
         $mform->setDefault('ignoreconflicts', false);
         $mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
         
-        // Break between slots
-        $this->add_minutes_field('break', 'break', 0, 'minutes');
-
-        // Force when overlap?
-        $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
-
         // Common fields
         $this->add_base_fields();
 
@@ -642,7 +644,7 @@ class scheduler_addaperiodsession_form extends scheduler_slotform_base {
             $errors['breakgroup'] = get_string('breaknotnegative', 'scheduler');
         }
 
-        // TODO conflict checks
+        // Conflict checks are now being done after submitting the form.
 
         return $errors;
     }

@@ -163,7 +163,7 @@ if ($action == 'updateslot') {
     }
 
 }
-/************************************ Add session multiple slots (weekly) form ****************************************/
+/************************************ Add session multiple slots (by weekdays) form ****************************************/
 if ($action == 'addsession') {
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
@@ -189,22 +189,23 @@ if ($action == 'addsession') {
     }
 }
 
-/************************************ Add session multiple slots (aperiodically) form ************************************/
+/************************************ Add session multiple slots (via YUI calendar) form ************************************/
 if ($action == 'addaperiodsession') {
-    //need to localization option
-    $courselang = substr($COURSE->lang, 0, 2); 
+    
+    $courselang = substr($COURSE->lang, 0, 2); //need to localization option
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'addaperiodsession', 'id' => $cm->id, 'subpage' => $subpage));
     $returnurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage));
 
-    if (!scheduler_has_teachers($context)) {
+    if (!$scheduler->has_available_teachers()) {
         print_error('needteachers', 'scheduler', $returnurl);
-    }                    
-    //create form
+    }
+    
     $mform = new scheduler_addaperiodsession_form($actionurl, $scheduler, $cm, $usergroups);
-    //process form responce
+    
+    //process form response
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } else if ($formdata = $mform->get_data()) {

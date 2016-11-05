@@ -176,7 +176,6 @@ function scheduler_delete_slots_from_ui(array $slots, $action) {
     echo $output->action_message($msg);
 }
 
-/************************************ Saving a aperiod session with slots ********************************/
 function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
 
     global $DB, $output;
