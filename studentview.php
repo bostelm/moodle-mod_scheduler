@@ -27,7 +27,9 @@ $actionurl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 
 
 // General permissions check.
-require_capability('mod/scheduler:appoint', $context);
+require_capability('mod/scheduler:viewslots', $context);
+$canbook = has_capability('mod/scheduler:appoint', $context);
+$canseefull = has_capability('mod/scheduler:viewfullslots', $context);
 
 if ($scheduler->is_group_scheduling_enabled()) {
     $mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $scheduler->bookingrouping, 'g.id, g.name');
@@ -133,9 +135,9 @@ if (count($upcomingslots) > 0) {
 }
 
 $bookablecnt = $scheduler->count_bookable_appointments($USER->id, false);
-$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, false));
+$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, $canseefull));
 
-if ($bookablecnt == 0) {
+if (!$canseefull && $bookablecnt == 0) {
     echo html_writer::div(get_string('canbooknofurtherappointments', 'scheduler'), 'studentbookingmessage');
 
 } else if (count($bookableslots) == 0) {
@@ -145,7 +147,7 @@ if ($bookablecnt == 0) {
     echo html_writer::div($noslots, 'studentbookingmessage');
 
 } else {
-    // The student can book further appointments, and slots are available.
+    // The student can book (or see) further appointments, and slots are available.
     // Show the booking form.
 
     $booker = new scheduler_slot_booker($scheduler, $USER->id, $actionurl, $bookablecnt);
@@ -160,8 +162,9 @@ if ($bookablecnt == 0) {
 
     for ($idx = $start; $idx < $end; $idx++) {
         $slot = $bookableslots[$idx];
+        $canbookthisslot = $canbook && ($bookablecnt != 0);
 
-        if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+        if (has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $others = new scheduler_student_list($scheduler, false);
             foreach ($slot->get_appointments() as $otherapp) {
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id);
@@ -173,20 +176,21 @@ if ($bookablecnt == 0) {
         }
 
         // Check what to print as group information...
+        $remaining = $slot->count_remaining_appointments();
         if ($slot->exclusivity == 0) {
             $groupinfo = get_string('yes');
-        } else if ($slot->exclusivity == 1) {
+        } else if ($slot->exclusivity == 1 && $remaining == 1) {
             $groupinfo = get_string('no');
         } else {
-            $remaining = $slot->count_remaining_appointments();
             if ($remaining > 0) {
                 $groupinfo = get_string('limited', 'scheduler', $remaining.'/'.$slot->exclusivity);
             } else { // Group info should not be visible to students.
                 $groupinfo = get_string('complete', 'scheduler');
+                $canbookthisslot = false;
             }
         }
 
-        $booker->add_slot($slot, true, false, $groupinfo, $others);
+        $booker->add_slot($slot, $canbookthisslot, false, $groupinfo, $others);
     }
 
 
@@ -194,7 +198,9 @@ if ($bookablecnt == 0) {
     $bookingmsg1 = get_string($msgkey, 'scheduler');
 
     $a = $bookablecnt;
-    if ($bookablecnt == 1) {
+    if ($bookablecnt == 0) {
+        $msgkey = 'canbooknofurtherappointments';
+    } else if ($bookablecnt == 1) {
         $msgkey = ($scheduler->schedulermode == 'oneonly') ? 'canbooksingleappointment' : 'canbook1appointment';
     } else if ($bookablecnt > 1) {
         $msgkey = 'canbooknappointments';
@@ -204,8 +210,10 @@ if ($bookablecnt == 0) {
     $bookingmsg2 = get_string($msgkey, 'scheduler', $a);
 
     echo $output->heading(get_string('availableslots', 'scheduler'), 3);
-    echo html_writer::div($bookingmsg1, 'studentbookingmessage');
-    echo html_writer::div($bookingmsg2, 'studentbookingmessage');
+    if ($canbook) {
+        echo html_writer::div($bookingmsg1, 'studentbookingmessage');
+        echo html_writer::div($bookingmsg2, 'studentbookingmessage');
+    }
     if ($total > $pagesize) {
         echo $output->paging_bar($total, $offset, $pagesize, $actionurl, 'offset');
     }

@@ -499,9 +499,13 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
             $rowdata[] = $groupinfo;
 
-            $bookurl = new moodle_url($booker->actionurl, array('what' => 'bookslot', 'slotid' => $slot->slotid));
-            $button = new single_button($bookurl, get_string('bookslot', 'scheduler'));
-            $rowdata[] = $this->render($button);
+            if ($slot->canbook) {
+                $bookurl = new moodle_url($booker->actionurl, array('what' => 'bookslot', 'slotid' => $slot->slotid));
+                $button = new single_button($bookurl, get_string('bookslot', 'scheduler'));
+                $rowdata[] = $this->render($button);
+            } else {
+                $rowdata[] = '';
+            }
 
             $table->data[] = $rowdata;
 
@@ -723,6 +727,30 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         }
         $o .= html_writer::end_tag('dl');
         $o .= html_writer::end_div('totalgrade');
+        return $o;
+    }
+
+    public function render_scheduler_conflict_list(scheduler_conflict_list $cl) {
+
+        $o = html_writer::start_tag('ul');
+
+        foreach ($cl->conflicts as $conflict) {
+            $a = new stdClass();
+            $a->datetime = userdate($conflict->starttime);
+            $a->duration = $conflict->duration;
+            if ($conflict->isself) {
+                $entry = get_string('conflictlocal', 'scheduler', $a);
+            } else {
+                $a->courseshortname = $conflict->courseshortname;
+                $a->coursefullname = $conflict->coursefullname;
+                $a->schedulername = format_string($conflict->schedulername);
+                $entry = get_string('conflictremote', 'scheduler', $a);
+            }
+            $o .= html_writer::tag('li', $entry);
+        }
+
+        $o .= html_writer::end_tag('ul');
+
         return $o;
     }
 

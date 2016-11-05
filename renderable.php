@@ -300,3 +300,28 @@ class scheduler_totalgrade_info implements renderable {
     }
 
 }
+
+/**
+ * This class represents a list of scheduling conflicts
+ */
+class scheduler_conflict_list implements renderable {
+
+    public $conflicts = array();
+
+    public function add_conflict(stdClass $conflict, $user = null) {
+        $c = clone($conflict);
+        if ($user) {
+            $c->userfullname = fullname($user);
+        } else {
+            $c->userfullname = '';
+        }
+        $this->conflicts[] = $c;
+    }
+
+    public function add_conflicts(array $conflicts) {
+        foreach ($conflicts as $c) {
+            $this->add_conflict($c);
+        }
+    }
+
+}

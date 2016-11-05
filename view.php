@@ -35,7 +35,6 @@ $subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
 require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
-// TODO require_capability('mod/scheduler:view', $context);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
@@ -44,20 +43,6 @@ $output = $PAGE->get_renderer('mod_scheduler');
 
 // Print the page header.
 
-$strschedulers = get_string('modulenameplural', 'scheduler');
-$strscheduler  = get_string('modulename', 'scheduler');
-$strtime = get_string('time');
-$strdate = get_string('date', 'scheduler');
-$strstart = get_string('start', 'scheduler');
-$strend = get_string('end', 'scheduler');
-$strname = get_string('name');
-$strseen = get_string('seen', 'scheduler');
-$strnote = get_string('comments', 'scheduler');
-$strgrade = get_string('grade', 'scheduler');
-$straction = get_string('action', 'scheduler');
-$strduration = get_string('duration', 'scheduler');
-$stremail = get_string('email');
-
 $title = $course->shortname . ': ' . format_string($scheduler->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
@@ -65,8 +50,10 @@ $PAGE->set_heading($course->fullname);
 
 // Route to screen.
 
-// Teacher side.
-if (has_capability('mod/scheduler:manage', $context)) {
+$isteacher = has_capability('mod/scheduler:manage', $context);
+$isstudent = has_capability('mod/scheduler:viewslots', $context);
+if ($isteacher) {
+    // Teacher side.
     if ($action == 'viewstatistics') {
         include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
     } else if ($action == 'viewstudent') {
@@ -79,12 +66,12 @@ if (has_capability('mod/scheduler:manage', $context)) {
         include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }
 
+} else if ($isstudent) {
     // Student side.
-} else if (has_capability('mod/scheduler:appoint', $context)) {
     include($CFG->dirroot.'/mod/scheduler/studentview.php');
 
-    // For guests.
 } else {
+    // For guests.
     echo $OUTPUT->header();
     echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');
     echo $OUTPUT->footer($course);

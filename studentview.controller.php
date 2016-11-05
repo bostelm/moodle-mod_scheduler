@@ -19,6 +19,7 @@ $returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
 if ($action == 'bookslot') {
 
     require_sesskey();
+    require_capability('mod/scheduler:appoint', $context);
 
     // Get the request parameters.
     $slotid = required_param('slotid', PARAM_INT);
@@ -100,6 +101,7 @@ if ($action == 'bookslot') {
 if ($action == 'cancelbooking') {
 
     require_sesskey();
+    require_capability('mod/scheduler:appoint', $context);
 
     // Get the request parameters.
     $slotid = required_param('slotid', PARAM_INT);
@@ -111,8 +113,6 @@ if ($action == 'cancelbooking') {
     if (!$slot->is_in_bookable_period()) {
         throw new moodle_exception('nopermissions');
     }
-
-    require_capability('mod/scheduler:appoint', $context);
 
     $userstocancel = array($USER->id);
     if ($appointgroup) {

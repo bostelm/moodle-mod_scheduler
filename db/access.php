@@ -101,6 +101,22 @@ $capabilities = array(
         )
     ),
 
+    'mod/scheduler:viewslots' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'mod/scheduler:appoint'
+    ),
+
+    'mod/scheduler:viewfullslots' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+        )
+    ),
+
     'mod/scheduler:seeotherstudentsbooking' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,

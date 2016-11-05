@@ -227,6 +227,8 @@ class scheduler_editslot_form extends scheduler_slotform_base {
     }
 
     public function validation($data, $files) {
+        global $output;
+
         $errors = parent::validation($data, $files);
 
         // Check number of appointments vs exclusivity.
@@ -258,54 +260,19 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         }
 
         if (!isset($data['ignoreconflicts'])) {
-            /* Avoid overlapping slots, by asking the user if they'd like to overwrite the existing ones...
-               for other scheduler, we check independently of exclusivity. Any slot here conflicts
-               for this scheduler, we check against exclusivity. Any complete slot here conflicts */
-            $conflictsremote = scheduler_get_conflicts($this->scheduler->id,
+            /* Avoid overlapping slots by warning the user */
+            $conflicts = $this->scheduler->get_conflicts(
                             $data['starttime'], $data['starttime'] + $data['duration'] * 60,
-                            $data['teacherid'], 0, SCHEDULER_OTHERS, false);
-            $conflictslocal = scheduler_get_conflicts($this->scheduler->id,
-                            $data['starttime'], $data['starttime'] + $data['duration'] * 60,
-                            $data['teacherid'], 0, SCHEDULER_SELF, true);
-            if (!$conflictsremote) {
-                $conflictsremote = array();
-            }
-            if (!$conflictslocal) {
-                $conflictslocal = array();
-            }
-            $conflicts = $conflictsremote + $conflictslocal;
+                            $data['teacherid'], 0, SCHEDULER_ALL, $this->slotid);
 
-            // Remove itself from conflicts when updating.
-            if (array_key_exists($this->slotid, $conflicts)) {
-                unset($conflicts[$this->slotid]);
-            }
+            if (count($conflicts) > 0) {
 
-            if (count($conflicts)) {
+                $cl = new scheduler_conflict_list();
+                $cl->add_conflicts($conflicts);
+
                 $msg = get_string('slotwarning', 'scheduler');
-
-                foreach ($conflicts as $conflict) {
-                    $students = scheduler_get_appointed($conflict->id);
-
-                    $slotmsg = userdate($conflict->starttime);
-                    $slotmsg .= ' [';
-                    $slotmsg .= $conflict->duration.' '.get_string('minutes');
-                    $slotmsg .= ']';
-
-                    if ($students) {
-                        $slotmsg .= ' (';
-                        $appointed = array();
-                        foreach ($students as $astudent) {
-                            $appointed[] = fullname($astudent);
-                        }
-                        if (count ($appointed)) {
-                            $slotmsg .= implode(', ', $appointed);
-                        }
-                        unset ($appointed);
-                        $slotmsg .= ')';
-                        $slotmsg = html_writer::tag('b', $slotmsg);
-                    }
-                    $msg .= html_writer::div($slotmsg);
-                }
+                $msg .= $output->render($cl);
+                $msg .= $output->doc_link('mod/scheduler/conflict', '', true);
 
                 $errors['starttime'] = $msg;
             }
@@ -567,55 +534,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
             $errors['breakgroup'] = get_string('breaknotnegative', 'scheduler');
         }
 
-        // TODO conflict checks
-
-        /*
-
-        /// make a base slot for generating
-        $slot = new stdClass();
-        $slot->appointmentlocation = $data->appointmentlocation;
-        $slot->exclusivity = $data->exclusivity;
-        $slot->duration = $data->duration;
-        $slot->schedulerid = $scheduler->id;
-        $slot->timemodified = time();
-        $slot->teacherid = $data->teacherid;
-
-        /// check if overlaps. Check also if some slots are in allowed day range
-        $startfrom = $data->rangestart;
-        $noslotsallowed = true;
-        for ($d = 0; $d <= $fordays; $d ++){
-        $starttime = $startfrom + ($d * DAYSECS);
-        $eventdate = usergetdate($starttime);
-        $dayofweek = $eventdate['wday'];
-        if ((($dayofweek == 1) && ($data->monday == 1)) ||
-                        (($dayofweek == 2) && ($data->tuesday == 1)) ||
-                        (($dayofweek == 3) && ($data->wednesday == 1)) ||
-                        (($dayofweek == 4) && ($data->thursday == 1)) ||
-                        (($dayofweek == 5) && ($data->friday == 1)) ||
-                        (($dayofweek == 6) && ($data->saturday == 1)) ||
-                        (($dayofweek == 0) && ($data->sunday == 1))){
-                        $noslotsallowed = false;
-                        $data->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->starthour, $data->startminute);
-                        $conflicts = scheduler_get_conflicts($scheduler->id, $data->starttime, $data->starttime + $data->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
-                        if (!$data->forcewhenoverlap){
-                        if ($conflicts){
-                        unset($erroritem);
-                        $erroritem->message = get_string('overlappings', 'scheduler');
-                        $erroritem->on = 'range';
-                        $errors[] = $erroritem;
-                        }
-                        }
-                        }
-                        }
-
-                        /// Finally check if some slots are allowed (an error is thrown to ask care to this situation)
-                        if ($noslotsallowed){
-                        unset($erroritem);
-                        $erroritem->message = get_string('allslotsincloseddays', 'scheduler');
-                        $erroritem->on = 'days';
-                        $errors[] = $erroritem;
-                        }
-         */
+        // Conflict checks are now being done after submitting the form.
 
         return $errors;
     }
