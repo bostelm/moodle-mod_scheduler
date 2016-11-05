@@ -181,6 +181,8 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
     global $DB, $output;
 
     $data = (object) $formdata;
+    
+    $listdatesarr = json_decode($data->getlistdates, true);
 
     // Create as many slots of $duration on the given dates list $listdates and that do not conflict.
     $countslots = 0;
@@ -189,14 +191,15 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
     $slot->schedulerid = $scheduler->id;
     $slot->teacherid = $data->teacherid;
     $slot->appointmentlocation = $data->appointmentlocation;
-    $slot->reuse = $data->reuse;
-    $slot->exclusivity = $data->exclusivity;
-    $slot->duration = $data->duration;
+    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
+    if ($data->divide) {
+        $slot->duration = $data->duration;
+    } else {
+        $slot->duration = $data->endhour * 60 + $data->endminute - $data->starthour * 60 - $data->startminute;
+    };
     $slot->notes = '';
     $slot->notesformat = FORMAT_HTML;
     $slot->timemodified = time();
-
-    $listdatesarr = json_decode($data->getlistdates, true);
     
     for ($d = 0; $d <= count($listdatesarr[0])-1; $d ++){
         $year = date("Y", strtotime($listdatesarr[0][$d]));
@@ -222,51 +225,46 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
             $slot->emaildate = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 0, 0) - $data->emaildaterel;
         }
                 
-        while ($slot->starttime <= $data->timeend - $data->duration * 60) {
-            //TDMU exclusivity check-out
-            if (isset($data->ignoreconflicts)) {
-                $exclusive_condition = true;
+        while ($slot->starttime <= $data->timeend - $data->duration * 60) {            
+            if (!isset($data->ignoreconflicts)) {
+                //check against ALL conflicts
+                $conflicts = $scheduler->get_conflicts($data->timestart, $data->timestart + $slot->duration * 60,
+                                                       $data->teacherid, 0, SCHEDULER_ALL);
             }
             else {
-                $exclusive_condition = false;
+                //check against LOCAL conflicts only
+                $conflicts = $scheduler->get_conflicts($data->timestart, $data->timestart + $slot->duration * 60,
+                                                       $data->teacherid, 0, SCHEDULER_SELF);
             }          
-            $conflictsRemote = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $data->duration * 60, $data->teacherid, 0, SCHEDULER_OTHERS, $exclusive_condition);
-            $conflictsLocal = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $data->duration * 60, $data->teacherid, 0, SCHEDULER_SELF, true);
-            if (!$conflictsRemote) $conflictsRemote = array();
-            if (!$conflictsLocal) $conflictsLocal = array();
-            $conflicts = $conflictsRemote + $conflictsLocal;                    
+            $resolvable = (boolean) $data->forcewhenoverlap;
+            foreach ($conflicts as $conflict) {
+                    $resolvable = $resolvable
+                                     && $conflict->isself == 1       // Do not delete slots outside the current scheduler.
+                                     && $conflict->numstudents == 0; // Do not delete slots with bookings.
+            }
+            
             if ($conflicts) {
-                if (!$data->forcewhenoverlap){
-                    print_string('conflictingslots', 'scheduler');
-                    echo '<ul>';
-                    foreach ($conflicts as $aconflict){
-                        $conflictinfo = scheduler_get_courseinfobyslotid($aconflict->id);//TDMU
-                        $msg = $output->userdate($conflictinfo->starttime) . ', ' . $output->usertime($conflictinfo->starttime) . ': ';
-                        $msg .= s($conflictinfo->schedname). ' '.get_string('incourse', 'scheduler') . ' ';
-                        $msg .= $conflictinfo->shortname . ' - ' . $conflictinfo->fullname;
-                        echo html_writer::tag('li', $msg);
+                $cl = new scheduler_conflict_list();
+                $cl->add_conflicts($conflicts);
+                if (!$resolvable) {
+                    print_string('conflictingslots', 'scheduler', userdate($data->timestart));
+                    echo $output->doc_link('mod/scheduler/conflict', '', true);
+                    echo $output->render($cl);
+                } else { // We force, so delete all conflicting before inserting.
+                    foreach ($conflicts as $conflict) {
+                        $cslot = $scheduler->get_slot($conflict->id);
+                        \mod_scheduler\event\slot_deleted::create_from_slot($cslot, 'addsession-conflict')->trigger();
+                        $cslot->delete();
                     }
-                    echo '</ul><br/>';
+                    print_string('deletedconflictingslots', 'scheduler', userdate($data->timestart));
+                    echo $output->doc_link('mod/scheduler/conflict', '', true);
+                    echo $output->render($cl);
                 }
-                else { // we force, so delete all conflicting before inserting
-                    foreach($conflicts as $conflict){
-                            if ($conflict->schedulerid == $scheduler->id) {
-                                //scheduler "local" conflict
-                                $cslot = $scheduler->get_slot($conflict->id);
-                                $cslot->delete();
-                            } else {
-                                //scheduler "remote" conflict
-                                $remote_sceduler = new StdClass;
-                                $remote_sceduler = scheduler_instance::load_by_id($conflict->schedulerid);
-                                $cslot = $remote_sceduler->get_slot($conflict->id);
-                                $cslot->delete();
-                                unset($remote_sceduler);
-                            }
-                    }
-                }
-            } 
-            else {
-                $DB->insert_record('scheduler_slots', $slot, false, true);
+            }
+            if (!$conflicts || $resolvable) {
+                $slotid = $DB->insert_record('scheduler_slots', $slot, true, true);
+                $slotobj = $scheduler->get_slot($slotid);
+                \mod_scheduler\event\slot_added::create_from_slot($slotobj)->trigger();
                 $countslots++;
             }
             $slot->starttime += ($data->duration + $data->break) * 60;
