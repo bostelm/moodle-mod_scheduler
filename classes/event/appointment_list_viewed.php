@@ -1,11 +1,11 @@
 <?php
+
 /**
  * The mod_scheduler appointment list viewed event.
  *
  * Indicates that a teacher has viewed the list of appointments and slots.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

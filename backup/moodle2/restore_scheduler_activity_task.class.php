@@ -1,16 +1,15 @@
 <?php
 
 /**
- * @package    mod
- * @subpackage scheduler
- * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/scheduler/backup/moodle2/restore_scheduler_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/scheduler/backup/moodle2/restore_scheduler_stepslib.php');
 
 /**
  * scheduler restore task that provides all the settings and steps to perform one
@@ -22,14 +21,14 @@ class restore_scheduler_activity_task extends restore_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // Scheduler has only one structure step
+        // Scheduler has only one structure step.
         $this->add_step(new restore_scheduler_activity_structure_step('scheduler_structure', 'scheduler.xml'));
     }
 

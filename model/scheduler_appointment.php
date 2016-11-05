@@ -3,8 +3,7 @@
 /**
  * A class for representing a scheduler appointment.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -20,7 +19,7 @@ require_once('modellib.php');
  *
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 class scheduler_appointment extends mvc_child_record_model {
 
 
@@ -35,6 +34,7 @@ class scheduler_appointment extends mvc_child_record_model {
         $this->data->slotid = $slot->get_id();
         $this->data->attended = 0;
         $this->data->appointmentnoteformat = FORMAT_HTML;
+        $this->data->teachernoteformat = FORMAT_HTML;
     }
 
     public function save() {
@@ -44,12 +44,24 @@ class scheduler_appointment extends mvc_child_record_model {
         scheduler_update_grades($scheddata, $this->studentid);
     }
 
+    public function delete() {
+        $studid = $this->studentid;
+        parent::delete();
+        $scheddata = $this->get_scheduler()->get_data();
+        scheduler_update_grades($scheddata, $studid);
+    }
+
+    public function get_slot() {
+        return $this->get_parent();
+    }
+
     public function get_scheduler() {
         return $this->get_parent()->get_parent();
     }
 
     /**
-     * Return the student object
+     * Return the student object.
+     * May be null if no student is assigned to this appointment (this _should_ never happen).
      */
     public function get_student() {
         global $DB;

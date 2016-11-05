@@ -1,11 +1,11 @@
 <?php
+
 /**
  * The mod_scheduler booking form viewed event.
  *
  * Indicates that a student has viewed the booking form.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

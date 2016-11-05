@@ -3,8 +3,7 @@
 /**
  * Controller for all teacher-related views.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -19,24 +18,24 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     $data = (object) $formdata;
 
     $fordays = 0;
-    if ($data->rangeend > 0){
+    if ($data->rangeend > 0) {
         $fordays = ($data->rangeend - $data->rangestart) / DAYSECS;
     }
 
     // Create as many slots of $duration as will fit between $starttime and $endtime and that do not conflict.
     $countslots = 0;
     $couldnotcreateslots = '';
-    $startfrom = $data->rangestart+($data->starthour*60+$data->startminute)*60;
-    $endat = $data->rangestart+($data->endhour*60+$data->endminute)*60;
+    $startfrom = $data->rangestart + ($data->starthour * 60 + $data->startminute) * 60;
+    $endat = $data->rangestart + ($data->endhour * 60 + $data->endminute) * 60;
     $slot = new stdClass();
     $slot->schedulerid = $scheduler->id;
     $slot->teacherid = $data->teacherid;
     $slot->appointmentlocation = $data->appointmentlocation;
-    $slot->exclusivity = $data->exclusivity;
-    if($data->divide) {
+    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
+    if ($data->divide) {
         $slot->duration = $data->duration;
     } else {
-        $slot->duration = $data->endhour*60+$data->endminute-$data->starthour*60-$data->startminute;
+        $slot->duration = $data->endhour * 60 + $data->endminute - $data->starthour * 60 - $data->startminute;
     };
     $slot->notes = '';
     $slot->notesformat = FORMAT_HTML;
@@ -53,57 +52,60 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
         (($dayofweek == 5) && ($data->friday == 1)) ||
         (($dayofweek == 6) && ($data->saturday == 1)) ||
         (($dayofweek == 0) && ($data->sunday == 1))) {
-            $slot->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->starthour, $data->startminute);
+            $slot->starttime = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'],
+                                              $data->starthour, $data->startminute);
             $data->timestart = $slot->starttime;
-            $data->timeend = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], $data->endhour, $data->endminute);
+            $data->timeend = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'],
+                                            $data->endhour, $data->endminute);
 
-            // this corrects around midnight bug
+            // This corrects around midnight bug.
             if ($data->timestart > $data->timeend) {
                 $data->timeend += DAYSECS;
             }
             if ($data->hideuntilrel == 0) {
                 $slot->hideuntil = time();
             } else {
-                $slot->hideuntil = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 6, 0) - $data->hideuntilrel;
+                $slot->hideuntil = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 6, 0) -
+                                    $data->hideuntilrel;
             }
             if ($data->emaildaterel == -1) {
                 $slot->emaildate = 0;
             } else {
-                $slot->emaildate = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 0, 0) - $data->emaildaterel;
+                $slot->emaildate = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 0, 0) -
+                                    $data->emaildaterel;
             }
             while ($slot->starttime <= $data->timeend - $slot->duration * 60) {
-                $conflicts = scheduler_get_conflicts($scheduler->id, $data->timestart, $data->timestart + $slot->duration * 60, $data->teacherid, 0, SCHEDULER_ALL, false);
+                $conflicts = $scheduler->get_conflicts($data->timestart, $data->timestart + $slot->duration * 60,
+                                                       $data->teacherid, 0, SCHEDULER_ALL);
+                $resolvable = (boolean) $data->forcewhenoverlap;
+                foreach ($conflicts as $conflict) {
+                    $resolvable = $resolvable
+                                     && $conflict->isself == 1       // Do not delete slots outside the current scheduler.
+                                     && $conflict->numstudents == 0; // Do not delete slots with bookings.
+                }
+
                 if ($conflicts) {
-                    if (!$data->forcewhenoverlap) {
-                        print_string('conflictingslots', 'scheduler');
-                        echo '<ul>';
-                        foreach ($conflicts as $aconflict) {
-                            $conflictinfo = scheduler_get_courseinfobyslotid($aconflict->id);//TDMU
-                            $msg = $output->userdate($conflictinfo->starttime) . ', ' . $output->usertime($conflictinfo->starttime) . ': ';
-                            $msg .= s($conflictinfo->schedname). ' '.get_string('incourse', 'scheduler') . ' ';
-                            $msg .= $conflictinfo->shortname . ' - ' . $conflictinfo->fullname;
-                            echo html_writer::tag('li', $msg);
-                        }
-                        echo '</ul><br/>';
-                    } else { // we force, so delete all conflicting before inserting
+                    $cl = new scheduler_conflict_list();
+                    $cl->add_conflicts($conflicts);
+                    if (!$resolvable) {
+                        print_string('conflictingslots', 'scheduler', userdate($data->timestart));
+                        echo $output->doc_link('mod/scheduler/conflict', '', true);
+                        echo $output->render($cl);
+                    } else { // We force, so delete all conflicting before inserting.
                         foreach ($conflicts as $conflict) {
-                            if ($conflict->schedulerid == $scheduler->id) {
-                                //scheduler "local" conflict
-                                $cslot = $scheduler->get_slot($conflict->id);
-                                $cslot->delete();
-                            } else {
-                                //scheduler "remote" conflict
-                                $remote_sceduler = new StdClass;
-                                $remote_sceduler = scheduler_instance::load_by_id($conflict->schedulerid);
-                                $cslot = $remote_sceduler->get_slot($conflict->id);
-                                $cslot->delete();
-                                unset($remote_sceduler);
-                            }
+                            $cslot = $scheduler->get_slot($conflict->id);
+                            \mod_scheduler\event\slot_deleted::create_from_slot($cslot, 'addsession-conflict')->trigger();
+                            $cslot->delete();
                         }
+                        print_string('deletedconflictingslots', 'scheduler', userdate($data->timestart));
+                        echo $output->doc_link('mod/scheduler/conflict', '', true);
+                        echo $output->render($cl);
                     }
                 }
-                if (!$conflicts || $data->forcewhenoverlap) {
-                    $DB->insert_record('scheduler_slots', $slot, false, true);
+                if (!$conflicts || $resolvable) {
+                    $slotid = $DB->insert_record('scheduler_slots', $slot, true, true);
+                    $slotobj = $scheduler->get_slot($slotid);
+                    \mod_scheduler\event\slot_added::create_from_slot($slotobj)->trigger();
                     $countslots++;
                 }
                 $slot->starttime += ($slot->duration + $data->break) * 60;
@@ -112,6 +114,66 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
         }
     }
     echo $output->action_message(get_string('slotsadded', 'scheduler', $countslots));
+}
+
+function scheduler_action_dosendmessage($scheduler, $formdata) {
+
+    global $DB, $USER, $output;
+
+    $data = (object) $formdata;
+
+    $recipients = $data->recipient;
+    if ($data->copytomyself) {
+        $recipients[$USER->id] = 1;
+    }
+    $rawmessage = $data->body['text'];
+    $format = $data->body['format'];
+    $textmessage = format_text_email($rawmessage, $format);
+    $htmlmessage = null;
+    if ($format == FORMAT_HTML) {
+        $htmlmessage = $rawmessage;
+    }
+
+    $cnt = 0;
+    foreach ($recipients as $recipientid => $value) {
+        if ($value) {
+            $message = new \core\message\message();
+            $message->component = 'mod_scheduler';
+            $message->name = 'invitation';
+            $message->userfrom = $USER;
+            $message->userto = $recipientid;
+            $message->subject = $data->subject;
+            $message->fullmessage = $textmessage;
+            $message->fullmessageformat = $format;
+            if ($htmlmessage) {
+                $message->fullmessagehtml = $htmlmessage;
+            }
+            $message->notification = '0';
+
+            message_send($message);
+            $cnt++;
+        }
+    }
+
+    echo $output->action_message(get_string('messagesent', 'scheduler', $cnt));
+}
+
+function scheduler_delete_slots_from_ui(array $slots, $action) {
+    global $output;
+
+    $cnt = 0;
+    foreach ($slots as $slot) {
+        \mod_scheduler\event\slot_deleted::create_from_slot($slot, $action)->trigger();
+        $slot->delete();
+        $cnt++;
+    }
+
+    if ($cnt == 1) {
+        $msg = get_string('oneslotdeleted', 'scheduler');
+    } else {
+        $msg = get_string('slotsdeleted', 'scheduler', $cnt);
+    }
+    echo $output->action_message($msg);
 }
 
 /************************************ Saving a aperiod session with slots ********************************/
@@ -218,35 +280,35 @@ function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
 // Require valid session key for all actions.
 require_sesskey();
 
-// We first have to check whether some action needs to be performed
+// We first have to check whether some action needs to be performed.
 switch ($action) {
     /************************************ Deleting a slot ***********************************************/
     case 'deleteslot': {
         $slotid = required_param('slotid', PARAM_INT);
         $slot = $scheduler->get_slot($slotid);
-        $slot->delete();
+        scheduler_delete_slots_from_ui(array($slot), $action);
         break;
     }
     /************************************ Deleting multiple slots ***********************************************/
     case 'deleteslots': {
         $slotids = required_param('items', PARAM_SEQUENCE);
-        $slots = explode(",", $slotids);
-        foreach ($slots as $slotid) {
-            $slot = $scheduler->get_slot($slotid);
-            $slot->delete();
+        $slotids = explode(",", $slotids);
+        $slots = array();
+        foreach ($slotids as $slotid) {
+            $slots[] = $scheduler->get_slot($slotid);
         }
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Students were seen ***************************************************/
     case 'saveseen': {
-        // get required param
         $slotid = required_param('slotid', PARAM_INT);
         $slot = $scheduler->get_slot($slotid);
         $seen = optional_param_array('seen', array(), PARAM_INT);
 
         if (is_array($seen)) {
             foreach ($slot->get_appointments() as $app) {
-                $app->attended = (in_array($app->id, $seen)) ? 1 : 0 ;
+                $app->attended = (in_array($app->id, $seen)) ? 1 : 0;
                 $app->timemodified = time();
             }
         }
@@ -263,7 +325,7 @@ switch ($action) {
             $oldstudents[] = $app->studentid;
             $slot->remove_appointment($app);
         }
-        // notify student
+        // Notify the student.
         if ($scheduler->allownotifications) {
             foreach ($oldstudents as $oldstudent) {
                 include_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
@@ -271,8 +333,8 @@ switch ($action) {
                 $student = $DB->get_record('user', array('id' => $oldstudent));
                 $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
 
-                $vars = scheduler_get_mail_variables($scheduler, $slot, $teacher, $student, $COURSE, $student);
-                scheduler_send_email_from_template($student, $teacher, $COURSE, 'cancelledbyteacher', 'teachercancelled', $vars, 'scheduler');
+                scheduler_messenger::send_slot_notification($slot, 'bookingnotification', 'teachercancelled',
+                                        $teacher, $student, $teacher, $student, $COURSE);
             }
         }
 
@@ -303,46 +365,27 @@ switch ($action) {
     /************************************ Deleting all slots ***************************************************/
     case 'deleteall':{
         require_capability('mod/scheduler:manageallappointments', $context);
-        foreach ($scheduler->get_all_slots() as $slot) {
-            $slot->delete();
-        }
+        $slots = $scheduler->get_all_slots();
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Deleting unused slots *************************************************/
-    // MUST STAY HERE, JUST BEFORE deleteallunused
     case 'deleteunused':{
-        $teacherClause = " AND s.teacherid = {$USER->id} ";
+        $slots = $scheduler->get_slots_without_appointment($USER->id);
+        scheduler_delete_slots_from_ui($slots, $action);
+        break;
     }
     /************************************ Deleting unused slots (all teachers) ************************************/
     case 'deleteallunused': {
-        if (!isset($teacherClause)) $teacherClause = '';
-        if (has_capability('mod/scheduler:manageallappointments', $context)) {
-            $sql = "
-            SELECT
-            s.id,
-            s.id
-            FROM
-            {scheduler_slots} s
-            LEFT JOIN
-            {scheduler_appointment} a
-            ON
-            s.id = a.slotid
-            WHERE
-            s.schedulerid = ? AND a.studentid IS NULL
-            {$teacherClause}
-            ";
-            if ($unappointed = $DB->get_records_sql($sql, array($scheduler->id))) {
-                list($usql, $params) = $DB->get_in_or_equal(array_keys($unappointed));
-                $DB->delete_records_select('scheduler_slots', "schedulerid = $cm->instance AND id $usql ", $params);
-            }
-        }
+        require_capability('mod/scheduler:manageallappointments', $context);
+        $slots = $scheduler->get_slots_without_appointment();
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Deleting current teacher's slots ***************************************/
     case 'deleteonlymine': {
-        foreach ($scheduler->get_slots_for_teacher($USER->id) as $slot) {
-            $slot->delete();
-        }
+        $slots = $scheduler->get_slots_for_teacher($USER->id);
+        scheduler_delete_slots_from_ui($slots, $action);
         break;
     }
     /************************************ Mark as seen now *******************************************************/
@@ -367,9 +410,14 @@ switch ($action) {
         $appointment->attended = 1;
         $appointment->appointmentnote = '';
         $appointment->appointmentnoteformat = FORMAT_HTML;
+        $appointment->teachernote = '';
+        $appointment->teachernoteformat = FORMAT_HTML;
         $appointment->timecreated = time();
         $appointment->timemodified = time();
         $DB->insert_record('scheduler_appointment', $appointment);
+
+        $slot = $scheduler->get_slot($slotid);
+        \mod_scheduler\event\slot_added::create_from_slot($slot)->trigger();
 
         break;
     }

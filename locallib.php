@@ -3,8 +3,7 @@
 /**
  * General library for the scheduler module.
  *
- * @package    mod
- * @subpackage scheduler
+ * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -18,18 +17,7 @@ require_once(dirname(__FILE__).'/model/scheduler_slot.php');
 require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
 
 
-/**
- * get list of attendants for slot form
- * @param int $cmid the course module
- * @return array of moodle user records
- */
-function scheduler_get_attendants($cmid){
-    $context = context_module::instance($cmid);
-    $attendants = get_users_by_capability ($context, 'mod/scheduler:attend',
-        user_picture::fields('u'), 'u.lastname, u.firstname',
-        '', '', '', '', false, false, false);
-    return $attendants;
-}
+/* Events related functions */
 
 /**
 * Get a course info by the sheduler slot id
@@ -178,102 +166,22 @@ function scheduler_delete_calendar_events($slot) {
 
     $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
 
-    if (!$scheduler) return false ;
-
-    $teacherEventType = "SSsup:{$slot->id}:{$scheduler->course}";
-    $studentEventType = "SSstu:{$slot->id}:{$scheduler->course}";
-
-    $teacherDeletionSuccess = $DB->delete_records('event', array('eventtype'=>$teacherEventType));
-    $studentDeletionSuccess = $DB->delete_records('event', array('eventtype'=>$studentEventType));
-
-    return ($teacherDeletionSuccess && $studentDeletionSuccess);
-    //this return may not be meaningful if the delete records functions do not return anything meaningful.
-}
-
-/**
- * Returns a float or a string which denotes a given user's timezone.
- *
- * A float value means that a simple offset from GMT is used, while a string (it will be the name of a timezone in the database)
- * means that for this timezone there are also DST rules to be taken into account.
- * Checks various settings and picks the most dominant of those which have a value.
- *
- * This is mainly a copy of lib/moodlelib.php, function get_user_timezone(),
- * but with an additional parameter to specify a user (other than the current one)
- * for whom the setting is computed.
- *
- * @param float|int|string $tz timezone to calculate GMT time offset before
- *        calculating user timezone, 99 is default user timezone
- *        {@link http://docs.moodle.org/dev/Time_API#Timezone}
- * @return float|string
- */
-function scheduler_get_user_timezone(stdClass $user, $tz = 99) {
-    global $CFG;
-
-    $timezones = array(
-        $tz,
-        isset($CFG->forcetimezone) ? $CFG->forcetimezone : 99,
-        isset($user->timezone) ? $user->timezone : 99,
-        isset($CFG->timezone) ? $CFG->timezone : 99,
-        );
-
-    $tz = 99;
-
-    // Loop while $tz is, empty but not zero, or 99, and there is another timezone is the array.
-    while (((empty($tz) && !is_numeric($tz)) || $tz == 99) && $next = each($timezones)) {
-        $tz = $next['value'];
+    if (!$scheduler) {
+        return false;
     }
-    return is_numeric($tz) ? (float) $tz : $tz;
+
+    $teachereventtype = "SSsup:{$slot->id}:{$scheduler->course}";
+    $studenteventtype = "SSstu:{$slot->id}:{$scheduler->course}";
+
+    $teacherdeletionsuccess = $DB->delete_records('event', array('eventtype' => $teachereventtype));
+    $studentdeletionsuccess = $DB->delete_records('event', array('eventtype' => $studenteventtype));
+
+    return ($teacherdeletionsuccess && $studentdeletionsuccess);
+    // This return may not be meaningful if the delete records functions do not return anything meaningful.
 }
 
 
-/**
- * Construct an array with subtitution rules for mail templates, relating to
- * a single appointment. Any of the parameters can be null.
- * @param scheduler_instance $scheduler The scheduler instance
- * @param scheduler_slot $slot The slot data as an MVC object
- * @param user $attendant A {@link $USER} object describing the attendant (teacher)
- * @param user $attendee A {@link $USER} object describing the attendee (student)
- * @param object $course A course object relating to the ontext of the message
- * @param object $recipient A {@link $USER} object describing the recipient of the message (used for determining the message language)
- * @return array A hash with mail template substitutions
- */
-function scheduler_get_mail_variables (scheduler_instance $scheduler, scheduler_slot $slot, $attendant, $attendee, $course, $recipient) {
 
-    global $CFG;
-
-    $lang = scheduler_get_message_language($recipient, $course);
-    // Force any string formatting to happen in the target language.
-    $oldlang = force_current_language($lang);
-
-    $tz = scheduler_get_user_timezone($recipient);
-
-    $vars = array();
-
-    if ($scheduler) {
-        $vars['MODULE']     = $scheduler->name;
-        $vars['STAFFROLE']  = $scheduler->get_teacher_name();
-    }
-    if ($slot) {
-        $vars ['DATE']     = userdate($slot->starttime, get_string('strftimedate'), $tz);
-        $vars ['TIME']     = userdate($slot->starttime, get_string('strftimetime'), $tz);
-        $vars ['ENDTIME']  = userdate($slot->endtime, get_string('strftimetime'), $tz);
-        $vars ['LOCATION'] = format_string($slot->appointmentlocation);
-    }
-    if ($attendant) {
-        $vars['ATTENDANT']     = fullname($attendant);
-        $vars['ATTENDANT_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendant->id.'&course='.$scheduler->course;
-    }
-    if ($attendee) {
-        $vars['ATTENDEE']     = fullname($attendee);
-        $vars['ATTENDEE_URL'] = $CFG->wwwroot.'/user/view.php?id='.$attendee->id.'&course='.$scheduler->course;
-    }
-
-    // Reset language settings.
-    force_current_language($oldlang);
-
-    return $vars;
-
-}
 
 /**
  * Prints a summary of a user in a nice little box.
@@ -300,7 +208,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $usercontext = context_user::instance($user->id);
     }
 
-    if (empty($string)) {     // Cache all the strings for the rest of the page
+    if (empty($string)) {     // Cache all the strings for the rest of the page.
 
         $string = new stdClass();
         $string->email       = get_string('email');
@@ -326,7 +234,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
 
     }
 
-    /// Get the hidden field list
+    // Get the hidden field list.
     if (has_capability('moodle/course:viewhiddenuserfields', $context)) {
         $hiddenfields = array();
     } else {
@@ -336,7 +244,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
     $output .= '<table class="userinfobox">';
     $output .= '<tr>';
     $output .= '<td class="left side">';
-    $output .= $OUTPUT->user_picture($user, array('size'=>100));
+    $output .= $OUTPUT->user_picture($user, array('size' => 100));
     $output .= '</td>';
     $output .= '<td class="content">';
     $output .= '<div class="username">'.fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</div>';
@@ -350,7 +258,6 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $output .= $field->title . ': ' . $field->value . '<br />';
     }
 
-
     if (!isset($hiddenfields['lastaccess'])) {
         if ($user->lastaccess) {
             $output .= $string->lastaccess .': '. userdate($user->lastaccess);
@@ -360,17 +267,21 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         }
     }
     $output .= '</div></td><td class="links">';
-    //link to blogs
+    // Link to blogs.
     if ($CFG->bloglevel > 0) {
-        $output .= '<a href="'.$CFG->wwwroot.'/blog/index.php?userid='.$user->id.'">'.get_string('blogs','blog').'</a><br />';
+        $output .= '<a href="'.$CFG->wwwroot.'/blog/index.php?userid='.$user->id.'">'.get_string('blogs', 'blog').'</a><br />';
     }
-    //link to notes
-    if (!empty($CFG->enablenotes) and (has_capability('moodle/notes:manage', $context) || has_capability('moodle/notes:view', $context))) {
-        $output .= '<a href="'.$CFG->wwwroot.'/notes/index.php?course=' . $course->id. '&amp;user='.$user->id.'">'.get_string('notes','notes').'</a><br />';
+    // Link to notes.
+    if (!empty($CFG->enablenotes) and (has_capability('moodle/notes:manage', $context)
+            || has_capability('moodle/notes:view', $context))) {
+        $output .= '<a href="'.$CFG->wwwroot.'/notes/index.php?course=' . $course->id. '&amp;user='.$user->id.'">'.
+                    get_string('notes', 'notes').'</a><br />';
     }
 
-    if (has_capability('moodle/site:viewreports', $context) or has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
-        $output .= '<a href="'. $CFG->wwwroot .'/course/user.php?id='. $course->id .'&amp;user='. $user->id .'">'. $string->activity .'</a><br />';
+    if (has_capability('moodle/site:viewreports', $context) or
+            has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
+        $output .= '<a href="'. $CFG->wwwroot .'/course/user.php?id='. $course->id .'&amp;user='. $user->id .'">'.
+                    $string->activity .'</a><br />';
     }
     $output .= '<a href="'. $CFG->wwwroot .'/user/profile.php?id='. $user->id .'">'. $string->fullprofile .'...</a>';
 
@@ -388,9 +299,162 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
 }
 
 
-function scheduler_has_teachers($context) {
-    $teachers = get_users_by_capability ($context, 'mod/scheduler:attend', 'u.id');
-    return count($teachers) > 0;
+/**
+ * File browsing support class
+ */
+class scheduler_file_info extends file_info {
+    /** @var stdClass Course object */
+    protected $course;
+    /** @var stdClass Course module object */
+    protected $cm;
+    /** @var array Available file areas */
+    protected $areas;
+    /** @var string File area to browse */
+    protected $filearea;
+    /** @var scheduler_instance The scheduler that this file area refers to */
+    protected $scheduler;
+
+    /**
+     * Constructor
+     *
+     * @param file_browser $browser file_browser instance
+     * @param stdClass $course course object
+     * @param stdClass $cm course module object
+     * @param stdClass $context module context
+     * @param array $areas available file areas
+     * @param string $filearea file area to browse
+     */
+    public function __construct($browser, $course, $cm, $context, $areas, $filearea) {
+        parent::__construct($browser, $context);
+        $this->course   = $course;
+        $this->cm       = $cm;
+        $this->areas    = $areas;
+        $this->filearea = $filearea;
+        $this->scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
+    }
+
+    /**
+     * Returns list of standard virtual file/directory identification.
+     * The difference from stored_file parameters is that null values
+     * are allowed in all fields
+     * @return array with keys contextid, filearea, itemid, filepath and filename
+     */
+    public function get_params() {
+        return array('contextid' => $this->context->id,
+                     'component' => 'mod_scheduler',
+                     'filearea'  => $this->filearea,
+                     'itemid'    => null,
+                     'filepath'  => null,
+                     'filename'  => null);
+    }
+
+    /**
+     * Returns localised visible name.
+     * @return string
+     */
+    public function get_visible_name() {
+        return $this->areas[$this->filearea];
+    }
+
+    /**
+     * Can I add new files or directories?
+     * @return bool
+     */
+    public function is_writable() {
+        return false;
+    }
+
+    /**
+     * Is directory?
+     * @return bool
+     */
+    public function is_directory() {
+        return true;
+    }
+
+    /**
+     * Returns list of children.
+     * @return array of file_info instances
+     */
+    public function get_children() {
+        return $this->get_filtered_children('*', false, true);
+    }
+
+    /**
+     * Help function to return files matching extensions or their count
+     *
+     * @param string|array $extensions, either '*' or array of lowercase extensions, i.e. array('.gif','.jpg')
+     * @param bool|int $countonly if false returns the children, if an int returns just the
+     *    count of children but stops counting when $countonly number of children is reached
+     * @param bool $returnemptyfolders if true returns items that don't have matching files inside
+     * @return array|int array of file_info instances or the count
+     */
+    private function get_filtered_children($extensions = '*', $countonly = false, $returnemptyfolders = false) {
+        global $DB;
+
+        $params = array('contextid' => $this->context->id,
+                        'component' => 'mod_scheduler',
+                        'filearea' => $this->filearea);
+        $sql = "SELECT DISTINCT f.itemid AS id
+                           FROM {files} f
+                          WHERE f.contextid = :contextid
+                                AND f.component = :component
+                                AND f.filearea = :filearea";
+        if (!$returnemptyfolders) {
+            $sql .= ' AND filename <> :emptyfilename';
+            $params['emptyfilename'] = '.';
+        }
+        list($sql2, $params2) = $this->build_search_files_sql($extensions, 'f');
+        $sql .= ' '.$sql2;
+        $params = array_merge($params, $params2);
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $children = array();
+        foreach ($rs as $record) {
+            if ($child = $this->browser->get_file_info($this->context, 'mod_scheduler', $this->filearea, $record->id)) {
+                if ($returnemptyfolders || $child->count_non_empty_children($extensions)) {
+                    $children[] = $child;
+                }
+            }
+            if ($countonly !== false && count($children) >= $countonly) {
+                break;
+            }
+        }
+        $rs->close();
+        if ($countonly !== false) {
+            return count($children);
+        }
+        return $children;
+    }
+
+    /**
+     * Returns list of children which are either files matching the specified extensions
+     * or folders that contain at least one such file.
+     *
+     * @param string|array $extensions, either '*' or array of lowercase extensions, i.e. array('.gif','.jpg')
+     * @return array of file_info instances
+     */
+    public function get_non_empty_children($extensions = '*') {
+        return $this->get_filtered_children($extensions, false);
+    }
+
+    /**
+     * Returns the number of children which are either files matching the specified extensions
+     * or folders containing at least one such file.
+     *
+     * @param string|array $extensions, for example '*' or array('.gif','.jpg')
+     * @param int $limit stop counting after at least $limit non-empty children are found
+     * @return int
+     */
+    public function count_non_empty_children($extensions = '*', $limit = 1) {
+        return $this->get_filtered_children($extensions, $limit);
+    }
+
+    /**
+     * Returns parent file_info instance
+     * @return file_info or null for root
+     */
+    public function get_parent() {
+        return $this->browser->get_file_info($this->context);
+    }
 }
-
-

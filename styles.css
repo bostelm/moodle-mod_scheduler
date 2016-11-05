@@ -31,9 +31,9 @@ div .path-mod-scheduler .appointmentnote{
     margin-right:auto;
 }
 
-.path-mod-scheduler #slotbookertable tr.booked {
-    background-color : #E7EFE7;
-    font-weight : bold;
+.path-mod-scheduler #slotbookertable {
+    margin-left:auto;
+    margin-right:auto;
 }
 
 .path-mod-scheduler div.bookercontrols {
@@ -48,26 +48,33 @@ div .path-mod-scheduler .appointmentnote{
     display: none;
 }
 
-.path-mod-scheduler div.commandbar  {
+.path-mod-scheduler div.commandbar {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
     background-color : #EEEEEE;
-    padding: 0.5em; 
-} 
+    padding: 0.5em;
+}
+
+// Reduce space usage by single buttons in table cells
+.path-mod-scheduler table div.singlebutton div {
+    margin-bottom: 0px;
+}
+.path-mod-scheduler table div.singlebutton input {
+    margin: 0px;
+}
 
 .path-mod-scheduler div.commandbar span.title {
-    float: left; 
-    clear: right; 
-    width: 10em; 
-    text-align: left; 
-    font-weight: bold; 
+    float: left;
+    clear: right;
+    width: 10em;
+    text-align: left;
+    font-weight: bold;
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu {
     display: inline;
 }
-
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu .menubar {
     width: 15em;
@@ -78,7 +85,7 @@ div .path-mod-scheduler .appointmentnote{
 }
 .path-mod-scheduler .moodle-actionmenu .menu-action-text {
     display: inline;
-} 
+}
 
 
 body.path-mod-scheduler input.slotselect {
@@ -127,7 +134,7 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     margin-right: auto;
     margin-bottom: 10px;
     border: solid 2px;
-    padding: 5px;    
+    padding: 5px;
     display: block;
     text-align: center;
     font-weight: bold;
@@ -141,6 +148,69 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
 .path-mod-scheduler div.actionmessage.error {
     background-color: ##FFB2B8;
     border-color: #F40000;
+}
+
+.path-mod-scheduler div.totalgrade {
+    padding-bottom: 25px;
+}
+.path-mod-scheduler dl.totalgrade dl {
+    width: 100%;
+}
+.path-mod-scheduler dl.totalgrade dt {
+    float:left;
+    clear:left;
+    width: 30%;
+}
+.path-mod-scheduler dl.totalgrade dd {
+    float:left;
+    width: 60%;
+}
+
+.path-mod-scheduler div.dropdownmenu {
+    display: inline-block;
+    padding-right: 1em;
+}
+
+.path-mod-scheduler div.dropdownmenu select {
+    vertical-align: middle;
+}
+
+// Format data fields in vertical rather than horizontal list.
+.path-mod-scheduler #id_datafieldhdr .fitem {
+    width: 30%;
+    margin-left: 10px;
+}
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
+    width: 100%;
+    text-align: left;
+    margin-left: 0;
+}
+.path-mod-scheduler #id_datafieldhdr .fitem {
+    float: left;
+    width: 30%;
+    clear: none;
+}
+
+.path-mod-scheduler #id_datafieldhdr .fitemtitle {
+    width: 100%;
+    font-weight: bold;
+    text-align: left;
+    height: 2.5em;
+    margin-left: 0;
+}
+
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
+    clear: left;
+    margin: 0 0 1em;
+}
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup > span {
+    float: left;
+    clear: left;
+    line-height: 1.7;
+}
+
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup span label {
+    margin-left: 0.4em;
 }
 
 .yui3-skin-sam .redtext {
