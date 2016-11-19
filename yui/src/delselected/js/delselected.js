@@ -1,5 +1,5 @@
 var SELECTORS = {
-        DELACTION: 'a#delselected',
+        DELACTION: 'div.commandbar a#delselected',
         SELECTBOX: 'table#slotmanager input.slotselect'
     },
     MOD;
@@ -28,7 +28,9 @@ MOD.collect_selection = function(link, baseurl) {
 
 MOD.init = function(baseurl) {
 	var link = Y.one(SELECTORS.DELACTION);
-	link.on('click', function(e) {
-		M.mod_scheduler.delselected.collect_selection(link, baseurl);
-	});
+	if (link != null) {
+		link.on('click', function(e) {
+			M.mod_scheduler.delselected.collect_selection(link, baseurl);
+		});
+	}
 };
