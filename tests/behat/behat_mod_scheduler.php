@@ -123,11 +123,10 @@ class behat_mod_scheduler extends behat_base {
                         )) ) );
         $this->execute('behat_auth::i_log_in_as', 'globalmanager1');
         $this->execute('behat_general::click_link', $home);
-//        $this->execute('behat_general::click_link', $turnon);
         $this->execute('behat_general::i_click_on_in_the', array($turnon, 'link', 'Administration', 'block'));
         $this->execute('behat_blocks::i_add_the_block', 'Upcoming events');
 
-        $this->execute('behat_action_menu::i_open_the_action_menu_in', array('Upcoming events', 'block'));
+        $this->execute('behat_blocks::i_open_the_blocks_action_menu', 'Upcoming events');
         $this->execute('behat_general::click_link', 'Configure Upcoming events block');
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', new TableNode(array(
                             array('Page contexts', 'Display throughout the entire site')
