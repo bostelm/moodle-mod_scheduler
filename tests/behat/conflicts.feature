@@ -1,4 +1,4 @@
-@mod_scheduler @wip
+@mod_scheduler
 Feature: Teachers are warned about scheduling conflicts
   In order to create useful slots
   As a teacher

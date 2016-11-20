@@ -107,6 +107,9 @@ class behat_mod_scheduler extends behat_base {
      */
     public function i_add_the_upcoming_events_block_globally() {
 
+        $home = $this->escape(get_string('sitehome'));
+        $turnon = $this->escape(get_string('turneditingon'));
+
         $this->execute('behat_data_generators::the_following_exist', array('users',
                         new TableNode(array(
                             array('username', 'firstname', 'lastname', 'email'),
@@ -119,10 +122,12 @@ class behat_mod_scheduler extends behat_base {
                             array('globalmanager1', 'manager')
                         )) ) );
         $this->execute('behat_auth::i_log_in_as', 'globalmanager1');
-        $this->execute('behat_general::click_link', 'Site home');
-        $this->execute('behat_general::click_link', 'Turn editing on');
+        $this->execute('behat_general::click_link', $home);
+//        $this->execute('behat_general::click_link', $turnon);
+        $this->execute('behat_general::i_click_on_in_the', array($turnon, 'link', 'Administration', 'block'));
         $this->execute('behat_blocks::i_add_the_block', 'Upcoming events');
-        $this->execute('behat_general::i_click_on_in_the', array('Actions', 'link_or_button', 'Upcoming events', 'block'));
+
+        $this->execute('behat_action_menu::i_open_the_action_menu_in', array('Upcoming events', 'block'));
         $this->execute('behat_general::click_link', 'Configure Upcoming events block');
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', new TableNode(array(
                             array('Page contexts', 'Display throughout the entire site')
