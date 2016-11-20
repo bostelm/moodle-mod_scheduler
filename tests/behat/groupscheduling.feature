@@ -60,17 +60,17 @@ Feature: Entire groups can be booked into slots at once
     And I log in as "edteacher1"
     And I follow "Course 1"
     And I follow "Test scheduler no grouping"
-    And I follow "Edit settings"
+    And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Booking in groups | Yes, for all groups |
     And I click on "Save and return to course" "button"
     And I follow "Test scheduler grouping A"
-    And I follow "Edit settings"
+    And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Booking in groups | Yes, in grouping Grouping A |
     And I click on "Save and return to course" "button"
     And I follow "Test scheduler grouping B"
-    And I follow "Edit settings"
+    And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Booking in groups | Yes, in grouping Grouping B |
     And I click on "Save and return to course" "button"

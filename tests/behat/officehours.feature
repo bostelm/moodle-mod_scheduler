@@ -29,16 +29,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   | schedulermode |
       | scheduler | Test scheduler | n     | C1     | scheduler1 | oneonly       |
-    And I log in as "manager1"
-    And I follow "Site home"
-    And I follow "Turn editing on"
-    And I add the "Upcoming events" block
-    And I click on "Actions" "link_or_button" in the "Upcoming events" "block"
-    And I follow "Configure Upcoming events block"
-    And I set the following fields to these values:
-       | Page contexts | Display throughout the entire site |
-    And I click on "Save changes" "button"
-    And I log out
+    And I add the upcoming events block globally
 
   @javascript
   Scenario: The teacher adds slots, and students book them
