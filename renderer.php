@@ -542,8 +542,8 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->head  = array('', get_string('date', 'scheduler'), get_string('start', 'scheduler'),
-                        get_string('end', 'scheduler'), get_string('students', 'scheduler') );
-        $table->align = array ('center', 'left', 'left', 'left', 'left');
+                        get_string('end', 'scheduler'), get_string('location', 'scheduler'), get_string('students', 'scheduler') );
+        $table->align = array ('center', 'left', 'left', 'left', 'left', 'left');
         if ($slotman->showteacher) {
             $table->head[] = s($slotman->scheduler->get_teacher_name());
             $table->align[] = 'left';
@@ -589,6 +589,8 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $rowdata[] = $startdatestr;
             $rowdata[] = $starttimestr;
             $rowdata[] = $endtimestr;
+
+            $rowdata[] = format_string($slot->location);
 
             $rowdata[] = $this->render($slot->students);
 
