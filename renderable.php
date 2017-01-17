@@ -213,6 +213,7 @@ class scheduler_slot_manager implements renderable {
         $slot->slotid = $slotmodel->id;
         $slot->starttime = $slotmodel->starttime;
         $slot->endtime = $slotmodel->endtime;
+        $slot->location = $slotmodel->appointmentlocation;
         $slot->teacher = $slotmodel->get_teacher();
         $slot->students = $students;
         $slot->editable = $editable;
