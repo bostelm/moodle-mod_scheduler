@@ -100,7 +100,7 @@ Feature: Teachers can write notes on slots and appointments
     And I should see "note-confidential"
 
 	When I follow "Test scheduler"
-	And I click on "Edit settings" "link" in the "Administration" "block"
+	And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "0"
 	And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
@@ -121,7 +121,7 @@ Feature: Teachers can write notes on slots and appointments
     When I log in as "edteacher1"
     And I follow "Course 1"
     And I follow "Test scheduler"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "1"
 	And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
@@ -142,7 +142,7 @@ Feature: Teachers can write notes on slots and appointments
     When I log in as "edteacher1"
     And I follow "Course 1"
     And I follow "Test scheduler"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "2"
 	And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
@@ -163,7 +163,7 @@ Feature: Teachers can write notes on slots and appointments
     When I log in as "edteacher1"
     And I follow "Course 1"
     And I follow "Test scheduler"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "3"
 	And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
