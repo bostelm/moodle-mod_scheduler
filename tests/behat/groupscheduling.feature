@@ -60,17 +60,17 @@ Feature: Entire groups can be booked into slots at once
     And I log in as "edteacher1"
     And I follow "Course 1"
     And I follow "Test scheduler no grouping"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Booking in groups | Yes, for all groups |
     And I click on "Save and return to course" "button"
     And I follow "Test scheduler grouping A"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Booking in groups | Yes, in grouping Grouping A |
     And I click on "Save and return to course" "button"
     And I follow "Test scheduler grouping B"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Booking in groups | Yes, in grouping Grouping B |
     And I click on "Save and return to course" "button"
@@ -81,23 +81,27 @@ Feature: Entire groups can be booked into slots at once
     Given I log in as "edteacher1"
     And I follow "Course 1"
 
-    When I follow "Test scheduler no grouping"
+    When I follow "C1"
+    And I follow "Test scheduler no grouping"
     Then I should see "Group A1" in the "groupstoschedule" "table"
     And I should see "Group A2" in the "groupstoschedule" "table"
     And I should see "Group B1" in the "groupstoschedule" "table"
     And I should see "Group B2" in the "groupstoschedule" "table"
 
-    When I follow "Test scheduler grouping A"
+    When I follow "C1"
+    And I follow "Test scheduler grouping A"
     Then I should see "Group A1" in the "groupstoschedule" "table"
     And I should see "Group A2" in the "groupstoschedule" "table"
     And I should not see "Group B" in the "groupstoschedule" "table"
 
-    When I follow "Test scheduler grouping B"
+    When I follow "C1"
+    And I follow "Test scheduler grouping B"
     Then I should not see "Group A" in the "groupstoschedule" "table"
     And I should see "Group B1" in the "groupstoschedule" "table"
     And I should see "Group B2" in the "groupstoschedule" "table"
 
-    When I follow "Test scheduler no grouping"
+    When I follow "C1"
+    And I follow "Test scheduler no grouping"
     And I click on "Schedule" "link_or_button" in the "Group A1" "table_row"
     And I click on "Schedule in slot" "text" in the "Group A1" "table_row"
     And I click on "Save changes" "button"

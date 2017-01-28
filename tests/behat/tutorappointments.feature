@@ -204,7 +204,10 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
     
     When I log in as "manager1"
-    And I follow "Courses"
+    And I follow "Site home"
+    And I navigate to "Turn editing on" in current page administration
+    And I add the "Navigation" block if not present
+    And I click on "Courses" "link" in the "Navigation" "block"
     And I follow "Course 1"    
     And I follow "Tutor sessions"
     And I follow "Statistics"

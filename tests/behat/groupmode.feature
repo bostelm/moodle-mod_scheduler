@@ -334,7 +334,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
   Scenario: Students can see slots available to their own groups in forced group mode
     When I log in as "edteacher1"
     And I follow "Course 1"
-    And I click on "Edit settings" "link" in the "Administration" "block"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Group mode" to "Separate groups"
     And I set the field "Force group mode" to "Yes"
