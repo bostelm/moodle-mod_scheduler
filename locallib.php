@@ -201,7 +201,8 @@ function scheduler_get_unappointed_slots($schedulerid){
         WHERE
         s.schedulerid = ?
         GROUP BY
-        s.id
+        s.id, s.schedulerid, s.starttime,s.duration,s.teacherid,s.appointmentlocation,s.reuse, 
+        s.timemodified,s.notes,s.exclusivity,s.appointmentnote,s.emaildate,s.hideuntil 
         HAVING
         MAX(a.studentid) = 0 OR MAX(a.studentid) IS NULL
         ORDER BY

@@ -437,6 +437,7 @@ if ($action == 'schedulegroup') {
             $form->exclusivity = count($members);
             foreach($members as $member){
                 unset($appointment);
+		$appointment=new stdClass();
                 $appointment->slotid = -1;
                 // hack for 1.8 / 1.9 compatibility of groups_get_members() call
                 if (is_numeric($member)){

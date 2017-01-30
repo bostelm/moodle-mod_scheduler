@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $string['pluginname'] = 'Rendez-vous';
 $string['pluginadministration'] = 'Administration Rendez-vous';
 $string['modulename'] = 'Rendez-vous';
@@ -39,7 +39,7 @@ $string['allowgroup'] = 'Créneau exclusif - cliquer pour changer';
 $string['allslotsincloseddays'] = 'Tous les créneaux sont dans des jours invalidés';
 $string['allteachersgrading'] = 'Les enseignants peuvent noter tous les entretiens';
 $string['allteachersgrading_desc'] = 'Si cette option est activée, les enseignants peuvent noter des travaux de créneaux attribués à d\'autres enseignants.';
-$string['alreadyappointed'] = 'Cannot make the appointment. The slot is already fully booked.';
+$string['alreadyappointed'] = 'Ne peut enregistrer le rendez-vous. Le créneau est déjà totalement plein.';
 $string['appointagroup'] = 'Rendez-vous de groupe';
 $string['appointfor'] = 'Prendre rendez-vous pour ';
 $string['appointformygroup'] = 'Prendre rendez-vous pour mon groupe ';
@@ -100,7 +100,7 @@ $string['enddate'] = 'Répéter le créneau jusqu\'à ';
 $string['endtime'] = 'Heure de fin ';
 $string['exclusive'] = 'Exclusif';
 $string['exclusivity'] = 'Exclusivitée';
-$string['exclusivitylockedto'] = 'Vous ne pouvez pas changer le mode du créneau lors d\'une planification. La limite du créneau de destination s\'appliquera. si le créneau est nouveau, une limite de 1 sera appliquée par défaut.';
+$string['exclusivitylockedto'] = 'Vous ne pouvez pas changer le mode du créneau lors d\'une planification. La limite du créneau de destination s\'appliquera. Si le créneau est nouveau, une limite de 1 sera appliquée par défaut.';
 $string['exclusivityoverload'] = 'La contrainte d\'exclusivité est contrariée';
 $string['explaingeneralconfig'] = 'Ces options sont réglables au niveau site et sont applicables à tous les Rendez-vous actifs sur cette plate-forme.';
 $string['exportinstructions'] = 'De préférence, enregistrez le fichier exporté sur votre disque dur avant de l\'exploiter.';
@@ -113,13 +113,13 @@ $string['forcourses'] = 'Cours concernés';
 $string['friday'] = 'Vendredi';
 $string['generalconfig'] = 'Configuration générale';
 $string['gradingstrategy'] = 'Stratégie de notation';
-$string['gradingstrategy_help'] = 'Dans un planning où les étudiants peuvent avoir plusieurs entretiens, choisissez comment la notation doit être affichée.<br/>
-Le carnet de notes peut afficher soit <ul><li>la note moyenne ou</li><li>la note maximale</li></ul> que l\'étudiant a reçue.';
+$string['gradingstrategy_help'] = 'Dans un planning où les étudiants peuvent avoir plusieurs entretiens, choisissez comment la notation doit être affichée.<br/>'.
+'Le carnet de notes peut afficher soit <ul><li>la note moyenne ou</li><li>la note maximale</li></ul> que l\'étudiant a reçue.';
 $string['group'] = 'groupe ';
 $string['groupbreakdown'] = 'Par taille de groupe';
 $string['groupscheduling'] = 'Autoriser les rendez-vous collectifs';
-$string['groupscheduling_desc'] = 'Permet à des groupes entiers d\'être en rendez-vous d\'un coup. 
-		(En plus de l\'option globale, l\'option de groupe de l\'activité doit être "Groupes visibles" ou "Groupes séparés" pour activer cette fonctionnalité.)';
+$string['groupscheduling_desc'] = 'Permet à des groupes entiers d\'être en rendez-vous d\'un coup. '.
+'(En plus de l\'option globale, l\'option de groupe de l\'activité doit être "Groupes visibles" ou "Groupes séparés" pour activer cette fonctionnalité.)';
 $string['groupsession'] = 'Rendez-vous collectif';
 $string['groupsize'] = 'Taille du groupe';
 $string['guestscantdoanything'] = 'Les invités ne peuvent pas utiliser cette activité.';
@@ -205,7 +205,8 @@ $string['schedulegroups'] = 'Planifier par groupe';
 $string['scheduler'] = 'Carnet';
 $string['schedulestudents'] = 'Planifier par étudiant';
 $string['showemailplain'] = 'Show e-mail addresses in plain text';
-$string['showemailplain_desc'] = 'Dans la vue enseignant du planning, afficher les adresses e-mails des étudiants voulant un entretien de façon textuelle, en plus des liens mailto:.';
+$string['showemailplain_desc'] = 'Dans la vue enseignant du planning, '.
+'afficher les adresses e-mails des étudiants voulant un entretien de façon textuelle, en plus des liens mailto:.';
 $string['seen'] = 'Vu ';
 $string['setreused'] = 'Rendre le créneau réutilisable';
 $string['setunreused'] = 'Rendre le créneau volatile';
@@ -262,17 +263,15 @@ $string['yourappointmentnote'] = 'Commentaire sur votre prestation individuelle'
 $string['yourslotnotes'] = 'Commentaires généraux de séance';
 
 
-/* ***********  Help strings from here on ************ */
+/* *********** Help strings from here on ************ */
 
 $string['forcewhenoverlap_help']='
 <h3>Forcer l\'ajout de créneaux dans une session</h3>
 <p>Cette option permet de forcer l\'ajout de créneaux quand la session est en conflit avec d\'autres créneaux.
 Dans ce cas, seul les créneaux "saufs" seront ajoutés. Ceux qui posent problème seront ignorés.</p>
 
-<p>
-Dans le cas contraire, la procédure bloquera dès qu\'un chevauchement sera détecté, et il vous sera demandé de supprimer
-des créneaux précédents avant que la procédure puisse ajouter de nouveaux créneaux.
-</p>';
+<p>Dans le cas contraire, la procédure bloquera dès qu\'un chevauchement sera détecté, et il vous sera demandé de supprimer
+des créneaux précédents avant que la procédure puisse ajouter de nouveaux créneaux.</p>';
 
 $string['addscheduled_help']='
 <h3>Ajouter un entretien </h3>
@@ -296,44 +295,33 @@ si ce créneau remplace les rendez-vous avec lesquels il est en conflit. Notez q
 
 $string['exclusivity_help']='<p>Vous pouvez fixer une limite au nombre d\étudiants qui peuvent s\'inscrire à un créneau donné.</p>
 <p>Fixer une limite de 1 (par défaut) fera passé le créneau en mode exclusif.</p>
-<p>Si le créneau est fixé à un nimbre infini (0), ce créneau ne sera jamais utilisé lors des évalutations de contraintes, même si d\'autres créneaux sont exclusif ou limités dans la même 
-';
-
-$string['exclusivity_help']='<p>You can set a limit on the amount of students that can apply for a given slot. </p>
-<p>Setting a limit of 1 (default) will toggle the slot in exclusive mode.</p>
-<p>If the slot is set to unlimited number (0), this slot will never be considered in constraints evaluation, even if other slots are exclusive or limited in the same time range.
+<p>Si le créneau est fixé à un nombre infini (0), ce créneau ne sera jamais utilisé lors des évalutations de contraintes, même si d\'autres créneaux sont exclusifs ou limités
+dans la même tranche horaire.
 </p>';
-
-$string['forcewhenoverlap_help']='
-<p>This control allows forcing the addition of slots when the session conflicts with other slots. 
-In that case, only "clean" slots will be added. Conflicting will be ignored.</p>
-
-<p>If not used, the addition procedure will block when overlapping are detected, and you will asked for
-deleting previous slots before the procedure can add new slots.</p>';
 
 $string['location_help']='Spécifier le lieu prévu pour le rendez-vous.';
 
 $string['notifications_help']='Lorsque cette option est cochée, les enseignants et les étudiants reçoivent des notifications lorsque des rendez-vous sont pris ou annulés.';
 
 $string['reuse_help']='
-A <i>reuseable</i> slot will remain in the scheduler even a student or the teacher revokes an appointment. The freed slot is available again for appointing.</p>
+<p>Un créneau <i>réutilisable</i> restera dans le planning même si un étudiant ou l\'enseignant annule un rendez-vous. Le créneau libre redevient alors disponible pour un rendez-vous.</p>
 
-<p>A <i>volatile</i> slot will be automatically deleted in the above cases if it has to start to close to the current dat (it is considered you may not want to add a constraint so close to "right now"). The guard delay can be set by the instance-scoped configuration parameter "Reuse guard time".
+<p>Un créneau <i>volatile</i> sera automatiquement supprimé dans les cas ci-dessus s\'il débute trop près de la date courante (on considère le cas où vous ne voulez pas ajouter une contrainte aussi proche que "dès maintenant"). Le délai de garde peut être fixé par le paramètre "Délai de garde des créneaux" de la configuration générale.
 </p>';
 
 $string['reuseguardtime_help']='
-<p>This parameter sets up the guard time for keeping volatile slots.</p>
-<p>When a slot is declared as volatile (not reusable), it will be automatically deleted when a student changes is appointment assignation, feeing completely the slot, or when a teacher revokes all appointments on it. The deletion takes place when the slot starts too close to the actual date.</p>
-<p>The parameter specifies the delay, from "now on", under which a freed slot will be deleted and will not be available for further appointments.</p>';
+<p>Ce paramètre fixe le délai de guarde pour maintenir les créneaux volatiles.</p>
+<p>Quand un créneau est déclaré comme volatile (non réutilisable), il est automatiquement supprimé lorsqu\'un étudiant change son attribution de rendez-vous, laissant le créneau totalement libre, ou quand un enseignant révoque tous les rendez-vous qu\'il contient. La suppression a lieu lorsque le créneau débute trop près de la date actuelle.</p>
+<p>Ce paramètre spécifie le délai, depuis "maintenant", à partir duquel un créneau libre sera supprimé et ne sera plus disponible pour de futurs rendez-vous.</p>';
 
 $string['staffrolename_help']='
-The label for the role who attends students. This is not necessarily a "teacher".';
+Le titre pour le rôle de la personne prenant rendez-vous avec les étudiants. Ce n\'est pas forcément un "enseignant".';
 
 
-/* ***********  E-mail templates from here on ************ */
+/* *********** E-mail templates from here on ************ */
 
 $string['email_applied_subject'] = '{$a->course_short}: Nouveau rendez-vous';
-$string['email_applied_plain'] = 'Un rendez-vous a été pris le {$a->date} à {$a->time}, 
+$string['email_applied_plain'] = 'Un rendez-vous a été pris le {$a->date} à {$a->time},
 par l\'étudiant {$a->attendee} pour le cours :
 
 {$a->course_short}: {$a->course}
@@ -349,7 +337,7 @@ par l\'étudiant <a href="{$a->attendee_url}">{$a->attendee}</a> pour le cours :
 
 $string['email_cancelled_subject'] = '{$a->course_short}: Rendez-vous annulé ou déplacé par un étudiant';
 
-$string['email_cancelled_plain'] = 'Votre rendez-vous du {$a->date} à {$a->time}, 
+$string['email_cancelled_plain'] = 'Votre rendez-vous du {$a->date} à {$a->time},
 avec l\'étudiant {$a->attendee} pour le cours :
 
 {$a->course_short} : {$a->course}
@@ -358,7 +346,7 @@ dans le planning de "{$a->module}" sur le site : {$a->site}
 
 a été annulé ou déplacé.';
 
-$string['email_cancelled_html'] = '<p>Votre rendez-vous du <b>{$a->date}</b> à <b>{$a->time}</b>,<br/> 
+$string['email_cancelled_html'] = '<p>Votre rendez-vous du <b>{$a->date}</b> à <b>{$a->time}</b>,<br/>
 avec l\'étudiant <b><a href="{$a->attendee_url}">{$a->attendee}</a></b> pour le cours :</p>
 
 <p><b>{$a->course_short} : <a href="{$a->course_url}">{$a->course}</a></b></p>
@@ -375,15 +363,15 @@ avec {$a->attendant}.
 
 Lieu : {$a->location}';
 
-$string['email_reminder_html'] = '<p>Vous avez un rendez-vous prévu prochainement le <b>{$a->date}</b> 
-de <b>{$a->time}</b> à <b>{$a->endtime}</b><br/> 
+$string['email_reminder_html'] = '<p>Vous avez un rendez-vous prévu prochainement le <b>{$a->date}</b>
+de <b>{$a->time}</b> à <b>{$a->endtime}</b><br/>
 avec <b><a href="{$a->attendant_url}">{$a->attendant}</a></b>.</p>
 
 <p>Lieu : <b>{$a->location}</b></p>';
 
 $string['email_teachercancelled_subject'] = '{$a->course_short}: Rendez-vous annulé par l\'enseignant';
 
-$string['email_teachercancelled_plain'] = 'Votre rendez-vous du {$a->date} à {$a->time}, 
+$string['email_teachercancelled_plain'] = 'Votre rendez-vous du {$a->date} à {$a->time},
 avec le {$a->staffrole} {$a->attendant} pour le cours :
 
 {$a->course_short}: {$a->course}
@@ -392,7 +380,7 @@ dans le planning intitulé "{$a->module}" sur le site : {$a->site}
 
 a été annulé. Veuillez choisir un nouveau créneau, s\'il vous plait.';
 
-$string['email_teachercancelled_html'] = '<p>Votre rendez-vous du <b>{$a->date}</b> à <b>{$a->time} </b>,<br/> 
+$string['email_teachercancelled_html'] = '<p>Votre rendez-vous du <b>{$a->date}</b> à <b>{$a->time} </b>,<br/>
 avec le {$a->staffrole} <b><a href="{$a->attendant_url}">{$a->attendant}</a></b> pour le cours :</p>
 
 <p><b>{$a->course_short}: <a href="{$a->course_url}">{$a->course}</a></b></p>
