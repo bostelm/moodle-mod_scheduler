@@ -131,9 +131,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         if (isset($this->_customdata['slotid'])) {
             $this->slotid = $this->_customdata['slotid'];
         }
+        $timeoptions = $this->_customdata['timeoptions'];
 
         // Start date/time of the slot.
-        $mform->addElement('date_time_selector', 'starttime', get_string('date', 'scheduler'));
+        $mform->addElement('date_time_selector', 'starttime', get_string('date', 'scheduler'), $timeoptions);
         $mform->setDefault('starttime', time());
         $mform->addHelpButton('starttime', 'choosingslotstart', 'scheduler');
 

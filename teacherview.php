@@ -139,6 +139,11 @@ if ($action == 'updateslot') {
 
     $slotid = required_param('slotid', PARAM_INT);
     $slot = $scheduler->get_slot($slotid);
+    if ($slot->starttime % 300 !== 0 || $slot->duration % 5 !== 0) {
+        $timeoptions = array('step' => 1, 'optional' => false);
+    } else {
+        $timeoptions = array('step' => 5, 'optional' => false);
+    }
 
     $actionurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid,
@@ -146,7 +151,10 @@ if ($action == 'updateslot') {
     $returnurl = new moodle_url('/mod/scheduler/view.php',
                     array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
 
-    $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array('slotid' => $slotid));
+    $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array(
+            'slotid' => $slotid,
+            'timeoptions' => $timeoptions)
+        );
     $data = $mform->prepare_formdata($slot);
     $mform->set_data($data);
 
