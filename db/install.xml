@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/scheduler/db" VERSION="20150625" COMMENT="XMLDB file for scheduler module"
+<XMLDB PATH="mod/scheduler/db" VERSION="20170205" COMMENT="XMLDB file for scheduler module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -22,6 +22,14 @@
         <FIELD NAME="gradingstrategy" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="bookingrouping" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="-1" SEQUENCE="false" COMMENT="Groups can be scheduled from this grouping, -1 if none, 0 if all"/>
         <FIELD NAME="usenotes" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Which types of notes to show for appointments"/>
+        <FIELD NAME="usebookingform" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether a booking form is used"/>
+        <FIELD NAME="bookinginstructions" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Text field with instructions for booking"/>
+        <FIELD NAME="bookinginstructionsformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="usestudentnotes" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether students can enter notes at time of booking"/>
+        <FIELD NAME="requireupload" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether students must upload files when booking"/>
+        <FIELD NAME="uploadmaxfiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Maximum number of files that a student can upload with a booking"/>
+        <FIELD NAME="uploadmaxsize" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Maximum file size for student uploads"/>
+        <FIELD NAME="usecaptcha" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether a CAPTCHA is used when students make a booking"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -62,6 +70,8 @@
         <FIELD NAME="appointmentnoteformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="teachernote" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Notes visible to teacher only"/>
         <FIELD NAME="teachernoteformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="studentnote" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Note supplied by student at time of booking"/>
+        <FIELD NAME="studentnoteformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>

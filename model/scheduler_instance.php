@@ -202,7 +202,7 @@ class scheduler_instance extends mvc_record_model {
 
     /**
      * Whether this scheduler uses "appointment notes" visible to teachers and students
-     * @return whether appointment notes are used
+     * @return boolean whether appointment notes are used
      */
     public function uses_appointmentnotes() {
         return ($this->data->usenotes % 2 == 1);
@@ -210,11 +210,63 @@ class scheduler_instance extends mvc_record_model {
 
     /**
      * Whether this scheduler uses "teacher notes" visible to teachers only
-     * @return whether appointment notes are used
+     * @return boolean whether appointment notes are used
      */
     public function uses_teachernotes() {
         return (floor($this->data->usenotes / 2) % 2 == 1);
     }
+
+    /**
+     * Whether this scheduler uses booking forms at all
+     * @return boolean whether the booking form is used
+     */
+    public function uses_bookingform() {
+        return $this->data->usebookingform;
+    }
+
+    /**
+     * Whether this scheduler has booking instructions
+     * @return boolean whether booking instructions present
+     */
+    public function has_bookinginstructions() {
+        $instr = trim(strip_tags($this->data->bookinginstructions));
+        return $this->uses_bookingform() && strlen($instr) > 0;
+    }
+
+    /**
+     * Whether this scheduler uses "student notes" filled by students at booking time
+     * @return boolean whether student notes are used
+     */
+    public function uses_studentnotes() {
+        return $this->uses_bookingform() && $this->usestudentnotes > 0;
+    }
+
+    /**
+     * Whether this scheduler uses student file uploads at booking time
+     * @return boolean whether student file uploads are used
+     */
+    public function uses_studentfiles() {
+        return $this->uses_bookingform() && $this->uploadmaxfiles > 0;
+    }
+
+    /**
+     * Whether this scheduler uses any data entered by the student at booking time
+     * @return boolean whether student data is used
+     */
+    public function uses_studentdata() {
+        return $this->uses_studentnotes() || $this->uses_studentfiles();
+    }
+
+    /**
+     * Whether this scheduler uses captchas at booking time
+     * @return boolean whether captchas are used
+     */
+    public function uses_bookingcaptcha() {
+        global $CFG;
+        return  $this->uses_bookingform() && $this->data->usecaptcha
+                && !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey);
+    }
+
 
     /**
      * Checks whether this scheduler allows a student (in principle) to book several slots at a time

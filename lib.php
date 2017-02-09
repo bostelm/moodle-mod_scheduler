@@ -29,22 +29,31 @@ define ('SCHEDULER_MAX_GRADE', 1);  // Used for grading strategy.
  * Given an object containing all the necessary data,
  * will create a new instance and return the id number
  * of the new instance.
- * @param object $scheduler the current instance
+ * @param stdClass $data the current instance
+ * @param moodleform $mform the form that the user filled
  * @return int the new instance id
  * @uses $DB
  */
-function scheduler_add_instance($scheduler) {
+function scheduler_add_instance($data, $mform = null) {
     global $DB;
 
-    $scheduler->timemodified = time();
-    $scheduler->scale = isset($scheduler->grade) ? $scheduler->grade : 0;
+    $cmid = $data->coursemodule;
 
-    $id = $DB->insert_record('scheduler', $scheduler);
-    $scheduler->id = $id;
+    $data->timemodified = time();
+    $data->scale = isset($data->grade) ? $data->grade : 0;
 
-    scheduler_grade_item_update($scheduler);
+    $data->id = $DB->insert_record('scheduler', $data);
 
-    return $id;
+    $DB->set_field('course_modules', 'instance', $data->id, array('id' => $cmid));
+    $context = context_module::instance($cmid);
+
+    if ($mform) {
+        $mform->save_mod_data($data, $context);
+    }
+
+    scheduler_grade_item_update($data);
+
+    return $data->id;
 }
 
 /**
@@ -52,21 +61,25 @@ function scheduler_add_instance($scheduler) {
  * (defined by the form in mod.html) this function
  * will update an existing instance with new data.
  * @param object $scheduler the current instance
+ * @param moodleform $mform the form that the user filled
  * @return object the updated instance
  * @uses $DB
  */
-function scheduler_update_instance($scheduler) {
+function scheduler_update_instance($data, $mform) {
     global $DB;
 
-    $scheduler->timemodified = time();
-    $scheduler->id = $scheduler->instance;
+    $data->timemodified = time();
+    $data->id = $data->instance;
 
-    $scheduler->scale = $scheduler->grade;
+    $data->scale = $data->grade;
 
-    $DB->update_record('scheduler', $scheduler);
+    $DB->update_record('scheduler', $data);
+
+    $context = context_module::instance($data->coursemodule);
+    $mform->save_mod_data($data, $context);
 
     // Update grade item and grades.
-    scheduler_update_grades($scheduler);
+    scheduler_update_grades($data);
 
     return true;
 }
@@ -485,6 +498,7 @@ function scheduler_grade_item_delete($scheduler) {
  */
 function scheduler_get_file_areas($course, $cm, $context) {
     return array(
+            'bookinginstructions' => get_string('bookinginstructions', 'scheduler'),
             'slotnote' => get_string('areaslotnote', 'scheduler'),
             'appointmentnote' => get_string('areaappointmentnote', 'scheduler'),
             'teachernote' => get_string('areateachernote', 'scheduler')
@@ -528,7 +542,12 @@ function scheduler_get_file_info($browser, $areas, $course, $cm, $context, $file
     try {
         $scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
 
-        if ($filearea === 'slotnote') {
+        if ($filearea === 'bookinginstructions') {
+            $cansee = true;
+            $canwrite = has_capability('moodle/course:manageactivities', $context);
+            $name = get_string('bookinginstructions', 'scheduler');
+
+        } else if ($filearea === 'slotnote') {
             $slot = $scheduler->get_slot($itemid);
 
             $cansee = true;
@@ -574,7 +593,7 @@ function scheduler_get_file_info($browser, $areas, $course, $cm, $context, $file
 }
 
 /**
- * Serves the files embedded in various notes fields
+ * Serves the files embedded in various rich text fields, or uploaded by students
  *
  * @package  mod_scheduler
  * @category files
@@ -585,10 +604,10 @@ function scheduler_get_file_info($browser, $areas, $course, $cm, $context, $file
  * @param array $args extra arguments
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
- * @return bool false if file not found, does not return if found - justsend the file
+ * @return bool false if file not found, does not return if found - just send the file
  */
 function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    global $CFG, $DB;
+    global $CFG, $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
@@ -636,6 +655,26 @@ function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
             }
 
             if (!($USER->id == $slot->teacherid)) {
+                require_capability('mod/scheduler:manageallappointments', $context);
+            }
+
+        } else if ($filearea === 'bookinginstructions') {
+            $caps = array('moodle/course:manageactivities', 'mod/scheduler:appoint');
+            if (!has_any_capability($caps)) {
+                return false;
+            }
+
+        } else if ($filearea === 'studentfiles') {
+            if (!$scheduler->uses_studentfiles()) {
+                return false;
+            }
+
+            list($slot, $app) = $scheduler->get_slot_appointment($entryid);
+            if (!$app) {
+                return false;
+            }
+
+            if (($USER->id != $slot->teacherid) && ($USER->id != $app->studentid)) {
                 require_capability('mod/scheduler:manageallappointments', $context);
             }
 

@@ -20,7 +20,7 @@ class scheduler_slot_table implements renderable {
     public $showgrades;
     public $showslot = true;
     public $showattended = false;
-    public $showactions = false;
+    public $showactions = true;
     public $showteachernotes = false;
     public $showeditlink = false;
     public $showlocation = true;
@@ -28,7 +28,7 @@ class scheduler_slot_table implements renderable {
     public $actionurl;
 
     public function add_slot(scheduler_slot $slotmodel, scheduler_appointment $appointmentmodel,
-                             $otherstudents, $cancancel = false) {
+                             $otherstudents, $cancancel = false, $canedit = false, $canview = false) {
         $slot = new stdClass();
         $slot->slotid = $slotmodel->id;
         if ($this->showstudent) {
@@ -52,6 +52,8 @@ class scheduler_slot_table implements renderable {
         }
         $slot->otherstudents = $otherstudents;
         $slot->cancancel = $cancancel;
+        $slot->canedit = $canedit;
+        $slot->canview = $canview;
         if ($this->showgrades) {
             $slot->grade = $appointmentmodel->grade;
         }
@@ -84,17 +86,27 @@ class scheduler_student_list implements renderable {
     public $actionurl = null;
     public $linkappointment = false;
 
-    public function add_student(scheduler_appointment $appointmentmodel, $highlight, $checked = false, $showgrade = true) {
+    public function add_student(scheduler_appointment $appointment, $highlight, $checked = false,
+                                $showgrade = true, $showstudprovided = false) {
         $student = new stdClass();
-        $student->user = $appointmentmodel->get_student();
+        $student->user = $appointment->get_student();
         if ($this->showgrades && $showgrade) {
-            $student->grade = $appointmentmodel->grade;
+            $student->grade = $appointment->grade;
         } else {
             $student->grade = null;
         }
         $student->highlight = $highlight;
         $student->checked = $checked;
-        $student->entryid = $appointmentmodel->id;
+        $student->entryid = $appointment->id;
+        $scheduler = $appointment->get_scheduler();
+        $student->notesprovided = false;
+        $student->filesprovided = 0;
+        if ($showstudprovided) {
+            $student->notesprovided = $scheduler->uses_studentnotes() && $appointment->has_studentnotes();
+            if ($scheduler->uses_studentfiles()) {
+                $student->filesprovided = $appointment->count_studentfiles();
+            }
+        }
         $this->students[] = $student;
     }
 
@@ -321,6 +333,60 @@ class scheduler_conflict_list implements renderable {
         foreach ($conflicts as $c) {
             $this->add_conflict($c);
         }
+    }
+
+}
+
+class scheduler_appointment_info implements renderable {
+
+    public $scheduler;
+    public $slot;
+    public $appointment;
+    public $showslotinfo;
+    public $showbookinginfo;
+    public $showstudentdata;
+    public $onstudentside;
+    public $showresult;
+
+    public static function make_from_slot(scheduler_slot $slot, $showbookinginstr = true, $onstudentside = true) {
+        $info = new scheduler_appointment_info();
+        $info->slot = $slot;
+        $info->scheduler = $slot->get_scheduler();
+        $info->showslotinfo = true;
+        $info->showbookinginfo = $showbookinginstr;
+        $info->showstudentdata   = false;
+        $info->showresult   = false;
+        $info->onstudentside = $onstudentside;
+
+        return $info;
+    }
+
+    public static function make_from_appointment(scheduler_slot $slot, scheduler_appointment $appointment, $onstudentside = true) {
+        $info = new scheduler_appointment_info();
+        $info->slot = $slot;
+        $info->appointment = $appointment;
+        $info->scheduler = $slot->get_scheduler();
+        $info->showslotinfo = true;
+        $info->showboookinginfo = true;
+        $info->showstudentdata = $info->scheduler->uses_studentdata();
+        $info->showresult   = true;
+        $info->onstudentside = $onstudentside;
+
+        return $info;
+    }
+
+    public static function make_for_teacher(scheduler_slot $slot, scheduler_appointment $appointment) {
+        $info = new scheduler_appointment_info();
+        $info->slot = $slot;
+        $info->appointment = $appointment;
+        $info->scheduler = $slot->get_scheduler();
+        $info->showslotinfo = true;
+        $info->showboookinginfo = false;
+        $info->showstudentdata = $info->scheduler->uses_studentdata();
+        $info->showresult   = false;
+        $info->onstudentside = false;
+
+        return $info;
     }
 
 }

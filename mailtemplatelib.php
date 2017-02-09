@@ -116,6 +116,7 @@ class scheduler_messenger {
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->fullmessagehtml = self::compile_mail_template ( $template, 'html', $vars, $modulename, $lang );
         $message->notification = '1';
+        $message->courseid = $course->id;
         $message->contexturl = $defaultvars['COURSE_URL'];
         $message->contexturlname = $course->fullname;
 
