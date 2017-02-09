@@ -128,6 +128,8 @@ function scheduler_get_export_fields() {
     $result[] = new scheduler_grade_field();
     $result[] = new scheduler_appointmentnote_field();
     $result[] = new scheduler_teachernote_field();
+    $result[] = new scheduler_studentnote_field();
+    $result[] = new scheduler_filecount_field();
 
     return $result;
 }
@@ -426,6 +428,74 @@ class scheduler_teachernote_field extends scheduler_export_field {
             return '';
         }
         return strip_tags($appointment->teachernote);
+    }
+
+}
+
+/**
+ * Export field: Student-provided notes
+ */
+class scheduler_studentnote_field extends scheduler_export_field {
+
+    public function get_id() {
+        return 'studentnote';
+    }
+
+    public function get_group() {
+        return 'appointment';
+    }
+
+    public function get_typical_width(scheduler_instance $scheduler) {
+        return 30;
+    }
+
+    public function is_wrapping() {
+        return true;
+    }
+
+    public function is_available(scheduler_instance $scheduler) {
+        return $scheduler->uses_studentnotes();
+    }
+
+    public function get_value(scheduler_slot $slot, $appointment) {
+        if (! $appointment instanceof scheduler_appointment) {
+            return '';
+        }
+        return strip_tags($appointment->studentnote);
+    }
+
+}
+
+/**
+ * Export field: Number of student-provided files
+ */
+class scheduler_filecount_field extends scheduler_export_field {
+
+    public function get_id() {
+        return 'filecount';
+    }
+
+    public function get_group() {
+        return 'appointment';
+    }
+
+    public function get_typical_width(scheduler_instance $scheduler) {
+        return 2;
+    }
+
+    public function is_wrapping() {
+        return false;
+    }
+
+    public function is_available(scheduler_instance $scheduler) {
+        return $scheduler->uses_studentfiles();
+    }
+
+    public function get_value(scheduler_slot $slot, $appointment) {
+        if (! $appointment instanceof scheduler_appointment) {
+            return '';
+        }
+        return $appointment->count_studentfiles();
     }
 
 }

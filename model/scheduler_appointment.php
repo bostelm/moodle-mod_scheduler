@@ -79,6 +79,21 @@ class scheduler_appointment extends mvc_child_record_model {
         return (boolean) $this->data->attended;
     }
 
+    public function has_studentnotes() {
+        return $this->get_scheduler()->uses_studentnotes() &&
+                strlen(trim(strip_tags($this->studentnote))) > 0;
+    }
+
+    public function count_studentfiles() {
+        if (!$this->get_scheduler()->uses_studentnotes()) {
+            return 0;
+        }
+        $ctx = $this->get_scheduler()->context->id;
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($ctx, 'mod_scheduler', 'studentfiles', $this->id, "filename", false);
+        return count($files);
+    }
+
 }
 
 class scheduler_appointment_factory extends mvc_child_model_factory {

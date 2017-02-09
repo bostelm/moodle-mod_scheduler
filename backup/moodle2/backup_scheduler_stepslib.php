@@ -25,7 +25,10 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
         $scheduler = new backup_nested_element('scheduler', array('id'), array(
             'name', 'intro', 'introformat', 'schedulermode', 'maxbookings',
             'guardtime', 'defaultslotduration', 'allownotifications', 'staffrolename',
-            'scale', 'gradingstrategy', 'bookingrouping', 'usenotes', 'timemodified'));
+            'scale', 'gradingstrategy', 'bookingrouping', 'usenotes',
+            'usebookingform', 'bookinginstructions', 'bookinginstructionsformat',
+            'usestudentnotes', 'requireupload', 'uploadmaxfiles', 'uploadmaxsize',
+            'usecaptcha', 'timemodified'));
 
         $slots = new backup_nested_element('slots');
 
@@ -39,7 +42,7 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
         $appointment = new backup_nested_element('appointment', array('id'), array(
             'studentid', 'attended', 'grade',
             'appointmentnote', 'appointmentnoteformat', 'teachernote', 'teachernoteformat',
-            'timecreated', 'timemodified'));
+            'studentnote', 'studentnoteformat', 'timecreated', 'timemodified'));
 
         // Build the tree.
 
@@ -69,9 +72,11 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
 
         // Define file annotations.
         $scheduler->annotate_files('mod_scheduler', 'intro', null); // Files stored in intro field.
+        $scheduler->annotate_files('mod_scheduler', 'bookinginstructions', null); // Files stored in intro field.
         $slot->annotate_files('mod_scheduler', 'slotnote', 'id'); // Files stored in slot notes.
         $appointment->annotate_files('mod_scheduler', 'appointmentnote', 'id'); // Files stored in appointment notes.
         $appointment->annotate_files('mod_scheduler', 'teachernote', 'id'); // Files stored in teacher-only notes.
+        $appointment->annotate_files('mod_scheduler', 'studentfiles', 'id'); // Files uploaded by students.
 
         // Return the root element (scheduler), wrapped into standard activity structure.
         return $this->prepare_activity_structure($scheduler);

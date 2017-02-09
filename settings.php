@@ -34,4 +34,9 @@ if ($ADMIN->fulltree) {
                      get_string('maxstudentlistsize_desc', 'scheduler'),
                      200, PARAM_INT));
 
+    $settings->add(new admin_setting_configtext('mod_scheduler/uploadmaxfiles',
+                     get_string('uploadmaxfiles', 'scheduler'),
+                     get_string('uploadmaxfiles_desc', 'scheduler'),
+                     5, PARAM_INT));
+
 }

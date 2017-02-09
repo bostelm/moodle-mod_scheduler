@@ -67,14 +67,6 @@ echo $output->header();
 
 scheduler_print_user($DB->get_record('user', array('id' => $appointment->studentid)), $course);
 
-$params = array(
-                'startdate' => $output->userdate($slot->starttime),
-                'starttime' => $output->usertime($slot->starttime),
-                'endtime' => $output->usertime($slot->endtime),
-                'teacher' => fullname($slot->get_teacher())
-                );
-echo html_writer::tag('p', get_string('appointmentsummary', 'scheduler', $params));
-
 // Print tabs.
 $tabrows = array();
 $row  = array();
@@ -91,6 +83,9 @@ if (count($pages) > 1) {
 $totalgradeinfo = new scheduler_totalgrade_info($scheduler, $scheduler->get_gradebook_info($appointment->studentid));
 
 if ($subpage == 'thisappointment') {
+
+    $ai = scheduler_appointment_info::make_for_teacher($slot, $appointment);
+    echo $output->render($ai);
 
     $mform->display();
 
@@ -122,6 +117,9 @@ if ($subpage == 'thisappointment') {
 
 } else if ($subpage == 'otherstudents') {
     // Print table of other students in the same slot.
+
+    $ai = scheduler_appointment_info::make_from_slot($slot, false);
+    echo $output->render($ai);
 
     $studenturl = new moodle_url($taburl, array('page' => 'thisappointment'));
     $table = new scheduler_slot_table($scheduler, true, $studenturl);

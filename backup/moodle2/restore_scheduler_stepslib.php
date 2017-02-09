@@ -102,8 +102,10 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
     protected function after_execute() {
         // Add scheduler related files.
         $this->add_related_files('mod_scheduler', 'intro', null);
+        $this->add_related_files('mod_scheduler', 'bookinginstructions', null);
         $this->add_related_files('mod_scheduler', 'slotnote', 'scheduler_slot');
         $this->add_related_files('mod_scheduler', 'appointmentnote', 'scheduler_appointment');
         $this->add_related_files('mod_scheduler', 'teachernote', 'scheduler_appointment');
+        $this->add_related_files('mod_scheduler', 'studentfiles', 'scheduler_appointment');
     }
 }

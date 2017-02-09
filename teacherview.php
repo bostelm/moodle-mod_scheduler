@@ -467,7 +467,7 @@ if ($slots) {
         $studlist->buttontext = get_string('saveseen', 'scheduler');
         $studlist->actionurl = new moodle_url($actionurl, array('what' => 'saveseen', 'slotid' => $slot->id));
         foreach ($slot->get_appointments() as $app) {
-            $studlist->add_student($app, false, $app->is_attended());
+            $studlist->add_student($app, false, $app->is_attended(), true, $scheduler->uses_studentdata());
         }
 
         $slotman->add_slot($slot, $studlist, $editable);
