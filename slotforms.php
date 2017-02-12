@@ -181,6 +181,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
             }
         }
         $grouparray[] = $mform->createElement('select', 'studentid', '', $studentsmenu);
+        $grouparray[] = $mform->createElement('hidden', 'appointid', 0);
 
         // Seen tickbox.
         $grouparray[] = $mform->createElement('static', 'attendedlabel', '', get_string('seen', 'scheduler'));
@@ -206,6 +207,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                                                    array('rows' => 3, 'columns' => 60), $this->noteoptions);
         }
 
+        // Tickbox to remove the student
+        $repeatarray[] = $mform->createElement('advcheckbox', 'deletestudent', '', get_string('deleteonsave', 'scheduler'));
+
+
         if (isset($this->_customdata['repeats'])) {
             $repeatno = $this->_customdata['repeats'];
         } else if ($this->slotid) {
@@ -216,11 +221,14 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         }
 
         $repeateloptions = array();
+        $repeateloptions['appointid']['type'] = PARAM_INT;
+        $repeateloptions['studentid']['disabledif'] = array('appointid', 'neq', 0);
         $nostudcheck = array('studentid', 'eq', 0);
         $repeateloptions['attended']['disabledif'] = $nostudcheck;
         $repeateloptions['appointmentnote_editor']['disabledif'] = $nostudcheck;
         $repeateloptions['teachernote_editor']['disabledif'] = $nostudcheck;
         $repeateloptions['grade']['disabledif'] = $nostudcheck;
+        $repeateloptions['deletestudent']['disabledif'] = $nostudcheck;
         $repeateloptions['appointhead']['expanded'] = true;
 
         $this->repeat_elements($repeatarray, $repeatno, $repeateloptions,
@@ -238,7 +246,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         // Check number of appointments vs exclusivity.
         $numappointments = 0;
         for ($i = 0; $i < $data['appointment_repeats']; $i++) {
-            if ($data['studentid'][$i] > 0) {
+            if ($data['studentid'][$i] > 0 && $data['deletestudent'][$i] == 0) {
                 $numappointments++;
             }
         }
@@ -256,7 +264,8 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         // Check whether students have been selected several times.
         for ($i = 0; $i < $data['appointment_repeats']; $i++) {
             for ($j = 0; $j < $i; $j++) {
-                if ($data['studentid'][$i] > 0 && $data['studentid'][$i] == $data['studentid'][$j]) {
+                if ($data['deletestudent'][$j] == 0 && $data['studentid'][$i] > 0
+                        && $data['studentid'][$i] == $data['studentid'][$j]) {
                     $errors['studgroup['.$i.']'] = get_string('studentmultiselect', 'scheduler');
                     $errors['studgroup['.$j.']'] = get_string('studentmultiselect', 'scheduler');
                 }
@@ -303,6 +312,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         $i = 0;
         foreach ($slot->get_appointments() as $appointment) {
+            $data->appointid[$i] = $appointment->id;
             $data->studentid[$i] = $appointment->studentid;
             $data->attended[$i] = $appointment->attended;
 
@@ -359,17 +369,18 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $slot->notesformat = $editor['format'];
 
         $currentapps = $slot->get_appointments();
-        $processedstuds = array();
         for ($i = 0; $i < $data->appointment_repeats; $i++) {
-            if ($data->studentid[$i] > 0) {
-                $app = null;
-                foreach ($currentapps as $currentapp) {
-                    if ($currentapp->studentid == $data->studentid[$i]) {
-                        $app = $currentapp;
-                        $processedstuds[] = $currentapp->studentid;
-                    }
+            if ($data->deletestudent[$i] != 0) {
+                if ($data->appointid[$i]) {
+                    $app = $slot->get_appointment($data->appointid[$i]);
+                    $slot->remove_appointment($app);
                 }
-                if ($app == null) {
+            }
+            else if ($data->studentid[$i] > 0) {
+                $app = null;
+                if ($data->appointid[$i]) {
+                    $app = $slot->get_appointment($data->appointid[$i]);
+                } else {
                     $app = $slot->create_appointment();
                     $app->studentid = $data->studentid[$i];
                     $app->save();
@@ -395,11 +406,6 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                             $this->noteoptions, $editor['text']);
                     $app->teachernoteformat = $editor['format'];
                 }
-            }
-        }
-        foreach ($currentapps as $currentapp) {
-            if (!in_array($currentapp->studentid, $processedstuds)) {
-                $slot->remove_appointment($currentapp);
             }
         }
 

@@ -34,7 +34,7 @@ define ('SCHEDULER_MAX_GRADE', 1);  // Used for grading strategy.
  * @return int the new instance id
  * @uses $DB
  */
-function scheduler_add_instance($data, $mform) {
+function scheduler_add_instance($data, $mform = null) {
     global $DB;
 
     $cmid = $data->coursemodule;
@@ -47,7 +47,9 @@ function scheduler_add_instance($data, $mform) {
     $DB->set_field('course_modules', 'instance', $data->id, array('id' => $cmid));
     $context = context_module::instance($cmid);
 
-    $mform->save_mod_data($data, $context);
+    if ($mform) {
+        $mform->save_mod_data($data, $context);
+    }
 
     scheduler_grade_item_update($data);
 

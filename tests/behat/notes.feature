@@ -57,8 +57,9 @@ Feature: Teachers can write notes on slots and appointments
     And I follow "Statistics"
     And I follow "All appointments"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
-    Then I should see "Appointment on"
-    And I should see "4:00 AM to 4:45 AM with Editingteacher 1"
+    Then I should see ", 4:00 AM" in the "Date and time" "table_row"
+    And I should see "4:45 AM" in the "Date and time" "table_row"
+    And I should see "Editingteacher 1" in the "Teacher" "table_row"
     And I set the following fields to these values:
       | Attended | 1 |
       | Notes for appointment (visible to student) | note-for-appointment |
