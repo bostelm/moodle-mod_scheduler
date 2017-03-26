@@ -352,7 +352,7 @@ class scheduler_appointment_info implements renderable {
         $info->slot = $slot;
         $info->scheduler = $slot->get_scheduler();
         $info->showslotinfo = true;
-        $info->showboookinginfo = $showbookinginstr;
+        $info->showbookinginfo = $showbookinginstr;
         $info->showstudentdata   = false;
         $info->showresult   = false;
 

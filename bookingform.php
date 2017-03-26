@@ -60,7 +60,7 @@ class scheduler_booking_form extends moodleform {
             $mform->addElement('filemanager', 'studentfiles',
                     get_string('uploadstudentfiles', 'scheduler'),
                     null, $this->uploadoptions );
-            if (true||$scheduler->requireupload) {
+            if ($scheduler->requireupload) {
                 $mform->addRule('studentfiles', get_string('uploadrequired', 'scheduler'), 'required');
             }
         }
