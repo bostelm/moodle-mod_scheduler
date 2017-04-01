@@ -345,9 +345,10 @@ class scheduler_appointment_info implements renderable {
     public $showslotinfo;
     public $showbookinginfo;
     public $showstudentdata;
+    public $onstudentside;
     public $showresult;
 
-    public static function make_from_slot(scheduler_slot $slot, $showbookinginstr = true) {
+    public static function make_from_slot(scheduler_slot $slot, $showbookinginstr = true, $onstudentside = true) {
         $info = new scheduler_appointment_info();
         $info->slot = $slot;
         $info->scheduler = $slot->get_scheduler();
@@ -355,11 +356,12 @@ class scheduler_appointment_info implements renderable {
         $info->showbookinginfo = $showbookinginstr;
         $info->showstudentdata   = false;
         $info->showresult   = false;
+        $info->onstudentside = $onstudentside;
 
         return $info;
     }
 
-    public static function make_from_appointment(scheduler_slot $slot, scheduler_appointment $appointment) {
+    public static function make_from_appointment(scheduler_slot $slot, scheduler_appointment $appointment, $onstudentside = true) {
         $info = new scheduler_appointment_info();
         $info->slot = $slot;
         $info->appointment = $appointment;
@@ -368,6 +370,7 @@ class scheduler_appointment_info implements renderable {
         $info->showboookinginfo = true;
         $info->showstudentdata = $info->scheduler->uses_studentdata();
         $info->showresult   = true;
+        $info->onstudentside = $onstudentside;
 
         return $info;
     }
@@ -381,6 +384,7 @@ class scheduler_appointment_info implements renderable {
         $info->showboookinginfo = false;
         $info->showstudentdata = $info->scheduler->uses_studentdata();
         $info->showresult   = false;
+        $info->onstudentside = false;
 
         return $info;
     }

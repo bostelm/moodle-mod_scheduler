@@ -458,7 +458,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $studicons = '';
                 $studprovided = array();
                 if ($student->notesprovided) {
-                    $studprovided[] = get_string('text', 'scheduler');
+                    $studprovided[] = get_string('message', 'scheduler');
                 }
                 if ($student->filesprovided) {
                     $studprovided[] = get_string('nfiles', 'scheduler', $student->filesprovided);
@@ -874,7 +874,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         if ($ai->showstudentdata) {
             if ($ai->scheduler->uses_studentnotes()) {
                 $row = new html_table_row();
-                $cell1 = new html_table_cell(get_string('studentnote', 'scheduler'));
+                if ($ai->onstudentside) {
+                    $key = 'yourstudentnote';
+                } else {
+                    $key = 'studentnote';
+                }
+                $cell1 = new html_table_cell(get_string($key, 'scheduler'));
                 $note = format_text($ai->appointment->studentnote, $ai->appointment->studentnoteformat);
                 $cell2 = new html_table_cell($note);
                 $row->cells = array($cell1, $cell2);
