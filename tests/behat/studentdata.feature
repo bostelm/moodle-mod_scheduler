@@ -31,7 +31,7 @@ Feature: Student-supplied data
     And I expand all fieldsets
     And I set the field "Use booking form" to "1"
     And I set the field "Booking instructions" to "Please enter your first name"
-    And I set the field "Let students enter notes" to "Yes, student must enter notes"
+    And I set the field "Let students enter a message" to "Yes, student must enter a message"
     And I set the field "Maximum number of uploaded files" to "1"
     And I click on "Save and display" "button"
     And I add 10 slots 5 days ahead in "Test scheduler" scheduler and I fill the form with:
