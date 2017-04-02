@@ -1,4 +1,4 @@
-@wip @mod_scheduler
+@mod_scheduler
 Feature: Student-supplied data
   In order to collect data from students
   As a teacher
