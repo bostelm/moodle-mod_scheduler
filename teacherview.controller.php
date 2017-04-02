@@ -176,6 +176,104 @@ function scheduler_delete_slots_from_ui(array $slots, $action) {
     echo $output->action_message($msg);
 }
 
+function scheduler_action_doaddaperiodsession($scheduler, $formdata) {
+
+    global $DB, $output;
+
+    $data = (object) $formdata;
+    
+    $listdatesarr = json_decode($data->getlistdates, true);
+
+    // Create as many slots of $duration on the given dates list $listdates and that do not conflict.
+    $countslots = 0;
+    $couldnotcreateslots = '';
+    $slot = new stdClass();
+    $slot->schedulerid = $scheduler->id;
+    $slot->teacherid = $data->teacherid;
+    $slot->appointmentlocation = $data->appointmentlocation;
+    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
+    if ($data->divide) {
+        $slot->duration = $data->duration;
+    } else {
+        $slot->duration = $data->endhour * 60 + $data->endminute - $data->starthour * 60 - $data->startminute;
+    };
+    $slot->notes = '';
+    $slot->notesformat = FORMAT_HTML;
+    $slot->timemodified = time();
+    
+    for ($d = 0; $d <= count($listdatesarr[0])-1; $d ++){
+        $year = date("Y", strtotime($listdatesarr[0][$d]));
+        $month = date("m", strtotime($listdatesarr[0][$d]));
+        $day = date("d", strtotime($listdatesarr[0][$d]));
+        $slot->starttime = make_timestamp($year, $month, $day, $data->starthour, $data->startminute);
+        $eventdate = usergetdate($slot->starttime);
+        $data->timestart = $slot->starttime;
+        $data->timeend = make_timestamp(date('Y',$data->timestart), date('m',$data->timestart), date('d',$data->timestart), $data->endhour, $data->endminute);
+
+        // this corrects around midnight bug
+        if ($data->timestart > $data->timeend){
+            $data->timeend += DAYSECS;
+        }
+        if ($data->hideuntilrel == 0) {
+            $slot->hideuntil = time();
+        } else {
+            $slot->hideuntil = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 6, 0) - $data->hideuntilrel;
+        }
+        if ($data->emaildaterel == -1) {
+            $slot->emaildate = 0;
+        } else {
+            $slot->emaildate = make_timestamp($eventdate['year'], $eventdate['mon'], $eventdate['mday'], 0, 0) - $data->emaildaterel;
+        }
+                
+        while ($slot->starttime <= $data->timeend - $data->duration * 60) {            
+            if (!isset($data->ignoreconflicts)) {
+                //check against ALL conflicts
+                $conflicts = $scheduler->get_conflicts($data->timestart, $data->timestart + $slot->duration * 60,
+                                                       $data->teacherid, 0, SCHEDULER_ALL);
+            }
+            else {
+                //check against LOCAL conflicts only
+                $conflicts = $scheduler->get_conflicts($data->timestart, $data->timestart + $slot->duration * 60,
+                                                       $data->teacherid, 0, SCHEDULER_SELF);
+            }          
+            $resolvable = (boolean) $data->forcewhenoverlap;
+            foreach ($conflicts as $conflict) {
+                    $resolvable = $resolvable
+                                     && $conflict->isself == 1       // Do not delete slots outside the current scheduler.
+                                     && $conflict->numstudents == 0; // Do not delete slots with bookings.
+            }
+            
+            if ($conflicts) {
+                $cl = new scheduler_conflict_list();
+                $cl->add_conflicts($conflicts);
+                if (!$resolvable) {
+                    print_string('conflictingslots', 'scheduler', userdate($data->timestart));
+                    echo $output->doc_link('mod/scheduler/conflict', '', true);
+                    echo $output->render($cl);
+                } else { // We force, so delete all conflicting before inserting.
+                    foreach ($conflicts as $conflict) {
+                        $cslot = $scheduler->get_slot($conflict->id);
+                        \mod_scheduler\event\slot_deleted::create_from_slot($cslot, 'addsession-conflict')->trigger();
+                        $cslot->delete();
+                    }
+                    print_string('deletedconflictingslots', 'scheduler', userdate($data->timestart));
+                    echo $output->doc_link('mod/scheduler/conflict', '', true);
+                    echo $output->render($cl);
+                }
+            }
+            if (!$conflicts || $resolvable) {
+                $slotid = $DB->insert_record('scheduler_slots', $slot, true, true);
+                $slotobj = $scheduler->get_slot($slotid);
+                \mod_scheduler\event\slot_added::create_from_slot($slotobj)->trigger();
+                $countslots++;
+            }
+            $slot->starttime += ($data->duration + $data->break) * 60;
+            $data->timestart += ($data->duration + $data->break) * 60;
+        }
+    }
+    echo $output->action_message(get_string('slotsadded', 'scheduler', $countslots));
+}
+
 // Require valid session key for all actions.
 require_sesskey();
 

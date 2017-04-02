@@ -217,3 +217,7 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
 .path-mod-scheduler #id_datafieldhdr fieldset.fgroup span label {
     margin-left: 0.4em;
 }
+
+.yui3-skin-sam .redtext {
+  color:#ff0000;
+}

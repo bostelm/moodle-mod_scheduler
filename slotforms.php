@@ -543,3 +543,113 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         return $errors;
     }
 }
+
+class scheduler_addaperiodsession_form extends scheduler_slotform_base {
+
+    protected function definition() {
+
+        global $DB, $CFG, $COURSE;
+
+        $mform = $this->_form;
+  
+        $listdates = "";
+        $mform->addElement('hidden', 'getlistdates', $listdates);
+      
+        // Define Calendar panel
+        $mform->addElement('html', '<div id="calendar" class="yui3-skin-sam">');
+        $mform->addElement('html', '<div id="calContainer"></div>');     
+        $mform->addElement('html', '</div>');
+        // Start and end time
+        $hours = array();
+        $minutes = array();
+        for ($i=0; $i<=23; $i++) {
+            $hours[$i] = sprintf("%02d", $i);
+        }
+        for ($i=0; $i<60; $i+=5) {
+            $minutes[$i] = sprintf("%02d", $i);
+        }
+
+        $timegroup = array();
+        $timegroup[] = $mform->createElement('static', 'timefrom', '', get_string('timefrom', 'scheduler'));
+        $timegroup[] = $mform->createElement('select', 'starthour', get_string('hour', 'form'), $hours);
+        $timegroup[] = $mform->createElement('select', 'startminute', get_string('minute', 'form'), $minutes);
+        $timegroup[] = $mform->createElement('static', 'timeto', '', get_string('timeto', 'scheduler'));
+        $timegroup[] = $mform->createElement('select', 'endhour', get_string('hour', 'form'), $hours);
+        $timegroup[] = $mform->createElement('select', 'endminute', get_string('minute', 'form'), $minutes);
+        $mform->addGroup($timegroup, 'timerange', get_string('timerange', 'scheduler'), null, false);
+        
+        // Divide into slots?
+        $mform->addElement('selectyesno', 'divide', get_string('divide', 'scheduler'));
+        $mform->setDefault('divide', 1);
+
+        // Duration of the slot
+        $this->add_duration_field('minutesperslot');
+
+        // Break between slots
+        $this->add_minutes_field('break', 'break', 0, 'minutes');
+        
+        // Force when overlap?
+        $mform->addElement('selectyesno', 'forcewhenoverlap', get_string('forcewhenoverlap', 'scheduler'));
+        
+        // Ignore conflict checkbox
+        $mform->addElement('checkbox', 'ignoreconflicts', get_string('ignoreconflicts', 'scheduler'));
+        $mform->setDefault('ignoreconflicts', false);
+        $mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
+        
+        // Common fields
+        $this->add_base_fields();
+
+        // Display slot from date - relative
+        $hideuntilsel = array();
+        $hideuntilsel[0] =  get_string('now', 'scheduler');
+        $hideuntilsel[DAYSECS] = get_string('onedaybefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $hideuntilsel[DAYSECS*$i] = get_string('xdaysbefore', 'scheduler', $i);
+        }
+        $hideuntilsel[WEEKSECS] = get_string('oneweekbefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $hideuntilsel[WEEKSECS*$i] = get_string('xweeksbefore', 'scheduler', $i);
+        }
+        $mform->addElement('select', 'hideuntilrel', get_string('displayfrom', 'scheduler'), $hideuntilsel);
+        $mform->setDefault('hideuntilsel', 0);
+
+        // E-mail reminder from
+        $remindersel = array();
+        $remindersel[-1] = get_string('never', 'scheduler');
+        $remindersel[0] = get_string('onthemorningofappointment', 'scheduler');
+        $remindersel[DAYSECS] = get_string('onedaybefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $remindersel[DAYSECS * $i] = get_string('xdaysbefore', 'scheduler', $i);
+        }
+        $remindersel[WEEKSECS] = get_string('oneweekbefore', 'scheduler');
+        for ($i = 2; $i < 7; $i++) {
+            $remindersel[WEEKSECS*$i] = get_string('xweeksbefore', 'scheduler', $i);
+        }
+
+        $mform->addElement('select', 'emaildaterel', get_string('emailreminder', 'scheduler'), $remindersel);
+        $mform->setDefault('remindersel', -1);
+
+        $this->add_action_buttons();
+
+    }
+
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // Time range is negative
+        $starttime = $data['starthour']*60+$data['startminute'];
+        $endtime = $data['endhour']*60+$data['endminute'];
+        if ($starttime > $endtime)  {
+            $errors['endtime'] = get_string('negativerange', 'scheduler');
+        }
+
+        // Break must be nonnegative
+        if ($data['break'] < 0) {
+            $errors['breakgroup'] = get_string('breaknotnegative', 'scheduler');
+        }
+
+        // Conflict checks are now being done after submitting the form.
+
+        return $errors;
+    }
+}
