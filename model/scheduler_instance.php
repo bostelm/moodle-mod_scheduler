@@ -683,7 +683,7 @@ class scheduler_instance extends mvc_record_model {
 
         $sql = "SELECT sl.*,
                        s.name AS schedulername,
-                       (s.id = :thisid) as isself,
+                       (CASE WHEN (s.id = :thisid) THEN 1 ELSE 0 END) AS isself,
                        c.id AS courseid, c.shortname AS courseshortname, c.fullname AS coursefullname,
                        (SELECT COUNT(*) FROM {scheduler_appointment} ac WHERE sl.id = ac.slotid) AS numstudents
                   FROM {scheduler_slots} sl
