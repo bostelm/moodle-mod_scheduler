@@ -200,7 +200,7 @@ if ($numrecords) {
 
     foreach ($results as $id => $row) {
         $courseurl = new moodle_url('/course/view.php', array('id' => $row->courseid));
-        $coursedata = html_writer::link($courseurl, $row->courseshort);
+        $coursedata = html_writer::link($courseurl, format_string($row->courseshort));
         $schedulerurl = new moodle_url('/mod/scheduler/view.php', array('a' => $row->schedulerid));
         $schedulerdata = html_writer::link($schedulerurl, format_string($row->name));
         $a = mod_scheduler_renderer::slotdatetime($row->starttime, $row->duration);

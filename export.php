@@ -117,6 +117,6 @@ $export->build($scheduler,
                $data->includeemptyslots,
                $pageperteacher);
 
-$filename = clean_filename($course->shortname.'_'.format_string($scheduler->name));
+$filename = clean_filename(format_string($course->shortname).'_'.format_string($scheduler->name));
 $canvas->send($filename);
 
