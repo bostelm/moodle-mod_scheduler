@@ -983,7 +983,7 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
-     * Frees all empty slots that are in the past, hance no longer bookable.
+     * Frees all empty slots that are in the past, hence no longer bookable.
      * This applies to all schedulers in the system.
      * @uses $CFG
      * @uses $DB
@@ -997,7 +997,7 @@ class scheduler_instance extends mvc_record_model {
                           WHERE a.studentid IS NULL
                             AND starttime < ?";
         $now = time();
-        $todelete = $DB->get_records_sql($sql, array($now));
+        $todelete = $DB->get_records_sql($sql, array($now), 0, 1000);
         if ($todelete) {
             list($usql, $params) = $DB->get_in_or_equal(array_keys($todelete));
             $DB->delete_records_select('scheduler_slots', " id $usql ", $params);
