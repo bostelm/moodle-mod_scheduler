@@ -194,7 +194,9 @@ switch ($action) {
         $slotids = explode(",", $slotids);
         $slots = array();
         foreach ($slotids as $slotid) {
-            $slots[] = $scheduler->get_slot($slotid);
+            if ($slotid > 0) {
+                $slots[] = $scheduler->get_slot($slotid);
+            }
         }
         scheduler_delete_slots_from_ui($slots, $action);
         break;
