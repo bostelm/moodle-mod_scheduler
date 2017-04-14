@@ -99,8 +99,8 @@ class scheduler_messenger {
         );
 
         if ($course) {
-            $defaultvars['COURSE_SHORT'] = $course->shortname;
-            $defaultvars['COURSE'] = $course->fullname;
+            $defaultvars['COURSE_SHORT'] = format_string($course->shortname);
+            $defaultvars['COURSE'] = format_string($course->fullname);
             $defaultvars['COURSE_URL'] = $CFG->wwwroot . '/course/view.php?id=' . $course->id;
         }
 
