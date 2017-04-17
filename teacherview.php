@@ -525,7 +525,7 @@ if ($students === 0) {
     echo $output->box_end();
 
 
-    $userfields = scheduler_get_user_fields(null);
+    $userfields = scheduler_get_user_fields(null, $context);
     $fieldtitles = array();
     foreach ($userfields as $f) {
         $fieldtitles[] = $f->title;
@@ -546,7 +546,7 @@ if ($students === 0) {
                         new pix_icon('t/approve', '', 'moodle'),
                         get_string('markasseennow', 'scheduler') );
 
-        $userfields = scheduler_get_user_fields($student);
+        $userfields = scheduler_get_user_fields($student, $context);
         $fieldvals = array();
         foreach ($userfields as $f) {
             $fieldvals[] = $f->value;

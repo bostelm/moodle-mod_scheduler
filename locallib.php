@@ -118,7 +118,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $output .= $string->role .': '. $user->role .'<br />';
     }
 
-    $extrafields = scheduler_get_user_fields($user);
+    $extrafields = scheduler_get_user_fields($user, $context);
     foreach ($extrafields as $field) {
         $output .= $field->title . ': ' . $field->value . '<br />';
     }

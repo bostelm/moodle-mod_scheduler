@@ -22,17 +22,20 @@ defined('MOODLE_INTERNAL') || die();
  *  $field->value : Value of the field for this user (not set if $user is null)
  *
  * @param stdClass $user the user record; may be null
+ * @param context $context context for permission checks
  * @return array an array of field objects
  */
-function scheduler_get_user_fields($user) {
+function scheduler_get_user_fields($user, $context) {
 
     $fields = array();
 
-    $emailfield = new stdClass();
-    $fields[] = $emailfield;
-    $emailfield->title = get_string('email');
-    if ($user) {
-        $emailfield->value = obfuscate_mailto($user->email);
+    if (has_capability('moodle/site:viewuseridentity', $context)) {
+        $emailfield = new stdClass();
+        $fields[] = $emailfield;
+        $emailfield->title = get_string('email');
+        if ($user) {
+            $emailfield->value = obfuscate_mailto($user->email);
+        }
     }
 
     /*
