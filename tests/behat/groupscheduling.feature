@@ -58,7 +58,7 @@ Feature: Entire groups can be booked into slots at once
       | scheduler | Test scheduler grouping A      | n     | C1     | schedulera |
       | scheduler | Test scheduler grouping B      | n     | C1     | schedulerb |
     And I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
@@ -79,28 +79,28 @@ Feature: Entire groups can be booked into slots at once
   @javascript
   Scenario: Editing teachers can see and schedule relevant groups
     Given I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
-    When I follow "C1"
+    When I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     Then I should see "Group A1" in the "groupstoschedule" "table"
     And I should see "Group A2" in the "groupstoschedule" "table"
     And I should see "Group B1" in the "groupstoschedule" "table"
     And I should see "Group B2" in the "groupstoschedule" "table"
 
-    When I follow "C1"
+    When I am on "Course 1" course homepage
     And I follow "Test scheduler grouping A"
     Then I should see "Group A1" in the "groupstoschedule" "table"
     And I should see "Group A2" in the "groupstoschedule" "table"
     And I should not see "Group B" in the "groupstoschedule" "table"
 
-    When I follow "C1"
+    When I am on "Course 1" course homepage
     And I follow "Test scheduler grouping B"
     Then I should not see "Group A" in the "groupstoschedule" "table"
     And I should see "Group B1" in the "groupstoschedule" "table"
     And I should see "Group B2" in the "groupstoschedule" "table"
 
-    When I follow "C1"
+    When I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     And I click on "Schedule" "link_or_button" in the "Group A1" "table_row"
     And I click on "Schedule in slot" "text" in the "Group A1" "table_row"
@@ -116,7 +116,7 @@ Feature: Entire groups can be booked into slots at once
   @javascript
   Scenario: Students can book their entire group into a slot
     Given I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     And I add 8 slots 5 days ahead in "Test scheduler" scheduler and I fill the form with:
       | Location    | Large office |
@@ -127,7 +127,7 @@ Feature: Entire groups can be booked into slots at once
     And I log out
    
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     Then the "appointgroup" select box should contain "Myself"
     And the "appointgroup" select box should contain "Group A1"       
@@ -141,7 +141,7 @@ Feature: Entire groups can be booked into slots at once
     And I log out
 
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     Then I should see "Student 1" in the "8:00 AM" "table_row"
     And I should see "Student 2" in the "8:00 AM" "table_row"

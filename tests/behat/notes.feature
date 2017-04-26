@@ -22,7 +22,7 @@ Feature: Teachers can write notes on slots and appointments
       | activity  | name               | intro | course | idnumber   | usenotes |
       | scheduler | Test scheduler     | n     | C1     | schedulern | 3        |
     And I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add 5 slots 10 days ahead in "Test scheduler" scheduler and I fill the form with:
       | Location  | Here |
     And I log out
@@ -30,7 +30,7 @@ Feature: Teachers can write notes on slots and appointments
   @javascript
   Scenario: Teachers can enter slot notes and appointment notes for others to see
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
     And I follow "All appointments"
@@ -44,7 +44,7 @@ Feature: Teachers can write notes on slots and appointments
     And I log out
 
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should see "Note-for-slot" in the "4:00 AM" "table_row"
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
@@ -52,7 +52,7 @@ Feature: Teachers can write notes on slots and appointments
     And I log out
     
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
     And I follow "All appointments"
@@ -70,7 +70,7 @@ Feature: Teachers can write notes on slots and appointments
     And I log out
         
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should see "Attended slots"
     And I should see "note-for-appointment"
@@ -81,14 +81,14 @@ Feature: Teachers can write notes on slots and appointments
   Scenario: Teachers see only the comments fields specified in the configuration
 
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I click on "Book slot" "button" in the "4:00 AM" "table_row"
     Then I should see "Upcoming slots"
     And I log out
     
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
     And I follow "All appointments"
@@ -113,14 +113,14 @@ Feature: Teachers can write notes on slots and appointments
 	And I log out
 
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should not see "note-for-appointment"
     And I should not see "note-confidential"
     And I log out
 
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "1"
@@ -134,14 +134,14 @@ Feature: Teachers can write notes on slots and appointments
 	And I log out
 	
 	When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should see "note-for-appointment"
     And I should not see "note-confidential"
     And I log out
     
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "2"
@@ -155,14 +155,14 @@ Feature: Teachers can write notes on slots and appointments
 	And I log out
 
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should not see "note-for-appointment"
     And I should not see "note-confidential"
     And I log out
 
     When I log in as "edteacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
 	And I set the field "Use notes for appointments" to "3"

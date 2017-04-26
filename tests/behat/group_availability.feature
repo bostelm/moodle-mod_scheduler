@@ -40,7 +40,7 @@ Feature: As a teacher I need to see an accurate list of users to be scheduled
       | activity  | name           | intro | course | idnumber   |
       | scheduler | Test scheduler | n     | C1     | scheduler1 |      
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
   @javascript
   Scenario: A scheduler that is restricted to a single group

@@ -61,7 +61,7 @@ Feature: Booking of appointments with individual tutors per group
   @javascript
   Scenario: A tutor adds slots, and students book them
     When I log in as "tutor2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add 10 slots 5 days ahead in "Tutor sessions" scheduler and I fill the form with:
       | Location | My office |
     Then I should see "10 slots have been added"
@@ -71,7 +71,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
            
     When I log in as "student2a"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
@@ -81,7 +81,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
     
     When I log in as "student2b"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should not see "2:00 AM" in the "slotbookertable" "table"
@@ -92,7 +92,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
     
     When I log in as "tutor2"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should see "1:00 AM" in the "slotmanager" "table"
     And I should see "Student 2a" in the "2:00 AM" "table_row"
@@ -106,7 +106,7 @@ Feature: Booking of appointments with individual tutors per group
   @javascript
   Scenario: Several tutors add slots, they can be seen only by relevant users
     When I log in as "coor1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add 10 slots 5 days ahead in "Tutor sessions" scheduler and I fill the form with:
       | Location | Office 1 |
     Then I should see "10 slots have been added"
@@ -116,7 +116,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
 
     When I log in as "tutor2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add 10 slots 5 days ahead in "Tutor sessions" scheduler and I fill the form with:
       | Location | Office 2 |
     Then I should see "10 slots have been added"
@@ -126,7 +126,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
 
     When I log in as "tutor3"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add 10 slots 5 days ahead in "Tutor sessions" scheduler and I fill the form with:
       | Location | Office 2 |
     Then I should see "10 slots have been added"
@@ -136,7 +136,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
 
     When I log in as "student1a"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
@@ -149,7 +149,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
 
     When I log in as "student2a"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
@@ -162,7 +162,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
     
     When I log in as "coor1"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should see "Student 1a" in the "slotmanager" "table"
     And I should not see "Student 1b" in the "slotmanager" "table"
@@ -177,7 +177,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
     
     When I log in as "tutor2"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should not see "Student 1a" in the "slotmanager" "table"
     And I should not see "Student 1b" in the "slotmanager" "table"
@@ -192,7 +192,7 @@ Feature: Booking of appointments with individual tutors per group
     And I log out
     
     When I log in as "tutor3"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     Then I should not see "Student 1a" in the "slotmanager" "table"
     And I should not see "Student 1b" in the "slotmanager" "table"
@@ -208,7 +208,7 @@ Feature: Booking of appointments with individual tutors per group
     And I navigate to "Turn editing on" in current page administration
     And I add the "Navigation" block if not present
     And I click on "Courses" "link" in the "Navigation" "block"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Tutor sessions"
     And I follow "Statistics"
     And I follow "My appointments"

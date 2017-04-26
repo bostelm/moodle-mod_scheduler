@@ -25,7 +25,7 @@ Feature: Student-supplied data
   @javascript
   Scenario: A teacher configures a booking form, and students enter data
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
@@ -40,7 +40,7 @@ Feature: Student-supplied data
     And I log out
            
     When I log in as "student1"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Test scheduler"
     Then I should see "3:00 AM" in the "slotbookertable" "table"
     
@@ -56,7 +56,7 @@ Feature: Student-supplied data
     And I log out
 
     When I log in as "student2"
-    And I follow "Course 1"    
+    And I am on "Course 1" course homepage    
     And I follow "Test scheduler"
     And I click on "Book slot" "button" in the "4:00 AM" "table_row"
     Then I should see "Please enter your first name"
@@ -68,7 +68,7 @@ Feature: Student-supplied data
     And I log out
 
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
     And I follow "My appointments"
