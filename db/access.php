@@ -6,6 +6,8 @@
  * @package    mod_scheduler
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $capabilities = array(
 
     'mod/scheduler:addinstance' => array(

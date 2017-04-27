@@ -1,5 +1,7 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+
 function scheduler_migrate_config_setting($name) {
     $oldval = get_config('core', 'scheduler_'.$name);
     set_config($name, $oldval, 'mod_scheduler');

@@ -10,6 +10,8 @@
 
 namespace mod_scheduler\task;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once(dirname(__FILE__).'/../../model/scheduler_instance.php');
 
 class purge_unused_slots extends \core\task\scheduled_task {
