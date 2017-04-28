@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Strings for component 'mod_scheduler', language 'en'
+ *
+ * @package    mod_scheduler
+ * @copyright  2017 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';

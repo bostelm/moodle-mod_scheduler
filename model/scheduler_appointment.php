@@ -51,10 +51,20 @@ class scheduler_appointment extends mvc_child_record_model {
         scheduler_update_grades($scheddata, $studid);
     }
 
+    /**
+     * Retrieve the slot associated with this appointment
+     *
+     * @return scheduler_slot;
+     */
     public function get_slot() {
         return $this->get_parent();
     }
 
+    /**
+     * Retrieve the scheduler associated with this appointment
+     *
+     * @return scheduler_instance
+     */
     public function get_scheduler() {
         return $this->get_parent()->get_parent();
     }
@@ -79,11 +89,20 @@ class scheduler_appointment extends mvc_child_record_model {
         return (boolean) $this->data->attended;
     }
 
+    /**
+     * Are there any student notes associated with this appointment?
+     * @return boolean
+     */
     public function has_studentnotes() {
         return $this->get_scheduler()->uses_studentnotes() &&
                 strlen(trim(strip_tags($this->studentnote))) > 0;
     }
 
+    /**
+     * How many files has the student uploaded for this appointment?
+     *
+     * @return int
+     */
     public function count_studentfiles() {
         if (!$this->get_scheduler()->uses_studentnotes()) {
             return 0;
@@ -96,6 +115,12 @@ class scheduler_appointment extends mvc_child_record_model {
 
 }
 
+/**
+ * A factory class for scheduler appointments.
+ *
+ * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class scheduler_appointment_factory extends mvc_child_model_factory {
     public function create_child(mvc_record_model $parent) {
         return new scheduler_appointment($parent);

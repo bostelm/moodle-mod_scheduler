@@ -12,6 +12,10 @@ defined ( 'MOODLE_INTERNAL' ) || die ();
 
 /**
  * Message functionality for scheduler module
+ *
+ * @package mod_scheduler
+ * @copyright 2016 Henning Bostelmann and others (see README.txt)
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_messenger {
     /**
@@ -46,6 +50,8 @@ class scheduler_messenger {
      * @param string $template the template's identified
      * @param string $format the mail format ('subject', 'html' or 'plain')
      * @param array $parameters an array ontaining pairs of parm => data to replace in template
+     * @param string $module module to use language strings from
+     * @param string $lang language to use
      * @return a fully resolved template where all data has been injected
      *
      */
@@ -70,10 +76,10 @@ class scheduler_messenger {
      *            name of the message in messages.php
      * @param int $isnotification
      *            1 for notifications, 0 for personal messages
-     * @param user $recipient
-     *            A {@link $USER} object describing the recipient
      * @param user $sender
      *            A {@link $USER} object describing the sender
+     * @param user $recipient
+     *            A {@link $USER} object describing the recipient
      * @param object $course
      *            The course that the activity is in. Can be null.
      * @param string $template
@@ -127,6 +133,7 @@ class scheduler_messenger {
     /**
      * Construct an array with subtitution rules for mail templates, relating to
      * a single appointment. Any of the parameters can be null.
+     *
      * @param scheduler_instance $scheduler The scheduler instance
      * @param scheduler_slot $slot The slot data as an MVC object, may be null
      * @param user $teacher A {@link $USER} object describing the attendant (teacher)

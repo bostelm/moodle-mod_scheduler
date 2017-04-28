@@ -15,6 +15,10 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 /**
  * Scheduler modedit form - overrides moodleform
+ *
+ * @package    mod_scheduler
+ * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_scheduler_mod_form extends moodleform_mod {
 

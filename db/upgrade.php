@@ -1,13 +1,31 @@
 <?php
 
+/**
+ * Upgrade code for the scheduler module
+ *
+ * @package    mod_scheduler
+ * @copyright  2017 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Migrate a configuration setting from global to plugin specific.
+ *
+ * @param string $name name of configuration setting
+ */
 function scheduler_migrate_config_setting($name) {
     $oldval = get_config('core', 'scheduler_'.$name);
     set_config($name, $oldval, 'mod_scheduler');
     unset_config('scheduler_'.$name);
 }
 
+/**
+ * Migrate the group mode settings to new 2.9 conventions.
+ *
+ * @param int $sid id of the scheduler to migrate
+ */
 function scheduler_migrate_groupmode($sid) {
     global $DB;
     $globalenable = (bool) get_config('mod_scheduler', 'groupscheduling');
@@ -24,8 +42,13 @@ function scheduler_migrate_groupmode($sid) {
     }
 }
 
+/**
+ * This function does anything necessary to upgrade older versions to match current functionality.
+ *
+ * @param int $oldversion version number to be migrated from
+ * @return bool true if upgrade is successful
+ */
 function xmldb_scheduler_upgrade($oldversion=0) {
-    // This function does anything necessary to upgrade older versions to match current functionality.
 
     global $CFG, $DB;
 

@@ -15,9 +15,10 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
 /**
  * A custom renderer class that extends the plugin_renderer_base and is used by the scheduler module.
  *
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_scheduler_renderer extends plugin_renderer_base {
-
 
     /**
      * Format a date in the current user's timezone.
@@ -74,8 +75,17 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $a;
     }
 
+    /**
+     * @var array a cached version of scale levels
+     */
     protected $scalecache = array();
 
+    /**
+     * Get a list of levels in a grading scale.
+     *
+     * @param int $scaleid id number of the scale
+     * @return array levels on the scale
+     */
     public function get_scale_levels($scaleid) {
         global $DB;
 
@@ -91,12 +101,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $this->scalecache[$scaleid];
     }
 
-
     /**
-     * Formats a grade in a specific scheduler for display
+     * Formats a grade in a specific scheduler for display.
+     *
      * @param mixed $subject either a scheduler instance or a scale id
      * @param string $grade the grade to be displayed
-     * @param boolean $short formats the grade in short form (result empty if grading is
+     * @param bool $short formats the grade in short form (result empty if grading is
      * not used, or no grade is available; parantheses are put around the grade if it is present)
      * @return string the formatted grade
      */
@@ -160,6 +170,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $scalegrades;
     }
 
+    /**
+     * Return a string describing the grading strategy of a scheduler.
+     *
+     * @param int $strategy id number for the strategy
+     * @return string description of the strategy
+     */
     public function format_grading_strategy($strategy) {
         if ($strategy == SCHEDULER_MAX_GRADE) {
             return get_string('maxgrade', 'scheduler');
@@ -168,11 +184,29 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         }
     }
 
+    /**
+     * Format a user-entered "note" on a slot or appointment, adjusting any links to embedded files.
+     *
+     * @param string $content content of the note
+     * @param int $format format of the note
+     * @param context $context context of the note
+     * @param string $area file ara for embedded files
+     * @param int $itemid item id for embedded files
+     * @return string the formatted note
+     */
     public function format_notes($content, $format, $context, $area, $itemid) {
         $text = file_rewrite_pluginfile_urls($content, 'pluginfile.php', $context->id, 'mod_scheduler', $area, $itemid);
         return format_text($text, $format);
     }
 
+    /**
+     * Format the notes relating to an appointment (appointment notes and confidential notes).
+     *
+     * @param scheduler_instance $scheduler the scheduler in whose context the appointment is
+     * @param stdClass $data database record describing the appointment
+     * @param string $idfield the field in the record containing the item id
+     * @return string formatted notes
+     */
     public function format_appointment_notes(scheduler_instance $scheduler, $data, $idfield = 'id') {
         $note = '';
         $id = $data->{$idfield};
@@ -187,11 +221,28 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $note;
     }
 
+    /**
+     * Produce HTML code for a link to a user's profile.
+     * That is, the full name of the user is displayed with a link to the user's course profile on it.
+     *
+     * @param scheduler_instance $scheduler the scheduler in whose context the link is
+     * @param stdClass $user the user to link to
+     * @return string HTML code of the link
+     */
     public function user_profile_link(scheduler_instance $scheduler, stdClass $user) {
         $profileurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $scheduler->course));
         return html_writer::link($profileurl, fullname($user));
     }
 
+    /**
+     * Produce HTML code for a link to a user's appointment.
+     * That is, the full name of the user is displayed with a link to a given appointment.
+     *
+     * @param unknown $scheduler the scheduler in whose context the link is
+     * @param unknown $user the use in question
+     * @param unknown $appointmentid id number of the appointment to link to
+     * @return string HTML code of the link
+     */
     public function appointment_link($scheduler, $user, $appointmentid) {
         $paras = array(
                         'what' => 'viewstudent',
@@ -202,6 +253,14 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return html_writer::link($url, fullname($user));
     }
 
+    /**
+     * Render a list of files in a filearea.
+     *
+     * @param int $contextid id number of the context of the files
+     * @param string $filearea name of the file area
+     * @param int $itemid item id in the file area
+     * @return string rendered list of files
+     */
     public function render_attachments($contextid, $filearea, $itemid) {
 
         $fs = get_file_storage();
@@ -230,6 +289,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     }
 
 
+    /**
+     * Render the module introduction of a scheduler.
+     *
+     * @param scheduler_instance $scheduler the scheduler in question
+     * @return string rendered module info
+     */
     public function mod_intro($scheduler) {
         $o = $this->heading(format_string($scheduler->name), 2);
 
@@ -241,6 +306,16 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $o;
     }
 
+    /**
+     * Construct a tab header in the teacher view.
+     *
+     * @param moodle_url $baseurl
+     * @param string $namekey
+     * @param string $what
+     * @param string $subpage
+     * @param string $nameargs
+     * @return tabobject
+     */
     private function teacherview_tab(moodle_url $baseurl, $namekey, $what, $subpage = '', $nameargs = null) {
         $taburl = new moodle_url($baseurl, array('what' => $what, 'subpage' => $subpage));
         $tabname = get_string($namekey, 'scheduler', $nameargs);
@@ -249,6 +324,15 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $tab;
     }
 
+    /**
+     * Render the tab header hierarchy in the teacher view.
+     *
+     * @param scheduler_instance $scheduler the scheduler in question
+     * @param moodle_url $baseurl base URL for the tab addresses
+     * @param string $selected the selected tab
+     * @param array $inactive any inactive tabs
+     * @return string rendered tab tree
+     */
     public function teacherview_tabs(scheduler_instance $scheduler, moodle_url $baseurl, $selected, $inactive = null) {
 
         $statstab = $this->teacherview_tab($baseurl, 'statistics', 'viewstatistics', 'overall');
@@ -272,13 +356,20 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $this->tabtree($level1, $selected, $inactive);
     }
 
+    /**
+     * Render an action message (such as "1 slot added").
+     *
+     * @param string $message the message
+     * @param string $type type of the message
+     * @return string the rendered message
+     */
     public function action_message($message, $type = 'success') {
         $classes = 'actionmessage '.$type;
-        echo html_writer::div($message, $classes);
+        return html_writer::div($message, $classes);
     }
 
     /**
-     * Rendering a table of slots
+     * Render a table of slots
      *
      * @param scheduler_slot_table $slottable the table to rended
      * @return string the HTML output
@@ -410,8 +501,8 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     /**
      * Rendering a list of student, to be displayed within a larger table
      *
-     * @param scheduler_slot_table $slottable the table to rended
-     * @return string the HTML output
+     * @param scheduler_student_list $studentlist
+     * @return string
      */
     public function render_scheduler_student_list(scheduler_student_list $studentlist) {
 
@@ -495,6 +586,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $o;
     }
 
+    /**
+     * Render a slot booker.
+     *
+     * @param scheduler_slot_booker $booker
+     * @return string
+     */
     public function render_scheduler_slot_booker(scheduler_slot_booker $booker) {
 
         $table = new html_table();
@@ -573,6 +670,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return html_writer::table($table);
     }
 
+    /**
+     * Render a command bar.
+     *
+     * @param scheduler_command_bar $commandbar
+     * @return string
+     */
     public function render_scheduler_command_bar(scheduler_command_bar $commandbar) {
         $o = '';
         foreach ($commandbar->linkactions as $id => $action) {
@@ -589,6 +692,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $o;
     }
 
+    /**
+     * Render a slot manager.
+     *
+     * @param scheduler_slot_manager $slotman
+     * @return string
+     */
     public function render_scheduler_slot_manager(scheduler_slot_manager $slotman) {
 
         $this->page->requires->yui_module('moodle-mod_scheduler-saveseen',
@@ -719,6 +828,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $o;
     }
 
+    /**
+     * Render a scheduling list.
+     *
+     * @param scheduler_scheduling_list $list
+     * @return string
+     */
     public function render_scheduler_scheduling_list(scheduler_scheduling_list $list) {
 
         $mtable = new html_table();
@@ -751,6 +866,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return html_writer::table($mtable);
     }
 
+    /**
+     * Render total grade information.
+     *
+     * @param scheduler_totalgrade_info $gradeinfo
+     * @return string
+     */
     public function render_scheduler_totalgrade_info(scheduler_totalgrade_info $gradeinfo) {
         $items = array();
 
@@ -788,6 +909,12 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         return $o;
     }
 
+    /**
+     * Render a conflict list.
+     *
+     * @param scheduler_conflict_list $cl
+     * @return string
+     */
     public function render_scheduler_conflict_list(scheduler_conflict_list $cl) {
 
         $o = html_writer::start_tag('ul');
@@ -921,7 +1048,5 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $o .= $this->output->container_end();
         return $o;
     }
-
-
 
 }

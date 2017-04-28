@@ -4,6 +4,8 @@
  * Scheduler module capability definition
  *
  * @package    mod_scheduler
+ * @copyright  2017 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

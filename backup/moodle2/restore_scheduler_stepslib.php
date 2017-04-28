@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Define all the restore steps that will be used by the restore_scheduler_activity_task
+ *
  * @package    mod_scheduler
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -9,11 +11,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Define all the restore steps that will be used by the restore_scheduler_activity_task
- */
-
-/**
  * Structure step to restore one scheduler activity
+ *
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_scheduler_activity_structure_step extends restore_activity_structure_step {
 

@@ -1,9 +1,7 @@
 <?php
 
 /**
- * The mod_scheduler slot added event.
- *
- * Indicates that a teacher has added a slot.
+ * Defines the mod_scheduler slot added event.
  *
  * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
@@ -14,8 +12,23 @@ namespace mod_scheduler\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_scheduler slot added event.
+ *
+ * Indicates that a teacher has added a slot.
+ *
+ * @package    mod_scheduler
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class slot_added extends slot_base {
 
+    /**
+     * Create this event on a given slot.
+     *
+     * @param \scheduler_slot $slot
+     * @return \core\event\base
+     */
     public static function create_from_slot(\scheduler_slot $slot) {
         $event = self::create(self::base_data($slot));
         $event->set_slot($slot);

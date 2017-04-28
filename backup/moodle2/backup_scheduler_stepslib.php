@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Define all the backup steps that will be used by the backup_scheduler_activity_task
+ *
  * @package    mod_scheduler
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -9,11 +11,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Define all the backup steps that will be used by the backup_scheduler_activity_task
- */
-
-/**
  * Define the complete scheduler structure for backup, with file and id annotations
+ *
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_scheduler_activity_structure_step extends backup_activity_structure_step {
 

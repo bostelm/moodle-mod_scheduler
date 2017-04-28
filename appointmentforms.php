@@ -15,15 +15,41 @@ require_once($CFG->libdir.'/formslib.php');
 
 /**
  * Form to edit one appointment
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_editappointment_form extends moodleform {
 
+    /**
+     * @var scheduler_appointment the appointment being edited
+     */
     protected $appointment;
+
+   /**
+     * @var bool whether to distribute grade to all group members
+     */
     protected $distribute;
+
+    /**
+     * @var whether the teacher can edit grades
+     */
     protected $editgrade;
 
+    /**
+     * @var array options for notes fields
+     */
     public $noteoptions;
 
+    /**
+     * Create a new edit appointment form
+     *
+     * @param scheduler_appointment $appointment the appointment to edit
+     * @param mixed $action the action attribute for the form
+     * @param bool $editgrade whether the grade can be edited
+     * @param bool $distribute whether to distribute grades to all group members
+     */
     public function __construct(scheduler_appointment $appointment, $action, $editgrade, $distribute) {
         $this->appointment = $appointment;
         $this->distribute = $distribute;
@@ -79,6 +105,12 @@ class scheduler_editappointment_form extends moodleform {
         return $errors;
     }
 
+    /**
+     * Prepare form data from an appointment record
+     *
+     * @param scheduler_appointment $appointment appointment to edit
+     * @return stdClass form data
+     */
     public function prepare_appointment_data(scheduler_appointment $appointment) {
         $newdata = clone($appointment->get_data());
         $context = $this->appointment->get_scheduler()->get_context();
@@ -91,6 +123,12 @@ class scheduler_editappointment_form extends moodleform {
         return $newdata;
     }
 
+    /**
+     * Save form data into appointment record
+     *
+     * @param stdClass $formdata data extracted from form
+     * @param scheduler_appointment $appointment appointment to update
+     */
     public function save_appointment_data(stdClass $formdata, scheduler_appointment $appointment) {
         $scheduler = $appointment->get_scheduler();
         $cid = $scheduler->context->id;

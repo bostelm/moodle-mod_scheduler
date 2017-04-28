@@ -4,7 +4,6 @@
  * mod_scheduler data generator
  *
  * @package    mod_scheduler
- * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -16,7 +15,6 @@ defined('MOODLE_INTERNAL') || die();
  * Scheduler module PHPUnit data generator class
  *
  * @package    mod_scheduler
- * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

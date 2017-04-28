@@ -1,5 +1,7 @@
 <?php
 
+use GuzzleHttp\Cookie\SetCookie;
+
 /**
  * Library for basic Model-View-Controller (MVC) structures
  *
@@ -30,10 +32,21 @@ class mvc_model {
  */
 abstract class mvc_record_model extends mvc_model {
 
+    /**
+     * @var stdClass the underlying data record
+     */
     protected $data = null;
 
+    /**
+     * Retrieve the name of the underlying database table
+     *
+     *  @return string
+     */
     abstract protected function get_table();
 
+    /**
+     * Create a new model. (To be used in subclass constructors.)
+     */
     protected function __construct() {
         $data = new stdClass();
     }
@@ -47,6 +60,11 @@ abstract class mvc_record_model extends mvc_model {
         $this->data = $rec;
     }
 
+    /**
+     * Load data from a database record
+     *
+     * @param stdClass the database record
+     */
     public function load_record(stdClass $rec) {
         $this->data = $rec;
     }
@@ -105,6 +123,8 @@ abstract class mvc_record_model extends mvc_model {
 
     /**
      * Retrieve the id number of the record
+     *
+     * @return int
      */
     public function get_id() {
         if (is_null($this->data)) {
@@ -120,6 +140,8 @@ abstract class mvc_record_model extends mvc_model {
      * Note that this is a copy (clone) of the data,
      * changes to the returned record object will not lead to changes in the
      * data of the present record.
+     *
+     * @return stdClass
      */
     public function get_data() {
         return clone($this->data);
@@ -127,6 +149,10 @@ abstract class mvc_record_model extends mvc_model {
 
     /**
      * Set a number of properties at once.
+     *
+     * @param mixed $data either an array or an object describing the properties to be set
+     * @param array $propnames list of properties to be set,
+     *        or null if all properties in the input should be used
      */
     public function set_data($data, $propnames = null) {
         $data = (array) $data;
@@ -138,6 +164,9 @@ abstract class mvc_record_model extends mvc_model {
         }
     }
 
+    /**
+     * Delete this model (from the database).
+     */
     public function delete() {
         global $DB;
 
@@ -149,11 +178,26 @@ abstract class mvc_record_model extends mvc_model {
 
 }
 
-
+/**
+ * A model mirroring one datebase record which as a "parent-child"
+ * relationship to a record in another table.
+ *
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 abstract class mvc_child_record_model extends mvc_record_model {
 
+    /**
+     * @var mvc_record_model the parent record
+     */
     private $parentrec;
 
+    /**
+     * Set the parent record.
+     *
+     * @param mvc_record_model $newparent
+     * @throws coding_exception
+     */
     protected function set_parent(mvc_record_model $newparent) {
         if (is_null($this->parentrec)) {
             $this->parentrec = $newparent;
@@ -162,6 +206,12 @@ abstract class mvc_child_record_model extends mvc_record_model {
         }
     }
 
+    /**
+     * Retrieve the parent record.
+     *
+     * @throws coding_exception
+     * @return mvc_record_model
+     */
     protected function get_parent() {
         if (is_null($this->parentrec)) {
             throw new coding_exception('parent has not been set');
@@ -169,15 +219,38 @@ abstract class mvc_child_record_model extends mvc_record_model {
         return $this->parentrec;
     }
 
+    /**
+     * Retrieve the id of the parent record
+     *
+     * @return int
+     */
     protected function get_parent_id() {
         return $this->get_parent()->get_id();
     }
 
 }
 
+/**
+ * An abstract factory class for loading records from the database.
+ *
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 abstract class mvc_model_factory {
+
+    /**
+     * Create a new instance of a record, with no data.
+     *
+     *  @return mvc_model
+     */
     public abstract function create();
 
+    /**
+     * Create a new record by loading it from the database.
+     *
+     * @param int $id the id of the record to load
+     * @return mvc_model
+     */
     public function create_from_id($id) {
         $new = $this->create();
         $new->load($id);
@@ -186,10 +259,23 @@ abstract class mvc_model_factory {
 
 }
 
+/**
+ * An abstract factory class for loading child records from the database.
+ *
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 abstract class mvc_child_model_factory extends mvc_model_factory {
 
+    /**
+     * @var mvc_model the parent record
+     */
     protected $myparent;
 
+    /**
+     * Create a new factory based on a parent record
+     * @param mvc_record_model $parent
+     */
     public function __construct(mvc_record_model $parent) {
         $this->myparent = $parent;
     }
@@ -198,8 +284,19 @@ abstract class mvc_child_model_factory extends mvc_model_factory {
         return $this->create_child($this->myparent);
     }
 
+    /**
+     * Create a new child record (with no data)
+     *
+     * @param mvc_record_model $parent
+     */
     public abstract function create_child(mvc_record_model $parent);
 
+    /**
+     * Create a child record from a database entry, already loaded
+     *
+     * @param stdClass $rec the record from the database
+     * @return mvc_child_record_model the new child record
+     */
     public function create_child_from_record(stdClass $rec) {
         $new = $this->create_child($this->myparent);
         $new->load_record($rec);
@@ -208,16 +305,57 @@ abstract class mvc_child_model_factory extends mvc_model_factory {
 }
 
 
+/**
+ * A list of child records.
+ *
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mvc_child_list {
 
+    /**
+     * @var array list of child records
+     */
     private $children;
+
+    /**
+     * @var int number of child records
+     */
     private $childcount;
+
+    /**
+     * @var string name of the table for child records
+     */
     private $childtable;
+
+    /**
+     * @var string name of parent id field in child table
+     */
     private $childfield;
+
+    /**
+     * @var mvc_child_model_factory factory for new child records
+     */
     private $childfactory;
+
+    /**
+     * @var array list of child records marked for deletion
+     */
     private $childrenfordeletion;
+
+    /**
+     * @var mvc_record_model parent record
+     */
     private $parentmodel;
 
+    /**
+     * Create a new child list.
+     *
+     * @param mvc_record_model $parent parent record
+     * @param string $childtable name of table for child records
+     * @param string $childfield name of parent id field in child table
+     * @param mvc_model_factory $factory factory for child records
+     */
     public function __construct(mvc_record_model $parent, $childtable, $childfield,
                                 mvc_model_factory $factory) {
         $this->children = null;
@@ -229,10 +367,17 @@ class mvc_child_list {
         $this->childrenfordeletion = array();
     }
 
+    /**
+     * Retrieve the id of the parent record
+     * @return int
+     */
     private function get_parent_id() {
         return $this->parentmodel->get_id();
     }
 
+    /**
+     * Load the list of all children from the database
+     */
     public function load() {
         global $DB;
         if (!is_null($this->children)) {
@@ -253,6 +398,12 @@ class mvc_child_list {
         }
     }
 
+    /**
+     * Return a child record by its id
+     *
+     * @param int $id
+     * @return mvc_child_record_model child record, or null if none found
+     */
     public function get_child_by_id($id) {
         $this->load();
         $found = null;
@@ -265,11 +416,21 @@ class mvc_child_list {
         return $found;
     }
 
+    /**
+     * Return all children in this list
+     *
+     * @return array
+     */
     public function get_children() {
         $this->load();
         return $this->children;
     }
 
+    /**
+     * Count the children in this list.
+     *
+     * @return int
+     */
     public function get_child_count() {
         global $DB;
         if ($this->childcount >= 0) {
@@ -283,6 +444,9 @@ class mvc_child_list {
         }
     }
 
+    /**
+     * Save all child records to the database.
+     */
     public function save_children() {
         if (!is_null($this->children)) {
             foreach ($this->children as $child) {
@@ -295,6 +459,10 @@ class mvc_child_list {
         $this->childrenfordeletion = array();
     }
 
+    /**
+     * Create a new, empty child record.
+     * @return mvc_child_record_model the new record
+     */
     public function create_child() {
         $this->load();
         $newchild = $this->childfactory->create();
@@ -302,6 +470,11 @@ class mvc_child_list {
         return $newchild;
     }
 
+    /**
+     * Remove a child record from the list
+     * @param mvc_child_record_model $child the record to remove
+     * @throws coding_exception if the record does nto belong to this list
+     */
     public function remove_child(mvc_child_record_model $child) {
         if (is_null($this->children) || !in_array($child, $this->children)) {
             throw new coding_exception ('Child record to remove not found in list');
@@ -311,6 +484,9 @@ class mvc_child_list {
         $this->childrenfordeletion[] = $child;
     }
 
+    /**
+     * Delete all child records
+     */
     public function delete_children() {
         $this->load();
         foreach ($this->children as $child) {

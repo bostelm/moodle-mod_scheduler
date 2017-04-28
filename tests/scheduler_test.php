@@ -4,11 +4,9 @@
  * Unit tests for the scheduler_instance class.
  *
  * @package    mod_scheduler
- * @category   phpunit
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -18,14 +16,30 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 /**
  * Unit tests for the scheduler_instance class.
  *
- * @group mod_scheduler
+ * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
-    protected $moduleid;    // Course_module id used for testing.
-    protected $courseid;    // Course id used for testing.
-    protected $schedulerid; // Scheduler id used for testing.
-    protected $slotid;      // One of the slots used for testing.
+    /**
+     * @var intger Course_module id used for testing
+     */
+    protected $moduleid;
+
+    /**
+     * @var int Course id used for testing
+     */
+    protected $courseid;
+
+    /**
+     * @var int Scheduler id used for testing
+     */
+    protected $schedulerid;
+
+    /**
+     * @var int One of the slots used for testing
+     */
+    protected $slotid;
 
     protected function setUp() {
         global $DB, $CFG;
@@ -60,6 +74,12 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         $this->appointmentids = array_keys($DB->get_records('scheduler_appointment', array('slotid' => $this->slotid)));
     }
 
+    /**
+     * Create a student record and enrol him in a course.
+     *
+     * @param int $courseid
+     * @return int user id
+     */
     private function create_student($courseid = 0) {
         if ($courseid == 0) {
             $courseid = $this->courseid;
@@ -69,6 +89,14 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         return $userid;
     }
 
+    /**
+     * Assert a record count in the database.
+     *
+     * @param string $table table name to test
+     * @param string $field field name
+     * @param string $value value to look for
+     * @param int $expect expected record count where that field has that value
+     */
     private function assert_record_count($table, $field, $value, $expect) {
         global $DB;
 
@@ -76,6 +104,9 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         $this->assertEquals($expect, $act, "Checking whether table $table has $expect records with $field equal to $value");
     }
 
+    /**
+     * Test a scheduler instance
+     */
     public function test_scheduler_instance() {
         global $DB;
 
@@ -87,6 +118,9 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test the loading of slots
+     */
     public function test_load_slots() {
         global $DB;
 
@@ -130,6 +164,9 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test adding slots to a scheduler
+     */
     public function test_add_slot() {
 
         $scheduler = scheduler_instance::load_by_coursemodule_id($this->moduleid);
@@ -146,6 +183,9 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test deleting a scheduler
+     */
     public function test_delete_scheduler() {
 
         $options = array();
@@ -179,6 +219,13 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Assert that slot times have certain values
+     * @param array $expected list of expected slots
+     * @param array $actual list of actual slots
+     * @param array $options expected attributes of slots
+     * @param string $message
+     */
     private function assert_slot_times($expected, $actual, $options, $message) {
         $this->assertEquals(count($expected), count($actual), "Slot count - $message");
         $slottimes = array();
@@ -190,6 +237,17 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Check slots in the scheduler for certain patterns.
+     *
+     * @param int $schedulerid id of the scheduler
+     * @param unknown $studentid
+     * @param array $slotoptions expected attributes of slots
+     * @param array $expattended which slots are expected to be "attended"
+     * @param array $expupcoming which slots are expected to be "upcoming"
+     * @param unknown $expavailable which slots are expected to be "available" (including already booked ones)
+     * @param unknown $expbookable  which slots are expected to be "bookable"
+     */
     private function check_timed_slots($schedulerid, $studentid, $slotoptions,
                                        $expattended, $expupcoming, $expavailable, $expbookable) {
 
@@ -209,6 +267,9 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test slot timings when parameters of the scheduler are altered.
+     */
     public function test_load_slot_timing() {
 
         global $DB;
@@ -295,6 +356,14 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Assert the number of appointments for a student with certain properties.
+     *
+     * @param int $expectedwithchangeables expected number of bookable appointments, including changeable ones
+     * @param int $expectedwithoutchangeables expected number of bookable appointments, excluding changeable ones
+     * @param int $schedid scheduler id
+     * @param int $studentid student id
+     */
     private function assert_bookable_appointments($expectedwithchangeables, $expectedwithoutchangeables,
                                                   $schedid, $studentid) {
         $scheduler = scheduler_instance::load_by_id($schedid);
@@ -325,6 +394,12 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
      * The scheduler is created in a new course, into which the given student is enrolled.
      * Also, two other students (without any slot bookings) is created in the course.
      *
+     * @param int $schedulermode scheduler mode
+     * @param int $maxbookings max number of bookings per student
+     * @param int $guardtime guard time
+     * @param int $studentid student to book into slots
+     * @param array $bookedslots slots to book the student in
+     * @param array $attendedslots slots which the student has attended
      */
     private function create_data_for_bookable_appointments($schedulermode, $maxbookings, $guardtime, $studentid,
                                                            array $bookedslots, array $attendedslots) {
@@ -365,6 +440,9 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         return $scheduler->id;
     }
 
+    /**
+     * Test the retrieveal routines for bookable appointments.
+     */
     public function test_bookable_appointments() {
 
         $studid = $this->create_student();

@@ -15,27 +15,54 @@ require_once($CFG->libdir.'/formslib.php');
 
 /**
  * Base class for slot-related forms
+ *
+ * @package    mod_scheduler
+ * @copyright  2013 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class scheduler_slotform_base extends moodleform {
 
+    /**
+     * @var scheduler_instance the scheduler that this form refers to
+     */
     protected $scheduler;
-    protected $cm;
-    protected $context;
+
+    /**
+     * @var array user groups to filter for
+     */
     protected $usergroups;
+
+    /**
+     * @var bool does this form have a duration field?
+     */
     protected $hasduration = false;
+
+    /**
+     * @var array options for note fields
+     */
     protected $noteoptions;
 
+    /**
+     * Create a new form
+     *
+     * @param mixed $action the action attribute for the form
+     * @param scheduler_instance $scheduler
+     * @param object $cm unused
+     * @param array $usergroups groups to filter for
+     * @param array $customdata
+     */
     public function __construct($action, scheduler_instance $scheduler, $cm, $usergroups, $customdata=null) {
         $this->scheduler = $scheduler;
-        $this->cm = $cm;
-        $this->context = context_module::instance($cm->id);
         $this->usergroups = $usergroups;
         $this->noteoptions = array('trusttext' => true, 'maxfiles' => -1, 'maxbytes' => 0,
-                                   'context' => $this->context, 'subdirs' => false);
+                                   'context' => $scheduler->get_context(), 'subdirs' => false);
 
         parent::__construct($action, $customdata);
     }
 
+    /**
+     * Add basic fields to this form. To be used in definition() methods of subclasses.
+     */
     protected function add_base_fields() {
 
         global $CFG, $USER;
@@ -64,7 +91,7 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->addHelpButton('appointmentlocation', 'location', 'scheduler');
 
         // Choose the teacher (if allowed).
-        if (has_capability('mod/scheduler:canscheduletootherteachers', $this->context)) {
+        if (has_capability('mod/scheduler:canscheduletootherteachers', $this->scheduler->get_context())) {
             $teachername = s($this->scheduler->get_teacher_name());
             $teachers = $this->scheduler->get_available_teachers();
             $teachersmenu = array();
@@ -87,6 +114,14 @@ abstract class scheduler_slotform_base extends moodleform {
 
     }
 
+    /**
+     * Add an input field for a number of minutes
+     *
+     * @param string $name field name
+     * @param string $label language key for field label
+     * @param int $defaultval default value
+     * @param string $minuteslabel language key for suffix "minutes"
+     */
     protected function add_minutes_field($name, $label, $defaultval, $minuteslabel = 'minutes') {
         $mform = $this->_form;
         $group = array();
@@ -97,6 +132,10 @@ abstract class scheduler_slotform_base extends moodleform {
         $mform->setDefault($name, $defaultval);
     }
 
+    /**
+     * Add theduration field to the form.
+     * @param string $minuteslabel language key for the "minutes" label
+     */
     protected function add_duration_field($minuteslabel = 'minutes') {
         $this->add_minutes_field('duration', 'duration', $this->scheduler->defaultslotduration, $minuteslabel);
         $this->hasduration = true;
@@ -118,8 +157,18 @@ abstract class scheduler_slotform_base extends moodleform {
 
 }
 
+/**
+ * Slot edit form
+ *
+ * @package    mod_scheduler
+ * @copyright  2013 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class scheduler_editslot_form extends scheduler_slotform_base {
 
+    /**
+     * @var int id of the slot being edited
+     */
     protected $slotid;
 
     protected function definition() {
@@ -293,6 +342,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         return $errors;
     }
 
+    /**
+     * Fill the form data from an existing slot
+     *
+     * @param scheduler_slot $slot
+     * @return stdClass form data
+     */
     public function prepare_formdata(scheduler_slot $slot) {
 
         $context = $slot->get_scheduler()->get_context();
@@ -339,6 +394,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         return $data;
     }
 
+    /**
+     * Save a slot object, updating it with data from the form
+     * @param int $slotid
+     * @param mixed $data form data
+     * @return scheduler_slot the updated slot
+     */
     public function save_slot($slotid, $data) {
 
         $context = $this->scheduler->get_context();
@@ -417,7 +478,13 @@ class scheduler_editslot_form extends scheduler_slotform_base {
     }
 }
 
-
+/**
+ * "Add session" form
+ *
+ * @package    mod_scheduler
+ * @copyright  2013 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class scheduler_addsession_form extends scheduler_slotform_base {
 
     protected function definition() {

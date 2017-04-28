@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Backup activity task for the Scheduler module
+ *
  * @package    mod_scheduler
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -11,8 +13,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/scheduler/backup/moodle2/backup_scheduler_stepslib.php');
 
 /**
- * scheduler backup task that provides all the settings and steps to perform one
- * complete backup of the activity
+ * Scheduler backup task that provides all the settings and steps to perform one
+ * complete backup of the activity.
+ *
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_scheduler_activity_task extends backup_activity_task {
 
@@ -34,6 +39,8 @@ class backup_scheduler_activity_task extends backup_activity_task {
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable (encoded) links
+     *
+     * @param string $content some HTML text that eventually contains URLs to the activity instance scripts
      */
     static public function encode_content_links($content) {
         global $CFG;

@@ -11,6 +11,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 
+/**
+ * Add a session (confirmed action) from data entered into the add session form
+ * @param scheduler_instance $scheduler
+ * @param mixed $formdata
+ */
 function scheduler_action_doaddsession($scheduler, $formdata) {
 
     global $DB, $output;
@@ -116,6 +121,12 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     echo $output->action_message(get_string('slotsadded', 'scheduler', $countslots));
 }
 
+/**
+ * Send a message (confirmed action) after filling the message form
+ *
+ * @param scheduler_instance $scheduler
+ * @param mixed $formdata
+ */
 function scheduler_action_dosendmessage($scheduler, $formdata) {
 
     global $DB, $USER, $output;
@@ -158,6 +169,12 @@ function scheduler_action_dosendmessage($scheduler, $formdata) {
     echo $output->action_message(get_string('messagesent', 'scheduler', $cnt));
 }
 
+/**
+ * Delete slots (after UI button has beebn pushed)
+ *
+ * @param scheduler_slot[] $slots list of slots to be deleted
+ * @param string $action description of the action
+ */
 function scheduler_delete_slots_from_ui(array $slots, $action) {
     global $output;
 

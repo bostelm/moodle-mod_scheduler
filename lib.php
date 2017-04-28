@@ -29,6 +29,7 @@ define ('SCHEDULER_MAX_GRADE', 1);  // Used for grading strategy.
  * Given an object containing all the necessary data,
  * will create a new instance and return the id number
  * of the new instance.
+ *
  * @param stdClass $data the current instance
  * @param moodleform $mform the form that the user filled
  * @return int the new instance id
@@ -60,6 +61,7 @@ function scheduler_add_instance($data, $mform = null) {
  * Given an object containing all the necessary data,
  * (defined by the form in mod.html) this function
  * will update an existing instance with new data.
+ *
  * @param object $scheduler the current instance
  * @param moodleform $mform the form that the user filled
  * @return object the updated instance
@@ -89,8 +91,9 @@ function scheduler_update_instance($data, $mform) {
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
  * and any data that depends on it.
+ *
  * @param int $id the instance to be deleted
- * @return boolean true if success, false otherwise
+ * @return bool true if success, false otherwise
  * @uses $DB
  */
 function scheduler_delete_instance($id) {
@@ -114,6 +117,7 @@ function scheduler_delete_instance($id) {
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
+ *
  * $return->time = the time they did it
  * $return->info = a short text description
  * @param object $course the course instance
@@ -150,6 +154,7 @@ function scheduler_user_outline($course, $user, $mod, $scheduler) {
 /**
  * Prints a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
+ *
  * @param object $course the course instance
  * @param object $user the concerned user instance
  * @param object $mod the current course module instance
@@ -190,10 +195,11 @@ function scheduler_user_complete($course, $user, $mod, $scheduler) {
  * Given a course and a time, this module should find recent activity
  * that has occurred in scheduler activities and print it out.
  * Return true if there was output, or false is there was none.
+ *
  * @param object $course the course instance
- * @param boolean $isteacher true tells a teacher uses the function
+ * @param bool $isteacher true tells a teacher uses the function
  * @param int $timestart a time start timestamp
- * @return boolean true if anything was printed, otherwise false
+ * @return bool true if anything was printed, otherwise false
  */
 function scheduler_print_recent_activity($course, $isteacher, $timestart) {
 
@@ -202,12 +208,10 @@ function scheduler_print_recent_activity($course, $isteacher, $timestart) {
 
 
 /**
- * This function returns if a scale is being used by one newmodule
- * it it has support for grading and scales. Commented code should be
- * modified if necessary. See forum, glossary or journal modules
- * as reference.
+ * This function returns whether a scale is being used by a scheduler.
  *
- * @param int $newmoduleid ID of an instance of this module
+ * @param int $cmid ID of an instance of this module
+ * @param int $casleid the id of the scale in question
  * @return mixed
  * @uses $DB
  **/
@@ -230,9 +234,9 @@ function scheduler_scale_used($cmid, $scaleid) {
 /**
  * Checks if scale is being used by any instance of scheduler
  *
- * This is used to find out if scale used anywhere
- * @param $scaleid int
- * @return boolean True if the scale is used by any scheduler
+ * @param $scaleid int the id of the scale in question
+ * @return bool True if the scale is used by any scheduler
+ * @uses $DB
  */
 function scheduler_scale_used_anywhere($scaleid) {
     global $DB;
@@ -252,7 +256,10 @@ function scheduler_scale_used_anywhere($scaleid) {
 
 /**
  * Called by course/reset.php
+ *
  * @param $mform form passed by reference
+ * @uses $COURSE
+ * @uses $DB
  */
 function scheduler_reset_course_form_definition(&$mform) {
     global $COURSE, $DB;
@@ -269,6 +276,8 @@ function scheduler_reset_course_form_definition(&$mform) {
 
 /**
  * Default values for the reset form
+ *
+ * @param stdClass $course the course in which the reset takes place
  */
 function scheduler_reset_course_form_defaults($course) {
     return array('reset_scheduler_slots' => 1, 'reset_scheduler_appointments' => 1);
@@ -278,8 +287,9 @@ function scheduler_reset_course_form_defaults($course) {
 /**
  * This function is used by the remove_course_userdata function in moodlelib.
  * If this function exists, remove_course_userdata will execute it.
- * This function will remove all posts from the specified forum.
- * @param data the reset options
+ * This function will remove all slots and appointments from the specified scheduler.
+ *
+ * @param object $data the reset options
  * @return void
  */
 function scheduler_reset_userdata($data) {
@@ -330,6 +340,8 @@ function scheduler_reset_userdata($data) {
 }
 
 /**
+ * Determine whether a certain feature is supported by Scheduler.
+ *
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, null if doesn't know
  */
@@ -360,8 +372,11 @@ function scheduler_supports($feature) {
 /**
  * Update activity grades
  *
- * @param object $scheduler
+ * @param object $schedulerrecord
  * @param int $userid specific user only, 0 means all
+ * @param bool $nullifnone not used
+ * @uses $CFG
+ * @uses $DB
  */
 function scheduler_update_grades($schedulerrecord, $userid=0, $nullifnone=true) {
     global $CFG, $DB;
@@ -390,7 +405,7 @@ function scheduler_update_grades($schedulerrecord, $userid=0, $nullifnone=true) 
  * Create grade item for given scheduler
  *
  * @param object $scheduler object
- * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
 function scheduler_grade_item_update($scheduler, $grades=null) {

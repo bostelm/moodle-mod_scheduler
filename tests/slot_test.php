@@ -2,12 +2,11 @@
 
 /**
  * Unit tests for scheduler slots
+ *
  * @package    mod_scheduler
- * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -17,16 +16,45 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 /**
  * Unit tests for the scheduler_slots class.
  *
- * @group mod_scheduler
+ * @package    mod_scheduler
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_scheduler_slot_testcase extends advanced_testcase {
 
-    protected $moduleid;  // Course_modules id used for testing.
-    protected $courseid;  // Course id used for testing.
-    protected $schedulerid; // Scheduler id used for testing.
-    protected $teacherid;    // User id used for testing.
+    /**
+     * @var int Course_modules id used for testing
+     */
+    protected $moduleid;
+
+    /**
+     * @var int Course id used for testing
+     */
+    protected $courseid;
+
+    /**
+     * @var int Scheduler id used for testing
+     */
+    protected $schedulerid;
+
+    /**
+     * @var int User id of teacher used for testing
+     */
+    protected $teacherid;
+
+    /**
+     * @var int a slot used for testing
+     */
     protected $slotid;
+
+    /**
+     * @var int[] appointments used for testing
+     */
     protected $appointmentids;
+
+    /**
+     * @var int[] id of students used for testing
+     */
     protected $students;
 
     protected function setUp() {
@@ -58,6 +86,13 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->appointmentids = array_keys($DB->get_records('scheduler_appointment', array('slotid' => $this->slotid)));
     }
 
+    /**
+     * Assert that a record is present in the DB
+     *
+     * @param string $table name of table to test
+     * @param int $id id of record to look for
+     * @param string $msg message
+     */
     private function assert_record_present($table, $id, $msg = "") {
         global $DB;
 
@@ -65,6 +100,13 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assertTrue($ex, "Checking whether record $id is present in table $table: $msg");
     }
 
+    /**
+     * Assert that a record is absent from the DB
+     *
+     * @param string $table name of table to test
+     * @param int $id id of record to look for
+     * @param string $msg message
+     */
     private function assert_record_absent($table, $id, $msg = "") {
         global $DB;
 
@@ -72,6 +114,9 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assertFalse($ex, "Checking whether record $id is absent in table $table: $msg");
     }
 
+    /**
+     * Test creating a slot with appointments
+     */
     public function test_create() {
 
         global $DB;
@@ -99,6 +144,9 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
     }
 
 
+    /**
+     * Test deleting a slot and associated data
+     */
     public function test_delete() {
 
         $scheduler = scheduler_instance::load_by_id($this->schedulerid);
@@ -124,6 +172,9 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test adding an appointment to a slot.
+     */
     public function test_add_appointment() {
 
         global $DB;
@@ -144,6 +195,9 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test removing an appointment from a slot.
+     */
     public function test_remove_appointment() {
 
         global $DB;
@@ -163,6 +217,9 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assert_record_absent('scheduler_appointment', $delid);
     }
 
+    /**
+     * Test presence or absence of event records when appointments are modified.
+     */
     public function test_calendar_events() {
         global $DB;
 
@@ -209,6 +266,13 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Assert that a calendar event exists in the DB.
+     *
+     * @param int $userid user associated with event
+     * @param int $time start time of the event
+     * @param string $titlestart beginning of the title of the event
+     */
     private function assert_event_exists($userid, $time, $titlestart) {
         global $DB;
         $events = calendar_get_events($time - MINSECS, $time + HOURSECS, $userid, false, false);
@@ -219,6 +283,12 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
         $this->assertTrue(strpos($event->name, $titlestart) === 0, "Checking event title start: $titlestart");
     }
 
+    /**
+     * Assert that a calendar event at a certain time is absent from the DB.
+     *
+     * @param int $userid user id associated with event
+     * @param int $time start time of the event
+     */
     private function assert_event_absent($userid, $time) {
         $events = calendar_get_events($time - MINSECS, $time + HOURSECS, $userid, false, false);
         $this->assertEquals(0, count($events), "Expecting no event at time $time for user $userid");

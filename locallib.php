@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
  * The only argument this function requires is the complete database record of a scheduler slot.
  * @param object $slot the slot instance
  * @uses $DB
- * @return boolean true if success, false otherwise
+ * @return bool true if success, false otherwise
  */
 function scheduler_delete_calendar_events($slot) {
     global $DB;
@@ -55,6 +55,9 @@ function scheduler_delete_calendar_events($slot) {
  * @uses $USER
  * @param user $user A {@link $USER} object representing a user
  * @param course $course A {@link $COURSE} object representing a course
+ * @param bool $messageselect whether to include a checkbox to select the user
+ * @param bool $return whether the HTML fragment is to be returned as a string (otherwise printed)
+ * @return string HTML fragment, if so selected
  */
 function scheduler_print_user($user, $course, $messageselect=false, $return=false) {
 
@@ -166,6 +169,9 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
 
 /**
  * File browsing support class
+ *
+ * @copyright  2011 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_file_info extends file_info {
     /** @var stdClass Course object */
@@ -246,13 +252,14 @@ class scheduler_file_info extends file_info {
     }
 
     /**
-     * Help function to return files matching extensions or their count
+     * Helper function to return files matching extensions or their count
      *
-     * @param string|array $extensions, either '*' or array of lowercase extensions, i.e. array('.gif','.jpg')
+     * @param string|array $extensions either '*' or array of lowercase extensions, i.e. array('.gif','.jpg')
      * @param bool|int $countonly if false returns the children, if an int returns just the
      *    count of children but stops counting when $countonly number of children is reached
      * @param bool $returnemptyfolders if true returns items that don't have matching files inside
      * @return array|int array of file_info instances or the count
+     * @uses $DB
      */
     private function get_filtered_children($extensions = '*', $countonly = false, $returnemptyfolders = false) {
         global $DB;
@@ -296,7 +303,7 @@ class scheduler_file_info extends file_info {
      * Returns list of children which are either files matching the specified extensions
      * or folders that contain at least one such file.
      *
-     * @param string|array $extensions, either '*' or array of lowercase extensions, i.e. array('.gif','.jpg')
+     * @param string|array $extensions either '*' or array of lowercase extensions, i.e. array('.gif','.jpg')
      * @return array of file_info instances
      */
     public function get_non_empty_children($extensions = '*') {
@@ -307,7 +314,7 @@ class scheduler_file_info extends file_info {
      * Returns the number of children which are either files matching the specified extensions
      * or folders containing at least one such file.
      *
-     * @param string|array $extensions, for example '*' or array('.gif','.jpg')
+     * @param string|array $extensions for example '*' or array('.gif','.jpg')
      * @param int $limit stop counting after at least $limit non-empty children are found
      * @return int
      */
@@ -317,6 +324,7 @@ class scheduler_file_info extends file_info {
 
     /**
      * Returns parent file_info instance
+     *
      * @return file_info or null for root
      */
     public function get_parent() {

@@ -10,6 +10,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Print a selection box of existing slots to be scheduler in
+ *
+ * @param scheduler_instance $scheduler
+ * @param int $studentid student to schedule
+ * @param int $groupid group to schedule
+ */
 function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
     global $output;
 

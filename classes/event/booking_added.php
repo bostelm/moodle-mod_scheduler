@@ -1,9 +1,7 @@
 <?php
 
 /**
- * The mod_scheduler booking form added event.
- *
- * Indicates that a student has booked into a slot.
+ * Defines the mod_scheduler booking form added event.
  *
  * @package    mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
@@ -13,8 +11,23 @@
 namespace mod_scheduler\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_scheduler booking form added event.
+ *
+ * Indicates that a student has booked into a slot.
+ *
+ * @package    mod_scheduler
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class booking_added extends slot_base {
 
+    /**
+     * Create this event on a given scheduler.
+     *
+     * @param \scheduler_instance $scheduler
+     * @return \core\event\base
+     */
     public static function create_from_slot(\scheduler_slot $slot) {
         $event = self::create(self::base_data($slot));
         $event->set_slot($slot);

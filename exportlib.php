@@ -18,6 +18,10 @@ require_once($CFG->dirroot.'/lib/pdflib.php');
 
 /**
  * A data field included in an export from Scheduler.
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class scheduler_export_field {
 
@@ -29,7 +33,7 @@ abstract class scheduler_export_field {
 
     /**
      * Is the field available in this scheduler?
-     * @return boolean whether the field is available
+     * @return bool whether the field is available
      */
     public function is_available(scheduler_instance $scheduler) {
         return true;
@@ -84,7 +88,7 @@ abstract class scheduler_export_field {
     /**
      * Does this field use wrapped text?
      *
-     * @return boolean whether wrapping is used for this field
+     * @return bool whether wrapping is used for this field
      */
     public function is_wrapping() {
         return false;
@@ -137,6 +141,10 @@ function scheduler_get_export_fields() {
 
 /**
  * Export field: Date of the slot
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_slotdate_field extends scheduler_export_field {
 
@@ -159,6 +167,10 @@ class scheduler_slotdate_field extends scheduler_export_field {
 
 /**
  * Export field: Start time of the slot
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_starttime_field extends scheduler_export_field {
 
@@ -179,6 +191,10 @@ class scheduler_starttime_field extends scheduler_export_field {
 
 /**
  * Export field: End time of the slot
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_endtime_field extends scheduler_export_field {
 
@@ -198,6 +214,10 @@ class scheduler_endtime_field extends scheduler_export_field {
 
 /**
  * Export field: Full name of the teacher
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_teachername_field extends scheduler_export_field {
 
@@ -225,6 +245,10 @@ class scheduler_teachername_field extends scheduler_export_field {
 
 /**
  * Export field: Appointment location
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_location_field extends scheduler_export_field {
 
@@ -244,6 +268,10 @@ class scheduler_location_field extends scheduler_export_field {
 
 /**
  * Export field: Maximum number of students / appointments in the slot
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_maxstudents_field extends scheduler_export_field {
 
@@ -267,6 +295,10 @@ class scheduler_maxstudents_field extends scheduler_export_field {
 
 /**
  * Export field: A field in the student record (to be chosen via the constructor)
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_student_field extends scheduler_export_field {
 
@@ -316,6 +348,10 @@ class scheduler_student_field extends scheduler_export_field {
 
 /**
  * Export field: Whether the appointment has been attended
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_attended_field extends scheduler_export_field {
 
@@ -339,6 +375,10 @@ class scheduler_attended_field extends scheduler_export_field {
 
 /**
  * Export field: Slot notes
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_slotnotes_field extends scheduler_export_field {
 
@@ -366,6 +406,10 @@ class scheduler_slotnotes_field extends scheduler_export_field {
 
 /**
  * Export field: Appointment notes
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_appointmentnote_field extends scheduler_export_field {
 
@@ -400,6 +444,10 @@ class scheduler_appointmentnote_field extends scheduler_export_field {
 
 /**
  * Export field: Teacher notes
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_teachernote_field extends scheduler_export_field {
 
@@ -434,6 +482,10 @@ class scheduler_teachernote_field extends scheduler_export_field {
 
 /**
  * Export field: Student-provided notes
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_studentnote_field extends scheduler_export_field {
 
@@ -468,6 +520,10 @@ class scheduler_studentnote_field extends scheduler_export_field {
 
 /**
  * Export field: Number of student-provided files
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_filecount_field extends scheduler_export_field {
 
@@ -502,6 +558,10 @@ class scheduler_filecount_field extends scheduler_export_field {
 
 /**
  * Export field: Grade for the appointment
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_grade_field extends scheduler_export_field {
 
@@ -528,13 +588,32 @@ class scheduler_grade_field extends scheduler_export_field {
 
 /**
  * An "output device" for scheduler exports
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class scheduler_canvas {
 
 
+    /**
+     * @var object format instructions for header
+     */
     public $formatheader;
+
+    /**
+     * @var object format instructions for boldface text
+     */
     public $formatbold;
+
+    /**
+     * @var object format instructions for boldface italic text
+     */
     public $formatboldit;
+
+    /**
+     * @var object format instructions for text with line wrapping
+     */
     public $formatwrap;
 
     /**
@@ -584,6 +663,9 @@ abstract class scheduler_canvas {
         // Ignore widths by default.
     }
 
+    /**
+     * @var string title of the output file
+     */
     protected $title;
 
     /**
@@ -610,6 +692,10 @@ abstract class scheduler_canvas {
 
 /**
  * Output device: Excel file
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_excel_canvas extends scheduler_canvas {
 
@@ -675,6 +761,10 @@ class scheduler_excel_canvas extends scheduler_canvas {
 
 /**
  * Output device: ODS file
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_ods_canvas extends scheduler_canvas {
 
@@ -741,6 +831,10 @@ class scheduler_ods_canvas extends scheduler_canvas {
 
 /**
  * An output device that is based on first collecting all text in an array.
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class scheduler_cached_text_canvas extends scheduler_canvas {
 
@@ -835,6 +929,10 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
 
 /**
  * Output device: HTML file
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_html_canvas extends scheduler_cached_text_canvas {
 
@@ -917,6 +1015,10 @@ class scheduler_html_canvas extends scheduler_cached_text_canvas {
 
 /**
  * Output device: CSV (text) file
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_csv_canvas extends scheduler_cached_text_canvas {
 
@@ -971,6 +1073,10 @@ class scheduler_csv_canvas extends scheduler_cached_text_canvas {
 
 /**
  * Output device: PDF file
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_pdf_canvas extends scheduler_cached_text_canvas {
 
@@ -1054,17 +1160,43 @@ class scheduler_pdf_canvas extends scheduler_cached_text_canvas {
 
 /**
  * A class that generates the export file with given settings.
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_export {
 
+    /**
+     * @var scheduler_canvas the canvas used for output
+     */
     protected $canvas;
+
+    /**
+     * @var array a list of student ids to be filtered for
+     */
     protected $studfilter = null;
 
+    /**
+     * Create a new export with a given canvas
+     *
+     * @param scheduler_canvas $canvas the canvas to use
+     */
     public function __construct(scheduler_canvas $canvas) {
         $this->canvas = $canvas;
     }
 
-
+    /**
+     * Build the output on the canvas.
+     *
+     * @param scheduler_instance $scheduler the scheduler to export
+     * @param array $fields the fields to include
+     * @param string $mode output mode
+     * @param int $userid id of the teacher to export for, 0 if slots for all teachers are exported
+     * @param int $groupid the id of the group (of students) to export appointments for, 0 if none
+     * @param bool $includeempty whether to include slots without appointments
+     * @param bool $pageperteacher whether one page should be used for each teacher
+     */
     public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $groupid, $includeempty, $pageperteacher) {
         if ($groupid) {
             $this->studfilter = array_keys(groups_get_members($groupid, 'u.id'));
@@ -1087,6 +1219,16 @@ class scheduler_export {
         }
     }
 
+    /**
+     * Write a page of output to the canvas.
+     * (Pages correspond to "tabs" in spreadsheet format, not to printed pages.)
+     *
+     * @param scheduler_instance $scheduler the scheduler being exported
+     * @param array $fields the fields to include
+     * @param array $slots the slots to include
+     * @param string $mode output mode
+     * @param bool $includeempty whether to include slots without appointments
+     */
     protected function build_page(scheduler_instance $scheduler, array $fields, array $slots, $mode, $includeempty) {
 
         // Output the header.
@@ -1134,7 +1276,16 @@ class scheduler_export {
 
     }
 
-    protected function write_row($row, scheduler_slot $slot, $appointment, $fields, $includeslotfields = true, $multiple = false) {
+    /**
+     * Write a row of the export to the canvas
+     * @param int $row row number on canvas
+     * @param scheduler_slot $slot the slot of the appointment to write
+     * @param scheduler_appointment $appointment the appointment to write
+     * @param array $fields list of fields to include
+     * @param bool $includeslotfields whether fields relating to slots, rather than appointments, should be included
+     * @param string $multiple whether the row represents multiple values (appointments)
+     */
+    protected function write_row($row, scheduler_slot $slot, $appointment, array $fields, $includeslotfields = true, $multiple = false) {
 
         $col = 0;
         foreach ($fields as $field) {
@@ -1151,7 +1302,14 @@ class scheduler_export {
         }
     }
 
-    protected function write_row_summary($row, scheduler_slot $slot, $fields) {
+    /**
+     * Write a summary of slot-related data into a row
+     *
+     * @param int $row the row number on the canvas
+     * @param scheduler_slot $slot the slot to be written
+     * @param array $fields the fields to include
+     */
+    protected function write_row_summary($row, scheduler_slot $slot, array $fields) {
 
         $strs = array();
         $cols = 0;

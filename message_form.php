@@ -2,7 +2,6 @@
 
 /**
  * Message form for invitations
- * (using Moodle formslib)
  *
  * @package    mod_scheduler
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
@@ -13,10 +12,28 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
+/**
+ * Message form for invitations
+ * (using Moodle formslib)
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class scheduler_message_form extends moodleform {
 
+    /**
+     * @var scheduler_instance scheduler in whose context the messages are sent
+     */
     protected $scheduler;
 
+    /**
+     * Create a new messge form
+     *
+     * @param string $action
+     * @param scheduler_instance $scheduler scheduler in whose context the messages are sent
+     * @param object $customdata
+     */
     public function __construct($action, scheduler_instance $scheduler, $customdata=null) {
         $this->scheduler = $scheduler;
         parent::__construct($action, $customdata);
@@ -69,6 +86,7 @@ class scheduler_message_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
 
     }
+
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

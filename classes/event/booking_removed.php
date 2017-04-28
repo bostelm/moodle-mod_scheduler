@@ -1,6 +1,18 @@
 <?php
 
 /**
+ * Defines the mod_scheduler booking form removed event.
+ *
+ * @package    mod_scheduler
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace mod_scheduler\event;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
  * The mod_scheduler booking form removed event.
  *
  * Indicates that a student has removed their booking from a slot.
@@ -9,13 +21,14 @@
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
-namespace mod_scheduler\event;
-defined('MOODLE_INTERNAL') || die();
-
 class booking_removed extends slot_base {
 
+    /**
+     * Create this event on a given slot.
+     *
+     * @param \scheduler_slot $slot
+     * @return \core\event\base
+     */
     public static function create_from_slot(\scheduler_slot $slot) {
         $event = self::create(self::base_data($slot));
         $event->set_slot($slot);

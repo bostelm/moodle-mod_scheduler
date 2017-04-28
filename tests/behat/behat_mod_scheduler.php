@@ -18,6 +18,8 @@ use Behat\Behat\Context\Step\Given as Given, Behat\Behat\Context\Step\When as Wh
  *
  * @package mod_scheduler
  * @category test
+ * @copyright  2015 Henning Bostelmann
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_scheduler extends behat_base {
 
@@ -26,7 +28,6 @@ class behat_mod_scheduler extends behat_base {
      *
      * @Given /^I add a slot (\d+) days ahead at (\d+) in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler and I fill the form with:$/
      *
-     * @param int $slotcount
      * @param int $daysahead
      * @param int $time
      * @param string $activityname

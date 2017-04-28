@@ -17,7 +17,14 @@ require_once(dirname(__FILE__).'/../../model/scheduler_slot.php');
 require_once(dirname(__FILE__).'/../../model/scheduler_appointment.php');
 require_once(dirname(__FILE__).'/../../mailtemplatelib.php');
 
-class send_reminders extends \core\task\scheduled_task {
+/**
+ * Scheduled background task for sending automated appointment reminders
+ *
+ * @package    mod_scheduler
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+ class send_reminders extends \core\task\scheduled_task {
 
     public function get_name() {
         return get_string('sendreminders', 'mod_scheduler');

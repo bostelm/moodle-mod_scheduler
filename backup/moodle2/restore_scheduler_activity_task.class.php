@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Restore task for Scheduler.
+ *
  * @package    mod_scheduler
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -14,6 +16,9 @@ require_once($CFG->dirroot . '/mod/scheduler/backup/moodle2/restore_scheduler_st
 /**
  * scheduler restore task that provides all the settings and steps to perform one
  * complete restore of the activity
+ *
+ * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_scheduler_activity_task extends restore_activity_task {
 

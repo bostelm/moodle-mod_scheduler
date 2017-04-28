@@ -4,7 +4,6 @@
  * Unit tests for the MVC model classes
  *
  * @package    mod_scheduler
- * @category   phpunit
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -17,14 +16,31 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 /**
  * Unit tests for the MVC model classes
  *
- * @group mod_scheduler
+ * @package mod_scheduler
+ * @copyright  2014 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_scheduler_model_testcase extends advanced_testcase {
 
-    protected $moduleid;  // Course_modules id used for testing.
-    protected $courseid;  // Course id used for testing.
-    protected $schedulerid; // Scheduler id used for testing.
-    protected $userid;    // User id used for testing.
+    /**
+     * @var int Course_modules id used for testing
+     */
+    protected $moduleid;
+
+    /**
+     * @var int Course id used for testing
+     */
+    protected $courseid;
+
+    /**
+     * @var int Scheduler id used for testing
+     */
+    protected $schedulerid;
+
+    /**
+     * @var int User id used for testing
+     */
+    protected $userid;
 
     protected function setUp() {
         global $DB, $CFG;
@@ -55,6 +71,9 @@ class mod_scheduler_model_testcase extends advanced_testcase {
         $this->userid = 2;  // Admin user.
     }
 
+    /**
+     * Test loading a scheduler instance from the database
+     */
     public function test_scheduler_instance() {
         global $DB;
 
@@ -65,7 +84,6 @@ class mod_scheduler_model_testcase extends advanced_testcase {
         $this->assertEquals( $dbdata->name, $instance->get_name());
 
     }
-
 
     /**
      * Test the "appointment" data object
