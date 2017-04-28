@@ -1,39 +1,39 @@
-.path-mod-scheduler .timelabel{
-   color : #808080;
+.path-mod-scheduler .timelabel {
+    color: #808080;
 }
 
-.path-mod-scheduler .attended{
-   color : green;
+.path-mod-scheduler .attended {
+    color: green;
 }
 
-.path-mod-scheduler div.otherstudent.highlight{
-   font-weight : bold;
+.path-mod-scheduler div.otherstudent.highlight {
+    font-weight: bold;
 }
 
-.path-mod-scheduler div.slotnotes{
-   background-color : #E8E9EE;
-   border : solid 1px #A7ABBE;
-   font-size : 0.9em;
-   padding : 2px;
-   margin : 1px;
+.path-mod-scheduler div.slotnotes {
+    background-color: #e8e9ee;
+    border: solid 1px #a7abbe;
+    font-size: 0.9em;
+    padding: 2px;
+    margin: 1px;
 }
 
-div .path-mod-scheduler .appointmentnote{
-   background-color : #E7EFE7;
-   border : solid 1px #A0C5A4;
-   font-size : 0.9em;
-   padding : 2px;
-   margin : 1px;
-}
-
-.path-mod-scheduler #slotbookertable {
-    margin-left:auto;
-    margin-right:auto;
+div .path-mod-scheduler .appointmentnote {
+    background-color: #e7efe7;
+    border: solid 1px #a0c5a4;
+    font-size: 0.9em;
+    padding: 2px;
+    margin: 1px;
 }
 
 .path-mod-scheduler #slotbookertable {
-    margin-left:auto;
-    margin-right:auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.path-mod-scheduler #slotbookertable {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .path-mod-scheduler div.bookercontrols {
@@ -52,11 +52,11 @@ div .path-mod-scheduler .appointmentnote{
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    background-color : #EEEEEE;
+    background-color: #eee;
     padding: 0.5em;
 }
 
-// Reduce space usage by single buttons in table cells
+/* Reduce space usage by single buttons in table cells */
 .path-mod-scheduler table div.singlebutton div {
     margin-bottom: 0px;
 }
@@ -77,8 +77,8 @@ div .path-mod-scheduler .appointmentnote{
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu.show[data-enhanced] .menu.align-tr-br {
-	left: 0;
-	right: auto;
+    left: 0;
+    right: auto;
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu .menubar {
@@ -112,7 +112,7 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    background: #eeeeee;
+    background: #eee;
     text-align: center;
 }
 
@@ -146,13 +146,13 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
 }
 
 .path-mod-scheduler div.actionmessage.success {
-    background-color: #96FCA6;
-    border-color: #14FA34;
+    background-color: #96fca6;
+    border-color: #14fa34;
 }
 
 .path-mod-scheduler div.actionmessage.error {
-    background-color: ##FFB2B8;
-    border-color: #F40000;
+    background-color: #ffb2b8;
+    border-color: #f40000;
 }
 
 .path-mod-scheduler div.totalgrade {
@@ -162,12 +162,12 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     width: 100%;
 }
 .path-mod-scheduler dl.totalgrade dt {
-    float:left;
-    clear:left;
+    float: left;
+    clear: left;
     width: 30%;
 }
 .path-mod-scheduler dl.totalgrade dd {
-    float:left;
+    float: left;
     width: 60%;
 }
 
@@ -180,7 +180,7 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     vertical-align: middle;
 }
 
-// Format data fields in vertical rather than horizontal list.
+/* Format data fields in vertical rather than horizontal list. */
 .path-mod-scheduler #id_datafieldhdr .fitem {
     width: 30%;
     margin-left: 10px;
