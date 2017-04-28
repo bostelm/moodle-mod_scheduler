@@ -397,6 +397,9 @@ if ($offset == -1) {
         $offset = 0;
     }
 }
+if ($offset * $pagesize >= $sqlcount && $sqlcount > 0) {
+    $offset = floor(($sqlcount-1) / $pagesize);
+}
 
 $slots = $scheduler->get_slots_for_teacher($teacherid, $currentgroup, $offset * $pagesize, $pagesize);
 
