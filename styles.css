@@ -180,40 +180,36 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     vertical-align: middle;
 }
 
-// Format data fields in vertical rather than horizontal list.
-.path-mod-scheduler #id_datafieldhdr .fitem {
-    width: 30%;
-    margin-left: 10px;
-}
-.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
-    width: 100%;
-    text-align: left;
-    margin-left: 0;
-}
-.path-mod-scheduler #id_datafieldhdr .fitem {
+
+/* Format data fields in vertical rather than horizontal list. */
+
+.path-mod-scheduler #id_datafieldhdr .form-group,
+.path-mod-scheduler #id_datafieldhdr .fitem_fgroup {
     float: left;
-    width: 30%;
     clear: none;
 }
 
-.path-mod-scheduler #id_datafieldhdr .fitemtitle {
+.path-mod-scheduler #id_datafieldhdr .col-md-3,
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
     width: 100%;
-    font-weight: bold;
     text-align: left;
-    height: 2.5em;
     margin-left: 0;
 }
 
-.path-mod-scheduler #id_datafieldhdr fieldset.fgroup {
-    clear: left;
-    margin: 0 0 1em;
-}
-.path-mod-scheduler #id_datafieldhdr fieldset.fgroup > span {
-    float: left;
-    clear: left;
-    line-height: 1.7;
+.path-mod-scheduler #id_datafieldhdr .col-md-9 {
+    float: none;
+    width: 100%;
 }
 
-.path-mod-scheduler #id_datafieldhdr fieldset.fgroup span label {
-    margin-left: 0.4em;
+.path-mod-scheduler #id_datafieldhdr .col-form-label,
+.path-mod-scheduler #id_datafieldhdr .fitemtitle {
+    font-weight: bold;
+    text-align: left;
+}
+
+.path-mod-scheduler #id_datafieldhdr .form-group .felement .fitem,
+.path-mod-scheduler #id_datafieldhdr fieldset.fgroup > span {
+    clear: left;
+    float: left;
+    margin-left: 0.5em;
 }
