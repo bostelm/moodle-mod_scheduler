@@ -28,10 +28,20 @@ function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $fo
 
     $requiredcapacity = 1;
     $userstobook = array($userid);
-    if ($groupid) {
+    if ($groupid > 0) {
+        if (!$scheduler->is_group_scheduling_enabled()) {
+            throw new moodle_exception('error');
+        }
         $groupmembers = $scheduler->get_available_students($groupid);
         $requiredcapacity = count($groupmembers);
         $userstobook = array_keys($groupmembers);
+    } else if ($groupid == 0) {
+        if (!$scheduler->is_individual_scheduling_enabled()) {
+            throw new moodle_exception('error');
+        }
+    } else {
+        // Group scheduling enabled but no group selected.
+        throw new moodle_exception('error');
     }
 
     $errormessage = '';
@@ -39,8 +49,7 @@ function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $fo
     $bookinglimit = $scheduler->count_bookable_appointments($userid, false);
     if ($bookinglimit == 0) {
         $errormessage = get_string('selectedtoomany', 'scheduler', $bookinglimit);
-    }
-    if (!$errormessage) {
+    } else {
         // Validate our user ids.
         $existingstudents = array();
         foreach ($slot->get_appointments() as $app) {
@@ -95,8 +104,11 @@ function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $fo
 
 }
 
-
-$returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
+$returnurlparas =  array('id' => $cm->id);
+if ($scheduler->is_group_scheduling_enabled()) {
+    $returnurlparas['appointgroup'] = $appointgroup;
+}
+$returnurl = new moodle_url('/mod/scheduler/view.php', $returnurlparas);
 
 
 /******************************************** Show the booking form *******************************************/
@@ -116,7 +128,8 @@ if ($action == 'bookingform') {
 
     if ($mform->is_cancelled()) {
         redirect($returnurl);
-    } else if ($formdata = $mform->get_data()) {
+    } else if (($formdata = $mform->get_data()) || $appointgroup < 0) {
+        // Workaround - call scheduler_book_slot also if no group was selected, to show an error message.
         scheduler_book_slot($scheduler, $slotid, $USER->id, $appointgroup, $mform, $formdata, $returnurl);
         redirect($returnurl);
     } else {
