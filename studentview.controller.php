@@ -12,7 +12,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
 
-$returnurl = new moodle_url('/mod/scheduler/view.php', array('id' => $cm->id));
+$returnurlparas =  array('id' => $cm->id);
+if ($scheduler->is_group_scheduling_enabled()) {
+    $returnurlparas['appointgroup'] = $appointgroup;
+}
+$returnurl = new moodle_url('/mod/scheduler/view.php', $returnurlparas);
 
 /************************************************ Book a slot  ************************************************/
 
@@ -34,10 +38,20 @@ if ($action == 'bookslot') {
 
     $requiredcapacity = 1;
     $userstobook = array($USER->id);
-    if ($appointgroup) {
+    if ($appointgroup > 0) {
+        if (!$scheduler->is_group_scheduling_enabled()) {
+            throw new moodle_exception('error');
+        }
         $groupmembers = $scheduler->get_available_students($appointgroup);
         $requiredcapacity = count($groupmembers);
         $userstobook = array_keys($groupmembers);
+    } else if ($appointgroup == 0) {
+        if (!$scheduler->is_individual_scheduling_enabled()) {
+            throw new moodle_exception('error');
+        }
+    } else {
+        // Group scheduling enabled but no group selected.
+        throw new moodle_exception('error');
     }
 
     $errormessage = '';
@@ -45,8 +59,7 @@ if ($action == 'bookslot') {
     $bookinglimit = $scheduler->count_bookable_appointments($USER->id, false);
     if ($bookinglimit == 0) {
         $errormessage = get_string('selectedtoomany', 'scheduler', $bookinglimit);
-    }
-    if (!$errormessage) {
+    } else {
         // Validate our user ids.
         $existingstudents = array();
         foreach ($slot->get_appointments() as $app) {

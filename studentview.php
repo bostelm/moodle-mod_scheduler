@@ -10,7 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$appointgroup = optional_param('appointgroup', 0, PARAM_INT);
+$appointgroup = optional_param('appointgroup', -1, PARAM_INT);
 
 \mod_scheduler\event\booking_form_viewed::create_from_scheduler($scheduler)->trigger();
 
@@ -20,7 +20,7 @@ $urlparas = array(
         'id' => $scheduler->cmid,
         'sesskey' => sesskey()
 );
-if ($appointgroup) {
+if ($appointgroup >= 0) {
     $urlparas['appointgroup'] = $appointgroup;
 }
 $actionurl = new moodle_url('/mod/scheduler/view.php', $urlparas);
@@ -33,10 +33,17 @@ $canseefull = has_capability('mod/scheduler:viewfullslots', $context);
 
 if ($scheduler->is_group_scheduling_enabled()) {
     $mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $scheduler->bookingrouping, 'g.id, g.name');
-    if ($appointgroup && !array_key_exists($appointgroup, $mygroupsforscheduling)) {
+    if ($appointgroup > 0 && !array_key_exists($appointgroup, $mygroupsforscheduling)) {
         throw new moodle_exception('nopermissions');
     }
 }
+
+if ($scheduler->is_group_scheduling_enabled()) {
+    $canbook = $canbook && ($appointgroup >= 0);
+} else {
+    $appointgroup = 0;
+}
+
 
 include($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
@@ -70,12 +77,14 @@ if ($showowngrades) {
 // Print group selection menu if given.
 if ($scheduler->is_group_scheduling_enabled()) {
     $groupchoice = array();
+    if ($scheduler->is_individual_scheduling_enabled()) {
+        $groupchoice[0] = get_string('myself', 'scheduler');
+    }
     foreach ($mygroupsforscheduling as $group) {
         $groupchoice[$group->id] = $group->name;
     }
     $select = $output->single_select($actionurl, 'appointgroup', $groupchoice, $appointgroup,
-                                     array(0 => get_string('myself', 'scheduler')),
-                                     'appointgroupform');
+                                     array(-1 => 'choosedots'), 'appointgroupform');
     echo html_writer::div(get_string('appointforgroup', 'scheduler', $select), 'dropdownmenu');
 }
 
@@ -127,7 +136,11 @@ if (count($upcomingslots) > 0) {
             $others = null;
         }
 
-        $slottable->add_slot($slot, $appointment, $others, $slot->is_in_bookable_period());
+        $cancancel = $slot->is_in_bookable_period();
+        if ($scheduler->is_group_scheduling_enabled()) {
+            $cancancel = $cancancel && ($appointgroup >= 0);
+        }
+        $slottable->add_slot($slot, $appointment, $others, $cancancel);
     }
 
     echo $output->heading(get_string('upcomingslots', 'scheduler'), 3);

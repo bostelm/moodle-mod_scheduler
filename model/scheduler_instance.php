@@ -183,6 +183,21 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
+     * Retrieve whether individual scheduling is enabled in this instance.
+     * This is usually the case, but is disabled if the instance uses group scheduling
+     * and the configuration setting 'mixindivgroup' is set to inactive.
+     *
+     * @return boolean
+     */
+    public function is_individual_scheduling_enabled() {
+        if ($this->is_group_scheduling_enabled()) {
+            return (bool) get_config('mod_scheduler', 'mixindivgroup');
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * get the last location of a certain teacher in this scheduler
      * @param $user
      * @uses $DB
