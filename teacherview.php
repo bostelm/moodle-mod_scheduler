@@ -497,10 +497,21 @@ if ($slots) {
 $groupfilter = ($subpage == 'myappointments') ? $groupsthatcanseeme : $groupsicurrentlysee;
 $maxlistsize = get_config('mod_scheduler', 'maxstudentlistsize');
 $students = array();
+$reminderstudents = array();
 if ($groupfilter === '') {
     $students = $scheduler->get_students_for_scheduling('', $maxlistsize);
+    if ($scheduler->allows_unlimited_bookings()) {
+        $reminderstudents  = $scheduler->get_students_for_scheduling('', $maxlistsize, true);
+    } else {
+        $reminderstudents = $students;
+    }
 } else if (count($groupfilter) > 0) {
     $students = $scheduler->get_students_for_scheduling(array_keys($groupfilter), $maxlistsize);
+    if ($scheduler->allows_unlimited_bookings()) {
+        $reminderstudents = $scheduler->get_students_for_scheduling(array_keys($groupfilter), $maxlistsize, true);
+    } else {
+        $reminderstudents = $students;
+    }
 }
 
 if ($students === 0) {
@@ -516,24 +527,25 @@ if ($students === 0) {
 
 } else if (count($students) > 0) {
 
-    $studids = implode(',', array_keys($students));
+    if (count($reminderstudents) > 0) {
+        $studids = implode(',', array_keys($reminderstudents));
 
-    $messageurl = new moodle_url($actionurl, array('what' => 'sendmessage', 'recipients' => $studids));
-    $invitationurl = new moodle_url($messageurl, array('template' => 'invite'));
-    $reminderurl = new moodle_url($messageurl, array('template' => 'invitereminder'));
+        $messageurl = new moodle_url($actionurl, array('what' => 'sendmessage', 'recipients' => $studids));
+        $invitationurl = new moodle_url($messageurl, array('template' => 'invite'));
+        $reminderurl = new moodle_url($messageurl, array('template' => 'invitereminder'));
 
-    $maildisplay = '';
-    $maildisplay .= html_writer::link($invitationurl, get_string('sendinvitation', 'scheduler'));
-    $maildisplay .= ' &mdash; ';
-    $maildisplay .= html_writer::link($reminderurl, get_string('sendreminder', 'scheduler'));
+        $maildisplay = '';
+        $maildisplay .= html_writer::link($invitationurl, get_string('sendinvitation', 'scheduler'));
+        $maildisplay .= ' &mdash; ';
+        $maildisplay .= html_writer::link($reminderurl, get_string('sendreminder', 'scheduler'));
 
-    echo $output->box_start('maildisplay');
-    // Print number of students who still have to make an appointment.
-    echo $output->heading(get_string('missingstudents', 'scheduler', count($students)), 3);
-    // Print e-mail addresses and mailto links.
-    echo $maildisplay;
-    echo $output->box_end();
-
+        echo $output->box_start('maildisplay');
+        // Print number of students who still have to make an appointment.
+        echo $output->heading(get_string('missingstudents', 'scheduler', count($reminderstudents)), 3);
+        // Print e-mail addresses and mailto links.
+        echo $maildisplay;
+        echo $output->box_end();
+    }
 
     $userfields = scheduler_get_user_fields(null, $context);
     $fieldtitles = array();

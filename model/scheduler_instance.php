@@ -349,6 +349,14 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
+     * Checks whether this scheduler allows unlimited bookings per student.
+     * @return bool
+     */
+    public function allows_unlimited_bookings() {
+        return ($this->maxbookings == 0);
+    }
+
+    /**
      * Checks whether this scheduler uses grading at all.
      * @return boolean
      */
@@ -1123,17 +1131,26 @@ class scheduler_instance extends mvc_record_model {
      * @param int $cutoff if the number of students in the course is more than this limit,
      *            the routine will return the number of students rather than a list
      *            (this is for performance reasons).
+     * @param bool $onlymandatory include only students who _must_ (rather than _can_) make
+     *            another appointment. This matters onyl in schedulers where students can make
+     *            unlimited appointments.
      * @return int|array of moodle user records; or int 0 if there are no students in the course;
      *            or the number of students if there are too many students. Array keys are student ids.
      */
-    public function get_students_for_scheduling($groups = '', $cutoff = 0) {
+    public function get_students_for_scheduling($groups = '', $cutoff = 0, $onlymandatory = false) {
         $studs = $this->get_available_students($groups);
         if (($cutoff > 0 && count($studs) > $cutoff) || count($studs) == 0) {
             return count($studs);
         }
         $schedstuds = array();
         foreach ($studs as $stud) {
-            if ($this->count_bookable_appointments($stud->id, false) != 0) {
+            $include = false;
+            if ($this->allows_unlimited_bookings()) {
+                $include = !$onlymandatory || !$this->has_slots_for_student($stud->id, false, false);
+            } else {
+                $include = ($this->count_bookable_appointments($stud->id, false) != 0);
+            }
+            if ($include) {
                 $schedstuds[$stud->id] = $stud;
             }
         }
