@@ -14,6 +14,7 @@ require_once($CFG->dirroot.'/lib/excellib.class.php');
 require_once($CFG->dirroot.'/lib/odslib.class.php');
 require_once($CFG->dirroot.'/lib/csvlib.class.php');
 require_once($CFG->dirroot.'/lib/pdflib.php');
+require_once($CFG->dirroot.'/user/profile/lib.php');
 
 
 /**
@@ -127,6 +128,12 @@ function scheduler_get_export_fields() {
     $result[] = new scheduler_student_field('studentemail', 'email');
     $result[] = new scheduler_student_field('studentusername', 'username');
     $result[] = new scheduler_student_field('studentidnumber', 'idnumber');
+
+    $pfields = profile_get_custom_fields();
+    foreach ($pfields as $id => $field) {
+        $type = $field->datatype;
+        $result[] = new scheduler_profile_field('profile_'.$type, $id, $type);
+    }
 
     $result[] = new scheduler_attended_field();
     $result[] = new scheduler_grade_field();
@@ -343,8 +350,64 @@ class scheduler_student_field extends scheduler_export_field {
         }
     }
 
+}
+
+/**
+ * Export field: A cutom profile field in the student record
+ *
+ * @package    mod_scheduler
+ * @copyright  2017 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class scheduler_profile_field extends scheduler_export_field {
+
+    protected $id;
+    protected $field;
+
+    /**
+     * Create a new export entry for a custom profile field.
+     *
+     * @param string $id the id of the field (for internal use)
+     * @param int $fieldid id of the field in the database table
+     * @param string $type data type of profile field to add
+     */
+    public function __construct($id, $fieldid, $type) {
+        global $CFG;
+
+        $this->id = $id;
+        require_once($CFG->dirroot.'/user/profile/field/'.$type.'/field.class.php');
+        $fieldclass = 'profile_field_'.$type;
+        $fieldobj = new $fieldclass($fieldid, 0);
+        $this->field = $fieldobj;
+    }
+
+    public function get_id() {
+        return $this->id;
+    }
+
+    public function get_group() {
+        return 'student';
+    }
+
+    public function get_header(scheduler_instance $scheduler) {
+        return format_string($this->field->field->name);
+    }
+
+    public function get_value(scheduler_slot $slot, $appointment) {
+        if (!$appointment instanceof scheduler_appointment || $appointment->studentid == 0) {
+            return '';
+        }
+        $this->field->set_userid($appointment->studentid);
+        $this->field->load_data();
+        if ($this->field->is_visible()) {
+            $content = $this->field->display_data();
+            return strip_tags($content);
+        }
+        return '';
+    }
 
 }
+
 
 /**
  * Export field: Whether the appointment has been attended
