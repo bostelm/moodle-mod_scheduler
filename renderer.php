@@ -285,6 +285,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         if ($slottable->showgrades) {
             $table->head[] = get_string('grade', 'scheduler');
             $table->align[] = 'left';
+        } else if ($slottable->hasotherstudents) {
+            $table->head[] = get_string('otherstudents', 'scheduler');
+            $table->align[] = 'left';
         }
         if ($slottable->showactions) {
             $table->head[] = '';
@@ -343,10 +346,11 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $notes .= $this->format_appointment_notes($slottable->scheduler, $slot, 'appointmentid');
             $rowdata[] = $notes;
 
-            if ($slottable->showgrades) {
+            if ($slottable->showgrades || $slottable->hasotherstudents) {
+                $gradedata = '';
                 if ($slot->otherstudents) {
                     $gradedata = $this->render($slot->otherstudents);
-                } else {
+                } else if ($slottable->showgrades) {
                     $gradedata = $this->format_grade($slottable->scheduler, $slot->grade);
                 }
                 $rowdata[] = $gradedata;

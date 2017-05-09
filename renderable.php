@@ -18,6 +18,9 @@ class scheduler_slot_table implements renderable {
     public $slots = array();
     public $scheduler;
     public $showgrades;
+    /** @var bool whether any slot in the table has other students to show */
+    public $hasotherstudents = false;
+
     public $showslot = true;
     public $showattended = false;
     public $showactions = false;
@@ -56,6 +59,7 @@ class scheduler_slot_table implements renderable {
             $slot->grade = $appointmentmodel->grade;
         }
         $this->showactions = $this->showactions || $cancancel;
+        $this->hasotherstudents = $this->hasotherstudents || (bool) $otherstudents;
 
         $this->slots[] = $slot;
     }
