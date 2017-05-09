@@ -19,6 +19,8 @@ class scheduler_slot_table implements renderable {
     public $scheduler;
     public $showgrades;
     public $showactions;
+    public $hasotherstudents = false;
+
     public $actionurl;
 
     public function add_slot(scheduler_slot $slotmodel, scheduler_appointment $appointmentmodel, $otherstudents, $cancancel = false) {
@@ -40,6 +42,7 @@ class scheduler_slot_table implements renderable {
             $slot->grade = $appointmentmodel->grade;
         }
         $this->showactions = $this->showactions || $cancancel;
+        $this->hasotherstudents = $this->hasotherstudents || (bool) $otherstudents;
 
         $this->slots[] = $slot;
     }
