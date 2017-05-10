@@ -120,7 +120,15 @@ class mod_scheduler_mod_form extends moodleform_mod {
     function data_preprocessing(&$defaultvalues) {
         parent::data_preprocessing($defaultvalues);
         if (array_key_exists('scale', $defaultvalues)) {
-            $defaultvalues['grade'] = $defaultvalues['scale'];
+            $dgrade = $defaultvalues['scale'];
+            $defaultvalues['grade'] = $dgrade;
+            $type = 'none';
+            if ($dgrade > 0) {
+                $type = 'point';
+            } else if ($dgrade < 0) {
+                $type = 'scale';
+            }
+            $defaultvalues['grade[modgrade_type]'] = $type;
         }
     }
 
