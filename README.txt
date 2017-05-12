@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/31/en/Scheduler_module
+    http://docs.moodle.org/33/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 3.1 and above.
+This module is intended for Moodle 3.3 and above.
 
 
 === Authors ===
@@ -57,6 +57,38 @@ With further contributions taken from:
 
 
 === Release notes ===
+
+--- Version 3.3 ---
+
+Intended for Moodle 3.3 and later.
+
+New features / improvements:
+
+Optionally, before making an appointment, students now see a booking screen 
+in which they need to enter text, upload a file, and/or solve a captcha.
+
+Filter strings (e.g., multilang syntax) are now processed in course shortname,
+course fullname, and location fields.
+
+Export files can now include custom profile fields of students.
+
+Feature changes:
+
+For booking in groups, students now need to select explicitly which group
+they are booking for, or whether they want to make an individual booking.
+Individual bookings can be disabled via a global configuration setting.
+
+For viewing student's email addresses, the capability 
+moodle/site:viewuseridentity is now required.
+
+When allowing an "unlimited" number of appointments, students will no longer
+be included in reminder e-mails if they have booked at least one slot. 
+
+Refactoring / API changes:
+
+The function scheduler_get_user_fields() in customlib.php has changed 
+signature. If you have customized it in an earlier version, you will want 
+to edit your code.
 
 --- Version 3.1 ---
 
@@ -182,5 +214,4 @@ should be considered a bug:
 * Scheduler tasks API
 * Messaging API
 
-The module does not use any deprecated API as of Moodle 3.1.
-
+The module does not use any deprecated API as of Moodle 3.3.
