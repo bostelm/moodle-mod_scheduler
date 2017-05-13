@@ -40,8 +40,8 @@ if ($ADMIN->fulltree) {
                      200, PARAM_INT));
 
     $settings->add(new admin_setting_configtext('mod_scheduler/uploadmaxfiles',
-                     get_string('uploadmaxfiles', 'scheduler'),
-                     get_string('uploadmaxfiles_desc', 'scheduler'),
+                     get_string('uploadmaxfilesglobal', 'scheduler'),
+                     get_string('uploadmaxfilesglobal_desc', 'scheduler'),
                      5, PARAM_INT));
 
 }
