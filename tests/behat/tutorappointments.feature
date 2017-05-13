@@ -100,7 +100,7 @@ Feature: Booking of appointments with individual tutors per group
     And I should see "10:00 AM" in the "slotmanager" "table"
     And I should see "Meeting with your Student, Student 2a" in the "Upcoming events" "block"
     And I should see "Meeting with your Student, Student 2b" in the "Upcoming events" "block"
-    And I should see "2 students still need to make an appointment"
+    And I should not see "students still need to make an appointment"
     And I log out
 
   @javascript
