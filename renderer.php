@@ -991,6 +991,14 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             }
         }
 
+        if ($ai->groupinfo) {
+            $row = new html_table_row();
+            $cell1 = new html_table_cell(get_string('appointfor', 'scheduler'));
+            $cell2 = new html_table_cell(format_string($ai->groupinfo));
+            $row->cells = array($cell1, $cell2);
+            $t->data[] = $row;
+        }
+
         if ($ai->showbookinginfo) {
             if ($ai->scheduler->has_bookinginstructions()) {
                 $row = new html_table_row();

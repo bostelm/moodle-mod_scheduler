@@ -73,6 +73,7 @@ $string['allowgroup'] = 'Exclusive slot - click to change';
 $string['allteachersgrading'] = 'Teachers can grade all appointments';
 $string['allteachersgrading_desc'] = 'When enabled, teachers can grade appointments they are not assigned to.';
 $string['alreadyappointed'] = 'Cannot make the appointment. The slot is already fully booked.';
+$string['appointfor'] = 'Make appointment for';
 $string['appointforgroup'] = 'Make appointments for: {$a}';
 $string['appointingstudent'] = 'Appointment for slot';
 $string['appointingstudentinnew'] = 'Appointment for new slot';

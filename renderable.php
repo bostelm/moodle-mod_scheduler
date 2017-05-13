@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Config\Definition\BooleanNode;
-
 /**
  * This file contains the definition for the renderable classes for the assignment
  *
@@ -595,6 +593,11 @@ class scheduler_appointment_info implements renderable {
     public $showstudentdata;
 
     /**
+     * @var string information about the group the booking is for
+     */
+    public $groupinfo;
+
+    /**
      * @var bool whether the information is shown to a student (rather than a teacher)
      */
     public $onstudentside;
@@ -605,14 +608,16 @@ class scheduler_appointment_info implements renderable {
     public $showresult;
 
     /**
-     * Create appointment informatino for a new appointment in a slot.
+     * Create appointment information for a new appointment in a slot.
      *
      * @param scheduler_slot $slot the slot in question
      * @param bool $showbookinginstr whether to show booking instructions
      * @param bool $onstudentside whether the screen is shown to a student
+     * @param string $groupinfo information about the group that the booking is for
      * @return scheduler_appointment_info
      */
-    public static function make_from_slot(scheduler_slot $slot, $showbookinginstr = true, $onstudentside = true) {
+    public static function make_from_slot(scheduler_slot $slot, $showbookinginstr = true, $onstudentside = true,
+                                          $groupinfo = null) {
         $info = new scheduler_appointment_info();
         $info->slot = $slot;
         $info->scheduler = $slot->get_scheduler();
@@ -621,6 +626,7 @@ class scheduler_appointment_info implements renderable {
         $info->showstudentdata   = false;
         $info->showresult   = false;
         $info->onstudentside = $onstudentside;
+        $info->groupinfo = $groupinfo;
 
         return $info;
     }
@@ -643,6 +649,7 @@ class scheduler_appointment_info implements renderable {
         $info->showstudentdata = $info->scheduler->uses_studentdata();
         $info->showresult   = true;
         $info->onstudentside = $onstudentside;
+        $info->groupinfo = null;
 
         return $info;
     }
@@ -665,6 +672,7 @@ class scheduler_appointment_info implements renderable {
         $info->showstudentdata = $info->scheduler->uses_studentdata();
         $info->showresult   = false;
         $info->onstudentside = false;
+        $info->groupinfo = null;
 
         return $info;
     }

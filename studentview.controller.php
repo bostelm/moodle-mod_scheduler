@@ -133,10 +133,18 @@ if ($action == 'bookingform') {
         scheduler_book_slot($scheduler, $slotid, $USER->id, $appointgroup, $mform, $formdata, $returnurl);
         redirect($returnurl);
     } else {
+        $groupinfo = null;
+        if ($scheduler->is_group_scheduling_enabled() && $appointgroup == 0) {
+            $groupinfo = get_string('myself', 'scheduler');
+        } else if ($appointgroup > 0) {
+            $groupinfo = $mygroupsforscheduling[$appointgroup]->name;
+        }
+
         echo $output->header();
         echo $output->heading(get_string('bookaslot', 'scheduler'));
         echo $output->box(format_text($scheduler->intro, $scheduler->introformat));
-        $info = scheduler_appointment_info::make_from_slot($slot);
+
+        $info = scheduler_appointment_info::make_from_slot($slot, true, true, $groupinfo);
         echo $output->render($info);
         $mform->display();
         echo $output->footer();
