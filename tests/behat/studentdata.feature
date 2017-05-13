@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod_scheduler @javascript @_file_upload
 Feature: Student-supplied data
   In order to collect data from students
   As a teacher
