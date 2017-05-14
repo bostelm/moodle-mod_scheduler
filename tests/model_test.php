@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 /**
  * Unit tests for the MVC model classes
  *
- * @package mod_scheduler
+ * @group mod_scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

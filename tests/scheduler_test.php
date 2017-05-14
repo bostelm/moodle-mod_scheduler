@@ -16,6 +16,7 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 /**
  * Unit tests for the scheduler_instance class.
  *
+ * @group mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
