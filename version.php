@@ -12,13 +12,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This is the development branch (master) of the scheduler module.
+ * This is the MOODLE_29_STABLE branch of the scheduler module.
  */
 
 $plugin->component = 'mod_scheduler'; // Full name of the plugin (used for diagnostics)
-$plugin->version   = 2015102903;      // The current module version (Date: YYYYMMDDXX)
-$plugin->release   = '2.9.1+';       // Human-friendly version name
+$plugin->version   = 2015102904;      // The current module version (Date: YYYYMMDDXX)
+$plugin->release   = '2.9.2';         // Human-friendly version name
 $plugin->requires  = 2015042800;      // Requires Moodle 2.9
-$plugin->maturity  = MATURITY_STABLE;  // Alpha development code - not for production sites
+$plugin->maturity  = MATURITY_STABLE; // Stable release
 
 $plugin->cron     = 60;               // Period for cron to check this module (secs)
