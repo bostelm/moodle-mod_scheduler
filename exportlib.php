@@ -125,9 +125,9 @@ function scheduler_get_export_fields() {
     $result[] = new scheduler_student_field('studentfullname', 'fullname', 25);
     $result[] = new scheduler_student_field('studentfirstname', 'firstname');
     $result[] = new scheduler_student_field('studentlastname', 'lastname');
-    $result[] = new scheduler_student_field('studentemail', 'email');
+    $result[] = new scheduler_student_field('studentemail', 'email', 0, true);
     $result[] = new scheduler_student_field('studentusername', 'username');
-    $result[] = new scheduler_student_field('studentidnumber', 'idnumber');
+    $result[] = new scheduler_student_field('studentidnumber', 'idnumber', 0, true);
 
     $pfields = profile_get_custom_fields();
     foreach ($pfields as $id => $field) {
@@ -312,11 +312,13 @@ class scheduler_student_field extends scheduler_export_field {
     protected $id;
     protected $studfield;
     protected $typicalwidth;
+    protected $idfield;
 
-    public function __construct($id, $studfield, $typicalwidth=0) {
+    public function __construct($id, $studfield, $typicalwidth = 0, $idfield = false) {
         $this->id = $id;
         $this->studfield = $studfield;
         $this->typicalwidth = $typicalwidth;
+        $this->idfield = $idfield;
     }
 
     public function get_id() {
@@ -325,6 +327,14 @@ class scheduler_student_field extends scheduler_export_field {
 
     public function get_group() {
         return 'student';
+    }
+
+    public function is_available(scheduler_instance $scheduler) {
+        if (!$this->idfield) {
+            return true;
+        }
+        $ctx = $scheduler->get_context();
+        return has_capability('moodle/site:viewuseridentity', $ctx);
     }
 
     public function get_typical_width(scheduler_instance $scheduler) {
