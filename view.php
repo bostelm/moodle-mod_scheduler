@@ -33,7 +33,7 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 $defaultsubpage = groups_get_activity_groupmode($cm) ? 'myappointments' : 'allappointments';
 $subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
-require_login($course->id, false, $cm);
+require_login($course->id, true, $cm);
 $context = context_module::instance($cm->id);
 
 // Initialize $PAGE, compute blocks.
