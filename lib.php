@@ -54,6 +54,9 @@ function scheduler_add_instance($data, $mform = null) {
 
     scheduler_grade_item_update($data);
 
+    $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
+    \core_completion\api::update_completion_date_event($data->coursemodule, 'scheduler', $data->id, $completiontimeexpected);
+
     return $data->id;
 }
 
@@ -82,6 +85,9 @@ function scheduler_update_instance($data, $mform) {
 
     // Update grade item and grades.
     scheduler_update_grades($data);
+
+    $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
+    \core_completion\api::update_completion_date_event($data->coursemodule, 'scheduler', $data->id, $completiontimeexpected);
 
     return true;
 }
@@ -710,5 +716,35 @@ function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
     }
 
     send_stored_file($file, 0, 0, $forcedownload, $options);
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_scheduler_core_calendar_provide_event_action(calendar_event $event,
+                                                            \core_calendar\action_factory $factory) {
+    $cm = get_fast_modinfo($event->courseid)->instances['scheduler'][$event->instance];
+
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
+    }
+
+    return $factory->create_instance(
+            get_string('view'),
+            new \moodle_url('/mod/scheduler/view.php', ['id' => $cm->id]),
+            1,
+            true
+    );
 }
 
