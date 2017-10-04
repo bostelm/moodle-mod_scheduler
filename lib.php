@@ -54,8 +54,10 @@ function scheduler_add_instance($data, $mform = null) {
 
     scheduler_grade_item_update($data);
 
-    $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
-    \core_completion\api::update_completion_date_event($data->coursemodule, 'scheduler', $data->id, $completiontimeexpected);
+    if (class_exists('\core_completion\api')) {
+        $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
+        \core_completion\api::update_completion_date_event($data->coursemodule, 'scheduler', $data->id, $completiontimeexpected);
+    }
 
     return $data->id;
 }
@@ -86,8 +88,10 @@ function scheduler_update_instance($data, $mform) {
     // Update grade item and grades.
     scheduler_update_grades($data);
 
-    $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
-    \core_completion\api::update_completion_date_event($data->coursemodule, 'scheduler', $data->id, $completiontimeexpected);
+    if (class_exists('\core_completion\api')) {
+        $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
+        \core_completion\api::update_completion_date_event($data->coursemodule, 'scheduler', $data->id, $completiontimeexpected);
+    }
 
     return true;
 }
