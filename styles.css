@@ -54,6 +54,9 @@ div .path-mod-scheduler .appointmentnote {
     margin-right: auto;
     background-color: #eee;
     padding: 0.5em;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 
 /* Reduce space usage by single buttons in table cells */
