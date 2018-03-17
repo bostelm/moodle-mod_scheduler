@@ -58,8 +58,8 @@ Feature: Teacher can add slots to a scheduler activity
     And I set the following fields to these values:
       | starttime[year]  | 2050  |
       | duration         | -1    |
-    And I click on "Save changes" "button"
-    And I should see "Slot duration must be between"
+    When I click on "Save changes" "button"
+    Then I should see "Slot duration must be between"
     And I set the following fields to these values:
       | duration         | 10    |
       | exclusivity      | -10   |
