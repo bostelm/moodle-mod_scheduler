@@ -186,6 +186,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
     /**
      * Format a user-entered "note" on a slot or appointment, adjusting any links to embedded files.
+     * The "note" may also be the booking instructions.
      *
      * @param string $content content of the note
      * @param int $format format of the note
@@ -1003,8 +1004,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             if ($ai->scheduler->has_bookinginstructions()) {
                 $row = new html_table_row();
                 $cell1 = new html_table_cell(get_string('bookinginstructions', 'scheduler'));
-                $cell2 = new html_table_cell(format_text($ai->scheduler->bookinginstructions,
-                                                         $ai->scheduler->bookinginstructionsformat));
+                $note = $this->format_notes($ai->scheduler->bookinginstructions, $ai->scheduler->bookinginstructionsformat,
+                                            $ai->scheduler->get_context(), 'bookinginstructions', 0);
+                $cell2 = new html_table_cell($note);
                 $row->cells = array($cell1, $cell2);
                 $t->data[] = $row;
             }
