@@ -15,8 +15,9 @@ defined('MOODLE_INTERNAL') || die();
  * Add a session (confirmed action) from data entered into the add session form
  * @param scheduler_instance $scheduler
  * @param mixed $formdata
+ * @param moodle_url $returnurl the URL to redirect to after the action has been performed
  */
-function scheduler_action_doaddsession($scheduler, $formdata) {
+function scheduler_action_doaddsession($scheduler, $formdata, moodle_url $returnurl) {
 
     global $DB, $output;
 
@@ -90,22 +91,24 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
                 }
 
                 if ($conflicts) {
+                    $conflictmsg = '';
                     $cl = new scheduler_conflict_list();
                     $cl->add_conflicts($conflicts);
                     if (!$resolvable) {
-                        print_string('conflictingslots', 'scheduler', userdate($data->timestart));
-                        echo $output->doc_link('mod/scheduler/conflict', '', true);
-                        echo $output->render($cl);
+                        $conflictmsg .= get_string('conflictingslots', 'scheduler', userdate($data->timestart));
+                        $conflictmsg .= $output->doc_link('mod/scheduler/conflict', '', true);
+                        $conflictmsg .= $output->render($cl);
                     } else { // We force, so delete all conflicting before inserting.
                         foreach ($conflicts as $conflict) {
                             $cslot = $scheduler->get_slot($conflict->id);
                             \mod_scheduler\event\slot_deleted::create_from_slot($cslot, 'addsession-conflict')->trigger();
                             $cslot->delete();
                         }
-                        print_string('deletedconflictingslots', 'scheduler', userdate($data->timestart));
-                        echo $output->doc_link('mod/scheduler/conflict', '', true);
-                        echo $output->render($cl);
+                        $conflictmsg .= get_string('deletedconflictingslots', 'scheduler', userdate($data->timestart));
+                        $conflictmsg .= $output->doc_link('mod/scheduler/conflict', '', true);
+                        $conflictmsg .= $output->render($cl);
                     }
+                    \core\notification::warning($conflictmsg);
                 }
                 if (!$conflicts || $resolvable) {
                     $slotid = $DB->insert_record('scheduler_slots', $slot, true, true);
@@ -118,7 +121,12 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
             }
         }
     }
-    echo $output->action_message(get_string('slotsadded', 'scheduler', $countslots));
+
+    $messagetype = ($countslots > 0) ? \core\output\notification::NOTIFY_SUCCESS : \core\output\notification::NOTIFY_INFO;
+    $message = get_string('slotsadded', 'scheduler', $countslots);
+    \core\notification::add($message, $messagetype);
+
+    redirect($returnurl);
 }
 
 /**
@@ -126,10 +134,11 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
  *
  * @param scheduler_instance $scheduler
  * @param mixed $formdata
+ * @param moodle_url $returnurl the URL to redirect to after the action has been performed
  */
-function scheduler_action_dosendmessage($scheduler, $formdata) {
+function scheduler_action_dosendmessage($scheduler, $formdata, $returnurl) {
 
-    global $DB, $USER, $output;
+    global $DB, $USER;
 
     $data = (object) $formdata;
 
@@ -166,18 +175,19 @@ function scheduler_action_dosendmessage($scheduler, $formdata) {
         }
     }
 
-    echo $output->action_message(get_string('messagesent', 'scheduler', $cnt));
+    $message = get_string('messagesent', 'scheduler', $cnt);
+    $messagetype = \core\output\notification::NOTIFY_SUCCESS;
+    redirect($returnurl, $message, 0, $messagetype);
 }
 
 /**
- * Delete slots (after UI button has beebn pushed)
+ * Delete slots (after UI button has been pushed)
  *
  * @param scheduler_slot[] $slots list of slots to be deleted
  * @param string $action description of the action
+ * @param moodle_url $returnurl the URL to redirect to after the action has been performed
  */
-function scheduler_delete_slots_from_ui(array $slots, $action) {
-    global $output;
-
+function scheduler_action_delete_slots(array $slots, $action, moodle_url $returnurl) {
     $cnt = 0;
     foreach ($slots as $slot) {
         \mod_scheduler\event\slot_deleted::create_from_slot($slot, $action)->trigger();
@@ -186,24 +196,26 @@ function scheduler_delete_slots_from_ui(array $slots, $action) {
     }
 
     if ($cnt == 1) {
-        $msg = get_string('oneslotdeleted', 'scheduler');
+        $message = get_string('oneslotdeleted', 'scheduler');
     } else {
-        $msg = get_string('slotsdeleted', 'scheduler', $cnt);
+        $message = get_string('slotsdeleted', 'scheduler', $cnt);
     }
-    echo $output->action_message($msg);
+    $messagetype = ($cnt > 0) ? \core\output\notification::NOTIFY_SUCCESS : \core\output\notification::NOTIFY_INFO;
+    \core\notification::add($message, $messagetype);
+    redirect($returnurl);
 }
 
 // Require valid session key for all actions.
 require_sesskey();
 
 // We first have to check whether some action needs to be performed.
+// Any of the following actions must issue a redirect when finished.
 switch ($action) {
     /************************************ Deleting a slot ***********************************************/
     case 'deleteslot': {
         $slotid = required_param('slotid', PARAM_INT);
         $slot = $scheduler->get_slot($slotid);
-        scheduler_delete_slots_from_ui(array($slot), $action);
-        break;
+        scheduler_action_delete_slots(array($slot), $action, $viewurl);
     }
     /************************************ Deleting multiple slots ***********************************************/
     case 'deleteslots': {
@@ -215,8 +227,7 @@ switch ($action) {
                 $slots[] = $scheduler->get_slot($slotid);
             }
         }
-        scheduler_delete_slots_from_ui($slots, $action);
-        break;
+        scheduler_action_delete_slots($slots, $action, $viewurl);
     }
     /************************************ Students were seen ***************************************************/
     case 'saveseen': {
@@ -231,7 +242,7 @@ switch ($action) {
             }
         }
         $slot->save();
-        break;
+        redirect($viewurl);
     }
     /************************************ Revoking all appointments to a slot ***************************************/
     case 'revokeall': {
@@ -257,7 +268,7 @@ switch ($action) {
         }
 
         $slot->save();
-        break;
+        redirect($viewurl);
     }
 
     /************************************ Toggling to unlimited group ***************************************/
@@ -267,7 +278,7 @@ switch ($action) {
         $slot->id = $slotid;
         $slot->exclusivity = 0;
         $DB->update_record('scheduler_slots', $slot);
-        break;
+        redirect($viewurl);
     }
 
     /************************************ Toggling to single student ******************************************/
@@ -277,34 +288,30 @@ switch ($action) {
         $slot->id = $slotid;
         $slot->exclusivity = 1;
         $DB->update_record('scheduler_slots', $slot);
-        break;
+        redirect($viewurl);
     }
 
     /************************************ Deleting all slots ***************************************************/
     case 'deleteall':{
         require_capability('mod/scheduler:manageallappointments', $context);
         $slots = $scheduler->get_all_slots();
-        scheduler_delete_slots_from_ui($slots, $action);
-        break;
+        scheduler_action_delete_slots($slots, $action, $viewurl);
     }
     /************************************ Deleting unused slots *************************************************/
     case 'deleteunused':{
         $slots = $scheduler->get_slots_without_appointment($USER->id);
-        scheduler_delete_slots_from_ui($slots, $action);
-        break;
+        scheduler_action_delete_slots($slots, $action, $viewurl);
     }
     /************************************ Deleting unused slots (all teachers) ************************************/
     case 'deleteallunused': {
         require_capability('mod/scheduler:manageallappointments', $context);
         $slots = $scheduler->get_slots_without_appointment();
-        scheduler_delete_slots_from_ui($slots, $action);
-        break;
+        scheduler_action_delete_slots($slots, $action, $viewurl);
     }
     /************************************ Deleting current teacher's slots ***************************************/
     case 'deleteonlymine': {
         $slots = $scheduler->get_slots_for_teacher($USER->id);
-        scheduler_delete_slots_from_ui($slots, $action);
-        break;
+        scheduler_action_delete_slots($slots, $action, $viewurl);
     }
     /************************************ Mark as seen now *******************************************************/
     case 'markasseennow': {
@@ -337,7 +344,7 @@ switch ($action) {
         $slot = $scheduler->get_slot($slotid);
         \mod_scheduler\event\slot_added::create_from_slot($slot)->trigger();
 
-        break;
+        redirect($viewurl);
     }
 }
 

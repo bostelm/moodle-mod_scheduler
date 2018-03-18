@@ -358,18 +358,6 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render an action message (such as "1 slot added").
-     *
-     * @param string $message the message
-     * @param string $type type of the message
-     * @return string the rendered message
-     */
-    public function action_message($message, $type = 'success') {
-        $classes = 'actionmessage '.$type;
-        return html_writer::div($message, $classes);
-    }
-
-    /**
      * Render a table of slots
      *
      * @param scheduler_slot_table $slottable the table to rended
