@@ -40,6 +40,17 @@ if ($data) {
             $selectedfields[] = $field;
             $field->set_renderer($output);
         }
+
+        foreach ($mform->get_custom_export_fields() as $customexportfield) {
+            $customexportfieldname = 'field-'.$customexportfield;
+            if (strstr($field->get_id(), $customexportfield) ) {
+
+                if ( (isset ($data->$customexportfieldname))  && ($data->$customexportfieldname == 1) ) {
+                    $selectedfields[] = $field;
+                    $field->set_renderer($output);
+                }
+            }
+        }
     }
     $userid = $USER->id;
     if (isset($data->includewhom) && $data->includewhom == 'all') {

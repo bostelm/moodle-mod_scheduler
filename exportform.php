@@ -29,6 +29,12 @@ class scheduler_export_form extends moodleform {
     protected $scheduler;
 
     /**
+     * @var custom_export_fields  An array of custom fields that are to be exported that are not part of the normal data exported.
+     *
+     */
+    protected $customexportfields;
+
+    /**
      * Create a new export settings form.
      *
      * @param string $action
@@ -37,6 +43,10 @@ class scheduler_export_form extends moodleform {
      */
     public function __construct($action, scheduler_instance $scheduler, $customdata=null) {
         $this->scheduler = $scheduler;
+
+        // Any custom export fields outside of the normal data.
+        $this->customexportfields = array ('coursegroup');
+
         parent::__construct($action, $customdata);
     }
 
@@ -82,6 +92,17 @@ class scheduler_export_form extends moodleform {
         $this->add_exportfield_group('slot', 'slot');
         $this->add_exportfield_group('student', 'student');
         $this->add_exportfield_group('appointment', 'appointment');
+
+        // Get any custom export fields (for special cases such as the course group).
+        foreach ($this->customexportfields as $customexportfield) {
+            $inputid = 'field-'.$customexportfield;
+            $label = get_string($customexportfield, 'scheduler');
+            $checkboxes[] = $mform->createElement('checkbox', $inputid, '', $label);
+            $mform->setDefault($inputid, 0);
+        }
+
+        $grouplabel = get_string('customformlabel', 'scheduler');
+        $mform->addGroup($checkboxes, 'fields-custom', $grouplabel, null, false);
 
         $mform->setDefault('field-date', 1);
         $mform->setDefault('field-starttime', 1);
@@ -139,11 +160,13 @@ class scheduler_export_form extends moodleform {
 
         foreach ($fields as $field) {
             if ($field->get_group() == $groupid && $field->is_available($this->scheduler)) {
-                $inputid = 'field-'.$field->get_id();
-                $label = $field->get_formlabel($this->scheduler);
-                $checkboxes[] = $mform->createElement('checkbox', $inputid, '', $label);
+
+                    $inputid = 'field-'.$field->get_id();
+                    $label = $field->get_formlabel($this->scheduler);
+                    $checkboxes[] = $mform->createElement('checkbox', $inputid, '', $label);
             }
         }
+
         $grouplabel = get_string($labelid, 'scheduler');
         $mform->addGroup($checkboxes, 'fields-'.$groupid, $grouplabel, null, false);
     }
@@ -154,4 +177,29 @@ class scheduler_export_form extends moodleform {
         return $errors;
     }
 
+    /**
+     * Get array of custom export data fields.
+     *
+     * @return array
+     */
+    public function get_custom_export_fields() {
+        return $this->customexportfields;
+    }
+
+    /**
+     * Check if a given value is in the array of custom export data fields.
+     *
+     * @param string $groupvaluetocheck
+     * 
+     * @return bool
+     */
+    public function check_custom_export_fields($valuetocheck) {
+
+        foreach ($this->customexportfields as $customexportfield) {
+            if (strstr ($valuetocheck, $customexportfield)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
