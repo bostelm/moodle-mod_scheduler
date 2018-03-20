@@ -41,6 +41,7 @@ if ($data) {
             $field->set_renderer($output);
         }
 
+        // Check if field is part of any custom export fields selected for display.
         foreach ($mform->get_custom_export_fields() as $customexportfield) {
             $customexportfieldname = 'field-'.$customexportfield;
             if (strstr($field->get_id(), $customexportfield) ) {
