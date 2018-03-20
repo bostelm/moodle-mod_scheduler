@@ -351,6 +351,8 @@ if ($action == 'sendmessage') {
 \mod_scheduler\event\appointment_list_viewed::create_from_scheduler($scheduler)->trigger();
 
 
+
+
 // Print top tabs.
 
 $actionurl = new moodle_url($taburl, array('offset' => $offset, 'sesskey' => sesskey()));
@@ -370,6 +372,7 @@ if ($groupmode) {
     if ($subpage == 'allappointments') {
         groups_print_activity_menu($cm, $taburl);
     } else {
+        groups_print_activity_menu($cm, $taburl);
         $a = new stdClass();
         $a->groupmode = get_string($groupmode == VISIBLEGROUPS ? 'groupsvisible' : 'groupsseparate');
         $groupnames = array();
@@ -385,7 +388,6 @@ if ($groupmode) {
 
 // Print intro.
 echo $output->mod_intro($scheduler);
-
 
 if ($subpage == 'allappointments') {
     $teacherid = 0;
@@ -415,7 +417,6 @@ echo $output->heading(get_string('slots', 'scheduler'));
 // Print instructions and button for creating slots.
 $key = ($slots) ? 'addslot' : 'welcomenewteacher';
 echo html_writer::div(get_string($key, 'scheduler'));
-
 
 $commandbar = new scheduler_command_bar();
 $commandbar->title = get_string('actions', 'scheduler');
