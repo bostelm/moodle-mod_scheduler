@@ -359,8 +359,6 @@ if ($action == 'sendmessage') {
 \mod_scheduler\event\appointment_list_viewed::create_from_scheduler($scheduler)->trigger();
 
 
-
-
 // Print top tabs.
 
 $actionurl = new moodle_url($viewurl, array('sesskey' => sesskey()));

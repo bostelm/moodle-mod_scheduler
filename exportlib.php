@@ -143,11 +143,9 @@ function scheduler_get_export_fields() {
     $result[] = new scheduler_filecount_field();
 
     // Get all course groups as columns.
-    // scheduler_get_export_fields
     global $PAGE;
     $coursegroups =  groups_get_all_groups($PAGE->course->id);
     foreach ($coursegroups as $coursegroup) {
-        // echo print_r($coursegroup, 1) . '<br>';
         $result[] = new scheduler_course_group_field('coursegroup' . $coursegroup->id, $coursegroup->name, $coursegroup->id, 'id');
     }
 
@@ -158,7 +156,7 @@ function scheduler_get_export_fields() {
  * Export field: A custom field for course groups.
  *
  * @package    mod_scheduler
- * @copyright  2017 Henning Bostelmann and others (see README.txt)
+ * @copyright  2018 Manoj Solanki (Coventry University)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_course_group_field extends scheduler_export_field {
@@ -193,8 +191,6 @@ class scheduler_course_group_field extends scheduler_export_field {
             return '';
         }
         $student = $appointment->get_student();
-        // echo 'Student: <br>' . print_r ($student, 1) . '<br>';
-        // echo ' For student: ' . $student->username. ' with id ' . $student->{$this->studfield} . ', value is ' . groups_is_member($this->groupid, $student->{$this->studfield});
         $result = get_string('coursegroupstudentisnotmemberof', 'scheduler');
         if (groups_is_member($this->groupid, $student->{$this->studfield})) {
             $result = get_string('coursegroupstudentismemberof', 'scheduler');
@@ -1379,7 +1375,6 @@ class scheduler_export {
 
         // Output the data rows.
         foreach ($slots as $slot) {
-            // echo 'Slot: ' . print_r ($slot, 1) . '<br><br><br>';
             $appts = $slot->get_appointments($this->studfilter);
             if ($mode == 'appointmentsgrouped') {
                 if ($appts || $includeempty) {

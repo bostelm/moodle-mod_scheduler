@@ -160,10 +160,9 @@ class scheduler_export_form extends moodleform {
 
         foreach ($fields as $field) {
             if ($field->get_group() == $groupid && $field->is_available($this->scheduler)) {
-
-                    $inputid = 'field-'.$field->get_id();
-                    $label = $field->get_formlabel($this->scheduler);
-                    $checkboxes[] = $mform->createElement('checkbox', $inputid, '', $label);
+                $inputid = 'field-'.$field->get_id();
+                $label = $field->get_formlabel($this->scheduler);
+                $checkboxes[] = $mform->createElement('checkbox', $inputid, '', $label);
             }
         }
 
