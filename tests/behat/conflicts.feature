@@ -54,10 +54,10 @@ Feature: Teachers are warned about scheduling conflicts
       | starttime[minute] | 55 |      
     And I click on "Save changes" "button"
     Then I should see "conflict"
-    And "Save changes" "button" should exist
-    And I should see "10:00 AM"
     And I should see "in course C1, scheduler Test scheduler B"
+    And I should see "10:00 AM"
     And I should not see "2:00 AM"
+    And "Save changes" "button" should exist
    
     When I set the following fields to these values:
       | starttime[hour]   | 09 |      
@@ -94,10 +94,10 @@ Feature: Teachers are warned about scheduling conflicts
       | duration          | 5  |      
     And I click on "Save changes" "button"
     Then I should see "conflict"
-    And "Save changes" "button" should exist
     And I should see "6:00 AM"
     And I should see "in this scheduler"
     And I should not see "3:00 AM"
+    And "Save changes" "button" should exist
      
     When I set the following fields to these values:
       | starttime[hour]   | 5  |      
@@ -106,10 +106,10 @@ Feature: Teachers are warned about scheduling conflicts
       | Teacher           | Teacher 2 |      
     And I click on "Save changes" "button"
     Then I should see "conflict"
-    And "Save changes" "button" should exist
     And I should see "5:00 AM"
     And I should see "in course C1, scheduler Test scheduler B"
     And I should not see "3:00 AM"
+    And "Save changes" "button" should exist
 
     When I set the following fields to these values:
       | starttime[hour]   | 6  |      
@@ -118,9 +118,9 @@ Feature: Teachers are warned about scheduling conflicts
       | Teacher           | Teacher 2 |      
     And I click on "Save changes" "button"
     Then I should not see "conflict"
-    And "Save changes" "button" should not exist
     And I should see "slot updated"
     And "6:40 AM" "table_row" should exist
+    And "Save changes" "button" should not exist
     And I log out
     
     

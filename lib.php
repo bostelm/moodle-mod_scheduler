@@ -675,7 +675,7 @@ function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
 
         } else if ($filearea === 'bookinginstructions') {
             $caps = array('moodle/course:manageactivities', 'mod/scheduler:appoint');
-            if (!has_any_capability($caps)) {
+            if (!has_any_capability($caps, $context)) {
                 return false;
             }
 

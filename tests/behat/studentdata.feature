@@ -75,13 +75,13 @@ Feature: Student-supplied data
     Then I should see "Student 1" in the "3:00 AM" "table_row"
     And I should see "Student 2" in the "4:00 AM" "table_row"
     
-    When I click on "Student 1" "link" in the "3:00 AM" "table_row"
+    When I click on "Student 1" "text" in the "3:00 AM" "table_row"
     Then I should see "Student 1"
     And I should see "Joe"
     And I should not see "studentfile.txt"
 
     When I click on "Continue" "button"
-    And I click on "Student 2" "link" in the "4:00 AM" "table_row"
+    And I click on "Student 2" "text" in the "4:00 AM" "table_row"
     Then I should see "Student 2"
     And I should see "Jill"
     And I should see "studentfile.txt"
