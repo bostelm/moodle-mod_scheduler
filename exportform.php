@@ -29,8 +29,7 @@ class scheduler_export_form extends moodleform {
     protected $scheduler;
 
     /**
-     * @var custom_export_fields  An array of custom fields that are to be exported that are not part of the normal data exported.
-     *
+     * @var customexportfields  An array of custom fields that are to be exported that are not part of the normal data exported.
      */
     protected $customexportfields;
 
