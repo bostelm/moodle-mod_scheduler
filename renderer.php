@@ -364,6 +364,8 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      * @return string the HTML output
      */
     public function render_scheduler_slot_table(scheduler_slot_table $slottable) {
+        global $DB;
+
         $table = new html_table();
 
         if ($slottable->showslot) {
@@ -465,6 +467,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             }
             if ($slottable->showactions) {
                 $actions = '';
+                if ($slottable->scheduler->uses_roles()) {
+                    $actions .= get_string('role') . ': <strong>' . $DB->get_field('scheduler_roles', 'rname', array('id' => $slot->roleid)) . '</strong>&nbsp;&nbsp;';
+                }
                 if ($slot->canedit) {
                     $buttonurl = new moodle_url($slottable->actionurl,
                                      array('what' => 'editbooking', 'appointmentid' => $slot->appointmentid));
@@ -539,6 +544,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 } else {
                     $name = fullname($student->user);
                 }
+                if (!empty($student->roles)) {
+                    $name .= ' (' . join(', ', $student->roles) . ')';
+                }
                 $studicons = '';
                 $studprovided = array();
                 if ($student->notesprovided) {
@@ -586,12 +594,13 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_scheduler_slot_booker(scheduler_slot_booker $booker) {
+        global $USER;
 
         $table = new html_table();
-        $table->head  = array( get_string('date', 'scheduler'), get_string('start', 'scheduler'),
-                        get_string('end', 'scheduler'), get_string('location', 'scheduler'),
-                        get_string('comments', 'scheduler'), s($booker->scheduler->get_teacher_name()),
-                        get_string('groupsession', 'scheduler'), '');
+        $table->head = array(get_string('date', 'scheduler'), get_string('start', 'scheduler'),
+            get_string('end', 'scheduler'), get_string('location', 'scheduler'),
+            get_string('comments', 'scheduler'), s($booker->scheduler->get_teacher_name()),
+            get_string('groupsession', 'scheduler'), '');
         $table->align = array ('left', 'left', 'left', 'left', 'left', 'left', 'left', 'left');
         $table->id = 'slotbookertable';
         $table->data = array();
@@ -602,62 +611,89 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $canappoint = false;
 
         foreach ($booker->slots as $slot) {
+            if (!$slot->notignoreconflictsstudents || ($slot->notignoreconflictsstudents 
+                    && !count($booker->scheduler->get_conflicts($slot->starttime, 
+                            $slot->endtime, 0, $USER->id)))) {
 
-            $rowdata = array();
+                $rowdata = array();
 
-            $startdate = $this->userdate($slot->starttime);
-            $starttime = $this->usertime($slot->starttime);
-            $endtime = $this->usertime($slot->endtime);
-            // Simplify display of dates, start and end times.
-            if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
-                // If this row exactly matches previous, there's nothing to display.
-                $startdatestr = '';
-                $starttimestr = '';
-                $endtimestr = '';
-            } else if ($startdate == $previousdate) {
-                // If this date matches previous date, just display times.
-                $startdatestr = '';
-                $starttimestr = $starttime;
-                $endtimestr = $endtime;
-            } else {
-                // Otherwise, display all elements.
-                $startdatestr = $startdate;
-                $starttimestr = $starttime;
-                $endtimestr = $endtime;
+                $startdate = $this->userdate($slot->starttime);
+                $starttime = $this->usertime($slot->starttime);
+                $endtime = $this->usertime($slot->endtime);
+                // Simplify display of dates, start and end times.
+                if ($startdate == $previousdate && $starttime == $previoustime && $endtime == $previousendtime) {
+                    // If this row exactly matches previous, there's nothing to display.
+                    $startdatestr = '';
+                    $starttimestr = '';
+                    $endtimestr = '';
+                } else if ($startdate == $previousdate) {
+                    // If this date matches previous date, just display times.
+                    $startdatestr = '';
+                    $starttimestr = $starttime;
+                    $endtimestr = $endtime;
+                } else {
+                    // Otherwise, display all elements.
+                    $startdatestr = $startdate;
+                    $starttimestr = $starttime;
+                    $endtimestr = $endtime;
+                }
+
+                $rowdata[] = $startdatestr;
+                $rowdata[] = $starttimestr;
+                $rowdata[] = $endtimestr;
+
+                $rowdata[] = format_string($slot->location);
+
+                $rowdata[] = $this->format_notes($slot->notes, $slot->notesformat, $booker->scheduler->get_context(),
+                                                 'slotnote', $slot->slotid);
+
+                $rowdata[] = $this->user_profile_link($booker->scheduler, $slot->teacher);
+
+                $groupinfo = $slot->bookedbyme ? get_string('complete', 'scheduler') : $slot->groupinfo;
+                if ($slot->otherstudents) {
+                    $groupinfo .= $this->render($slot->otherstudents);
+                }
+
+                $rowdata[] = $groupinfo;
+
+                if ($slot->canbook) {
+                    $bookaction = $booker->scheduler->uses_bookingform() ? 'bookingform' : 'bookslot';
+                    $form = html_writer::start_tag('form', array('action' => $booker->actionurl));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'id', 'value' => optional_param('id', 0, PARAM_INT)));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'sesskey', 'value' => sesskey()));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'what', 'value' => $bookaction));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'slotid', 'value' => $slot->slotid));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'notignoreconflictsstudents', 'value' => $slot->notignoreconflictsstudents));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'starttime', 'value' => $slot->starttime));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'endtime', 'value' => $slot->endtime));
+                    $form .= html_writer::empty_tag('input', array('type' => 'hidden',
+                        'name' => 'teacherid', 'value' => $slot->teacher->id));
+                    $roles = get_scheduler_roles(optional_param('id', 0, PARAM_INT),
+                            true, true, $USER->id);
+                    if ($booker->scheduler->uses_roles() && $roles) {
+                        $form .= html_writer::select($roles, 'roleid', null, null);
+                    }
+                    $form .= html_writer::tag('button', get_string('bookslot', 'scheduler'),
+                            array('type' => 'submit', 'class' => 'btn btn-secondary mr-5'));
+                    $form .= html_writer::end_tag('form');
+                    $rowdata[] = $form;
+                } else {
+                    $rowdata[] = '';
+                }
+
+                $table->data[] = $rowdata;
+
+                $previoustime = $starttime;
+                $previousendtime = $endtime;
+                $previousdate = $startdate;
             }
-
-            $rowdata[] = $startdatestr;
-            $rowdata[] = $starttimestr;
-            $rowdata[] = $endtimestr;
-
-            $rowdata[] = format_string($slot->location);
-
-            $rowdata[] = $this->format_notes($slot->notes, $slot->notesformat, $booker->scheduler->get_context(),
-                                             'slotnote', $slot->slotid);
-
-            $rowdata[] = $this->user_profile_link($booker->scheduler, $slot->teacher);
-
-            $groupinfo = $slot->bookedbyme ? get_string('complete', 'scheduler') : $slot->groupinfo;
-            if ($slot->otherstudents) {
-                $groupinfo .= $this->render($slot->otherstudents);
-            }
-
-            $rowdata[] = $groupinfo;
-
-            if ($slot->canbook) {
-                $bookaction = $booker->scheduler->uses_bookingform() ? 'bookingform' : 'bookslot';
-                $bookurl = new moodle_url($booker->actionurl, array('what' => $bookaction, 'slotid' => $slot->slotid));
-                $button = new single_button($bookurl, get_string('bookslot', 'scheduler'));
-                $rowdata[] = $this->render($button);
-            } else {
-                $rowdata[] = '';
-            }
-
-            $table->data[] = $rowdata;
-
-            $previoustime = $starttime;
-            $previousendtime = $endtime;
-            $previousdate = $startdate;
         }
 
         return html_writer::table($table);

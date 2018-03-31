@@ -32,14 +32,36 @@ class scheduler_appointment extends mvc_child_record_model {
         $this->data = new stdClass();
         $this->set_parent($slot);
         $this->data->slotid = $slot->get_id();
+        $this->data->roleid = 0;
         $this->data->attended = 0;
         $this->data->appointmentnoteformat = FORMAT_HTML;
         $this->data->teachernoteformat = FORMAT_HTML;
     }
 
     public function save() {
+        global $DB;
+
         $this->data->slotid = $this->get_parent()->get_id();
-        parent::save();
+        if (isset($_REQUEST['roleid']) && !empty($_REQUEST['roleid'])) {
+            if (!is_array($_REQUEST['roleid'])) {
+                $this->data->roleid = intval($_REQUEST['roleid']);
+            } else {
+                if ($apps = array_values($DB->get_records('scheduler_appointment', 
+                        array('slotid' => intval($_REQUEST['slotid']))))) {
+                    foreach ($apps as $i => $app) {
+                        if ($app->studentid == $this->data->studentid) {
+                            $this->data->roleid = intval($_REQUEST['roleid'][$i]);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        $uses_roles = $this->get_scheduler()->uses_roles();
+        if (!$uses_roles || ($this->data->roleid && $uses_roles && 
+                check_slot_role_limit($this->data->roleid, $this->data->studentid))) {
+            parent::save();
+        }
         $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $this->studentid);
     }

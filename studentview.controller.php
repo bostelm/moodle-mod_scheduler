@@ -77,6 +77,7 @@ function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $fo
     foreach ($userstobook as $studentid) {
         $appointment = $slot->create_appointment();
         $appointment->studentid = $studentid;
+        $appointment->roleid = 0;
         $appointment->attended = 0;
         $appointment->timecreated = time();
         $appointment->timemodified = time();
@@ -164,8 +165,15 @@ if ($action == 'bookslot') {
 
     // Get the request parameters.
     $slotid = required_param('slotid', PARAM_INT);
-
-    scheduler_book_slot($scheduler, $slotid, $USER->id, $appointgroup, null, null, $returnurl);
+    $roleid = optional_param('roleid', 0, PARAM_INT);
+    $notignoreconflictsstudents = optional_param('notignoreconflictsstudents', 0, PARAM_INT);
+    if (!$roleid || ($roleid && $scheduler->uses_roles() && check_slot_role_limit($roleid, $USER->id))) {
+        if (!$notignoreconflictsstudents || ($notignoreconflictsstudents && count($scheduler->get_conflicts(
+                optional_param('starttime', 0, PARAM_INT), optional_param('endtime', 0, PARAM_INT),
+                0, $USER->id)) > 0)) {
+            scheduler_book_slot($scheduler, $slotid, $USER->id, $appointgroup, null, null, $returnurl);
+        }
+    }
 }
 
 /******************************************** Show details of booking *******************************************/

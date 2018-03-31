@@ -289,6 +289,15 @@ class scheduler_instance extends mvc_record_model {
     }
 
     /**
+     * Is scheduler supports roles or not
+     * @return int|boolean
+     */
+    public function uses_roles() {
+        return (isset($this->data->rolessupport) && 
+                !empty($this->data->rolessupport)) ? intval($this->data->rolessupport) : 0;
+    }
+
+    /**
      * Whether this scheduler uses booking forms at all
      * @return bool whether the booking form is used
      */
@@ -899,8 +908,11 @@ class scheduler_instance extends mvc_record_model {
             $teacherscope = "";
         }
 
-        $studentjoin = ($student != 0) ? "JOIN {scheduler_appointment} a ON a.slotid = sl.id AND a.studentid = :studentid " : '';
-        $params['studentid'] = $student;
+        $studentjoin = '';
+        if ($student != 0) {
+            $studentjoin = "JOIN {scheduler_appointment} a ON a.slotid = sl.id AND a.studentid = :studentid ";
+            $params['studentid'] = $student;
+        }
 
         $timeclause = "( (sl.starttime <= :starttime1 AND sl.starttime + sl.duration * 60 > :starttime2) OR
                          (sl.starttime < :endtime1 AND sl.starttime + sl.duration * 60 >= :endtime2) OR

@@ -78,6 +78,7 @@ class scheduler_slot_table implements renderable {
         $slot->slotnote = $slotmodel->notes;
         $slot->slotnoteformat = $slotmodel->notesformat;
         $slot->teacher = $slotmodel->get_teacher();
+        $slot->roleid = $appointmentmodel->roleid;
         $slot->appointmentid = $appointmentmodel->id;
         if ($this->scheduler->uses_appointmentnotes()) {
             $slot->appointmentnote = $appointmentmodel->appointmentnote;
@@ -172,6 +173,8 @@ class scheduler_student_list implements renderable {
         } else {
             $student->grade = null;
         }
+        $student->roles = get_scheduler_user_roles($student->user->id, 
+                $appointment->get_scheduler()->get_id(), $appointment->__get('slotid'));
         $student->highlight = $highlight;
         $student->checked = $checked;
         $student->entryid = $appointment->id;
@@ -250,6 +253,7 @@ class scheduler_slot_booker implements renderable {
         $slot->canbook = $canbook;
         $slot->groupinfo = $groupinfo;
         $slot->teacher = $slotmodel->get_teacher();
+        $slot->notignoreconflictsstudents = $slotmodel->notignoreconflictsstudents;
         $slot->otherstudents = $otherstudents;
 
         $this->slots[] = $slot;

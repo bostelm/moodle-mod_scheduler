@@ -133,6 +133,8 @@ class scheduler_editappointment_form extends moodleform {
         $scheduler = $appointment->get_scheduler();
         $cid = $scheduler->context->id;
         $appointment->set_data($formdata);
+        $appointment->roleid = ($scheduler->uses_roles() && isset($formdata->roleid) && 
+                !empty($formdata->roleid)) ? intval($formdata->roleid) : 0;
         $appointment->attended = isset($formdata->attended);
         if ($scheduler->uses_appointmentnotes() && isset($formdata->appointmentnote_editor)) {
             $editor = $formdata->appointmentnote_editor;

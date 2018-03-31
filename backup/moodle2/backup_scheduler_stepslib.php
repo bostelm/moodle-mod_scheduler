@@ -42,7 +42,7 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
         $appointments = new backup_nested_element('appointments');
 
         $appointment = new backup_nested_element('appointment', array('id'), array(
-            'studentid', 'attended', 'grade',
+            'studentid', 'roleid', 'attended', 'grade',
             'appointmentnote', 'appointmentnoteformat', 'teachernote', 'teachernoteformat',
             'studentnote', 'studentnoteformat', 'timecreated', 'timemodified'));
 

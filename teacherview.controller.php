@@ -46,6 +46,8 @@ function scheduler_action_doaddsession($scheduler, $formdata, moodle_url $return
     $slot->notes = '';
     $slot->notesformat = FORMAT_HTML;
     $slot->timemodified = time();
+    $slot->notignoreconflictsstudents = (isset($data->notignoreconflictsstudents) 
+            && !empty($data->notignoreconflictsstudents)) ? 1 : 0;
 
     for ($d = 0; $d <= $fordays; $d ++) {
         $starttime = $startfrom + ($d * DAYSECS);

@@ -712,3 +712,87 @@ function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
     send_stored_file($file, 0, 0, $forcedownload, $options);
 }
 
+function get_scheduler_user_roles($userid, $schedulerid, $slotid) {
+    global $DB;
+
+    $ret = array();
+    $sql = 'SELECT sr.id,sr.rname '
+            . 'FROM {scheduler_appointment} sa LEFT JOIN {scheduler_roles} sr '
+            . 'ON sa.roleid = sr.id LEFT JOIN {scheduler_slots} ss '
+            . 'ON sa.slotid = ss.id LEFT JOIN {scheduler} s '
+            . 'ON ss.schedulerid = s.id '
+            . 'WHERE sa.studentid = ? AND s.id = ? AND sa.slotid = ?';
+    if ($roles = $DB->get_records_sql($sql, array($userid, $schedulerid, $slotid))) {
+        foreach ($roles as $roleid => $role) {
+            if (!empty($roleid)) {
+                $ret[$role->id] = $role->rname;
+            }
+        }
+    }
+
+    return $ret;
+}
+
+/**
+ * Get roles for course module
+ *
+ * @global stdClass $DB
+ * @param int $cmid Course module id
+ * @param boolean $simple
+ * @param boolean $checklimits
+ * @param boolean $userid
+ * @param string $key
+ * @return array
+ */
+function get_scheduler_roles($cmid, $simple = false, $checklimits = false, $userid = false, $key = 'rname') {
+    global $DB;
+
+    if ($cmid > 0) {
+        $sql = 'SELECT '
+            . 'sr.id, sr.* '
+            . 'FROM {scheduler_roles} sr '
+            . 'LEFT JOIN {scheduler} s '
+            . 'ON sr.schedulerid = s.id '
+            . 'LEFT JOIN {course_modules} cm '
+            . 'ON s.id = cm.instance '
+            . 'LEFT JOIN {modules} m '
+            . 'ON cm.module = m.id WHERE cm.id = ? AND m.name = ?';
+        $conditions = array($cmid, 'scheduler');
+        $array = array_values($DB->get_records_sql($sql, $conditions));
+        if ($simple) {
+            $ret = array();
+            foreach ($array as $item) {
+                $ret[$item->id] = $item->$key;
+            }
+            if ($checklimits) {
+                $tmp = $ret;
+                foreach (array_keys($tmp) as $roleid) {
+                    if (!check_slot_role_limit($roleid, $userid)) {
+                        unset($ret[$roleid]);
+                    }
+                }
+            }
+            return $ret;
+        }
+        return $array;
+    }
+
+    return array();
+}
+
+function check_slot_role_limit($roleid, $studentid = false) {
+    global $DB;
+
+    if ($role = $DB->get_record('scheduler_roles', array('id' => $roleid), '*', MUST_EXIST)) {
+        if ($role->rlimit > 0 && $studentid) {
+            $appointments = $DB->get_records('scheduler_appointment',
+                    array('roleid' => $roleid, 'studentid' => $studentid));
+            if (count($appointments) < $role->rlimit) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
