@@ -134,7 +134,7 @@ class scheduler_export_form extends moodleform {
     private function add_exportfield_group($groupid, $labelid) {
 
         $mform = $this->_form;
-        $fields = scheduler_get_export_fields();
+        $fields = scheduler_get_export_fields($this->scheduler);
         $checkboxes = array();
 
         foreach ($fields as $field) {

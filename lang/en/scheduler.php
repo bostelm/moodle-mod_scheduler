@@ -205,6 +205,9 @@ $string['field-teachernote'] = 'Confidential note (teacher only)';
 $string['field-studentnote'] = 'Message by student';
 $string['field-filecount'] = 'Number of uploaded files';
 $string['field-grade'] = 'Grade';
+$string['field-groupssingle'] = 'Groups';
+$string['field-groupssingle-label'] = 'Groups (one column)';
+$string['field-groupsmulti'] = 'Groups (several columns)';
 $string['fileformat'] = 'File format';
 $string['fileformat_help'] = 'The following file formats are available:
      <ul>

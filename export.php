@@ -32,7 +32,7 @@ if ($mform->is_cancelled()) {
 
 $data = $mform->get_data();
 if ($data) {
-    $availablefields = scheduler_get_export_fields();
+    $availablefields = scheduler_get_export_fields($scheduler);
     $selectedfields = array();
     foreach ($availablefields as $field) {
         $inputid = 'field-'.$field->get_id();
