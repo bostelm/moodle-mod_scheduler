@@ -389,16 +389,18 @@ echo $output->mod_intro($scheduler);
 
 if ($subpage == 'allappointments') {
     $teacherid = 0;
+    $slotgroup = $currentgroup;
 } else {
     $teacherid = $USER->id;
+    $slotgroup = 0;
     $subpage = 'myappointments';
 }
-$sqlcount = $scheduler->count_slots_for_teacher($teacherid, $currentgroup);
+$sqlcount = $scheduler->count_slots_for_teacher($teacherid, $slotgroup);
 
 $pagesize = 25;
 if ($offset == -1) {
     if ($sqlcount > $pagesize) {
-        $offsetcount = $scheduler->count_slots_for_teacher($teacherid, $currentgroup, true);
+        $offsetcount = $scheduler->count_slots_for_teacher($teacherid, $slotgroup, true);
         $offset = floor($offsetcount / $pagesize);
     } else {
         $offset = 0;
@@ -408,7 +410,7 @@ if ($offset * $pagesize >= $sqlcount && $sqlcount > 0) {
     $offset = floor(($sqlcount-1) / $pagesize);
 }
 
-$slots = $scheduler->get_slots_for_teacher($teacherid, $currentgroup, $offset * $pagesize, $pagesize);
+$slots = $scheduler->get_slots_for_teacher($teacherid, $slotgroup, $offset * $pagesize, $pagesize);
 
 echo $output->heading(get_string('slots', 'scheduler'));
 
