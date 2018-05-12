@@ -399,6 +399,10 @@ class scheduler_profile_field extends scheduler_export_field {
         return 'student';
     }
 
+    public function is_available(scheduler_instance $scheduler) {
+        return $this->field->is_visible();
+    }
+
     public function get_header(scheduler_instance $scheduler) {
         return format_string($this->field->field->name);
     }
