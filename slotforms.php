@@ -198,6 +198,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $mform->setDefault('ignoreconflicts', false);
         $mform->addHelpButton('ignoreconflicts', 'ignoreconflicts', 'scheduler');
 
+        $mform->addElement('checkbox', 'notignoreconflictsstudents', get_string('notignoreconflictsstudents', 'scheduler'));
+        $mform->setDefault('notignoreconflictsstudents', false);
+        $mform->addHelpButton('notignoreconflictsstudents', 'notignoreconflictsstudents', 'scheduler');
+
         // Common fields.
         $this->add_base_fields();
 
@@ -259,6 +263,11 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         // Tickbox to remove the student
         $repeatarray[] = $mform->createElement('advcheckbox', 'deletestudent', '', get_string('deleteonsave', 'scheduler'));
 
+        if ($this->scheduler->uses_roles()) {
+            if ($roles = get_scheduler_roles(optional_param('id', 0, PARAM_INT), true)) {
+                $repeatarray[] = $mform->createElement('select', 'roleid', get_string('role'), $roles);
+            }
+        }
 
         if (isset($this->_customdata['repeats'])) {
             $repeatno = $this->_customdata['repeats'];
@@ -321,11 +330,22 @@ class scheduler_editslot_form extends scheduler_slotform_base {
             }
         }
 
-        if (!isset($data['ignoreconflicts'])) {
+        if (!isset($data['ignoreconflicts']) || (isset($data['notignoreconflictsstudents']) && !empty($data['notignoreconflictsstudents']))) {
             /* Avoid overlapping slots by warning the user */
-            $conflicts = $this->scheduler->get_conflicts(
+            if (isset($data['notignoreconflictsstudents']) && !empty($data['notignoreconflictsstudents'])) {
+                $conflicts = array();
+                for ($i = 0; $i < $data['appointment_repeats']; $i++) {
+                    if (isset($data['studentid'][$i]) && !empty($data['studentid'][$i])) {
+                        $conflicts = array_merge($conflicts, $this->scheduler->get_conflicts(
+                                $data['starttime'], $data['starttime'] + $data['duration'] * 60,
+                                0, intval($data['studentid'][$i]), SCHEDULER_ALL, $this->slotid));
+                    }
+                }
+            } else {
+                $conflicts = $this->scheduler->get_conflicts(
                             $data['starttime'], $data['starttime'] + $data['duration'] * 60,
                             $data['teacherid'], 0, SCHEDULER_ALL, $this->slotid);
+            }
 
             if (count($conflicts) > 0) {
 
@@ -337,6 +357,17 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 $msg .= $output->doc_link('mod/scheduler/conflict', '', true);
 
                 $errors['starttime'] = $msg;
+            }
+        }
+        foreach ($data['roleid'] as $k => $roleid) {
+            if ($this->scheduler->uses_roles()) {
+                if (((!isset($data['deletestudent'][$k]) || empty($data['deletestudent'][$k])) 
+                        && (isset($data['studentid'][$k]) && !empty($data['studentid'][$k]))) 
+                        || (isset($data['studentid'][$k]) && !empty($data['studentid'][$k]))) {
+                    if (!check_slot_role_limit($roleid, intval($data['studentid'][$k]))) {
+                        $errors['roleid['.$k.']'] = get_string('slotroleslimit', 'mod_scheduler');
+                    }
+                }
             }
         }
         return $errors;
@@ -369,6 +400,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         foreach ($slot->get_appointments() as $appointment) {
             $data->appointid[$i] = $appointment->id;
             $data->studentid[$i] = $appointment->studentid;
+            $data->roleid[$i] = $appointment->roleid;
             $data->attended[$i] = $appointment->attended;
 
             $draftid = file_get_submitted_draft_itemid('appointmentnote');
@@ -415,6 +447,8 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $slot->duration = $data->duration;
         $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
         $slot->teacherid = $data->teacherid;
+        $slot->ignoreconflicts = (isset($data->ignoreconflicts) && !empty($data->ignoreconflicts)) ? 1 : 0;
+        $slot->notignoreconflictsstudents = (isset($data->notignoreconflictsstudents) && !empty($data->notignoreconflictsstudents)) ? 1 : 0;
         $slot->appointmentlocation = $data->appointmentlocation;
         $slot->hideuntil = $data->hideuntil;
         $slot->emaildate = $data->emaildate;
@@ -444,6 +478,9 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 } else {
                     $app = $slot->create_appointment();
                     $app->studentid = $data->studentid[$i];
+                    if ($this->scheduler->uses_roles()) {
+                        $app->roleid = (isset($data->roleid[$i]) && !empty($data->roleid[$i])) ? intval($data->roleid[$i]) : 0;
+                    }
                     $app->save();
                 }
                 $app->attended = isset($data->attended[$i]);
@@ -577,6 +614,10 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         $mform->addElement('select', 'emaildaterel', get_string('emailreminder', 'scheduler'), $remindersel);
         $mform->setDefault('remindersel', -1);
+        
+        $mform->addElement('checkbox', 'notignoreconflictsstudents', get_string('notignoreconflictsstudents', 'scheduler'));
+        $mform->setDefault('notignoreconflictsstudents', false);
+        $mform->addHelpButton('notignoreconflictsstudents', 'notignoreconflictsstudents', 'scheduler');
 
         $this->add_action_buttons();
 

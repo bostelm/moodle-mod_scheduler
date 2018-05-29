@@ -56,6 +56,30 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
     $result = true;
 
+    if ($oldversion < 2017051400) {
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('rolessupport', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'schedulermode');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $table2 = new xmldb_table('scheduler_slots');
+        $field2 = new xmldb_field('ignoreconflicts', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'teacherid');
+        if (!$dbman->field_exists($table2, $field2)) {
+            $dbman->add_field($table2, $field2);
+        }
+        $field3 = new xmldb_field('notignoreconflictsstudents', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'ignoreconflicts');
+        if (!$dbman->field_exists($table2, $field3)) {
+            $dbman->add_field($table2, $field3);
+        }
+        $table3 = new xmldb_table('scheduler_appointment');
+        $field3 = new xmldb_field('roleid', XMLDB_TYPE_INTEGER, '11', null, null, null, '0', 'studentid');
+        if (!$dbman->field_exists($table3, $field3)) {
+            $dbman->add_field($table3, $field3);
+        }
+
+        upgrade_mod_savepoint(true, 2017051400, 'scheduler');
+    }
+
     /* ******************* 2.0 upgrade line ********************** */
 
     if ($oldversion < 2011081302) {

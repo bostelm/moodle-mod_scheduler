@@ -43,6 +43,8 @@
         <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="teacherid" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="ignoreconflicts" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="notignoreconflictsstudents" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="appointmentlocation" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="reuse" TYPE="int" LENGTH="5" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="legacy"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -64,6 +66,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="slotid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="studentid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="attended" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="appointmentnote" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Notes visible to teacher and student"/>
@@ -82,6 +85,17 @@
         <INDEX NAME="slotid" UNIQUE="false" FIELDS="slotid" COMMENT="By slot id"/>
         <INDEX NAME="studentid" UNIQUE="false" FIELDS="studentid" COMMENT="By student id"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="scheduler_roles" COMMENT="Scheduler roles">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="schedulerid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Scheduler ID"/>
+        <FIELD NAME="rname" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Role name"/>
+        <FIELD NAME="rlimit" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Role limit"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for scheduler_roles"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>
