@@ -42,8 +42,8 @@ function scheduler_action_doaddsession($scheduler, $formdata) {
     } else {
         $slot->duration = $data->endhour * 60 + $data->endminute - $data->starthour * 60 - $data->startminute;
     };
-	$slot->notes = $data->notes['text'];
-	$slot->notesformat = $data->notes['format'];
+    $slot->notes = $data->notes['text'];
+    $slot->notesformat = $data->notes['format'];
     $slot->timemodified = time();
 
     for ($d = 0; $d <= $fordays; $d ++) {
