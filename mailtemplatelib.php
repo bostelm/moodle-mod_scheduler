@@ -166,6 +166,7 @@ class scheduler_messenger {
             $vars ['TIME']     = userdate($slot->starttime, get_string('strftimetime'), $tz);
             $vars ['ENDTIME']  = userdate($slot->endtime, get_string('strftimetime'), $tz);
             $vars ['LOCATION'] = format_string($slot->appointmentlocation);
+            $vars ['NOTES']    = format_string($slot->notes);
         }
         if ($teacher) {
             $vars['ATTENDANT']     = fullname($teacher);
