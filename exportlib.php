@@ -142,63 +142,7 @@ function scheduler_get_export_fields() {
     $result[] = new scheduler_studentnote_field();
     $result[] = new scheduler_filecount_field();
 
-    // Get all course groups as columns.
-    global $PAGE;
-    $coursegroups =  groups_get_all_groups($PAGE->course->id);
-    foreach ($coursegroups as $coursegroup) {
-        $result[] = new scheduler_course_group_field('coursegroup' . $coursegroup->id, $coursegroup->name, $coursegroup->id, 'id');
-    }
-
     return $result;
-}
-
-/**
- * Export field: A custom field for course groups.
- *
- * @package    mod_scheduler
- * @copyright  2018 Manoj Solanki (Coventry University)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class scheduler_course_group_field extends scheduler_export_field {
-
-    protected $id;
-    protected $studfield;
-    protected $groupname;
-    protected $groupid;
-
-    public function __construct($id, $groupname, $groupid, $studfield) {
-        $this->id = $id;
-        $this->studfield = $studfield;
-        $this->groupname = $groupname;
-        $this->groupid = $groupid;
-    }
-
-    public function get_id() {
-        return $this->id;
-    }
-
-    public function get_group() {
-        return 'custom';
-    }
-
-    public function get_header(scheduler_instance $scheduler) {
-        return $this->groupname;
-    }
-
-    public function get_value(scheduler_slot $slot, $appointment) {
-
-        if (! $appointment instanceof scheduler_appointment) {
-            return '';
-        }
-        $student = $appointment->get_student();
-        $result = get_string('coursegroupstudentisnotmemberof', 'scheduler');
-        if (groups_is_member($this->groupid, $student->{$this->studfield})) {
-            $result = get_string('coursegroupstudentismemberof', 'scheduler');
-        }
-
-        return $result;
-
-    }
 }
 
 /**
@@ -1336,7 +1280,6 @@ class scheduler_export {
         $this->canvas->set_title(format_string($scheduler->name));
         if ($userid) {
             $slots = $scheduler->get_slots_for_teacher($userid, $groupid);
-
             $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
         } else if ($pageperteacher) {
             $teachers = $scheduler->get_teachers();
