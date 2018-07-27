@@ -215,3 +215,36 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     float: left;
     margin-left: 0.5em;
 }
+
+/* Further styling amendments */
+
+.path-mod-scheduler .schedulelist .moodle-actionmenu[data-enhanced].show .menu {
+    min-width: 220px;
+}
+
+.path-mod-scheduler .schedulelist .moodle-actionmenu[data-enhanced].show .menu,
+.path-mod-scheduler .commandbar .moodle-actionmenu[data-enhanced].show .menu
+ {
+    min-width: 220px;
+}
+
+.path-mod-scheduler .moodle-actionmenu[data-enhanced].show .menu {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 0px;
+}
+
+.path-mod-scheduler .schedulelist .generaltable {
+    padding-bottom: 80px;
+}
+
+@media only screen and (min-width : 1024px) {
+	.path-mod-scheduler .schedulelist .schedule-by-student-action-column {
+        padding: 0 20px 0 0;
+	}
+}
+
+.path-mod-scheduler .commandbar img.icon,
+.path-mod-scheduler .schedulelist img.icon {
+    padding-left: 3px;
+}

@@ -833,6 +833,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $mtable->id = $list->id;
         $mtable->head  = array ('', get_string('name'));
+        $mtable->class = 'schedule-by-student-action-column';
         $mtable->align = array ('center', 'left');
         foreach ($list->extraheaders as $field) {
             $mtable->head[] = $field;
@@ -853,7 +854,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $menu->actiontext = get_string('schedule', 'scheduler');
                 $actions = $this->render($menu);
             }
-            $data[] = $actions;
+            $data[] = html_writer::tag('div', $actions, array('class' => 'schedule-by-student-action-column'));
             $mtable->data[] = $data;
         }
         return html_writer::table($mtable);
