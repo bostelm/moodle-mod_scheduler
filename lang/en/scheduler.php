@@ -51,6 +51,33 @@ $string['messageprovider:reminder'] = 'Reminder of an upcoming appointment';
 /* ***** Search areas ***** */
 $string['search:activity'] = 'Scheduler - activity information';
 
+/* ***** Privacy API strings **** */
+
+$string['privacy:metadata:scheduler_slots'] = 'Represents one slot in a scheduler';
+
+$string['privacy:metadata:scheduler_slots:teacherid'] = 'Teacher associated with the slot';
+$string['privacy:metadata:scheduler_slots:starttime'] = 'Start time of the slot';
+$string['privacy:metadata:scheduler_slots_duration'] = 'Duration of the slot in minutes';
+$string['privacy:metadata:scheduler_slots:appointmentlocation'] = 'Appointment location';
+$string['privacy:metadata:scheduler_slots:notes'] = 'Notes about the slot';
+$string['privacy:metadata:scheduler_slots:notesformat'] = "Format of the notes";
+$string['privacy:metadata:scheduler_slots:exclusivity'] = "Maximum number of students on the slot";
+
+$string['privacy:metadata:scheduler_appointment'] = 'Represents a student appointment in a scheduler';
+
+$string['privacy:metadata:scheduler_appointment:studentid'] = "Student who booked the appointment";
+$string['privacy:metadata:scheduler_appointment:attended'] = "Whether the appointment was attended";
+$string['privacy:metadata:scheduler_appointment:grade'] = "Grade for the appointment";
+$string['privacy:metadata:scheduler_appointment:appointmentnote'] = "Note by teacher (visible to student)";
+$string['privacy:metadata:scheduler_appointment:appointmentnoteformat'] = "Format of teacher note";
+$string['privacy:metadata:scheduler_appointment:teachernote'] = "Note by teacher (private)";
+$string['privacy:metadata:scheduler_appointment:teachernoteformat'] = "Format of private teacher note";
+$string['privacy:metadata:scheduler_appointment:studentnote'] = "Note by student";
+$string['privacy:metadata:scheduler_appointment:studentnoteformat'] = "Format of student note";
+
+$string['privacy:metadata:filepurpose'] = 'File used in notes for the slot or appointment';
+
+
 /* ***** Interface strings ****** */
 
 $string['onedaybefore'] = '1 day before slot';
