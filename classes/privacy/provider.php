@@ -49,7 +49,7 @@ class provider implements
         \core_privacy\local\request\plugin\provider {
 
 
-    static $renderer;
+    private static $renderer;
 
     /**
      * Return the fields which contain personal data.
@@ -67,7 +67,7 @@ class provider implements
                 'appointmentlocation' => 'privacy:metadata:scheduler_slots:appointmentlocation',
                 'notes' => 'privacy:metadata:scheduler_slots:notes',
                 'notesformat' => 'privacy:metadata:scheduler_slots:notesformat',
-                'exclusivity' =>  'privacy:metadata:scheduler_slots:exclusivity'
+                'exclusivity' => 'privacy:metadata:scheduler_slots:exclusivity'
                  // The fields "timemodified", "emaildate" and "hideuntil" do not contain personal data.
             ],
             'privacy:metadata:scheduler_slots'
@@ -268,7 +268,7 @@ class provider implements
             'appointmentlocation' => format_string($record->appointmentlocation),
             'notes' => self::format_note($record->notes, $record->notesformat,
                                          'slotnote', $record->slotid, $context, $wrc, $slotarea),
-            'exclusivity' =>  $record->exclusivity,
+            'exclusivity' => $record->exclusivity,
         ];
 
         // Data about the slot.
