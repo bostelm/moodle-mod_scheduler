@@ -57,7 +57,7 @@ $string['privacy:metadata:scheduler_slots'] = 'Represents one slot in a schedule
 
 $string['privacy:metadata:scheduler_slots:teacherid'] = 'Teacher associated with the slot';
 $string['privacy:metadata:scheduler_slots:starttime'] = 'Start time of the slot';
-$string['privacy:metadata:scheduler_slots_duration'] = 'Duration of the slot in minutes';
+$string['privacy:metadata:scheduler_slots:duration'] = 'Duration of the slot in minutes';
 $string['privacy:metadata:scheduler_slots:appointmentlocation'] = 'Appointment location';
 $string['privacy:metadata:scheduler_slots:notes'] = 'Notes about the slot';
 $string['privacy:metadata:scheduler_slots:notesformat'] = "Format of the notes";
@@ -368,6 +368,10 @@ $string['reminder'] = 'Reminder';
 $string['requireupload'] = 'File upload required';
 $string['resetslots'] = 'Delete scheduler slots';
 $string['resetappointments'] = 'Delete appointments and grades';
+$string['revealteachernotes'] = 'Reveal teacher notes in privacy exports';
+$string['revealteachernotes_desc'] = 'If this option is selected, then confidential teacher notes (which are normally not visible to students)
+will be revealed to students in data export requests, i.e., via the privay API. You should decide based on individual usage of this field
+whether it needs to be included in data exports for students under the GDPR.';
 $string['return'] = 'Back to course';
 $string['revoke'] = 'Revoke the appointment';
 $string['saturday'] = 'Saturday';

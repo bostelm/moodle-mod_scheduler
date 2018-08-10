@@ -20,6 +20,12 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  */
 class mod_scheduler_renderer extends plugin_renderer_base {
 
+    public function __construct($page = null, $target = null) {
+        if ($page) {
+            parent::__construct($page, $target);
+        }
+    }
+
     /**
      * Format a date in the current user's timezone.
      * @param int $date a timestamp

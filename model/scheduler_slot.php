@@ -290,7 +290,17 @@ class scheduler_slot extends mvc_child_record_model {
     public function delete() {
         $this->appointments->delete_children();
         $this->clear_calendar();
+        $fs = get_file_storage();
+        $fs->delete_area_files($this->get_scheduler()->get_context()->id, 'mod_scheduler', 'slotnote', $this->get_id());
         parent::delete();
+    }
+
+    /**
+     * Delete all appointments in this slot.
+     */
+    public function delete_all_appointments() {
+        $this->appointments->delete_children();
+        $this->clear_calendar();
     }
 
 

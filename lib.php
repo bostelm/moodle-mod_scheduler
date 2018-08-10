@@ -298,42 +298,28 @@ function scheduler_reset_userdata($data) {
     $status = array();
     $componentstr = get_string('modulenameplural', 'scheduler');
 
-    $sqlfromslots = 'FROM {scheduler_slots} WHERE schedulerid IN '.
-        '(SELECT sc.id FROM {scheduler} sc '.
-        ' WHERE sc.course = :course)';
-
-    $params = array('course' => $data->courseid);
-
-    $strreset = get_string('reset');
+    $success = true;
 
     if (!empty($data->reset_scheduler_appointments) || !empty($data->reset_scheduler_slots)) {
 
-        $slots = $DB->get_recordset_sql('SELECT * '.$sqlfromslots, $params);
-        $success = true;
-        foreach ($slots as $slot) {
-            // Delete calendar events.
-            $success = $success && scheduler_delete_calendar_events($slot);
+        $schedulers = $DB->get_records('scheduler', ['course' => $data->courseid]);
 
-            // Delete appointments.
-            $success = $success && $DB->delete_records('scheduler_appointment', array('slotid' => $slot->id));
-        }
-        $slots->close();
+        foreach ($schedulers as $srec) {
+            $scheduler = scheduler_instance::load_by_id($srec->id);
 
-        // Reset gradebook.
-        $schedulers = $DB->get_records('scheduler', $params);
-        foreach ($schedulers as $scheduler) {
-            scheduler_grade_item_update($scheduler, 'reset');
-        }
-
-        $status[] = array(
-                        'component' => $componentstr,
-                        'item' => get_string('resetappointments', 'scheduler'),
-                        'error' => !$success
-                    );
-    }
-    if (!empty($data->reset_scheduler_slots)) {
-        if ($DB->execute('DELETE '.$sqlfromslots, $params)) {
-            $status[] = array('component' => $componentstr, 'item' => get_string('resetslots', 'scheduler'), 'error' => false);
+            if (!empty($data->reset_scheduler_slots) ) {
+                $scheduler->delete_all_slots();
+                $status[] = array('component' => $componentstr, 'item' => get_string('resetslots', 'scheduler'), 'error' => false);
+            } else if (!empty($data->reset_scheduler_appointments) ) {
+                foreach ($scheduler->get_all_slots() as $slot) {
+                    $slot->delete_all_appointments();
+                }
+                $status[] = array(
+                    'component' => $componentstr,
+                    'item' => get_string('resetappointments', 'scheduler'),
+                    'error' => !$success
+                );
+            }
         }
     }
     return $status;

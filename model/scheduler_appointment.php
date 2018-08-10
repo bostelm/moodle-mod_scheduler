@@ -47,8 +47,16 @@ class scheduler_appointment extends mvc_child_record_model {
     public function delete() {
         $studid = $this->studentid;
         parent::delete();
+
         $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $studid);
+
+        $fs = get_file_storage();
+        $cid = $this->get_scheduler()->get_context()->id;
+        $fs->delete_area_files($cid, 'mod_scheduler', 'appointmentnote', $this->get_id());
+        $fs->delete_area_files($cid, 'mod_scheduler', 'teachernote', $this->get_id());
+        $fs->delete_area_files($cid, 'mod_scheduler', 'studentnote', $this->get_id());
+
     }
 
     /**

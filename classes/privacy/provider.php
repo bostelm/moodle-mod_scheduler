@@ -28,9 +28,9 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
+use core_privacy\local\request\moodle_content_writer;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
-use core_privacy\manager;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -47,6 +47,9 @@ class provider implements
 
         // This plugin is a core_user_data_provider.
         \core_privacy\local\request\plugin\provider {
+
+
+    static $renderer;
 
     /**
      * Return the fields which contain personal data.
@@ -139,6 +142,35 @@ class provider implements
         return $contextlist;
     }
 
+    /**
+     * Load a scheduler instance from a context.
+     *
+     * Will return null if the context was not found.
+     *
+     * @param \context $context the context of the scheduler.
+     * @return \scheduler_instance scheduler object, or null if not found.
+     */
+    private static function load_scheduler_for_context(\context $context) {
+        global $DB;
+
+        if (!$context instanceof \context_module) {
+            return null;
+        }
+
+        $sql = "SELECT s.id as schedulerid
+                FROM {course_modules} cm
+                JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                JOIN {scheduler} s ON s.id = cm.instance
+                WHERE cm.id = :cmid";
+        $params = ['cmid' => $context->instanceid, 'modname' => 'scheduler'];
+        $rec = $DB->get_record_sql($sql, $params);
+        if ($rec) {
+            return \scheduler_instance::load_by_id($rec->schedulerid);
+        } else {
+            return null;
+        }
+
+    }
 
     /**
      * Export personal data for the given approved_contextlist. User and context information is contained within the contextlist.
@@ -147,91 +179,144 @@ class provider implements
      */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
-
         if (!$contextlist->count()) {
             return;
         }
 
+        self::$renderer = new \mod_scheduler_renderer();
+
         $user = $contextlist->get_user();
 
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-        $sql = "SELECT cm.id AS cmid, d.name AS dataname, cm.course AS courseid, " . self::sql_fields() . "
+        $sql = "SELECT cm.id AS cmid, s.name AS schedulername, s.id as schedulerid, cm.course AS courseid,
+                t.id as slotid, t.teacherid, t.starttime, t.duration,
+                t.appointmentlocation, t.notes, t.notesformat, t.exclusivity,
+                a.id as appointmentid,
+                a.studentid, a.attended, a.grade,
+                a.appointmentnote, a.appointmentnoteformat,
+                a.teachernote, a.teachernoteformat,
+                a.studentnote, a.studentnoteformat
                 FROM {context} ctx
                 JOIN {course_modules} cm ON cm.id = ctx.instanceid
                 JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                JOIN {data} d ON d.id = cm.instance
-                JOIN {data_records} dr ON dr.dataid = d.id
-                JOIN {data_content} dc ON dc.recordid = dr.id
-                JOIN {data_fields} df ON df.id = dc.fieldid
+                JOIN {scheduler} s ON s.id = cm.instance
+                JOIN {scheduler_slots} t ON t.schedulerid = s.id
+                JOIN {scheduler_appointment} a ON a.slotid = t.id
                 WHERE ctx.id {$contextsql} AND ctx.contextlevel = :contextlevel
-                AND dr.userid = :userid OR
-                  EXISTS (SELECT 1 FROM {comments} com WHERE com.commentarea=:commentarea
-                    AND com.itemid = dr.id AND com.userid = :userid1) OR
-                  EXISTS (SELECT 1 FROM {rating} r WHERE r.contextid = ctx.id AND r.itemid  = dr.id AND r.component = :moddata
-                    AND r.ratingarea = :ratingarea AND r.userid = :userid2)
-                ORDER BY cm.id, dr.id, dc.fieldid";
+                AND t.teacherid = :userid1 OR a.studentid = :userid2
+                ORDER BY cm.id, t.id, a.id";
         $rs = $DB->get_recordset_sql($sql, $contextparams + ['contextlevel' => CONTEXT_MODULE,
-                'modname' => 'data', 'userid' => $user->id, 'userid1' => $user->id, 'commentarea' => 'database_entry',
-                'userid2' => $user->id, 'ratingarea' => 'entry', 'moddata' => 'mod_data']);
+                'modname' => 'scheduler', 'userid1' => $user->id, 'userid2' => $user->id]);
 
         $context = null;
-        $recordobj = null;
+        $lastrow = null;
+        $scheduler = null;
         foreach ($rs as $row) {
             if (!$context || $context->instanceid != $row->cmid) {
-                // This row belongs to the different data module than the previous row.
+                // This row belongs to the different scheduler than the previous row.
                 // Export the data for the previous module.
-                self::export_data($context, $user);
-                // Start new data module.
+                self::export_scheduler($context, $user);
+                // Start new scheduler module.
                 $context = \context_module::instance($row->cmid);
+                $scheduler = \scheduler_instance::load_by_id($row->schedulerid);
             }
 
-            if (!$recordobj || $row->recordid != $recordobj->id) {
-                // Export previous data record.
-                self::export_data_record($context, $user, $recordobj);
-                // Prepare for exporting new data record.
-                $recordobj = self::extract_object_from_record($row, 'record', ['dataid' => $row->dataid]);
+            if (!$lastrow || $row->slotid != $lastrow->slotid) {
+                // Export previous slot record.
+                self::export_slot($context, $user, $row);
             }
-            $fieldobj = self::extract_object_from_record($row, 'field', ['dataid' => $row->dataid]);
-            $contentobj = self::extract_object_from_record($row, 'content',
-                ['fieldid' => $fieldobj->id, 'recordid' => $recordobj->id]);
-            self::export_data_content($context, $recordobj, $fieldobj, $contentobj);
+            self::export_appointment($context, $scheduler, $user, $row);
+            $lastrow = $row;
         }
         $rs->close();
-        self::export_data_record($context, $user, $recordobj);
-        self::export_data($context, $user);
+        self::export_slot($context, $user, $lastrow);
+        self::export_scheduler($context, $user);
+    }
+
+    private static function format_note($notetext, $noteformat, $filearea, $id,
+            \context $context, moodle_content_writer $wrc, $exportarea) {
+        $message = $notetext;
+        if ($filearea) {
+            $message = $wrc->rewrite_pluginfile_urls($exportarea, 'mod_scheduler', $filearea, $id, $notetext);
+        }
+        $opts = (object) [
+                'para'    => false,
+                'context' => $context
+        ];
+        $message = format_text($message, $noteformat, $opts);
+        return $message;
     }
 
     /**
-     * Export one entry in the database activity module (one record in {data_records} table)
+     * Export one slot in a scheduler (one record in {scheduler_slots} table)
      *
      * @param \context $context
      * @param \stdClass $user
-     * @param \stdClass $recordobj
+     * @param \stdClass $record
      */
-    protected static function export_data_record($context, $user, $recordobj) {
-        if (!$recordobj) {
+    protected static function export_slot($context, $user, $record) {
+        if (!$record) {
             return;
         }
+        $slotarea = ['slot '.$record->slotid];
+        $wrc = writer::with_context($context);
+
         $data = [
-            'userid' => transform::user($user->id),
-            'groupid' => $recordobj->groupid,
-            'timecreated' => transform::datetime($recordobj->timecreated),
-            'timemodified' => transform::datetime($recordobj->timemodified),
-            'approved' => transform::yesno($recordobj->approved),
+            'teacherid' => transform::user($record->teacherid),
+            'starttime' => transform::datetime($record->starttime),
+            'duration'  => $record->duration,
+            'appointmentlocation' => format_string($record->appointmentlocation),
+            'notes' => self::format_note($record->notes, $record->notesformat,
+                                         'slotnote', $record->slotid, $context, $wrc, $slotarea),
+            'exclusivity' =>  $record->exclusivity,
         ];
-        // Data about the record.
-        writer::with_context($context)->export_data([$recordobj->id], (object)$data);
-        // Related tags.
-        \core_tag\privacy\provider::export_item_tags($user->id, $context, [$recordobj->id],
-            'mod_data', 'data_records', $recordobj->id);
-        // Export comments. For records that were not made by this user export only this user's comments, for own records
-        // export comments made by everybody.
-        \core_comment\privacy\provider::export_comments($context, 'mod_data', 'database_entry', $recordobj->id,
-            [$recordobj->id], $recordobj->userid != $user->id);
-        // Export ratings. For records that were not made by this user export only this user's ratings, for own records
-        // export ratings from everybody.
-        \core_rating\privacy\provider::export_area_ratings($user->id, $context, [$recordobj->id], 'mod_data', 'entry',
-            $recordobj->id, $recordobj->userid != $user->id);
+
+        // Data about the slot.
+        $wrc->export_data($slotarea, (object)$data);
+        $wrc->export_area_files($slotarea, 'mod_scheduler', 'slotnote', $record->slotid);
+    }
+
+    /**
+     * Export one appointment in a scheduler (one record in {scheduler_appointment} table)
+     *
+     * @param \context $context
+     * @param \scheduler_instance $scheduler
+     * @param \stdClass $user
+     * @param \stdClass $record
+     */
+    protected static function export_appointment($context, $scheduler, $user, $record) {
+        if (!$record) {
+            return;
+        }
+        $wrc = writer::with_context($context);
+        $apparea = ['slot '.$record->slotid, 'appointment '.$record->appointmentid];
+
+        $revealteachernote = ($user->id == $record->teacherid) ||
+                             get_config('mod_scheduler', 'revealteachernotes');
+
+        $data = [
+                'studentid' => transform::user($record->studentid),
+                'attended' => transform::yesno($record->attended),
+                'grade' => self::$renderer->format_grade($scheduler, $record->grade),
+                'appointmentnote' => self::format_note($record->appointmentnote, $record->appointmentnoteformat,
+                                         'appointmentnote', $record->appointmentid, $context, $wrc, $apparea),
+                'studentnote' => self::format_note($record->studentnote, $record->studentnoteformat,
+                                     '', 0, $context, $wrc, $apparea),
+        ];
+        if ($revealteachernote) {
+            $data['teachernote'] = self::format_note($record->teachernote, $record->teachernoteformat,
+                                       'teachernote', $record->appointmentid, $context, $wrc, $apparea);
+        }
+
+        // Data about the appointment.
+
+        $wrc->export_data($apparea, (object)$data);
+
+        $wrc->export_area_files($apparea, 'mod_scheduler', 'appointmentnote', $record->appointmentid);
+        if ($revealteachernote) {
+            $wrc->export_area_files($apparea, 'mod_scheduler', 'teachernote', $record->appointmentid);
+        }
+        $wrc->export_area_files($apparea, 'mod_scheduler', 'studentfiles', $record->appointmentid);
     }
 
     /**
@@ -252,127 +337,42 @@ class provider implements
     /**
      * Delete all data for all users in the specified context.
      *
+     * This will delete both slots and appointments for all users.
+     *
      * @param \context $context the context to delete in.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        global $DB;
-
-        if (!$context instanceof \context_module) {
-            return;
+        if ($scheduler = self::load_scheduler_for_context($context)) {
+            $scheduler->delete_all_slots();
         }
-        $recordstobedeleted = [];
-
-        $sql = "SELECT " . self::sql_fields() . "
-                FROM {course_modules} cm
-                JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                JOIN {data} d ON d.id = cm.instance
-                JOIN {data_records} dr ON dr.dataid = d.id
-                LEFT JOIN {data_content} dc ON dc.recordid = dr.id
-                LEFT JOIN {data_fields} df ON df.id = dc.fieldid
-                WHERE cm.id = :cmid
-                ORDER BY dr.id";
-        $rs = $DB->get_recordset_sql($sql, ['cmid' => $context->instanceid, 'modname' => 'data']);
-        foreach ($rs as $row) {
-            self::mark_data_content_for_deletion($context, $row);
-            $recordstobedeleted[$row->recordid] = $row->recordid;
-        }
-        $rs->close();
-
-        self::delete_data_records($context, $recordstobedeleted);
     }
 
     /**
      * Delete all user data for the specified user, in the specified contexts.
      *
+     * This will delete only appointments where the specified user is a student.
+     * No data will be deleted if the user is (only) a teacher for the relevant slot/appointment,
+     * since deleting it may lose data for other users (namely, the students).
+     *
      * @param approved_contextlist $contextlist a list of contexts approved for deletion.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        global $DB;
 
         if (empty($contextlist->count())) {
             return;
         }
 
         $user = $contextlist->get_user();
-        $recordstobedeleted = [];
 
         foreach ($contextlist->get_contexts() as $context) {
-            $sql = "SELECT " . self::sql_fields() . "
-                FROM {context} ctx
-                JOIN {course_modules} cm ON cm.id = ctx.instanceid
-                JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                JOIN {data} d ON d.id = cm.instance
-                JOIN {data_records} dr ON dr.dataid = d.id AND dr.userid = :userid
-                LEFT JOIN {data_content} dc ON dc.recordid = dr.id
-                LEFT JOIN {data_fields} df ON df.id = dc.fieldid
-                WHERE ctx.id = :ctxid AND ctx.contextlevel = :contextlevel
-                ORDER BY dr.id";
-            $rs = $DB->get_recordset_sql($sql, ['ctxid' => $context->id, 'contextlevel' => CONTEXT_MODULE,
-                'modname' => 'data', 'userid' => $user->id]);
-            foreach ($rs as $row) {
-                self::mark_data_content_for_deletion($context, $row);
-                $recordstobedeleted[$row->recordid] = $row->recordid;
-            }
-            $rs->close();
-            self::delete_data_records($context, $recordstobedeleted);
-        }
 
-    }
-
-    /**
-     * Marks a data_record/data_content for deletion
-     *
-     * Also invokes callback from datafield plugin in case it stores additional data that needs to be deleted
-     *
-     * @param \context $context
-     * @param \stdClass $row result of SQL query - tables data_content, data_record, data_fields join together
-     */
-    protected static function mark_data_content_for_deletion($context, $row) {
-        $recordobj = self::extract_object_from_record($row, 'record', ['dataid' => $row->dataid]);
-        if ($row->contentid && $row->fieldid) {
-            $fieldobj = self::extract_object_from_record($row, 'field', ['dataid' => $row->dataid]);
-            $contentobj = self::extract_object_from_record($row, 'content',
-                ['fieldid' => $fieldobj->id, 'recordid' => $recordobj->id]);
-
-            // Allow datafield plugin to implement their own deletion.
-            $classname = manager::get_provider_classname_for_component('datafield_' . $fieldobj->type);
-            if (class_exists($classname) && is_subclass_of($classname, datafield_provider::class)) {
-                component_class_callback($classname, 'delete_data_content',
-                    [$context, $recordobj, $fieldobj, $contentobj]);
+            if ($scheduler = self::load_scheduler_for_context($context)) {
+                $apps = $scheduler->get_appointments_for_student($user->id);
+                foreach ($apps as $app) {
+                    $app->delete();
+                }
             }
         }
     }
 
-    /**
-     * Deletes records marked for deletion and all associated data
-     *
-     * Should be executed after all records were marked by {@link mark_data_content_for_deletion()}
-     *
-     * Deletes records from data_content and data_records tables, associated files, tags, comments and ratings.
-     *
-     * @param \context $context
-     * @param array $recordstobedeleted list of ids of the data records that need to be deleted
-     */
-    protected static function delete_data_records($context, $recordstobedeleted) {
-        global $DB;
-        if (empty($recordstobedeleted)) {
-            return;
-        }
-
-        list($sql, $params) = $DB->get_in_or_equal($recordstobedeleted, SQL_PARAMS_NAMED);
-
-        // Delete files.
-        get_file_storage()->delete_area_files_select($context->id, 'mod_data', 'data_records',
-            "IN (SELECT dc.id FROM {data_content} dc WHERE dc.recordid $sql)", $params);
-        // Delete from data_content.
-        $DB->delete_records_select('data_content', 'recordid ' . $sql, $params);
-        // Delete from data_records.
-        $DB->delete_records_select('data_records', 'id ' . $sql, $params);
-        // Delete tags.
-        \core_tag\privacy\provider::delete_item_tags_select($context, 'mod_data', 'data_records', $sql, $params);
-        // Delete comments.
-        \core_comment\privacy\provider::delete_comments_for_all_users_select($context, 'mod_data', 'database_entry', $sql, $params);
-        // Delete ratings.
-        \core_rating\privacy\provider::delete_ratings_select($context, 'mod_data', 'entry', $sql, $params);
-    }
 }

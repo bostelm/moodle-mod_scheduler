@@ -44,4 +44,9 @@ if ($ADMIN->fulltree) {
                      get_string('uploadmaxfilesglobal_desc', 'scheduler'),
                      5, PARAM_INT));
 
+    $settings->add(new admin_setting_configcheckbox('mod_scheduler/revealteachernotes',
+                    get_string('revealteachernotes', 'scheduler'),
+                    get_string('revealteachernotes_desc', 'scheduler'),
+                    0));
+
 }
