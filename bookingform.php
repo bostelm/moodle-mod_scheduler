@@ -81,10 +81,9 @@ class scheduler_booking_form extends moodleform {
 
         if (!$this->existing && $this->slot->get_scheduler()->uses_bookingcaptcha()) {
             $recaptcha = $this->_form->getElement('bookingcaptcha');
-            if (!empty($this->_form->_submitValues['recaptcha_challenge_field'])) {
-                $challenge = $this->_form->_submitValues['recaptcha_challenge_field'];
-                $response = $this->_form->_submitValues['recaptcha_response_field'];
-                if (true !== ($result = $recaptcha->verify($challenge, $response))) {
+            if (!empty($this->_form->_submitValues['g-recaptcha-response'])) {
+                $response = $this->_form->_submitValues['g-recaptcha-response'];
+                if (true !== ($result = $recaptcha->verify($response))) {
                     $errors['bookingcaptcha'] = $result;
                 }
             } else {
