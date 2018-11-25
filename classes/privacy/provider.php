@@ -143,6 +143,53 @@ class provider implements
     }
 
     /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+
+        $context = $userlist->get_context();
+
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+
+        // Fetch teachers.
+        $sql = "SELECT t.teacherid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {scheduler} s ON s.id = cm.instance
+            INNER JOIN {scheduler_slots} t ON t.schedulerid = s.id
+                 WHERE cm.id = :cmid";
+
+        $params = [
+                'modname'       => 'scheduler',
+                'cmid'          => $context->instanceid
+        ];
+
+        $contextlist->add_from_sql($sql, $params);
+
+        // Fetch students.
+        $sql = "SELECT a.studentid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {scheduler} s ON s.id = cm.instance
+            INNER JOIN {scheduler_slots} t ON t.schedulerid = s.id
+            INNER JOIN {scheduler_appointment} a ON a.slotid = t.id
+                 WHERE cm.id = :cmid";
+
+        $params = [
+                'modname'       => 'scheduler',
+                'cmid'          => $context->instanceid
+        ];
+
+        $contextlist->add_from_sql($sql, $params);
+
+        return $contextlist;
+    }
+
+    /**
      * Load a scheduler instance from a context.
      *
      * Will return null if the context was not found.
@@ -368,6 +415,30 @@ class provider implements
 
             if ($scheduler = self::load_scheduler_for_context($context)) {
                 $apps = $scheduler->get_appointments_for_student($user->id);
+                foreach ($apps as $app) {
+                    $app->delete();
+                }
+            }
+        }
+    }
+
+    /**
+     * Delete all user data for the specified users (plural), in the specified context.
+     *
+     * This will delete only appointments where the specified user is a student.
+     * No data will be deleted if the user is (only) a teacher for the relevant slot/appointment,
+     * since deleting it may lose data for other users (namely, the students).
+     *
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+
+        $context = $userlist->get_context();
+        $users = $userlist->get_userids();
+
+        if ($scheduler = self::load_scheduler_for_context($context)) {
+            foreach ($users as $userid) {
+                $apps = $scheduler->get_appointments_for_student($userid);
                 foreach ($apps as $app) {
                     $app->delete();
                 }
