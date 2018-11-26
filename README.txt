@@ -58,6 +58,15 @@ With further contributions taken from:
 
 === Release notes ===
 
+--- Version 3.5 ---
+
+Intended for Moodle 3.5 and later.
+
+New features / improvements:
+
+Support for Moodle's Privacy API.
+
+
 --- Version 3.3 ---
 
 Intended for Moodle 3.3 and later.
