@@ -26,9 +26,11 @@ namespace mod_scheduler\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\helper;
-use core_privacy\local\request\moodle_content_writer;
+use core_privacy\local\request\content_writer;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
 
@@ -168,7 +170,7 @@ class provider implements
                 'cmid'          => $context->instanceid
         ];
 
-        $contextlist->add_from_sql($sql, $params);
+        $userlist->add_from_sql('teacherid', $sql, $params);
 
         // Fetch students.
         $sql = "SELECT a.studentid
@@ -184,9 +186,9 @@ class provider implements
                 'cmid'          => $context->instanceid
         ];
 
-        $contextlist->add_from_sql($sql, $params);
+        $userlist->add_from_sql('studentid', $sql, $params);
 
-        return $contextlist;
+        return $userlist;
     }
 
     /**
@@ -281,7 +283,7 @@ class provider implements
     }
 
     private static function format_note($notetext, $noteformat, $filearea, $id,
-            \context $context, moodle_content_writer $wrc, $exportarea) {
+            \context $context, content_writer $wrc, $exportarea) {
         $message = $notetext;
         if ($filearea) {
             $message = $wrc->rewrite_pluginfile_urls($exportarea, 'mod_scheduler', $filearea, $id, $notetext);
