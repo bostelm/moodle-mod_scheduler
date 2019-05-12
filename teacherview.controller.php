@@ -168,7 +168,7 @@ function scheduler_action_dosendmessage($scheduler, $formdata, $returnurl) {
             if ($htmlmessage) {
                 $message->fullmessagehtml = $htmlmessage;
             }
-            $message->notification = '0';
+            $message->notification = '1';
 
             message_send($message);
             $cnt++;
