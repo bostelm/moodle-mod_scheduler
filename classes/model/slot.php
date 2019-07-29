@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A class for representing a scheduler slot.
@@ -25,6 +39,11 @@ class slot extends mvc_child_record_model {
      */
     protected $appointments;
 
+    /**
+     * get_table
+     *
+     * @return string
+     */
     protected function get_table() {
         return 'scheduler_slots';
     }
@@ -46,6 +65,9 @@ class slot extends mvc_child_record_model {
 
     /**
      * Create a scheduler slot from the database.
+     *
+     * @param int $id
+     * @param scheduler $scheduler
      */
     public static function load_by_id($id, scheduler $scheduler) {
         $slot = new slot($scheduler);
@@ -93,9 +115,9 @@ class slot extends mvc_child_record_model {
     /**
      * Distribute plugin files from a source to a target id within a file area
      *
-     * @param unknown $area
-     * @param unknown $sourceid
-     * @param unknown $targetid
+     * @param mixed $area
+     * @param mixed $sourceid
+     * @param mixed $targetid
      */
     private function distribute_file_area($area, $sourceid, $targetid) {
 
@@ -218,6 +240,7 @@ class slot extends mvc_child_record_model {
     /**
      * Has the slot been booked by a specific student?
      *
+     * @param mixed $studentid
      * @return boolean
      */
     public function is_booked_by_student($studentid) {
@@ -246,18 +269,20 @@ class slot extends mvc_child_record_model {
     }
 
     /**
-     *  Get an appointment by ID
+     * Get an appointment by ID
      *
-     *  @return scheduler_appointment
+     * @param int $id
+     * @return appointment
      */
     public function get_appointment($id) {
         return $this->appointments->get_child_by_id($id);
     }
 
     /**
-     *  Get an array of all appointments
+     * Get an array of all appointments
      *
-     *  @return array
+     * @param mixed $userfilter
+     * @return array
      */
     public function get_appointments($userfilter = null) {
         $apps = $this->appointments->get_children();
@@ -274,7 +299,7 @@ class slot extends mvc_child_record_model {
     /**
      * Create a new appointment relating to this slot.
      *
-     * @return scheduler_appointment
+     * @return appointment
      */
     public function create_appointment() {
         return $this->appointments->create_child();
@@ -289,6 +314,9 @@ class slot extends mvc_child_record_model {
         $this->appointments->remove_child($app);
     }
 
+    /**
+     * delete
+     */
     public function delete() {
         $this->appointments->delete_children();
         $this->clear_calendar();

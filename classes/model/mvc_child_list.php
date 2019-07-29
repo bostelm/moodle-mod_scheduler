@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *  A list of child records.
@@ -11,9 +25,6 @@
 namespace mod_scheduler\model;
 
 defined('MOODLE_INTERNAL') || die();
-
-/**
-
 
 /**
  * A list of child records.
@@ -183,11 +194,11 @@ class mvc_child_list {
     /**
      * Remove a child record from the list
      * @param mvc_child_record_model $child the record to remove
-     * @throws coding_exception if the record does nto belong to this list
+     * @throws \coding_exception if the record does nto belong to this list
      */
     public function remove_child(mvc_child_record_model $child) {
         if (is_null($this->children) || !in_array($child, $this->children)) {
-            throw new coding_exception ('Child record to remove not found in list');
+            throw new \coding_exception ('Child record to remove not found in list');
         }
         $key = array_search($child, $this->children, true);
         unset($this->children[$key]);

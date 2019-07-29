@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A model mirroring one datebase record in a specific table of the Moodle DB.
@@ -29,7 +43,7 @@ abstract class mvc_record_model extends mvc_model {
     /**
      * Retrieve the name of the underlying database table
      *
-     *  @return string
+     * @return string
      */
     abstract protected function get_table();
 
@@ -42,6 +56,8 @@ abstract class mvc_record_model extends mvc_model {
 
     /**
      * Load data from database. Should be used only in constructors / factory methods.
+     *
+     * @param int $id
      */
     public function load($id) {
         global $DB;
@@ -52,7 +68,7 @@ abstract class mvc_record_model extends mvc_model {
     /**
      * Load data from a database record
      *
-     * @param \stdClass the database record
+     * @param \stdClass $rec the database record
      */
     public function load_record(\stdClass $rec) {
         $this->data = $rec;
@@ -65,7 +81,7 @@ abstract class mvc_record_model extends mvc_model {
      * If not possible, returns the property from the internal record.
      * If even that is not possible, fails with an exception.
      *
-     * @param str $key
+     * @param string $key
      * @return mixed
      */
     public function __get($key) {
@@ -74,7 +90,7 @@ abstract class mvc_record_model extends mvc_model {
         } else if (property_exists($this->data, $key)) {
             return $this->data->{$key};
         } else {
-            throw new coding_exception('unknown property: '.$key);
+            throw new \coding_exception('unknown property: '.$key);
         }
     }
 
@@ -84,8 +100,8 @@ abstract class mvc_record_model extends mvc_model {
      * Attempts to call a set_$key method to set the property.
      * If not possible, sets the property directly in the internal record.
      *
-     * @param str $key
-     * @return mixed
+     * @param string $key
+     * @param mixed $value
      */
     public function __set($key, $value) {
         if (method_exists($this, 'set_'.$key)) {
@@ -101,7 +117,7 @@ abstract class mvc_record_model extends mvc_model {
     public function save() {
         global $DB;
         if (is_null($this->data)) {
-            throw new coding_exception('Missing data, cannot save');
+            throw new \coding_exception('Missing data, cannot save');
         } else if (property_exists($this->data, 'id') && ($this->data->id)) {
             $DB->update_record($this->get_table(), $this->data);
         } else {

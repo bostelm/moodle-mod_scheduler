@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * This file contains a renderer for the scheduler module
@@ -23,6 +37,12 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  */
 class mod_scheduler_renderer extends plugin_renderer_base {
 
+    /**
+     * Constructor method, calls the parent constructor
+     *
+     * @param moodle_page $page
+     * @param string $target one of rendering target constants
+     */
     public function __construct($page = null, $target = null) {
         if ($page) {
             parent::__construct($page, $target);
@@ -338,7 +358,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      * Render the tab header hierarchy in the teacher view.
      *
      * @param scheduler $scheduler the scheduler in question
-     * @param \mod_scheduler\permission\scheduler_permissions permissions the permissions manager (for hiding tabs)
+     * @param scheduler_permissions $permissions the permissions manager (for hiding tabs)
      * @param moodle_url $baseurl base URL for the tab addresses
      * @param string $selected the selected tab
      * @param array $inactive any inactive tabs

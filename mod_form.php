@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Defines the scheduler module settings form.
@@ -7,7 +21,6 @@
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -22,10 +35,13 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  */
 class mod_scheduler_mod_form extends moodleform_mod {
 
+    /** @var array */
     protected $editoroptions;
 
-
-    function definition() {
+    /**
+     * Form definition
+     */
+    public function definition() {
 
         global $CFG, $COURSE, $OUTPUT;
         $mform    =& $this->_form;
@@ -175,7 +191,15 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
-    function data_preprocessing(&$defaultvalues) {
+    /**
+     * Allows module to modify data returned by get_moduleinfo_data() or prepare_new_moduleinfo_data() before calling set_data()
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param array $defaultvalues passed by reference
+     */
+    public function data_preprocessing(&$defaultvalues) {
         parent::data_preprocessing($defaultvalues);
         if ($this->current->instance) {
             $newvalues = file_prepare_standard_editor((object)$defaultvalues, 'bookinginstructions',
@@ -196,6 +220,12 @@ class mod_scheduler_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * save_mod_data
+     *
+     * @param stdClass $data
+     * @param context_module $context
+     */
     public function save_mod_data(stdClass $data, context_module $context) {
         global $DB;
 

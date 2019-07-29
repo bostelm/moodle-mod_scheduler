@@ -1,8 +1,21 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Appointment-related forms of the scheduler module
- * (using Moodle formslib)
+ * Appointment-related forms of the scheduler module (using Moodle formslib)
  *
  * @package    mod_scheduler
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
@@ -12,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use \mod_scheduler\model\appointment;
+use \mod_scheduler\permission\scheduler_permissions;
 
 require_once($CFG->libdir.'/formslib.php');
 
@@ -29,13 +43,13 @@ class scheduler_editappointment_form extends moodleform {
      */
     protected $appointment;
 
-   /**
+    /**
      * @var bool whether to distribute grade to all group members
      */
     protected $distribute;
 
     /**
-     * @var permissions of the teacher
+     * @var array permissions of the teacher
      */
     protected $permissions;
 
@@ -49,10 +63,10 @@ class scheduler_editappointment_form extends moodleform {
      *
      * @param appointment $appointment the appointment to edit
      * @param mixed $action the action attribute for the form
-     * @param bool $editgrade whether the grade can be edited
+     * @param scheduler_permissions $permissions
      * @param bool $distribute whether to distribute grades to all group members
      */
-    public function __construct(appointment $appointment, $action, \mod_scheduler\permission\scheduler_permissions $permissions, $distribute) {
+    public function __construct(appointment $appointment, $action, scheduler_permissions $permissions, $distribute) {
         $this->appointment = $appointment;
         $this->distribute = $distribute;
         $this->permissions = $permissions;
@@ -62,6 +76,9 @@ class scheduler_editappointment_form extends moodleform {
         parent::__construct($action, null);
     }
 
+    /**
+     * Form definition
+     */
     protected function definition() {
 
         global $output;
@@ -121,6 +138,14 @@ class scheduler_editappointment_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * Form validation.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

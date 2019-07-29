@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod @mod_scheduler
 Feature: Students viewing slots available for booking
   In order to view slots that are available for booking
   As a student
@@ -7,7 +7,7 @@ Feature: Students viewing slots available for booking
   Background:
     Given the following "users" exist:
       | username | firstname   | lastname | email                |
-      | manager1 | Manager     | 1        | manager1@example.com | 
+      | manager1 | Manager     | 1        | manager1@example.com |
       | teacher1 | Teacher     | 1        | teacher1@example.com |
       | student1 | Student     | 1        | student1@example.com |
       | student2 | Student     | 2        | student2@example.com |
@@ -16,7 +16,7 @@ Feature: Students viewing slots available for booking
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
     And the following "course enrolments" exist:
-      | user  | course | role           |  
+      | user  | course | role           |
       | teacher1  | C1 | editingteacher |
       | student1  | C1 | student        |
       | student2  | C1 | student        |
@@ -29,24 +29,24 @@ Feature: Students viewing slots available for booking
       | scheduler | Test scheduler | n     | C1     | scheduler1 | 0         | oneonly       | 1           | 172800    |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    # Slot 1 is available to only 1 student and is not yet booked  
+    # Slot 1 is available to only 1 student and is not yet booked
     And I add a slot 5 days ahead at 0100 in "Test scheduler" scheduler and I fill the form with:
       | exclusivity | 1 |
-    # Slot 2 is available to only 1 student and is already booked  
+    # Slot 2 is available to only 1 student and is already booked
     And I add a slot 5 days ahead at 0200 in "Test scheduler" scheduler and I fill the form with:
       | exclusivity  | 1         |
       | studentid[0] | Student 3 |
-    # Slot 3 is a group slot that is empty 
+    # Slot 3 is a group slot that is empty
     And I add a slot 5 days ahead at 0300 in "Test scheduler" scheduler and I fill the form with:
       | exclusivity | 3        |
-    # Slot 4 is a group slot that is partially booked 
+    # Slot 4 is a group slot that is partially booked
     And I add a slot 5 days ahead at 0400 in "Test scheduler" scheduler and I fill the form with:
       | exclusivity  | 2         |
       | studentid[0] | Student 3 |
-    # Slot 5 is an unlimited group slot that is empty 
+    # Slot 5 is an unlimited group slot that is empty
     And I add a slot 5 days ahead at 0500 in "Test scheduler" scheduler and I fill the form with:
       | exclusivityenable | 0         |
-    # Slot 6 is an unlimited group slot that is partially booked 
+    # Slot 6 is an unlimited group slot that is partially booked
     And I add a slot 5 days ahead at 0600 in "Test scheduler" scheduler and I fill the form with:
       | exclusivityenable | 0         |
       | studentid[0]      | Student 3 |
@@ -60,9 +60,9 @@ Feature: Students viewing slots available for booking
 
   @javascript
   Scenario: A student can see only available upcoming slots (default setting)
-           
+
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then "Book slot" "button" should exist in the "1:00 AM" "table_row"
     And I should not see "2:00 AM" in the "slotbookertable" "table"
@@ -79,11 +79,11 @@ Feature: Students viewing slots available for booking
 
     When I click on "Cancel booking" "button"
     Then "Book slot" "button" should exist in the "1:00 AM" "table_row"
-    
+
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
     And I log out
     And I log in as "student2"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then "Book slot" "button" should exist in the "3:00 AM" "table_row"
     And I should not see "4:00 AM" in the "slotbookertable" "table"
@@ -96,9 +96,9 @@ Feature: Students viewing slots available for booking
       | mod/scheduler:appoint       | Allow      | student | Course       | C1        |
       | mod/scheduler:viewslots     | Allow      | student | Course       | C1        |
       | mod/scheduler:viewfullslots | Allow      | student | Course       | C1        |
-    
+
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then "Book slot" "button" should exist in the "1:00 AM" "table_row"
     And I should see "2:00 AM" in the "slotbookertable" "table"
@@ -118,17 +118,17 @@ Feature: Students viewing slots available for booking
 
     When I click on "Cancel booking" "button"
     Then "Book slot" "button" should exist in the "1:00 AM" "table_row"
-    
+
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
     And I log out
     And I log in as "student2"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then "Book slot" "button" should exist in the "3:00 AM" "table_row"
     And I should see "4:00 AM" in the "slotbookertable" "table"
     And "Book slot" "button" should not exist in the "4:00 AM" "table_row"
     And I log out
-    
+
   @javascript
   Scenario: Students can view all slots, but they cannot book any
     Given the following "permission overrides" exist:
@@ -136,9 +136,9 @@ Feature: Students viewing slots available for booking
       | mod/scheduler:appoint       | Prevent    | student | Course       | C1        |
       | mod/scheduler:viewslots     | Allow      | student | Course       | C1        |
       | mod/scheduler:viewfullslots | Allow      | student | Course       | C1        |
-    
+
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then "Book slot" "button" should not exist
     And I should see "1:00 AM" in the "slotbookertable" "table"
@@ -149,19 +149,19 @@ Feature: Students viewing slots available for booking
     And I should see "6:00 AM" in the "slotbookertable" "table"
     And I should not see "7:00 AM" in the "slotbookertable" "table"
     And I should not see "8:00 AM" in the "slotbookertable" "table"
-    
+
     And I log out
-    
- @javascript
- Scenario: Students can view bookable slots, but they cannot book any
+
+  @javascript
+  Scenario: Students can view bookable slots, but they cannot book any
     Given the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
       | mod/scheduler:appoint       | Prevent    | student | Course       | C1        |
       | mod/scheduler:viewslots     | Allow      | student | Course       | C1        |
       | mod/scheduler:viewfullslots | Prevent    | student | Course       | C1        |
-    
+
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then "Book slot" "button" should not exist
     And I should see "1:00 AM" in the "slotbookertable" "table"
@@ -172,6 +172,5 @@ Feature: Students viewing slots available for booking
     And I should see "6:00 AM" in the "slotbookertable" "table"
     And I should not see "7:00 AM" in the "slotbookertable" "table"
     And I should not see "8:00 AM" in the "slotbookertable" "table"
-    
+
     And I log out
- 

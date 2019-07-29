@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod @mod_scheduler
 Feature: Teacher can add slots to a scheduler activity
   In order to allow students to book a slot
   As a teacher
@@ -41,7 +41,7 @@ Feature: Teacher can add slots to a scheduler activity
     And I click on "Save changes" "button"
     Then I should see "1 slot added"
     And I should see "Friday, 1 April 2050"
-    
+
   @javascript
   Scenario: Teacher enters invalid values when adding a slot
     When I log in as "teacher1"
@@ -70,7 +70,7 @@ Feature: Teacher can add slots to a scheduler activity
     And I click on "Save changes" "button"
     And I should see "1 slot added"
 
-  @javascript
+  @javascript @ttt3
   Scenario: Teacher enters a slot and schedules 3 students
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
@@ -96,7 +96,6 @@ Feature: Teacher can add slots to a scheduler activity
     And I should see "Student 1"
     And I should see "Student 2"
     And I should see "Student 3"
-
 
   @javascript
   Scenario: Teacher creates 10 slots at once

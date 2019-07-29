@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Export settings form
@@ -16,8 +30,7 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/mod/scheduler/exportlib.php');
 
 /**
- * Export settings form
- * (using Moodle formslib)
+ * Export settings form (using Moodle formslib)
  *
  * @package    mod_scheduler
  * @copyright  2015 Henning Bostelmann and others (see README.txt)
@@ -42,6 +55,9 @@ class scheduler_export_form extends moodleform {
         parent::__construct($action, $customdata);
     }
 
+    /**
+     * Form definition
+     */
     protected function definition() {
 
         $mform = $this->_form;
@@ -158,6 +174,14 @@ class scheduler_export_form extends moodleform {
         $mform->addGroup($checkboxes, 'fields-'.$groupid, $grouplabel, null, false);
     }
 
+    /**
+     * Form validation
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

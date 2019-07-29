@@ -61,10 +61,10 @@ div .path-mod-scheduler .appointmentnote {
 
 /* Reduce space usage by single buttons in table cells */
 .path-mod-scheduler table div.singlebutton div {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 .path-mod-scheduler table div.singlebutton input {
-    margin: 0px;
+    margin: 0;
 }
 
 .path-mod-scheduler div.commandbar span.title {
@@ -76,7 +76,7 @@ div .path-mod-scheduler .appointmentnote {
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu {
-    display: inline-block !important;
+    display: inline-block !important; /* stylelint-disable-line declaration-no-important */
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu.show[data-enhanced] .menu.align-tr-br {
@@ -199,8 +199,8 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
 }
 
 .path-mod-scheduler #id_datafieldhdr .col-md-9 {
-	float: none;
-	width: 100%;
+    float: none;
+    width: 100%;
 }
 
 .path-mod-scheduler #id_datafieldhdr .col-form-label,

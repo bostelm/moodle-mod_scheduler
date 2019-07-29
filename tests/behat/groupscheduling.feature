@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod @mod_scheduler
 Feature: Entire groups can be booked into slots at once
   In order to allow booking of entire groups
   As a teacher
@@ -30,7 +30,7 @@ Feature: Entire groups can be booked into slots at once
       | Group A2 | C1     | GA2      |
       | Group B1 | C1     | GB1      |
       | Group B2 | C1     | GB2      |
-   And the following "groupings" exist:
+    And the following "groupings" exist:
       | name       | course  | idnumber  |
       | Grouping A | C1      | GROUPINGA |
       | Grouping B | C1      | GROUPINGB |
@@ -40,11 +40,11 @@ Feature: Entire groups can be booked into slots at once
       | neteacher1 | GA1   |
       | student1   | GA1   |
       | student2   | GA1   |
-      | student3   | GA2   |  
+      | student3   | GA2   |
       | student4   | GA2   |
       | student1   | GB1   |
       | student2   | GB2   |
-      | student3   | GB1   |  
+      | student3   | GB1   |
       | student4   | GB2   |
     And the following "grouping groups" exist:
       | grouping  | group |
@@ -75,7 +75,7 @@ Feature: Entire groups can be booked into slots at once
       | Booking in groups | Yes, in grouping Grouping B |
     And I click on "Save and return to course" "button"
     And I log out
-    
+
   @javascript
   Scenario: Editing teachers can see and schedule relevant groups
     Given I log in as "edteacher1"
@@ -112,7 +112,7 @@ Feature: Entire groups can be booked into slots at once
     And I should see "Group A2" in the "groupstoschedule" "table"
     And I should not see "Group B1" in the "groupstoschedule" "table"
     And I should not see "Group B2" in the "groupstoschedule" "table"
-    
+
   @javascript
   Scenario: Students can book their entire group into a slot
     Given I log in as "edteacher1"
@@ -120,21 +120,21 @@ Feature: Entire groups can be booked into slots at once
     And I follow "Test scheduler no grouping"
     And I add 8 slots 5 days ahead in "Test scheduler" scheduler and I fill the form with:
       | Location    | Large office |
-      | exclusivity | 5            | 
+      | exclusivity | 5            |
     And I add 5 slots 6 days ahead in "Test scheduler" scheduler and I fill the form with:
       | Location    | Small office |
-      | exclusivity | 1            | 
+      | exclusivity | 1            |
     And I log out
-   
+
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler no grouping"
     Then the "appointgroup" select box should contain "Myself"
-    And the "appointgroup" select box should contain "Group A1"       
-    And the "appointgroup" select box should contain "Group B1"       
-    And the "appointgroup" select box should not contain "Group A2"       
-    And the "appointgroup" select box should not contain "Group B2"       
-   
+    And the "appointgroup" select box should contain "Group A1"
+    And the "appointgroup" select box should contain "Group B1"
+    And the "appointgroup" select box should not contain "Group A2"
+    And the "appointgroup" select box should not contain "Group B2"
+
     When I set the field "appointgroup" to "Group A1"
     And I click on "Book slot" "button" in the "8:00 AM" "table_row"
     Then I should see "8:00 AM" in the "Large office" "table_row"
@@ -151,5 +151,3 @@ Feature: Entire groups can be booked into slots at once
     And I should not see "Group B1" in the "groupstoschedule" "table"
     And I should not see "Group B2" in the "groupstoschedule" "table"
     And I log out
-    
-   

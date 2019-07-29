@@ -1,4 +1,4 @@
-@mod_scheduler @javascript @_file_upload
+@mod @mod_scheduler @javascript @_file_upload
 Feature: Student-supplied data
   In order to collect data from students
   As a teacher
@@ -14,7 +14,7 @@ Feature: Student-supplied data
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
     And the following "course enrolments" exist:
-      | user  | course | role           |  
+      | user  | course | role           |
       | teacher1  | C1 | editingteacher |
       | student1  | C1 | student        |
       | student2  | C1 | student        |
@@ -38,29 +38,29 @@ Feature: Student-supplied data
       | Location | My office |
     Then I should see "10 slots have been added"
     And I log out
-           
+
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should see "3:00 AM" in the "slotbookertable" "table"
-    
+
     When I click on "Book slot" "button" in the "3:00 AM" "table_row"
     Then I should see "Please enter your first name"
-    
+
     When I click on "Confirm booking" "button"
-    Then I should see "You must enter text into this field"    
-    
+    Then I should see "You must enter text into this field"
+
     When I set the field "Your message" to "Joe"
     And I click on "Confirm booking" "button"
     Then "Cancel booking" "button" should exist
     And I log out
 
     When I log in as "student2"
-    And I am on "Course 1" course homepage    
+    And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I click on "Book slot" "button" in the "4:00 AM" "table_row"
     Then I should see "Please enter your first name"
-    
+
     When I set the field "Your message" to "Jill"
     And I upload "mod/scheduler/tests/fixtures/studentfile.txt" file to "Upload files" filemanager
     And I click on "Confirm booking" "button"
@@ -74,7 +74,7 @@ Feature: Student-supplied data
     And I follow "My appointments"
     Then I should see "Student 1" in the "3:00 AM" "table_row"
     And I should see "Student 2" in the "4:00 AM" "table_row"
-    
+
     When I click on "Student 1" "text" in the "3:00 AM" "table_row"
     Then I should see "Student 1"
     And I should see "Joe"
@@ -86,4 +86,3 @@ Feature: Student-supplied data
     And I should see "Jill"
     And I should see "studentfile.txt"
     And I log out
-    

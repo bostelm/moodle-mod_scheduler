@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Unit tests for scheduler permissions
@@ -64,6 +78,10 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
      * @var slot[] slots used for testing
      */
     protected $slots;
+
+    /**
+     * @var \mod_scheduler\model\appointment[]
+     */
     protected $appts;
 
     /**
@@ -110,7 +128,7 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
         $dg->enrol_user($this->administ, $course->id, $adminrole);
 
         $options = array();
-        $options['slottimes'] = [time() + DAYSECS, time() + 2*DAYSECS, time() + 3*DAYSECS];
+        $options['slottimes'] = [time() + DAYSECS, time() + 2 * DAYSECS, time() + 3 * DAYSECS];
         $options['slotstudents'] = array_values($this->students);
         $options['slotteachers'] = [$this->edteacher, $this->nonedteacher];
 
@@ -124,7 +142,7 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
         $slotids = array_keys($DB->get_records('scheduler_slots', array('schedulerid' => $this->scheduler->id), 'starttime ASC'));
         $this->slots = array();
         $this->appts = array();
-        foreach($slotids as $key => $id) {
+        foreach ($slotids as $key => $id) {
             $this->slots[$key] = $this->scheduler->get_slot($id);
             $this->appts[$key] = array_values($this->slots[$key]->get_appointments())[0];
         }
