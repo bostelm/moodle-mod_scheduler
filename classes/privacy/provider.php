@@ -36,6 +36,22 @@ use core_privacy\local\request\writer;
 
 defined('MOODLE_INTERNAL') || die();
 
+// Workaround for an interface that was defined only in Moodle 3.5.3.
+if (interface_exists('\core_privacy\local\request\core_userlist_provider')) {
+    abstract class provider_helper implements
+        \core_privacy\local\metadata\provider,
+        \core_privacy\local\request\plugin\provider,
+        \core_privacy\local\request\core_userlist_provider
+    {
+    }
+} else {
+    abstract class provider_helper implements
+        \core_privacy\local\metadata\provider,
+        \core_privacy\local\request\plugin\provider
+    {
+    }
+}
+
 /**
  * Implementation of the privacy subsystem plugin provider for the scheduler activity module.
  *
@@ -43,13 +59,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Henning Bostelmann
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-        // This plugin stores personal data.
-        \core_privacy\local\metadata\provider,
-
-        // This plugin is a core_user_data_provider.
-        \core_privacy\local\request\plugin\provider {
-
+class provider extends provider_helper {
 
     private static $renderer;
 
