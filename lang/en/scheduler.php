@@ -171,6 +171,7 @@ $string['confirmdelete-myunused'] = 'This will delete all your unused slots in t
 $string['confirmdelete-selected'] = 'This will delete the selected slots. Deletion cannot be undone. Continue anyway?';
 $string['confirmdelete-one'] = 'Delete slot?';
 $string['confirmdelete-unused'] = 'This will delete all unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
+$string['confirmrevoke'] = 'Revoke all appointments in the current slot?';
 $string['conflictingslots'] = 'The slot on {$a} cannot be created due to conflicting slots:';
 $string['copytomyself'] = 'Send a copy to myself';
 $string['course'] = 'Course';
