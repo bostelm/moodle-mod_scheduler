@@ -476,13 +476,20 @@ class scheduler_instance extends mvc_record_model {
             }
         } else {
             $gui = new graded_users_iterator($this->get_courserec());
-            $gui->init();
-            while ($userdata = $gui->next_user()) {
-                $uid = $userdata->user->id;
-                if (!array_key_exists($uid, $finalgrades)) {
-                    $finalgrades[$uid] = new stdClass();
-                    $finalgrades[$uid]->userid = $uid;
-                    $finalgrades[$uid]->rawgrade = null;
+            // We must gracefully live through the gradesneedregrading that can be thrown by init()
+            try {
+                $gui->init();
+                while ($userdata = $gui->next_user()) {
+                    $uid = $userdata->user->id;
+                    if (!array_key_exists($uid, $finalgrades)) {
+                        $finalgrades[$uid] = new stdClass();
+                        $finalgrades[$uid]->userid = $uid;
+                        $finalgrades[$uid]->rawgrade = null;
+                    }
+                }
+            } catch (\moodle_exception $e) {
+                if ($e->errorcode != 'gradesneedregrading') {
+                   throw $e;
                 }
             }
         }
