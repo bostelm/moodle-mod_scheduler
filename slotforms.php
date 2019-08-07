@@ -223,13 +223,13 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         // Choose student.
         $students = $this->scheduler->get_available_students($this->usergroups);
-        $studentsmenu = array('0' => get_string('choosedots'));
+        $studentchoices = array();
         if ($students) {
             foreach ($students as $astudent) {
-                $studentsmenu[$astudent->id] = fullname($astudent);
+                $studentchoices[$astudent->id] = fullname($astudent);
             }
         }
-        $grouparray[] = $mform->createElement('select', 'studentid', '', $studentsmenu);
+        $grouparray[] = $mform->createElement('searchableselector', 'studentid', '', $studentchoices);
         $grouparray[] = $mform->createElement('hidden', 'appointid', 0);
 
         // Seen tickbox.
