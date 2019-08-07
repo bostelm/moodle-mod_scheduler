@@ -1410,27 +1410,28 @@ class scheduler_export {
      * @param string $mode output mode
      * @param int $userid id of the teacher to export for, 0 if slots for all teachers are exported
      * @param int $groupid the id of the group (of students) to export appointments for, 0 if none
+     * @param int $timerange whether to include past and/or future slots (0=all, 1=future, 2=past)
      * @param bool $includeempty whether to include slots without appointments
      * @param bool $pageperteacher whether one page should be used for each teacher
      */
-    public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $groupid, $includeempty, $pageperteacher) {
+    public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $groupid, $timerange, $includeempty, $pageperteacher) {
         if ($groupid) {
             $this->studfilter = array_keys(groups_get_members($groupid, 'u.id'));
         }
         $this->canvas->set_title(format_string($scheduler->name));
         if ($userid) {
-            $slots = $scheduler->get_slots_for_teacher($userid, $groupid);
+            $slots = $scheduler->get_slots_for_teacher($userid, $groupid, '', '', $timerange);
             $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
         } else if ($pageperteacher) {
             $teachers = $scheduler->get_teachers();
             foreach ($teachers as $teacher) {
-                $slots = $scheduler->get_slots_for_teacher($teacher->id, $groupid);
+                $slots = $scheduler->get_slots_for_teacher($teacher->id, $groupid, '', '', $timerange);
                 $title = fullname($teacher);
                 $this->canvas->start_page($title);
                 $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
             }
         } else {
-            $slots = $scheduler->get_slots_for_group($groupid);
+            $slots = $scheduler->get_slots_for_group($groupid, '', '', $timerange);
             $this->build_page($scheduler, $fields, $slots, $mode, $includeempty);
         }
     }

@@ -76,6 +76,7 @@ if (!$data || $preview) {
                         $data->content,
                         $userid,
                         $currentgroupid,
+                        $data->timerange,
                         $data->includeemptyslots,
                         $pageperteacher);
 
@@ -114,6 +115,7 @@ $export->build($scheduler,
                $data->content,
                $userid,
                $currentgroupid,
+               $data->timerange,
                $data->includeemptyslots,
                $pageperteacher);
 

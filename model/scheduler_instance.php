@@ -814,10 +814,11 @@ class scheduler_instance extends mvc_record_model {
      * Retrieve a list of slots for a certain teacher or group of teachers
      * @param int $teacherid id of teacher to look for, can be 0
      * @param int $groupid find only slots with a teacher in this group, can be 0
-     * @param bool $inpast include only slots in the past?
+     * @param bool|int $timerange include only slots in the future/past?
+     *            Accepted values are: 0=all, 1=future, 2=past, false=all, true=past
      * @return mixed SQL condition and parameters
      */
-    protected function slots_for_teacher_cond($teacherid, $groupid, $inpast) {
+    protected function slots_for_teacher_cond($teacherid, $groupid, $timerange) {
         $wheres = array();
         $params = array();
         if ($teacherid > 0) {
@@ -828,8 +829,11 @@ class scheduler_instance extends mvc_record_model {
             $wheres[] = "EXISTS (SELECT 1 FROM {groups_members} gm WHERE gm.groupid = :gid AND gm.userid = s.teacherid)";
             $params['gid'] = $groupid;
         }
-        if ($inpast) {
+        if ($timerange === true || $timerange == 2) {
             $wheres[] = "s.starttime < ".strtotime('now');
+        }
+        else if ($timerange == 1) {
+            $wheres[] = "s.starttime >= ".strtotime('now');
         }
         $where = implode(" AND ", $wheres);
         return array($where, $params);
@@ -855,10 +859,11 @@ class scheduler_instance extends mvc_record_model {
      * @param int $groupid find only slots with a teacher in this group, can be 0
      * @param mixed $limitfrom start from this entry
      * @param mixed $limitnum max number of entries
+     * @param int $timerange whether to include past/future slots (0=all, 1=future, 0=past)
      * @return scheduler_slot[]
      */
-    public function get_slots_for_teacher($teacherid, $groupid = 0, $limitfrom = '', $limitnum = '') {
-        list($where, $params) = $this->slots_for_teacher_cond($teacherid, $groupid, false);
+    public function get_slots_for_teacher($teacherid, $groupid = 0, $limitfrom = '', $limitnum = '', $timerange = 0) {
+        list($where, $params) = $this->slots_for_teacher_cond($teacherid, $groupid, $timerange);
         return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC, s.duration ASC, s.teacherid');
     }
 
@@ -868,10 +873,11 @@ class scheduler_instance extends mvc_record_model {
      * @param int $groupid find only slots with a teacher in this group
      * @param mixed $limitfrom start from this entry
      * @param mixed $limitnum max number of entries
+     * @param int $timerange whether to include past/future slots (0=all, 1=future, 0=past)
      * @return scheduler_slot[]
      */
-    public function get_slots_for_group($groupid, $limitfrom = '', $limitnum = '') {
-        list($where, $params) = $this->slots_for_teacher_cond(0, $groupid, false);
+    public function get_slots_for_group($groupid, $limitfrom = '', $limitnum = '', $timerange = 0) {
+        list($where, $params) = $this->slots_for_teacher_cond(0, $groupid, $timerange);
         return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC, s.duration ASC, s.teacherid');
     }
 

@@ -72,6 +72,14 @@ class scheduler_export_form extends moodleform {
 
         }
 
+        $timeoptions = [
+                0 => get_string('exporttimerangeall', 'scheduler'),
+                1 => get_string('exporttimerangefuture', 'scheduler'),
+                2 => get_string('exporttimerangepast', 'scheduler')
+        ];
+        $mform->addElement('select', 'timerange', get_string('exporttimerange', 'scheduler'), $timeoptions);
+        $mform->setDefault('timerange', 0);
+
         $mform->addElement('selectyesno', 'includeemptyslots', get_string('includeemptyslots', 'scheduler'));
         $mform->setDefault('includeemptyslots', 1);
 
