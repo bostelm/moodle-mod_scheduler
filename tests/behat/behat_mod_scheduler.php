@@ -44,6 +44,8 @@ class behat_mod_scheduler extends behat_base {
         $this->execute('behat_general::i_click_on', array('Add slots', 'link'));
         $this->execute('behat_general::click_link', 'Add single slot');
 
+        $this->execute('behat_forms::i_expand_all_fieldsets');
+
         $rows = array();
         $rows[] = array('starttime[day]', date("j", $startdate));
         $rows[] = array('starttime[month]', date("F", $startdate));
@@ -52,7 +54,12 @@ class behat_mod_scheduler extends behat_base {
         $rows[] = array('starttime[minute]', $mins);
         $rows[] = array('duration', '45');
         foreach ($fielddata->getRows() as $row) {
-            $rows[] = $row;
+            if ($row[0] == 'studentid[0]') {
+                $this->execute('behat_forms::i_open_the_autocomplete_suggestions_list');
+                $this->execute('behat_forms::i_click_on_item_in_the_autocomplete_list', $row[1]);
+            } else {
+                $rows[] = $row;
+            }
         }
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', new TableNode($rows));
 
@@ -134,5 +141,25 @@ class behat_mod_scheduler extends behat_base {
         $this->execute('behat_general::i_click_on', array('Save changes', 'button'));
         $this->execute('behat_auth::i_log_out');
 
+    }
+
+    /**
+     * Select item from the nth autocomplete list.
+     *
+     * @Given /^I click on "([^"]*)" item in autocomplete list number (\d+)$/
+     *
+     * @param string $item
+     * @param int $listnumber
+     */
+    public function i_click_on_item_in_the_nth_autocomplete_list($item, $listnumber) {
+
+        $downarrowtarget = "(//span[@class='form-autocomplete-downarrow'])[$listnumber]";
+        $this->execute('behat_general::i_click_on', [$downarrowtarget, 'xpath_element']);
+
+        $xpathtarget = "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|" . $item . "|')])[$listnumber]";
+
+        $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
+
+        $this->execute('behat_general::i_press_key_in_element', ['13', 'body', 'xpath_element']);
     }
 }
