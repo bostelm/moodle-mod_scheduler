@@ -58,6 +58,8 @@ if ($isteacher) {
         include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
     } else if ($action == 'viewstudent') {
         include($CFG->dirroot.'/mod/scheduler/viewstudent.php');
+    } else if ($action == 'import') {
+        include($CFG->dirroot.'/mod/scheduler/import.php');
     } else if ($action == 'export') {
         include($CFG->dirroot.'/mod/scheduler/export.php');
     } else if ($action == 'datelist') {

@@ -357,6 +357,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                         $this->teacherview_tab($baseurl, 'allappointments', 'view', 'allappointments'),
                         $this->teacherview_tab($baseurl, 'datelist', 'datelist'),
                         $statstab,
+                        $this->teacherview_tab($baseurl, 'import', 'import'),
                         $this->teacherview_tab($baseurl, 'export', 'export')
         );
 
