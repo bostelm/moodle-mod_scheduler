@@ -76,7 +76,7 @@ div .path-mod-scheduler .appointmentnote {
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu {
-    display: inline-block;
+    display: inline-block !important;
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu.show[data-enhanced] .menu.align-tr-br {
