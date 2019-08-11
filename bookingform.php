@@ -11,6 +11,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\slot;
+use \mod_scheduler\model\appointment;
+
 require_once($CFG->libdir.'/formslib.php');
 
 /**
@@ -23,7 +26,7 @@ class scheduler_booking_form extends moodleform {
     protected $uploadoptions;
     protected $existing;
 
-    public function __construct(scheduler_slot $slot, $action, $existing = false) {
+    public function __construct(slot $slot, $action, $existing = false) {
         $this->slot = $slot;
         $this->existing = $existing;
         parent::__construct($action, null);
@@ -94,7 +97,7 @@ class scheduler_booking_form extends moodleform {
         return $errors;
     }
 
-    public function prepare_booking_data(scheduler_appointment $appointment) {
+    public function prepare_booking_data(appointment $appointment) {
         $this->appointment = $appointment;
 
         $newdata = clone($appointment->get_data());
@@ -109,7 +112,7 @@ class scheduler_booking_form extends moodleform {
         return $newdata;
     }
 
-    public function save_booking_data(stdClass $formdata, scheduler_appointment $appointment) {
+    public function save_booking_data(stdClass $formdata, appointment $appointment) {
         $scheduler = $appointment->get_scheduler();
         if ($scheduler->uses_studentnotes() && isset($formdata->studentnote_editor)) {
             $editor = $formdata->studentnote_editor;

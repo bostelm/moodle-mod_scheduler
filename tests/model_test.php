@@ -10,6 +10,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\scheduler;
+use \mod_scheduler\model\appointment_factory;
+
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
@@ -74,12 +77,12 @@ class mod_scheduler_model_testcase extends advanced_testcase {
     /**
      * Test loading a scheduler instance from the database
      */
-    public function test_scheduler_instance() {
+    public function test_scheduler() {
         global $DB;
 
         $dbdata = $DB->get_record('scheduler', array('id' => $this->schedulerid));
 
-        $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
+        $instance = scheduler::load_by_coursemodule_id($this->moduleid);
 
         $this->assertEquals( $dbdata->name, $instance->get_name());
 
@@ -93,9 +96,9 @@ class mod_scheduler_model_testcase extends advanced_testcase {
 
         global $DB;
 
-        $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
+        $instance = scheduler::load_by_coursemodule_id($this->moduleid);
         $slot = array_values($instance->get_slots())[0];
-        $factory = new scheduler_appointment_factory($slot);
+        $factory = new appointment_factory($slot);
 
         $user = $this->getdataGenerator()->create_user();
 

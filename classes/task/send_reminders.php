@@ -12,9 +12,6 @@ namespace mod_scheduler\task;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/../../model/scheduler_instance.php');
-require_once(dirname(__FILE__).'/../../model/scheduler_slot.php');
-require_once(dirname(__FILE__).'/../../model/scheduler_appointment.php');
 require_once(dirname(__FILE__).'/../../mailtemplatelib.php');
 
 /**
@@ -45,7 +42,7 @@ require_once(dirname(__FILE__).'/../../mailtemplatelib.php');
             $teacher = $DB->get_record('user', array('id' => $slot->teacherid));
 
             // Get scheduler, slot and course.
-            $scheduler = \scheduler_instance::load_by_id($slot->schedulerid);
+            $scheduler = \mod_scheduler\model\scheduler::load_by_id($slot->schedulerid);
             $slotm = $scheduler->get_slot($slot->id);
             $course = $scheduler->get_courserec();
 

@@ -10,11 +10,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir.'/filelib.php');
 require_once(dirname(__FILE__).'/customlib.php');
-
-require_once(dirname(__FILE__).'/model/scheduler_instance.php');
-require_once(dirname(__FILE__).'/model/scheduler_slot.php');
-require_once(dirname(__FILE__).'/model/scheduler_appointment.php');
 
 
 /* Events related functions */
@@ -182,7 +179,7 @@ class scheduler_file_info extends file_info {
     protected $areas;
     /** @var string File area to browse */
     protected $filearea;
-    /** @var scheduler_instance The scheduler that this file area refers to */
+    /** @var scheduler The scheduler that this file area refers to */
     protected $scheduler;
 
     /**
@@ -201,7 +198,7 @@ class scheduler_file_info extends file_info {
         $this->cm       = $cm;
         $this->areas    = $areas;
         $this->filearea = $filearea;
-        $this->scheduler = scheduler_instance::load_by_coursemodule_id($cm->id);
+        $this->scheduler = scheduler::load_by_coursemodule_id($cm->id);
     }
 
     /**

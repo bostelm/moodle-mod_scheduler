@@ -10,6 +10,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\scheduler;
+
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/mod/scheduler/exportlib.php');
 
@@ -24,7 +26,7 @@ require_once($CFG->dirroot.'/mod/scheduler/exportlib.php');
 class scheduler_export_form extends moodleform {
 
     /**
-     * @var scheduler_instance the scheduler to be exported
+     * @var scheduler the scheduler to be exported
      */
     protected $scheduler;
 
@@ -32,10 +34,10 @@ class scheduler_export_form extends moodleform {
      * Create a new export settings form.
      *
      * @param string $action
-     * @param scheduler_instance $scheduler the scheduler to export
+     * @param scheduler $scheduler the scheduler to export
      * @param object $customdata
      */
-    public function __construct($action, scheduler_instance $scheduler, $customdata=null) {
+    public function __construct($action, scheduler $scheduler, $customdata=null) {
         $this->scheduler = $scheduler;
         parent::__construct($action, $customdata);
     }

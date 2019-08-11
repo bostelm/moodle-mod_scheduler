@@ -43,7 +43,7 @@ if ($data) {
     }
     $userid = $USER->id;
     if (isset($data->includewhom) && $data->includewhom == 'all') {
-        require_capability('mod/scheduler:canseeotherteachersbooking', $context);
+        $permissions->ensure($permissions->can_see_all_slots());
         $userid = 0;
     }
     $pageperteacher = isset($data->paging) && $data->paging == 'perteacher';
@@ -57,7 +57,7 @@ if (!$data || $preview) {
 
     // Print top tabs.
     $taburl = new moodle_url('/mod/scheduler/view.php', array('id' => $scheduler->cmid, 'what' => 'export'));
-    echo $output->teacherview_tabs($scheduler, $taburl, 'export');
+    echo $output->teacherview_tabs($scheduler, $permissions, $taburl, 'export');
 
     if ($groupmode) {
         groups_print_activity_menu($scheduler->cm, $taburl);

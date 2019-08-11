@@ -55,6 +55,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
       | moodle/site:accessallgroups | Prevent    | teacher | Course       | C1        |
+      | mod/scheduler:canseeotherteachersbooking | Allow | teacher | Course  | C1     |
     And I add the upcoming events block globally
     And I log in as "edteacher1"
     And I am on "Course 1" course homepage

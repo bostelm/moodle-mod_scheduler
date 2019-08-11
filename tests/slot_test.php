@@ -10,6 +10,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\scheduler;
+use \mod_scheduler\model\slot;
+
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
@@ -121,7 +124,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
         global $DB;
 
-        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
+        $scheduler = scheduler::load_by_id($this->schedulerid);
         $slot = $scheduler->create_slot();
 
         $slot->teacherid = $this->getDataGenerator()->create_user()->id;
@@ -149,15 +152,15 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
      */
     public function test_delete() {
 
-        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
+        $scheduler = scheduler::load_by_id($this->schedulerid);
 
         // Make sure calendar events are all created.
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
         $start = $slot->starttime;
         $slot->save();
 
         // Load again, to delete.
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
         $slot->delete();
 
         $this->assert_record_absent('scheduler_slots', $this->slotid);
@@ -179,8 +182,8 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
         global $DB;
 
-        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
 
         $oldcnt = $DB->count_records('scheduler_appointment', array('slotid' => $slot->get_id()));
         $this->assertEquals(3, $oldcnt, "Counting number of appointments before addition");
@@ -202,8 +205,8 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
         global $DB;
 
-        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
 
         $apps = $slot->get_appointments();
         $appointment = array_pop($apps);
@@ -223,8 +226,8 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
     public function test_calendar_events() {
         global $DB;
 
-        $scheduler = scheduler_instance::load_by_id($this->schedulerid);
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
         $slot->save();
 
         $oldstart = $slot->starttime;
@@ -256,7 +259,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
 
         // Delete all appointments.
         $DB->delete_records('scheduler_appointment', array('slotid' => $this->slotid));
-        $slot = scheduler_slot::load_by_id($this->slotid, $scheduler);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
         $slot->save();
 
         foreach ($this->students as $student) {

@@ -25,10 +25,10 @@ class booking_added extends slot_base {
     /**
      * Create this event on a given scheduler.
      *
-     * @param \scheduler_instance $scheduler
+     * @param \mod_scheduler\model\scheduler $scheduler
      * @return \core\event\base
      */
-    public static function create_from_slot(\scheduler_slot $slot) {
+    public static function create_from_slot(\mod_scheduler\model\slot $slot) {
         $event = self::create(self::base_data($slot));
         $event->set_slot($slot);
         return $event;

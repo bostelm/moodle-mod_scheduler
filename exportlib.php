@@ -10,6 +10,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\scheduler;
+use \mod_scheduler\model\slot;
+use \mod_scheduler\model\appointment;
+
 require_once($CFG->dirroot.'/lib/excellib.class.php');
 require_once($CFG->dirroot.'/lib/odslib.class.php');
 require_once($CFG->dirroot.'/lib/csvlib.class.php');
@@ -36,7 +40,7 @@ abstract class scheduler_export_field {
      * Is the field available in this scheduler?
      * @return bool whether the field is available
      */
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return true;
     }
 
@@ -60,7 +64,7 @@ abstract class scheduler_export_field {
      * @param $scheduler the scheduler instance in question
      * @return string the header for this field
      */
-    public function get_header(scheduler_instance $scheduler) {
+    public function get_header(scheduler $scheduler) {
         return get_string('field-'.$this->get_id(), 'scheduler');
     }
 
@@ -71,7 +75,7 @@ abstract class scheduler_export_field {
      * @param $scheduler the scheduler instance in question
      * @return string the header for this field
      */
-    public function get_headers(scheduler_instance $scheduler) {
+    public function get_headers(scheduler $scheduler) {
         return array($this->get_header($scheduler));
     }
 
@@ -82,7 +86,7 @@ abstract class scheduler_export_field {
      * @param $scheduler the scheduler instance in question
      * @return string the form label for this field
      */
-    public function get_formlabel(scheduler_instance $scheduler) {
+    public function get_formlabel(scheduler $scheduler) {
         return $this->get_header($scheduler);
     }
 
@@ -92,7 +96,7 @@ abstract class scheduler_export_field {
      * @param $scheduler the scheduler instance in question
      * @return int the number of columns used
      */
-    public function get_num_columns(scheduler_instance $scheduler) {
+    public function get_num_columns(scheduler $scheduler) {
         return 1;
     }
 
@@ -103,7 +107,7 @@ abstract class scheduler_export_field {
      * @param $scheduler the scheduler instance in question
      * @return int the width of this field (number of characters per column)
      */
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return strlen($this->get_formlabel($scheduler));
     }
 
@@ -123,7 +127,7 @@ abstract class scheduler_export_field {
      * @param $appointment the appointment to evaluate (may be null for an empty slot)
      * @return string the value of this field for the given data
      */
-    public abstract function get_value(scheduler_slot $slot, $appointment);
+    public abstract function get_value(slot $slot, $appointment);
 
     /**
      * Retrieve the value of this field as an array.
@@ -133,7 +137,7 @@ abstract class scheduler_export_field {
      * @param $appointment the appointment to evaluate (may be null for an empty slot)
      * @return array an array of strings containing the column values
      */
-    public function get_values(scheduler_slot $slot, $appointment) {
+    public function get_values(slot $slot, $appointment) {
         return array($this->get_value($slot, $appointment));
     }
 
@@ -145,15 +149,15 @@ abstract class scheduler_export_field {
  *
  * @return array the fields as an array of scheduler_export_field objects.
  */
-function scheduler_get_export_fields(scheduler_instance $scheduler) {
+function scheduler_get_export_fields(scheduler $scheduler) {
     $result = array();
-    $result[] = new scheduler_slotdate_field();
+    $result[] = new slotdate_field();
     $result[] = new scheduler_starttime_field();
     $result[] = new scheduler_endtime_field();
     $result[] = new scheduler_location_field();
     $result[] = new scheduler_teachername_field();
     $result[] = new scheduler_maxstudents_field();
-    $result[] = new scheduler_slotnotes_field();
+    $result[] = new slotnotes_field();
 
     $result[] = new scheduler_student_field('studentfullname', 'fullname', 25);
     $result[] = new scheduler_student_field('studentfirstname', 'firstname');
@@ -189,7 +193,7 @@ function scheduler_get_export_fields(scheduler_instance $scheduler) {
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class scheduler_slotdate_field extends scheduler_export_field {
+class slotdate_field extends scheduler_export_field {
 
     public function get_id() {
         return 'date';
@@ -199,11 +203,11 @@ class scheduler_slotdate_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return strlen(mod_scheduler_renderer::userdate(1)) + 3;
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return mod_scheduler_renderer::userdate($slot->starttime);
     }
 }
@@ -225,7 +229,7 @@ class scheduler_starttime_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return mod_scheduler_renderer::usertime($slot->starttime);
     }
 
@@ -249,7 +253,7 @@ class scheduler_endtime_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return mod_scheduler_renderer::usertime($slot->endtime);
     }
 
@@ -272,15 +276,15 @@ class scheduler_teachername_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_header(scheduler_instance $scheduler) {
+    public function get_header(scheduler $scheduler) {
         return $scheduler->get_teacher_name();
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return 20;
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return fullname($slot->teacher);
     }
 
@@ -303,7 +307,7 @@ class scheduler_location_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return format_string($slot->appointmentlocation);
     }
 
@@ -326,7 +330,7 @@ class scheduler_maxstudents_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if ($slot->exclusivity <= 0) {
             return get_string('unlimited', 'scheduler');
         } else {
@@ -365,7 +369,7 @@ class scheduler_student_field extends scheduler_export_field {
         return 'student';
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         if (!$this->idfield) {
             return true;
         }
@@ -373,7 +377,7 @@ class scheduler_student_field extends scheduler_export_field {
         return has_capability('moodle/site:viewuseridentity', $ctx);
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         if ($this->typicalwidth > 0) {
             return $this->typicalwidth;
         } else {
@@ -381,7 +385,7 @@ class scheduler_student_field extends scheduler_export_field {
         }
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -435,16 +439,16 @@ class scheduler_profile_field extends scheduler_export_field {
         return 'student';
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return $this->field->is_visible();
     }
 
-    public function get_header(scheduler_instance $scheduler) {
+    public function get_header(scheduler $scheduler) {
         return format_string($this->field->field->name);
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
-        if (!$appointment instanceof scheduler_appointment || $appointment->studentid == 0) {
+    public function get_value(slot $slot, $appointment) {
+        if (!$appointment instanceof appointment || $appointment->studentid == 0) {
             return '';
         }
         $this->field->set_userid($appointment->studentid);
@@ -476,7 +480,7 @@ class scheduler_attended_field extends scheduler_export_field {
         return 'appointment';
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -493,7 +497,7 @@ class scheduler_attended_field extends scheduler_export_field {
  * @copyright  2016 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class scheduler_slotnotes_field extends scheduler_export_field {
+class slotnotes_field extends scheduler_export_field {
 
     public function get_id() {
         return 'slotnotes';
@@ -503,7 +507,7 @@ class scheduler_slotnotes_field extends scheduler_export_field {
         return 'slot';
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
@@ -511,7 +515,7 @@ class scheduler_slotnotes_field extends scheduler_export_field {
         return true;
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return strip_tags($slot->notes);
     }
 
@@ -534,7 +538,7 @@ class scheduler_appointmentnote_field extends scheduler_export_field {
         return 'appointment';
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
@@ -542,11 +546,11 @@ class scheduler_appointmentnote_field extends scheduler_export_field {
         return true;
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return $scheduler->uses_appointmentnotes();
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -572,7 +576,7 @@ class scheduler_teachernote_field extends scheduler_export_field {
         return 'appointment';
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
@@ -580,11 +584,11 @@ class scheduler_teachernote_field extends scheduler_export_field {
         return true;
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return $scheduler->uses_teachernotes();
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -610,7 +614,7 @@ class scheduler_studentnote_field extends scheduler_export_field {
         return 'appointment';
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
@@ -618,11 +622,11 @@ class scheduler_studentnote_field extends scheduler_export_field {
         return true;
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return $scheduler->uses_studentnotes();
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -648,7 +652,7 @@ class scheduler_filecount_field extends scheduler_export_field {
         return 'appointment';
     }
 
-    public function get_typical_width(scheduler_instance $scheduler) {
+    public function get_typical_width(scheduler $scheduler) {
         return 2;
     }
 
@@ -656,11 +660,11 @@ class scheduler_filecount_field extends scheduler_export_field {
         return false;
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return $scheduler->uses_studentfiles();
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -686,11 +690,11 @@ class scheduler_grade_field extends scheduler_export_field {
         return 'appointment';
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return $scheduler->uses_grades();
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -716,16 +720,16 @@ class scheduler_groups_single_field extends scheduler_export_field {
         return 'student';
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         $g = groups_get_all_groups($scheduler->courseid, 0, $scheduler->get_cm()->groupingid);
         return count($g) > 0;
     }
 
-    public function get_formlabel(scheduler_instance $scheduler) {
+    public function get_formlabel(scheduler $scheduler) {
         return get_string('field-groupssingle-label', 'scheduler');
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -752,7 +756,7 @@ class scheduler_groups_multi_field extends scheduler_export_field {
 
     protected $coursegroups;
 
-    public function __construct(scheduler_instance $scheduler) {
+    public function __construct(scheduler $scheduler) {
         $this->coursegroups =  groups_get_all_groups($scheduler->courseid, 0, $scheduler->get_cm()->groupingid);
     }
 
@@ -764,15 +768,15 @@ class scheduler_groups_multi_field extends scheduler_export_field {
         return 'student';
     }
 
-    public function is_available(scheduler_instance $scheduler) {
+    public function is_available(scheduler $scheduler) {
         return count($this->coursegroups) > 0;
     }
 
-    public function get_num_columns(scheduler_instance $scheduler) {
+    public function get_num_columns(scheduler $scheduler) {
         return count($this->coursegroups);
     }
 
-    public function get_headers(scheduler_instance $scheduler) {
+    public function get_headers(scheduler $scheduler) {
         $result = array();
         foreach ($this->coursegroups as $group) {
             $result[] = $group->name;
@@ -780,11 +784,11 @@ class scheduler_groups_multi_field extends scheduler_export_field {
         return $result;
     }
 
-    public function get_value(scheduler_slot $slot, $appointment) {
+    public function get_value(slot $slot, $appointment) {
         return '';
     }
 
-    public function get_values(scheduler_slot $slot, $appointment) {
+    public function get_values(slot $slot, $appointment) {
         if (! $appointment instanceof scheduler_appointment) {
             return '';
         }
@@ -1405,7 +1409,7 @@ class scheduler_export {
     /**
      * Build the output on the canvas.
      *
-     * @param scheduler_instance $scheduler the scheduler to export
+     * @param scheduler $scheduler the scheduler to export
      * @param array $fields the fields to include
      * @param string $mode output mode
      * @param int $userid id of the teacher to export for, 0 if slots for all teachers are exported
@@ -1414,7 +1418,7 @@ class scheduler_export {
      * @param bool $includeempty whether to include slots without appointments
      * @param bool $pageperteacher whether one page should be used for each teacher
      */
-    public function build(scheduler_instance $scheduler, array $fields, $mode, $userid, $groupid, $timerange, $includeempty, $pageperteacher) {
+    public function build(scheduler $scheduler, array $fields, $mode, $userid, $groupid, $timerange, $includeempty, $pageperteacher) {
         if ($groupid) {
             $this->studfilter = array_keys(groups_get_members($groupid, 'u.id'));
         }
@@ -1440,13 +1444,13 @@ class scheduler_export {
      * Write a page of output to the canvas.
      * (Pages correspond to "tabs" in spreadsheet format, not to printed pages.)
      *
-     * @param scheduler_instance $scheduler the scheduler being exported
+     * @param scheduler $scheduler the scheduler being exported
      * @param array $fields the fields to include
      * @param array $slots the slots to include
      * @param string $mode output mode
      * @param bool $includeempty whether to include slots without appointments
      */
-    protected function build_page(scheduler_instance $scheduler, array $fields, array $slots, $mode, $includeempty) {
+    protected function build_page(scheduler $scheduler, array $fields, array $slots, $mode, $includeempty) {
 
         // Output the header.
         $row = 0;
@@ -1499,13 +1503,13 @@ class scheduler_export {
     /**
      * Write a row of the export to the canvas
      * @param int $row row number on canvas
-     * @param scheduler_slot $slot the slot of the appointment to write
-     * @param scheduler_appointment $appointment the appointment to write
+     * @param slot $slot the slot of the appointment to write
+     * @param appointment $appointment the appointment to write
      * @param array $fields list of fields to include
      * @param bool $includeslotfields whether fields relating to slots, rather than appointments, should be included
      * @param string $multiple whether the row represents multiple values (appointments)
      */
-    protected function write_row($row, scheduler_slot $slot, $appointment, array $fields, $includeslotfields = true, $multiple = false) {
+    protected function write_row($row, slot $slot, $appointment, array $fields, $includeslotfields = true, $multiple = false) {
 
         $col = 0;
         foreach ($fields as $field) {
@@ -1531,10 +1535,10 @@ class scheduler_export {
      * Write a summary of slot-related data into a row
      *
      * @param int $row the row number on the canvas
-     * @param scheduler_slot $slot the slot to be written
+     * @param slot $slot the slot to be written
      * @param array $fields the fields to include
      */
-    protected function write_row_summary($row, scheduler_slot $slot, array $fields) {
+    protected function write_row_summary($row, slot $slot, array $fields) {
 
         $strs = array();
         $cols = 0;

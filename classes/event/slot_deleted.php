@@ -26,10 +26,10 @@ class slot_deleted extends slot_base {
     /**
      * Create this event on a given slot.
      *
-     * @param \scheduler_slot $slot
+     * @param \mod_scheduler\model\slot $slot
      * @return \core\event\base
      */
-    public static function create_from_slot(\scheduler_slot $slot, $action) {
+    public static function create_from_slot(\mod_scheduler\model\slot $slot, $action) {
         $data = self::base_data($slot);
         $data['other'] = array('action' => $action);
         $event = self::create($data);

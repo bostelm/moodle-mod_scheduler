@@ -24,7 +24,7 @@ echo $OUTPUT->header();
 
 // Display navigation tabs.
 
-echo $output->teacherview_tabs($scheduler, $taburl, $subpage);
+echo $output->teacherview_tabs($scheduler, $permissions, $taburl, $subpage);
 
 // Find active group in case that group mode is in use.
 $currentgroupid = 0;

@@ -53,6 +53,7 @@ Feature: Booking of appointments with individual tutors per group
     And the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
       | moodle/site:accessallgroups | Prevent    | teacher | Course       | C1        |
+      | mod/scheduler:canseeotherteachersbooking | Allow | teacher | Course  | C1     |
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   | groupmode | schedulermode | maxbookings |
       | scheduler | Tutor sessions | n     | C1     | scheduler1 | 1         | oneonly       | 0           |

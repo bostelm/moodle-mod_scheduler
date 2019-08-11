@@ -26,10 +26,10 @@ class booking_removed extends slot_base {
     /**
      * Create this event on a given slot.
      *
-     * @param \scheduler_slot $slot
+     * @param \mod_scheduler\model\slot $slot
      * @return \core\event\base
      */
-    public static function create_from_slot(\scheduler_slot $slot) {
+    public static function create_from_slot(\mod_scheduler\model\slot $slot) {
         $event = self::create(self::base_data($slot));
         $event->set_slot($slot);
         return $event;

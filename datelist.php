@@ -45,7 +45,7 @@ echo $output->header();
 
 // Print top tabs.
 
-echo $output->teacherview_tabs($scheduler, $taburl, 'datelist');
+echo $output->teacherview_tabs($scheduler, $permissions, $taburl, 'datelist');
 
 
 // Find active group in case that group mode is in use.

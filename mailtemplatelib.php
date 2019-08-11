@@ -10,6 +10,9 @@
 
 defined ( 'MOODLE_INTERNAL' ) || die ();
 
+use \mod_scheduler\model\scheduler;
+use \mod_scheduler\model\slot;
+
 /**
  * Message functionality for scheduler module
  *
@@ -134,8 +137,8 @@ class scheduler_messenger {
      * Construct an array with subtitution rules for mail templates, relating to
      * a single appointment. Any of the parameters can be null.
      *
-     * @param scheduler_instance $scheduler The scheduler instance
-     * @param scheduler_slot $slot The slot data as an MVC object, may be null
+     * @param scheduler $scheduler The scheduler instance
+     * @param slot $slot The slot data as an MVC object, may be null
      * @param user $teacher A {@link $USER} object describing the attendant (teacher)
      * @param user $student A {@link $USER} object describing the attendee (student)
      * @param object $course A course object relating to the ontext of the message
@@ -143,7 +146,7 @@ class scheduler_messenger {
      *                          (used for determining the message language)
      * @return array A hash with mail template substitutions
      */
-    public static function get_scheduler_variables(scheduler_instance $scheduler,  $slot,
+    public static function get_scheduler_variables(scheduler $scheduler,  $slot,
                                                    $teacher, $student, $course, $recipient) {
 
         global $CFG;
@@ -187,7 +190,7 @@ class scheduler_messenger {
     /**
      * Send a notification message about a scheduler slot.
      *
-     * @param scheduler_slot $slot the slot that the notification relates to
+     * @param slot $slot the slot that the notification relates to
      * @param string $messagename name of message as in db/message.php
      * @param string $template template name to use (language string up to prefix/postfix)
      * @param stdClass $sender user record for sender
@@ -196,7 +199,7 @@ class scheduler_messenger {
      * @param stdClass $student user record for student
      * @param stdClass $course course record
      */
-    public static function send_slot_notification(scheduler_slot $slot, $messagename, $template,
+    public static function send_slot_notification(slot $slot, $messagename, $template,
                                                   stdClass $sender, stdClass $recipient,
                                                   stdClass $teacher, stdClass $student, stdClass $course) {
         $vars = self::get_scheduler_variables($slot->get_scheduler(), $slot, $teacher, $student, $course, $recipient);

@@ -10,14 +10,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\scheduler;
+
 /**
  * Print a selection box of existing slots to be scheduler in
  *
- * @param scheduler_instance $scheduler
+ * @param scheduler $scheduler
  * @param int $studentid student to schedule
  * @param int $groupid group to schedule
  */
-function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
+function scheduler_print_schedulebox(scheduler $scheduler, $studentid, $groupid = 0) {
     global $output;
 
     $availableslots = $scheduler->get_slots_available_to_student($studentid);
@@ -127,6 +129,8 @@ if ($action != 'view') {
 
 /************************************ View : New single slot form ****************************************/
 if ($action == 'addslot') {
+    $permissions->ensure($permissions->can_edit_own_slots());
+
     $actionurl = new moodle_url($baseurl, array('what' => 'addslot'));
 
     if (!$scheduler->has_available_teachers()) {
@@ -157,6 +161,9 @@ if ($action == 'updateslot') {
 
     $slotid = required_param('slotid', PARAM_INT);
     $slot = $scheduler->get_slot($slotid);
+    $permissions->ensure($permissions->can_edit_slot($slot));
+
+
     if ($slot->starttime % 300 !== 0 || $slot->duration % 5 !== 0) {
         $timeoptions = array('step' => 1, 'optional' => false);
     } else {
@@ -192,6 +199,8 @@ if ($action == 'updateslot') {
 /************************************ Add session multiple slots form ****************************************/
 if ($action == 'addsession') {
 
+    $permissions->ensure($permissions->can_edit_own_slots());
+
     $actionurl = new moodle_url($baseurl, array('what' => 'addsession'));
 
     if (!$scheduler->has_available_teachers()) {
@@ -215,6 +224,8 @@ if ($action == 'addsession') {
 
 /************************************ Schedule a student form ***********************************************/
 if ($action == 'schedule') {
+    $permissions->ensure($permissions->can_edit_own_slots());
+
     echo $output->header();
 
     if ($subaction == 'dochooseslot') {
@@ -261,6 +272,8 @@ if ($action == 'schedule') {
 }
 /************************************ Schedule a whole group in form ***********************************************/
 if ($action == 'schedulegroup') {
+
+    $permissions->ensure($permissions->can_edit_own_slots());
 
     $groupid = required_param('groupid', PARAM_INT);
     $group = $DB->get_record('groups', array('id' => $groupid), '*', MUST_EXIST);
@@ -319,6 +332,8 @@ if ($action == 'schedulegroup') {
 
 /************************************ Send message to students ****************************************/
 if ($action == 'sendmessage') {
+    $permissions->ensure($permissions->can_edit_own_slots());
+
     require_once($CFG->dirroot.'/mod/scheduler/message_form.php');
 
     $template = optional_param('template', 'none', PARAM_ALPHA);
@@ -375,7 +390,7 @@ if ($DB->count_records('scheduler_slots', array('schedulerid' => $scheduler->id)
 
 echo $output->header();
 
-echo $output->teacherview_tabs($scheduler, $taburl, $subpage, $inactive);
+echo $output->teacherview_tabs($scheduler, $permissions, $taburl, $subpage, $inactive);
 if ($groupmode) {
     if ($subpage == 'allappointments') {
         groups_print_activity_menu($cm, $taburl);
@@ -449,7 +464,7 @@ if ($slots) {
     $delselected->formid = 'delselected';
     $delbuttons[] = $delselected;
 
-    if (has_capability('mod/scheduler:manageallappointments', $context) && $subpage == 'allappointments') {
+    if ($permissions->can_edit_all_slots() && $subpage == 'allappointments') {
         $delbuttons[] = $commandbar->action_link(
                         new moodle_url($actionurl, array('what' => 'deleteall')),
                         'deleteallslots', 't/delete', 'confirmdelete-all');
@@ -478,7 +493,7 @@ if ($slots) {
 
     foreach ($slots as $slot) {
 
-        $editable = ($USER->id == $slot->teacherid || has_capability('mod/scheduler:manageallappointments', $context));
+        $editable = $permissions->can_edit_slot($slot);
 
         $studlist = new scheduler_student_list($slotman->scheduler);
         $studlist->expandable = false;
@@ -489,7 +504,8 @@ if ($slots) {
         $studlist->buttontext = get_string('saveseen', 'scheduler');
         $studlist->actionurl = new moodle_url($actionurl, array('what' => 'saveseen', 'slotid' => $slot->id));
         foreach ($slot->get_appointments() as $app) {
-            $studlist->add_student($app, false, $app->is_attended(), true, $scheduler->uses_studentdata());
+            $studlist->add_student($app, false, $app->is_attended(), true, $scheduler->uses_studentdata(),
+                                   $permissions->can_edit_attended($app));
         }
 
         $slotman->add_slot($slot, $studlist, $editable);

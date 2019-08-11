@@ -23,7 +23,7 @@ require_once($CFG->libdir.'/formslib.php');
 class scheduler_message_form extends moodleform {
 
     /**
-     * @var scheduler_instance scheduler in whose context the messages are sent
+     * @var scheduler scheduler in whose context the messages are sent
      */
     protected $scheduler;
 
@@ -31,10 +31,10 @@ class scheduler_message_form extends moodleform {
      * Create a new messge form
      *
      * @param string $action
-     * @param scheduler_instance $scheduler scheduler in whose context the messages are sent
+     * @param scheduler $scheduler scheduler in whose context the messages are sent
      * @param object $customdata
      */
-    public function __construct($action, scheduler_instance $scheduler, $customdata=null) {
+    public function __construct($action, scheduler $scheduler, $customdata=null) {
         $this->scheduler = $scheduler;
         parent::__construct($action, $customdata);
     }

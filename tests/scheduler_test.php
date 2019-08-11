@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Unit tests for the scheduler_instance class.
+ * Unit tests for the scheduler class.
  *
  * @package    mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -10,11 +10,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use \mod_scheduler\model\scheduler;
+use \mod_scheduler\model\slot;
+use \mod_scheduler\model\appointment;
+
 global $CFG;
 require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 
 /**
- * Unit tests for the scheduler_instance class.
+ * Unit tests for the scheduler class.
  *
  * @group mod_scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
@@ -23,7 +27,7 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
 class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
     /**
-     * @var intger Course_module id used for testing
+     * @var int Course_module id used for testing
      */
     protected $moduleid;
 
@@ -108,12 +112,12 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
     /**
      * Test a scheduler instance
      */
-    public function test_scheduler_instance() {
+    public function test_scheduler() {
         global $DB;
 
         $dbdata = $DB->get_record('scheduler', array('id' => $this->schedulerid));
 
-        $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
+        $instance = scheduler::load_by_coursemodule_id($this->moduleid);
 
         $this->assertEquals($dbdata->name, $instance->get_name());
 
@@ -125,7 +129,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
     public function test_load_slots() {
         global $DB;
 
-        $instance = scheduler_instance::load_by_coursemodule_id($this->moduleid);
+        $instance = scheduler::load_by_coursemodule_id($this->moduleid);
 
         /* test slot retrieval */
 
@@ -143,7 +147,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
         $cnt = 0;
         foreach ($allslots as $slot) {
-            $this->assertTrue($slot instanceof scheduler_slot);
+            $this->assertTrue($slot instanceof slot);
 
             if ($cnt == 5) {
                 $expectedapp = 2;
@@ -158,7 +162,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
             $this->assertEquals($expectedapp, count($apps));
 
             foreach ($apps as $app) {
-                $this->assertTrue($app instanceof scheduler_appointment);
+                $this->assertTrue($app instanceof appointment);
             }
             $cnt++;
         }
@@ -170,7 +174,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
      */
     public function test_add_slot() {
 
-        $scheduler = scheduler_instance::load_by_coursemodule_id($this->moduleid);
+        $scheduler = scheduler::load_by_coursemodule_id($this->moduleid);
 
         $newslot = $scheduler->create_slot();
         $newslot->teacherid = $this->getDataGenerator()->create_user()->id;
@@ -200,7 +204,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
         $delrec = $this->getDataGenerator()->create_module('scheduler', array('course' => $this->courseid), $options);
         $delid = $delrec->id;
 
-        $delsched = scheduler_instance::load_by_id($delid);
+        $delsched = scheduler::load_by_id($delid);
 
         $this->assert_record_count('scheduler', 'id', $this->schedulerid, 1);
         $this->assert_record_count('scheduler_slots', 'schedulerid', $this->schedulerid, 6);
@@ -252,7 +256,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
     private function check_timed_slots($schedulerid, $studentid, $slotoptions,
                                        $expattended, $expupcoming, $expavailable, $expbookable) {
 
-        $sched = scheduler_instance::load_by_id($schedulerid);
+        $sched = scheduler::load_by_id($schedulerid);
 
         $attended = $sched->get_attended_slots_for_student($studentid);
         $this->assert_slot_times($expattended, $attended, $slotoptions, 'Attended slots');
@@ -367,7 +371,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
      */
     private function assert_bookable_appointments($expectedwithchangeables, $expectedwithoutchangeables,
                                                   $schedid, $studentid) {
-        $scheduler = scheduler_instance::load_by_id($schedid);
+        $scheduler = scheduler::load_by_id($schedid);
 
         $actualwithchangeables = $scheduler->count_bookable_appointments($studentid, true);
         $this->assertEquals($expectedwithchangeables, $actualwithchangeables,
@@ -420,7 +424,7 @@ class mod_scheduler_scheduler_testcase extends advanced_testcase {
 
         $schedrec = $this->getDataGenerator()->create_module('scheduler', array('course' => $course->id), $options);
 
-        $scheduler = scheduler_instance::load_by_id($schedrec->id);
+        $scheduler = scheduler::load_by_id($schedrec->id);
 
         $scheduler->schedulermode = $schedulermode;
         $scheduler->maxbookings = $maxbookings;

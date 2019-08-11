@@ -26,10 +26,10 @@ class booking_form_viewed extends scheduler_base {
     /**
      * Create this event on a given scheduler.
      *
-     * @param \scheduler_instance $scheduler
+     * @param \mod_scheduler\model\scheduler $scheduler
      * @return \core\event\base
      */
-    public static function create_from_scheduler(\scheduler_instance $scheduler) {
+    public static function create_from_scheduler(\mod_scheduler\model\scheduler $scheduler) {
         $event = self::create(self::base_data($scheduler));
         $event->set_scheduler($scheduler);
         return $event;

@@ -12,13 +12,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 
-if (!has_capability('mod/scheduler:manage', $context)) {
-    require_capability('mod/scheduler:manageallappointments', $context);
-}
-
 $appointmentid = required_param('appointmentid', PARAM_INT);
 list($slot, $appointment) = $scheduler->get_slot_appointment($appointmentid);
 $studentid = $appointment->studentid;
+
+$permissions->ensure($permissions->can_see_appointment($appointment));
 
 $urlparas = array('what' => 'viewstudent',
     'id' => $scheduler->cmid,
@@ -49,8 +47,8 @@ if ($subpage == 'thisappointment') {
     $returnurl = new moodle_url($taburl, array('page' => 'thisappointment'));
 
     $distribute = ($slot->get_appointment_count() > 1);
-    $gradeedit = ($slot->teacherid == $USER->id) || get_config('mod_scheduler', 'allteachersgrading');
-    $mform = new scheduler_editappointment_form($appointment, $actionurl, $gradeedit, $distribute);
+    $gradeedit = $permissions->can_edit_grade($appointment);
+    $mform = new scheduler_editappointment_form($appointment, $actionurl, $permissions, $distribute);
     $mform->set_data($mform->prepare_appointment_data($appointment));
 
     if ($mform->is_cancelled()) {

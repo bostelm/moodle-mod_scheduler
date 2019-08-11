@@ -12,8 +12,6 @@ namespace mod_scheduler\task;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__).'/../../model/scheduler_instance.php');
-
 /**
  * Scheduled background task for sending automated appointment reminders
  *
@@ -27,6 +25,6 @@ require_once(dirname(__FILE__).'/../../model/scheduler_instance.php');
     }
 
     public function execute() {
-        \scheduler_instance::free_late_unused_slots();
+        \mod_scheduler\model\scheduler::free_late_unused_slots();
     }
 }

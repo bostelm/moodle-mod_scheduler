@@ -9,6 +9,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_scheduler\model\scheduler;
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/mod/scheduler/lib.php');
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
@@ -22,24 +24,31 @@ $offset = optional_param('offset', -1, PARAM_INT);
 
 if ($id) {
     $cm = get_coursemodule_from_id('scheduler', $id, 0, false, MUST_EXIST);
-    $scheduler = scheduler_instance::load_by_coursemodule_id($id);
+    $scheduler = scheduler::load_by_coursemodule_id($id);
 } else {
     $a = required_param('a', PARAM_INT);     // Scheduler ID.
-    $scheduler = scheduler_instance::load_by_id($a);
+    $scheduler = scheduler::load_by_id($a);
     $cm = $scheduler->get_cm();
 }
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
-$defaultsubpage = groups_get_activity_groupmode($cm) ? 'myappointments' : 'allappointments';
-$subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
 require_login($course->id, true, $cm);
 $context = context_module::instance($cm->id);
+$permissions = new \mod_scheduler\permission\scheduler_permissions($context, $USER->id);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
 
 $output = $PAGE->get_renderer('mod_scheduler');
+
+if (groups_get_activity_groupmode($cm) || !$permissions->can_see_all_slots()) {
+    $defaultsubpage = 'myappointments';
+} else {
+    $defaultsubpage = 'allappointments';
+}
+$subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
+
 
 // Print the page header.
 
@@ -47,10 +56,10 @@ $title = $course->shortname . ': ' . format_string($scheduler->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
-
 // Route to screen.
 
-$isteacher = has_capability('mod/scheduler:manage', $context);
+$teachercaps = ['mod/scheduler:manage', 'mod/scheduler:manageallappointments', 'mod/scheduler:canseeotherteachersbooking'];
+$isteacher = has_any_capability($teachercaps, $context);
 $isstudent = has_capability('mod/scheduler:viewslots', $context);
 if ($isteacher) {
     // Teacher side.

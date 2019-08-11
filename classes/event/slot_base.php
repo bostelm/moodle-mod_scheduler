@@ -21,17 +21,17 @@ defined('MOODLE_INTERNAL') || die();
 abstract class slot_base extends \core\event\base {
 
     /**
-     * @var \scheduler_slot the slot associated with this event
+     * @var \mod_scheduler\model\slot the slot associated with this event
      */
     protected $slot;
 
     /**
      * Return the base data fields for a slot
      *
-     * @param \scheduler_slot $slot the slot in question
+     * @param \mod_scheduler\model\slot $slot the slot in question
      * @return array
      */
-    protected static function base_data(\scheduler_slot $slot) {
+    protected static function base_data(\mod_scheduler\model\slot $slot) {
         return array(
             'context' => $slot->get_scheduler()->get_context(),
             'objectid' => $slot->id,
@@ -42,9 +42,9 @@ abstract class slot_base extends \core\event\base {
     /**
      * Set the slot associated with this event
      *
-     * @param \scheduler_slot $slot
+     * @param \mod_scheduler\model\slot $slot
      */
-    protected function set_slot(\scheduler_slot $slot) {
+    protected function set_slot(\mod_scheduler\model\slot $slot) {
         $this->add_record_snapshot('scheduler_slots', $slot->data);
         $this->add_record_snapshot('scheduler', $slot->get_scheduler()->data);
         $this->slot = $slot;
@@ -57,7 +57,7 @@ abstract class slot_base extends \core\event\base {
      * NOTE: to be used from observers only.
      *
      * @throws \coding_exception
-     * @return \scheduler_slot
+     * @return \mod_scheduler\model\slot
      */
     public function get_slot() {
         if ($this->is_restored()) {

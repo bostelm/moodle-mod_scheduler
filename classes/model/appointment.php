@@ -8,10 +8,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_scheduler\model;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('modellib.php');
 
 
 /**
@@ -20,16 +20,16 @@ require_once('modellib.php');
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class scheduler_appointment extends mvc_child_record_model {
+class appointment extends mvc_child_record_model {
 
 
     protected function get_table() {
         return 'scheduler_appointment';
     }
 
-    public function __construct(scheduler_slot $slot) {
+    public function __construct(slot $slot) {
         parent::__construct();
-        $this->data = new stdClass();
+        $this->data = new \stdClass();
         $this->set_parent($slot);
         $this->data->slotid = $slot->get_id();
         $this->data->attended = 0;
@@ -71,7 +71,7 @@ class scheduler_appointment extends mvc_child_record_model {
     /**
      * Retrieve the scheduler associated with this appointment
      *
-     * @return scheduler_instance
+     * @return scheduler
      */
     public function get_scheduler() {
         return $this->get_parent()->get_parent();
@@ -123,14 +123,3 @@ class scheduler_appointment extends mvc_child_record_model {
 
 }
 
-/**
- * A factory class for scheduler appointments.
- *
- * @copyright  2011 Henning Bostelmann and others (see README.txt)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class scheduler_appointment_factory extends mvc_child_model_factory {
-    public function create_child(mvc_record_model $parent) {
-        return new scheduler_appointment($parent);
-    }
-}

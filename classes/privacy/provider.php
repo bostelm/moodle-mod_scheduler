@@ -198,7 +198,7 @@ class provider implements
      * Will return null if the context was not found.
      *
      * @param \context $context the context of the scheduler.
-     * @return \scheduler_instance scheduler object, or null if not found.
+     * @return \mod_scheduler\model\scheduler scheduler object, or null if not found.
      */
     private static function load_scheduler_for_context(\context $context) {
         global $DB;
@@ -215,7 +215,7 @@ class provider implements
         $params = ['cmid' => $context->instanceid, 'modname' => 'scheduler'];
         $rec = $DB->get_record_sql($sql, $params);
         if ($rec) {
-            return \scheduler_instance::load_by_id($rec->schedulerid);
+            return \mod_scheduler\model\scheduler::load_by_id($rec->schedulerid);
         } else {
             return null;
         }
@@ -268,7 +268,7 @@ class provider implements
                 self::export_scheduler($context, $user);
                 // Start new scheduler module.
                 $context = \context_module::instance($row->cmid);
-                $scheduler = \scheduler_instance::load_by_id($row->schedulerid);
+                $scheduler = \mod_scheduler\model\scheduler::load_by_id($row->schedulerid);
             }
 
             if (!$lastrow || $row->slotid != $lastrow->slotid) {
@@ -330,7 +330,7 @@ class provider implements
      * Export one appointment in a scheduler (one record in {scheduler_appointment} table)
      *
      * @param \context $context
-     * @param \scheduler_instance $scheduler
+     * @param \mod_scheduler\model\scheduler $scheduler
      * @param \stdClass $user
      * @param \stdClass $record
      */
