@@ -16,6 +16,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_scheduler'; // Full name of the plugin (used for diagnostics).
 $plugin->version   = 2018112700;      // The current module version (Date: YYYYMMDDXX).
-$plugin->release   = '3.x dev';         // Human-friendly version name.
-$plugin->requires  = 2018051700;      // Requires Moodle 3.5.
-$plugin->maturity  = MATURITY_ALPHA; // Stable release
+$plugin->release   = '3.x dev';       // Human-friendly version name.
+$plugin->requires  = 2019052000;      // requires Moodle 3.7.
+$plugin->maturity  = MATURITY_ALPHA;  // Development release - not for production use.
