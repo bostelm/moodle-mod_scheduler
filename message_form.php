@@ -34,7 +34,7 @@ class scheduler_message_form extends moodleform {
      * @param scheduler $scheduler scheduler in whose context the messages are sent
      * @param object $customdata
      */
-    public function __construct($action, scheduler $scheduler, $customdata=null) {
+    public function __construct($action, \mod_scheduler\model\scheduler $scheduler, $customdata=null) {
         $this->scheduler = $scheduler;
         parent::__construct($action, $customdata);
     }
