@@ -1,4 +1,18 @@
 <?PHP
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library (public API) of the scheduler module
@@ -33,7 +47,7 @@ define ('SCHEDULER_MAX_GRADE', 1);  // Used for grading strategy.
  * of the new instance.
  *
  * @param stdClass $data the current instance
- * @param moodleform $mform the form that the user filled
+ * @param mod_scheduler_mod_form $mform the form that the user filled
  * @return int the new instance id
  * @uses $DB
  */
@@ -69,9 +83,9 @@ function scheduler_add_instance($data, $mform = null) {
  * (defined by the form in mod.html) this function
  * will update an existing instance with new data.
  *
- * @param object $scheduler the current instance
- * @param moodleform $mform the form that the user filled
- * @return object the updated instance
+ * @param stdClass $data
+ * @param mod_scheduler_mod_form $mform the form that the user filled
+ * @return bool the updated instance
  * @uses $DB
  */
 function scheduler_update_instance($data, $mform) {
@@ -223,7 +237,7 @@ function scheduler_print_recent_activity($course, $isteacher, $timestart) {
  * This function returns whether a scale is being used by a scheduler.
  *
  * @param int $cmid ID of an instance of this module
- * @param int $casleid the id of the scale in question
+ * @param int $scaleid the id of the scale in question
  * @return mixed
  * @uses $DB
  **/
@@ -246,7 +260,7 @@ function scheduler_scale_used($cmid, $scaleid) {
 /**
  * Checks if scale is being used by any instance of scheduler
  *
- * @param $scaleid int the id of the scale in question
+ * @param int $scaleid the id of the scale in question
  * @return bool True if the scale is used by any scheduler
  * @uses $DB
  */
@@ -269,7 +283,7 @@ function scheduler_scale_used_anywhere($scaleid) {
 /**
  * Called by course/reset.php
  *
- * @param $mform form passed by reference
+ * @param MoodleQuickForm $mform form passed by reference
  * @uses $COURSE
  * @uses $DB
  */
@@ -345,16 +359,25 @@ function scheduler_reset_userdata($data) {
  */
 function scheduler_supports($feature) {
     switch($feature) {
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
 
-        default: return null;
+        default:
+            return null;
     }
 }
 

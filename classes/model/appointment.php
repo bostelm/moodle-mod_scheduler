@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A class for representing a scheduler appointment.
@@ -22,11 +36,20 @@ defined('MOODLE_INTERNAL') || die();
  */
 class appointment extends mvc_child_record_model {
 
-
+    /**
+     * get_table
+     *
+     * @return string
+     */
     protected function get_table() {
         return 'scheduler_appointment';
     }
 
+    /**
+     * appointment constructor.
+     *
+     * @param slot $slot
+     */
     public function __construct(slot $slot) {
         parent::__construct();
         $this->data = new \stdClass();
@@ -37,6 +60,9 @@ class appointment extends mvc_child_record_model {
         $this->data->teachernoteformat = FORMAT_HTML;
     }
 
+    /**
+     * save
+     */
     public function save() {
         $this->data->slotid = $this->get_parent()->get_id();
         parent::save();
@@ -44,6 +70,9 @@ class appointment extends mvc_child_record_model {
         scheduler_update_grades($scheddata, $this->studentid);
     }
 
+    /**
+     * delete
+     */
     public function delete() {
         $studid = $this->studentid;
         parent::delete();
@@ -62,7 +91,7 @@ class appointment extends mvc_child_record_model {
     /**
      * Retrieve the slot associated with this appointment
      *
-     * @return scheduler_slot;
+     * @return slot;
      */
     public function get_slot() {
         return $this->get_parent();
@@ -122,4 +151,3 @@ class appointment extends mvc_child_record_model {
     }
 
 }
-

@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod @mod_scheduler
 Feature: Users can only see their own groups if the scheduler is in group mode
   In order to see slots
   As a user
@@ -44,7 +44,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
       | neteacher1 | GC    |
       | student1   | GA    |
       | student2   | GA    |
-      | student3   | GB    |  
+      | student3   | GB    |
       | student4   | GB    |
       | student5   | GD    |
     And the following "activities" exist:
@@ -79,7 +79,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I add 5 slots 12 days ahead in "Test scheduler separate" scheduler and I fill the form with:
       | Location  | There |
     And I log out
-    
+
   @javascript
   Scenario: Editing teachers can see all slots and all groups
     When I log in as "edteacher1"
@@ -166,10 +166,10 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should not see "Student 5" in the "studentstoschedule" "table"
     And I should not see "Student 6" in the "studentstoschedule" "table"
     And I log out
-    
+
   @javascript
   Scenario: Nonediting teachers can see groups only if allowed by the group mode
-    
+
     When I log in as "neteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler none"
@@ -177,7 +177,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "My appointments"
     Then I should see "6 students still need to make an appointment"
     When I follow "All appointments"
-    Then I should see "Editingteacher 1" in the "slotmanager" "table" 
+    Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
     When I am on "Course 1" course homepage
@@ -197,14 +197,14 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
     When I set the field "group" to "Group A"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
-    And I should not see "Nonedteacher 1" in the "slotmanager" "table"    
+    And I should not see "Nonedteacher 1" in the "slotmanager" "table"
     When I set the field "group" to "Group B"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
     When I set the field "group" to "Group C"
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
-    
+
     When I am on "Course 1" course homepage
     And I follow "Test scheduler separate"
     And I follow "Statistics"
@@ -272,7 +272,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should see "No students available for scheduling"
     And I should see "Group mode: Separate groups"
     And I should see "students cannot book appointments with you"
-    
+
   @javascript
   Scenario: Students can see slots available to their own groups, or a slots if group mode is off
     When I log in as "student1"

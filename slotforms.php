@@ -1,8 +1,21 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Slot-related forms of the scheduler module
- * (using Moodle formslib)
+ * Slot-related forms of the scheduler module (using Moodle formslib)
  *
  * @package    mod_scheduler
  * @copyright  2013 Henning Bostelmann and others (see README.txt)
@@ -144,6 +157,14 @@ abstract class scheduler_slotform_base extends moodleform {
         $this->hasduration = true;
     }
 
+    /**
+     * Form validation
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -174,6 +195,9 @@ class scheduler_editslot_form extends scheduler_slotform_base {
      */
     protected $slotid;
 
+    /**
+     * Form definition
+     */
     protected function definition() {
 
         global $DB, $output;
@@ -259,9 +283,8 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                                                    array('rows' => 3, 'columns' => 60), $this->noteoptions);
         }
 
-        // Tickbox to remove the student
+        // Tickbox to remove the student.
         $repeatarray[] = $mform->createElement('advcheckbox', 'deletestudent', '', get_string('deleteonsave', 'scheduler'));
-
 
         if (isset($this->_customdata['repeats'])) {
             $repeatno = $this->_customdata['repeats'];
@@ -290,6 +313,14 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
     }
 
+    /**
+     * Form validation
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
     public function validation($data, $files) {
         global $output;
 
@@ -439,8 +470,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                     $app = $slot->get_appointment($data->appointid[$i]);
                     $slot->remove_appointment($app);
                 }
-            }
-            else if ($data->studentid[$i] > 0) {
+            } else if ($data->studentid[$i] > 0) {
                 $app = null;
                 if ($data->appointid[$i]) {
                     $app = $slot->get_appointment($data->appointid[$i]);
@@ -490,6 +520,9 @@ class scheduler_editslot_form extends scheduler_slotform_base {
  */
 class scheduler_addsession_form extends scheduler_slotform_base {
 
+    /**
+     * Form definition
+     */
     protected function definition() {
 
         global $DB;
@@ -585,6 +618,14 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
     }
 
+    /**
+     * Form validation
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

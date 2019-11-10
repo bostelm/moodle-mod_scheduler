@@ -91,7 +91,6 @@ class mod_scheduler_privacy_testcase extends provider_testcase {
         $course = $this->getDataGenerator()->create_course();
         $this->courseid  = $course->id;
 
-
         $this->student1 = $this->getDataGenerator()->create_user();
         $this->student2 = $this->getDataGenerator()->create_user();
         $this->allstudents = [$this->student1->id, $this->student2->id];
@@ -208,7 +207,7 @@ class mod_scheduler_privacy_testcase extends provider_testcase {
     public function test_delete_data_for_all_users_in_context() {
         provider::delete_data_for_all_users_in_context($this->context);
 
-        foreach($this->allstudents as $u) {
+        foreach ($this->allstudents as $u) {
             $this->assert_appointment_status($this->schedulerid, $u, false);
         }
     }

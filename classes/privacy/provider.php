@@ -52,6 +52,7 @@ class provider implements
 
         \core_privacy\local\request\core_userlist_provider {
 
+    /** @var mixed */
     private static $renderer;
 
     /**
@@ -283,6 +284,18 @@ class provider implements
         self::export_scheduler($context, $user);
     }
 
+    /**
+     * format_note
+     *
+     * @param string $notetext
+     * @param int $noteformat
+     * @param string $filearea
+     * @param int $id
+     * @param \context $context
+     * @param content_writer $wrc
+     * @param string $exportarea
+     * @return string
+     */
     private static function format_note($notetext, $noteformat, $filearea, $id,
             \context $context, content_writer $wrc, $exportarea) {
         $message = $notetext;

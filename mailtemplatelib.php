@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Message formatting from templates.
@@ -71,17 +85,15 @@ class scheduler_messenger {
      * Sends a message based on a template.
      * Several template substitution values are automatically filled by this routine.
      *
-     * @uses $CFG
-     * @uses $SITE
      * @param string $modulename
      *            name of the module that sends the message
      * @param string $messagename
      *            name of the message in messages.php
      * @param int $isnotification
      *            1 for notifications, 0 for personal messages
-     * @param user $sender
+     * @param stdClass $sender
      *            A {@link $USER} object describing the sender
-     * @param user $recipient
+     * @param stdClass $recipient
      *            A {@link $USER} object describing the recipient
      * @param object $course
      *            The course that the activity is in. Can be null.

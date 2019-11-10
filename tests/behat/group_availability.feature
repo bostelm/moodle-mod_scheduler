@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod @mod_scheduler
 Feature: As a teacher I need to see an accurate list of users to be scheduled
   In order to see who needs to schedule an appointment
   As a teacher
@@ -38,7 +38,7 @@ Feature: As a teacher I need to see an accurate list of users to be scheduled
       | enableavailability | 1 |
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   |
-      | scheduler | Test scheduler | n     | C1     | scheduler1 |      
+      | scheduler | Test scheduler | n     | C1     | scheduler1 |
     And I log in as "teacher"
     And I am on "Course 1" course homepage
 
@@ -48,7 +48,7 @@ Feature: As a teacher I need to see an accurate list of users to be scheduled
     Then I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 2" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
-    
+
     When I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
@@ -65,7 +65,7 @@ Feature: As a teacher I need to see an accurate list of users to be scheduled
     Then I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 2" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
-    
+
     When I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I click on "Add restriction..." "button"

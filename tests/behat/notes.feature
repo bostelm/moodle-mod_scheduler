@@ -1,4 +1,4 @@
-@mod_scheduler
+@mod @mod_scheduler
 Feature: Teachers can write notes on slots and appointments
   In order to record details about a meeting
   As a teacher
@@ -26,7 +26,7 @@ Feature: Teachers can write notes on slots and appointments
     And I add 5 slots 10 days ahead in "Test scheduler" scheduler and I fill the form with:
       | Location  | Here |
     And I log out
-    
+
   @javascript
   Scenario: Teachers can enter slot notes and appointment notes for others to see
     When I log in as "edteacher1"
@@ -50,7 +50,7 @@ Feature: Teachers can write notes on slots and appointments
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
     Then I should see "Note-for-slot"
     And I log out
-    
+
     When I log in as "edteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -68,7 +68,7 @@ Feature: Teachers can write notes on slots and appointments
     Then I should see "note-for-appointment"
     And I should see "note-confidential"
     And I log out
-        
+
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -76,7 +76,7 @@ Feature: Teachers can write notes on slots and appointments
     And I should see "note-for-appointment"
     And I should not see "note-confidential"
     And I log out
-    
+
   @javascript
   Scenario: Teachers see only the comments fields specified in the configuration
 
@@ -86,7 +86,7 @@ Feature: Teachers can write notes on slots and appointments
     And I click on "Book slot" "button" in the "4:00 AM" "table_row"
     Then I should see "Upcoming slots"
     And I log out
-    
+
     When I log in as "edteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -100,17 +100,17 @@ Feature: Teachers can write notes on slots and appointments
     Then I should see "note-for-appointment"
     And I should see "note-confidential"
 
-	When I follow "Test scheduler"
-	And I navigate to "Edit settings" in current page administration
-	And I set the field "Use notes for appointments" to "0"
-	And I click on "Save and display" "button"
+    When I follow "Test scheduler"
+    And I navigate to "Edit settings" in current page administration
+    And I set the field "Use notes for appointments" to "0"
+    And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
-	Then I should not see "Notes for appointment"
-	And I should not see "note-for-appointment"
-	And I should not see "Confidential notes"
-	And I should not see "note-confidential"
-	And I click on "Save changes" "button"
-	And I log out
+    Then I should not see "Notes for appointment"
+    And I should not see "note-for-appointment"
+    And I should not see "Confidential notes"
+    And I should not see "note-confidential"
+    And I click on "Save changes" "button"
+    And I log out
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
@@ -123,36 +123,36 @@ Feature: Teachers can write notes on slots and appointments
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
-	And I set the field "Use notes for appointments" to "1"
-	And I click on "Save and display" "button"
+    And I set the field "Use notes for appointments" to "1"
+    And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
-	Then I should see "Notes for appointment"
-	And I should see "note-for-appointment"
-	And I should not see "Confidential notes"
-	And I should not see "note-confidential"
-	And I click on "Save changes" "button"
-	And I log out
-	
-	When I log in as "student1"
+    Then I should see "Notes for appointment"
+    And I should see "note-for-appointment"
+    And I should not see "Confidential notes"
+    And I should not see "note-confidential"
+    And I click on "Save changes" "button"
+    And I log out
+
+    When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     Then I should see "note-for-appointment"
     And I should not see "note-confidential"
     And I log out
-    
+
     When I log in as "edteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
-	And I set the field "Use notes for appointments" to "2"
-	And I click on "Save and display" "button"
+    And I set the field "Use notes for appointments" to "2"
+    And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
-	Then I should not see "Notes for appointment"
-	And I should not see "note-for-appointment"
-	And I should see "Confidential notes"
-	And I should see "note-confidential"
-	And I click on "Save changes" "button"
-	And I log out
+    Then I should not see "Notes for appointment"
+    And I should not see "note-for-appointment"
+    And I should see "Confidential notes"
+    And I should see "note-confidential"
+    And I click on "Save changes" "button"
+    And I log out
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
@@ -165,11 +165,11 @@ Feature: Teachers can write notes on slots and appointments
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I navigate to "Edit settings" in current page administration
-	And I set the field "Use notes for appointments" to "3"
-	And I click on "Save and display" "button"
+    And I set the field "Use notes for appointments" to "3"
+    And I click on "Save and display" "button"
     And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
-	Then I should see "Notes for appointment"
-	And I should see "note-for-appointment"
-	And I should see "Confidential notes"
-	And I should see "note-confidential"
-	And I log out
+    Then I should see "Notes for appointment"
+    And I should see "note-for-appointment"
+    And I should see "Confidential notes"
+    And I should see "note-confidential"
+    And I log out

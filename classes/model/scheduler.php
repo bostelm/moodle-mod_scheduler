@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A class for representing a scheduler instance.
@@ -34,12 +48,12 @@ class scheduler extends mvc_record_model {
     protected $courserec = null;
 
     /**
-     * @var context_module context record of this scheduler
+     * @var \context_module context record of this scheduler
      */
     protected $context = null;
 
     /**
-     * @var effective group mode of this scheduler
+     * @var int effective group mode of this scheduler
      */
     protected $groupmode;
 
@@ -48,10 +62,18 @@ class scheduler extends mvc_record_model {
      */
     protected $slots;
 
+    /**
+     * get_table
+     *
+     * @return string
+     */
     protected function get_table() {
         return 'scheduler';
     }
 
+    /**
+     * scheduler constructor.
+     */
     protected function __construct() {
         parent::__construct();
         $this->slots = new mvc_child_list($this, 'scheduler_slots', 'schedulerid', new slot_factory($this));
@@ -376,7 +398,6 @@ class scheduler extends mvc_record_model {
      * Return grade for given user.
      * This does not take gradebook data into account.
      *
-     * @param int $schedulerid id of scheduler
      * @param int $userid user id
      * @return int grade of this user
      */
@@ -388,11 +409,10 @@ class scheduler extends mvc_record_model {
     /**
      * Return grade for given user or all users.
      *
-     * @param int $schedulerid id of scheduler
      * @param int $userid optional user id, 0 means all users
      * @return array array of grades, false if none
      */
-    public function get_user_grades($userid=0) {
+    public function get_user_grades($userid = 0) {
         global $CFG, $DB;
 
         if ($this->scale == 0) {
@@ -475,8 +495,8 @@ class scheduler extends mvc_record_model {
                 $finalgrades[$userid]->rawgrade = null;
             }
         } else {
-            $gui = new graded_users_iterator($this->get_courserec());
-            // We must gracefully live through the gradesneedregrading that can be thrown by init()
+            $gui = new \graded_users_iterator($this->get_courserec());
+            // We must gracefully live through the gradesneedregrading that can be thrown by init().
             try {
                 $gui->init();
                 while ($userdata = $gui->next_user()) {
@@ -489,7 +509,7 @@ class scheduler extends mvc_record_model {
                 }
             } catch (\moodle_exception $e) {
                 if ($e->errorcode != 'gradesneedregrading') {
-                   throw $e;
+                    throw $e;
                 }
             }
         }
@@ -528,7 +548,7 @@ class scheduler extends mvc_record_model {
      * @param mixed $limitfrom query limit from here
      * @param mixed $limitnum max number od records to fetch
      * @param string $orderby ORDER BY fields
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='') {
         global $DB;
@@ -630,7 +650,7 @@ class scheduler extends mvc_record_model {
      * Retrieve a slot by id.
      *
      * @param int $id
-     * @return scheduler_slot
+     * @return slot
      * @uses $DB
      */
     public function get_slot($id) {
@@ -646,7 +666,7 @@ class scheduler extends mvc_record_model {
     /**
      * Retrieve a list of all slots in this scheduler
      *
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_slots() {
         return $this->slots->get_children();
@@ -666,7 +686,7 @@ class scheduler extends mvc_record_model {
      *
      * @param string $limitfrom start from this entry
      * @param string $limitnum max number of entries
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_all_slots($limitfrom='', $limitnum='') {
         return $this->fetch_slots('', '', array(), $limitfrom, $limitnum, 's.starttime ASC');
@@ -676,7 +696,7 @@ class scheduler extends mvc_record_model {
      * Retrieves attended slots of a student. These will be sorted by start time.
      *
      * @param int $studentid
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_attended_slots_for_student($studentid) {
 
@@ -693,7 +713,7 @@ class scheduler extends mvc_record_model {
      * A slot is "upcoming" if it as been booked but is not attended.
      *
      * @param int $studentid
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_upcoming_slots_for_student($studentid) {
 
@@ -712,7 +732,7 @@ class scheduler extends mvc_record_model {
      *
      * @param int $studentid
      * @param bool $includefullybooked include slots that are already fully booked
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_slots_available_to_student($studentid, $includefullybooked = false) {
 
@@ -797,7 +817,7 @@ class scheduler extends mvc_record_model {
      * retrieves slots without any appointment made
      *
      * @param int $teacherid if given, will return only slots for this teacher
-     * @return scheduler_slot[] list of unused slots
+     * @return slot[] list of unused slots
      */
     public function get_slots_without_appointment($teacherid = 0) {
         $wherecond = '('.$this->appointment_count_query().' = 0)';
@@ -831,8 +851,7 @@ class scheduler extends mvc_record_model {
         }
         if ($timerange === true || $timerange == 2) {
             $wheres[] = "s.starttime < ".strtotime('now');
-        }
-        else if ($timerange == 1) {
+        } else if ($timerange == 1) {
             $wheres[] = "s.starttime >= ".strtotime('now');
         }
         $where = implode(" AND ", $wheres);
@@ -860,7 +879,7 @@ class scheduler extends mvc_record_model {
      * @param mixed $limitfrom start from this entry
      * @param mixed $limitnum max number of entries
      * @param int $timerange whether to include past/future slots (0=all, 1=future, 0=past)
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_slots_for_teacher($teacherid, $groupid = 0, $limitfrom = '', $limitnum = '', $timerange = 0) {
         list($where, $params) = $this->slots_for_teacher_cond($teacherid, $groupid, $timerange);
@@ -874,7 +893,7 @@ class scheduler extends mvc_record_model {
      * @param mixed $limitfrom start from this entry
      * @param mixed $limitnum max number of entries
      * @param int $timerange whether to include past/future slots (0=all, 1=future, 0=past)
-     * @return scheduler_slot[]
+     * @return slot[]
      */
     public function get_slots_for_group($groupid, $limitfrom = '', $limitnum = '', $timerange = 0) {
         list($where, $params) = $this->slots_for_teacher_cond(0, $groupid, $timerange);
@@ -896,7 +915,7 @@ class scheduler extends mvc_record_model {
      * @uses $DB
      * @return array conflicting slots
      */
-    function get_conflicts($starttime, $endtime, $teacher = 0, $student = 0,
+    public function get_conflicts($starttime, $endtime, $teacher = 0, $student = 0,
                            $others = SCHEDULER_SELF, $excludeslot = 0) {
         global $DB;
 
@@ -961,7 +980,8 @@ class scheduler extends mvc_record_model {
     /**
      * retrieves an appointment and the corresponding slot
      *
-     * @return mixed List of (scheduler_slot, scheduler_appointment)
+     * @param mixed $appointmentid
+     * @return mixed List of (slot, scheduler_appointment)
      */
     public function get_slot_appointment($appointmentid) {
         global $DB;
@@ -1009,7 +1029,7 @@ class scheduler extends mvc_record_model {
     /**
      * Create a new slot relating to this scheduler.
      *
-     * @return scheduler_slot
+     * @return slot
      */
     public function create_slot() {
         return $this->slots->create_child();

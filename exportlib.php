@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library for export functions
@@ -30,14 +44,22 @@ require_once($CFG->dirroot.'/user/profile/lib.php');
  */
 abstract class scheduler_export_field {
 
+    /** @var mixed */
     protected $renderer;
 
+    /**
+     * set_renderer
+     *
+     * @param mod_scheduler_renderer $renderer
+     */
     public function set_renderer(mod_scheduler_renderer $renderer) {
         $this->renderer = $renderer;
     }
 
     /**
      * Is the field available in this scheduler?
+     *
+     * @param scheduler $scheduler
      * @return bool whether the field is available
      */
     public function is_available(scheduler $scheduler) {
@@ -61,7 +83,7 @@ abstract class scheduler_export_field {
      * Retrieve the header (in the sense of table header in the output)
      * used for this field.
      *
-     * @param $scheduler the scheduler instance in question
+     * @param scheduler $scheduler the scheduler instance in question
      * @return string the header for this field
      */
     public function get_header(scheduler $scheduler) {
@@ -72,8 +94,8 @@ abstract class scheduler_export_field {
      * Retrieve the header (in the sense of table header in the output) as an array.
      * Needs to be overridden for multi-column fields only.
      *
-     * @param $scheduler the scheduler instance in question
-     * @return string the header for this field
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return array the header for this field
      */
     public function get_headers(scheduler $scheduler) {
         return array($this->get_header($scheduler));
@@ -83,7 +105,7 @@ abstract class scheduler_export_field {
      * Retrieve the label used in the configuration form to label this field.
      * By default, this equals the table header.
      *
-     * @param $scheduler the scheduler instance in question
+     * @param scheduler $scheduler the scheduler instance in question
      * @return string the form label for this field
      */
     public function get_formlabel(scheduler $scheduler) {
@@ -93,7 +115,7 @@ abstract class scheduler_export_field {
     /**
      * Retrieves the numer of table columns used by this field (typically 1).
      *
-     * @param $scheduler the scheduler instance in question
+     * @param scheduler $scheduler the scheduler instance in question
      * @return int the number of columns used
      */
     public function get_num_columns(scheduler $scheduler) {
@@ -104,7 +126,7 @@ abstract class scheduler_export_field {
      * Retrieve the typical width (in characters) of this field.
      * This is used to set the width of columns in the output, where this is relevant.
      *
-     * @param $scheduler the scheduler instance in question
+     * @param scheduler $scheduler the scheduler instance in question
      * @return int the width of this field (number of characters per column)
      */
     public function get_typical_width(scheduler $scheduler) {
@@ -123,8 +145,8 @@ abstract class scheduler_export_field {
     /**
      * Retrieve the value of this field in a particular data record
      *
-     * @param $slot the scheduler slot to get data from
-     * @param $appointment the appointment to evaluate (may be null for an empty slot)
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
      * @return string the value of this field for the given data
      */
     public abstract function get_value(slot $slot, $appointment);
@@ -133,8 +155,8 @@ abstract class scheduler_export_field {
      * Retrieve the value of this field as an array.
      * Needs to be overriden for multi-column fields only.
      *
-     * @param $slot the scheduler slot to get data from
-     * @param $appointment the appointment to evaluate (may be null for an empty slot)
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
      * @return array an array of strings containing the column values
      */
     public function get_values(slot $slot, $appointment) {
@@ -143,10 +165,10 @@ abstract class scheduler_export_field {
 
 }
 
-
 /**
  * Get a list of all export fields available.
  *
+ * @param scheduler $scheduler
  * @return array the fields as an array of scheduler_export_field objects.
  */
 function scheduler_get_export_fields(scheduler $scheduler) {
@@ -195,18 +217,41 @@ function scheduler_get_export_fields(scheduler $scheduler) {
  */
 class slotdate_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'date';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return strlen(mod_scheduler_renderer::userdate(1)) + 3;
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return mod_scheduler_renderer::userdate($slot->starttime);
     }
@@ -221,14 +266,30 @@ class slotdate_field extends scheduler_export_field {
  */
 class scheduler_starttime_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'starttime';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return mod_scheduler_renderer::usertime($slot->starttime);
     }
@@ -245,14 +306,30 @@ class scheduler_starttime_field extends scheduler_export_field {
  */
 class scheduler_endtime_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'endtime';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return mod_scheduler_renderer::usertime($slot->endtime);
     }
@@ -268,22 +345,52 @@ class scheduler_endtime_field extends scheduler_export_field {
  */
 class scheduler_teachername_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'teachername';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the header (in the sense of table header in the output)
+     * used for this field.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return string the header for this field
+     */
     public function get_header(scheduler $scheduler) {
         return $scheduler->get_teacher_name();
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return 20;
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return fullname($slot->teacher);
     }
@@ -299,14 +406,30 @@ class scheduler_teachername_field extends scheduler_export_field {
  */
 class scheduler_location_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'location';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return format_string($slot->appointmentlocation);
     }
@@ -322,14 +445,30 @@ class scheduler_location_field extends scheduler_export_field {
  */
 class scheduler_maxstudents_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'maxstudents';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         if ($slot->exclusivity <= 0) {
             return get_string('unlimited', 'scheduler');
@@ -349,11 +488,23 @@ class scheduler_maxstudents_field extends scheduler_export_field {
  */
 class scheduler_student_field extends scheduler_export_field {
 
+    /** @var mixed */
     protected $id;
+    /** @var mixed */
     protected $studfield;
+    /** @var mixed */
     protected $typicalwidth;
+    /** @var mixed */
     protected $idfield;
 
+    /**
+     * scheduler_student_field constructor.
+     *
+     * @param int $id
+     * @param mixed $studfield
+     * @param int $typicalwidth
+     * @param bool $idfield
+     */
     public function __construct($id, $studfield, $typicalwidth = 0, $idfield = false) {
         $this->id = $id;
         $this->studfield = $studfield;
@@ -361,14 +512,29 @@ class scheduler_student_field extends scheduler_export_field {
         $this->idfield = $idfield;
     }
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return $this->id;
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'student';
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         if (!$this->idfield) {
             return true;
@@ -377,6 +543,13 @@ class scheduler_student_field extends scheduler_export_field {
         return has_capability('moodle/site:viewuseridentity', $ctx);
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         if ($this->typicalwidth > 0) {
             return $this->typicalwidth;
@@ -385,8 +558,15 @@ class scheduler_student_field extends scheduler_export_field {
         }
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         $student = $appointment->get_student();
@@ -411,7 +591,9 @@ class scheduler_student_field extends scheduler_export_field {
  */
 class scheduler_profile_field extends scheduler_export_field {
 
+    /** @var mixed */
     protected $id;
+    /** @var mixed */
     protected $field;
 
     /**
@@ -431,22 +613,51 @@ class scheduler_profile_field extends scheduler_export_field {
         $this->field = $fieldobj;
     }
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return $this->id;
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'student';
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool|mixed
+     */
     public function is_available(scheduler $scheduler) {
         return $this->field->is_visible();
     }
 
+    /**
+     * Retrieve the header (in the sense of table header in the output)
+     * used for this field.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return string the header for this field
+     */
     public function get_header(scheduler $scheduler) {
         return format_string($this->field->field->name);
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         if (!$appointment instanceof appointment || $appointment->studentid == 0) {
             return '';
@@ -472,16 +683,32 @@ class scheduler_profile_field extends scheduler_export_field {
  */
 class scheduler_attended_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'attended';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'appointment';
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         $str = $appointment->is_attended() ? get_string('yes') : get_string('no');
@@ -499,22 +726,50 @@ class scheduler_attended_field extends scheduler_export_field {
  */
 class slotnotes_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'slotnotes';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'slot';
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
+    /**
+     * Does this field use wrapped text?
+     *
+     * @return bool whether wrapping is used for this field
+     */
     public function is_wrapping() {
         return true;
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return strip_tags($slot->notes);
     }
@@ -530,28 +785,62 @@ class slotnotes_field extends scheduler_export_field {
  */
 class scheduler_appointmentnote_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'appointmentnote';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'appointment';
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
+    /**
+     * Does this field use wrapped text?
+     *
+     * @return bool whether wrapping is used for this field
+     */
     public function is_wrapping() {
         return true;
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         return $scheduler->uses_appointmentnotes();
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         return strip_tags($appointment->appointmentnote);
@@ -568,28 +857,62 @@ class scheduler_appointmentnote_field extends scheduler_export_field {
  */
 class scheduler_teachernote_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'teachernote';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'appointment';
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
+    /**
+     * Does this field use wrapped text?
+     *
+     * @return bool whether wrapping is used for this field
+     */
     public function is_wrapping() {
         return true;
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         return $scheduler->uses_teachernotes();
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         return strip_tags($appointment->teachernote);
@@ -606,28 +929,62 @@ class scheduler_teachernote_field extends scheduler_export_field {
  */
 class scheduler_studentnote_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'studentnote';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'appointment';
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return 30;
     }
 
+    /**
+     * Does this field use wrapped text?
+     *
+     * @return bool whether wrapping is used for this field
+     */
     public function is_wrapping() {
         return true;
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         return $scheduler->uses_studentnotes();
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         return strip_tags($appointment->studentnote);
@@ -644,28 +1001,62 @@ class scheduler_studentnote_field extends scheduler_export_field {
  */
 class scheduler_filecount_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'filecount';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'appointment';
     }
 
+    /**
+     * Retrieve the typical width (in characters) of this field.
+     * This is used to set the width of columns in the output, where this is relevant.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the width of this field (number of characters per column)
+     */
     public function get_typical_width(scheduler $scheduler) {
         return 2;
     }
 
+    /**
+     * Does this field use wrapped text?
+     *
+     * @return bool whether wrapping is used for this field
+     */
     public function is_wrapping() {
         return false;
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         return $scheduler->uses_studentfiles();
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         return $appointment->count_studentfiles();
@@ -682,20 +1073,42 @@ class scheduler_filecount_field extends scheduler_export_field {
  */
 class scheduler_grade_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'grade';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'appointment';
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         return $scheduler->uses_grades();
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         return $this->renderer->format_grade($slot->get_scheduler(), $appointment->grade);
@@ -712,25 +1125,54 @@ class scheduler_grade_field extends scheduler_export_field {
  */
 class scheduler_groups_single_field extends scheduler_export_field {
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'groupssingle';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'student';
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         $g = groups_get_all_groups($scheduler->courseid, 0, $scheduler->get_cm()->groupingid);
         return count($g) > 0;
     }
 
+    /**
+     * Retrieve the label used in the configuration form to label this field.
+     * By default, this equals the table header.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return string the form label for this field
+     */
     public function get_formlabel(scheduler $scheduler) {
         return get_string('field-groupssingle-label', 'scheduler');
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         $scheduler = $slot->get_scheduler();
@@ -754,28 +1196,62 @@ class scheduler_groups_single_field extends scheduler_export_field {
  */
 class scheduler_groups_multi_field extends scheduler_export_field {
 
+    /** @var mixed */
     protected $coursegroups;
 
+    /**
+     * scheduler_groups_multi_field constructor.
+     *
+     * @param scheduler $scheduler
+     */
     public function __construct(scheduler $scheduler) {
-        $this->coursegroups =  groups_get_all_groups($scheduler->courseid, 0, $scheduler->get_cm()->groupingid);
+        $this->coursegroups = groups_get_all_groups($scheduler->courseid, 0, $scheduler->get_cm()->groupingid);
     }
 
+    /**
+     * Retrieve the unique id (a string) for this field
+     */
     public function get_id() {
         return 'groupsmulti';
     }
 
+    /**
+     * Retrieve the group that this field belongs to -
+     * either 'slot' or 'student' or 'appointment',
+     *
+     * @return string the group id as above
+     */
     public function get_group() {
         return 'student';
     }
 
+    /**
+     * is_available
+     *
+     * @param scheduler $scheduler
+     * @return bool
+     */
     public function is_available(scheduler $scheduler) {
         return count($this->coursegroups) > 0;
     }
 
+    /**
+     * Retrieves the numer of table columns used by this field (typically 1).
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return int the number of columns used
+     */
     public function get_num_columns(scheduler $scheduler) {
         return count($this->coursegroups);
     }
 
+    /**
+     * Retrieve the header (in the sense of table header in the output) as an array.
+     * Needs to be overridden for multi-column fields only.
+     *
+     * @param scheduler $scheduler the scheduler instance in question
+     * @return array the header for this field
+     */
     public function get_headers(scheduler $scheduler) {
         $result = array();
         foreach ($this->coursegroups as $group) {
@@ -784,12 +1260,27 @@ class scheduler_groups_multi_field extends scheduler_export_field {
         return $result;
     }
 
+    /**
+     * Retrieve the value of this field in a particular data record
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return string the value of this field for the given data
+     */
     public function get_value(slot $slot, $appointment) {
         return '';
     }
 
+    /**
+     * Retrieve the value of this field as an array.
+     * Needs to be overriden for multi-column fields only.
+     *
+     * @param slot $slot the scheduler slot to get data from
+     * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
+     * @return array an array of strings containing the column values
+     */
     public function get_values(slot $slot, $appointment) {
-        if (! $appointment instanceof scheduler_appointment) {
+        if (! $appointment instanceof appointment) {
             return '';
         }
         $usergroups = groups_get_user_groups($slot->get_scheduler()->courseid, $appointment->studentid)[0];
@@ -803,9 +1294,6 @@ class scheduler_groups_multi_field extends scheduler_export_field {
 
 }
 
-
-
-
 /**
  * An "output device" for scheduler exports
  *
@@ -814,7 +1302,6 @@ class scheduler_groups_multi_field extends scheduler_export_field {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class scheduler_canvas {
-
 
     /**
      * @var object format instructions for header
@@ -839,36 +1326,36 @@ abstract class scheduler_canvas {
     /**
      * Start a new page (tab, etc.) with an optional title.
      *
-     * @param $title the title of the page
+     * @param mixed $title the title of the page
      */
     public abstract function start_page($title);
 
     /**
      * Write a string into a certain position of the canvas.
      *
-     * @param $row the row into which to write (starts with 0)
-     * @param $column the column into which to write (starts with 0)
-     * @param $str the string to write
-     * @param $format the format to use (one of the $format... fields of this object), can be null
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $str the string to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
      */
     public abstract function write_string($row, $col, $str, $format);
 
     /**
      * Write a number into a certain position of the canvas.
      *
-     * @param $row the row into which to write (starts with 0)
-     * @param $column the column into which to write (starts with 0)
-     * @param $num the number to write
-     * @param $format the format to use (one of the $format... fields of this object), can be null
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $num the number to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
      */
     public abstract function write_number($row, $col, $num, $format);
 
     /**
      * Merge a range of cells in the same row.
      *
-     * @param $row the row in which to merge
-     * @param $fromcol the first column to merge
-     * @param $tocol the last column to merge
+     * @param mixed $row the row in which to merge
+     * @param mixed $fromcol the first column to merge
+     * @param mixed $tocol the last column to merge
      */
     public abstract function merge_cells($row, $fromcol, $tocol);
 
@@ -876,8 +1363,8 @@ abstract class scheduler_canvas {
      * Set the width of a particular column. (This will make sense only for certain outout formats,
      * it can be ignored otherwise.)
      *
-     * @param $col the affected column
-     * @param $width the width of that column
+     * @param int $col the affected column
+     * @param int $width the width of that column
      */
     public function set_column_width($col, $width) {
         // Ignore widths by default.
@@ -893,7 +1380,7 @@ abstract class scheduler_canvas {
      *
      * This is stored in the field $title, and can be used as appropriate for the particular implementation.
      *
-     * @param title the title to set
+     * @param string $title the title to set
      */
     public function set_title($title) {
         $this->title = $title;
@@ -902,13 +1389,11 @@ abstract class scheduler_canvas {
     /**
      * Send the output file via HTTP, as a downloadable file.
      *
-     * @param $filename the file name to send
+     * @param string $filename the file name to send
      */
     public abstract function send($filename);
 
 }
-
-
 
 /**
  * Output device: Excel file
@@ -919,10 +1404,14 @@ abstract class scheduler_canvas {
  */
 class scheduler_excel_canvas extends scheduler_canvas {
 
+    /** @var mixed */
     protected $workbook;
+    /** @var mixed */
     protected $worksheet;
 
-
+    /**
+     * scheduler_excel_canvas constructor.
+     */
     public function __construct() {
 
         // Create a workbook.
@@ -942,36 +1431,78 @@ class scheduler_excel_canvas extends scheduler_canvas {
 
     }
 
-
+    /**
+     * Start a new page (tab, etc.) with an optional title.
+     *
+     * @param mixed $title the title of the page
+     */
     public function start_page($title) {
         $this->worksheet = $this->workbook->add_worksheet($title);
     }
 
+    /**
+     * ensure_open_page
+     */
     private function ensure_open_page() {
         if (!$this->worksheet) {
             $this->start_page('');
         }
     }
 
+    /**
+     * Write a string into a certain position of the canvas.
+     *
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $str the string to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
+     */
     public function write_string($row, $col, $str, $format=null) {
         $this->ensure_open_page();
         $this->worksheet->write_string($row, $col, $str, $format);
     }
 
+    /**
+     * Write a number into a certain position of the canvas.
+     *
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $num the number to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
+     */
     public function write_number($row, $col, $num, $format=null) {
         $this->ensure_open_page();
         $this->worksheet->write_number($row, $col, $num, $format);
     }
 
+    /**
+     * Merge a range of cells in the same row.
+     *
+     * @param mixed $row the row in which to merge
+     * @param mixed $fromcol the first column to merge
+     * @param mixed $tocol the last column to merge
+     */
     public function merge_cells($row, $fromcol, $tocol) {
         $this->ensure_open_page();
         $this->worksheet->merge_cells($row, $fromcol, $row, $tocol);
     }
 
+    /**
+     * Set the width of a particular column. (This will make sense only for certain outout formats,
+     * it can be ignored otherwise.)
+     *
+     * @param int $col the affected column
+     * @param int $width the width of that column
+     */
     public function set_column_width($col, $width) {
         $this->worksheet->set_column($col, $col, $width);
     }
 
+    /**
+     * Send the output file via HTTP, as a downloadable file.
+     *
+     * @param string $filename the file name to send
+     */
     public function send($filename) {
         $this->workbook->send($filename);
         $this->workbook->close();
@@ -988,10 +1519,14 @@ class scheduler_excel_canvas extends scheduler_canvas {
  */
 class scheduler_ods_canvas extends scheduler_canvas {
 
+    /** @var mixed */
     protected $workbook;
+    /** @var mixed */
     protected $worksheet;
 
-
+    /**
+     * scheduler_ods_canvas constructor.
+     */
     public function __construct() {
 
         // Create a workbook.
@@ -1010,37 +1545,78 @@ class scheduler_ods_canvas extends scheduler_canvas {
 
     }
 
-
+    /**
+     * Start a new page (tab, etc.) with an optional title.
+     *
+     * @param mixed $title the title of the page
+     */
     public function start_page($title) {
         $this->worksheet = $this->workbook->add_worksheet($title);
     }
 
+    /**
+     * ensure_open_page
+     */
     private function ensure_open_page() {
         if (!$this->worksheet) {
             $this->start_page('');
         }
     }
 
-
+    /**
+     * Write a string into a certain position of the canvas.
+     *
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $str the string to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
+     */
     public function write_string($row, $col, $str, $format=null) {
         $this->ensure_open_page();
         $this->worksheet->write_string($row, $col, $str, $format);
     }
 
+    /**
+     * Write a number into a certain position of the canvas.
+     *
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $num the number to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
+     */
     public function write_number($row, $col, $num, $format=null) {
         $this->ensure_open_page();
         $this->worksheet->write_number($row, $col, $num, $format);
     }
 
+    /**
+     * Merge a range of cells in the same row.
+     *
+     * @param mixed $row the row in which to merge
+     * @param mixed $fromcol the first column to merge
+     * @param mixed $tocol the last column to merge
+     */
     public function merge_cells($row, $fromcol, $tocol) {
         $this->ensure_open_page();
         $this->worksheet->merge_cells($row, $fromcol, $row, $tocol);
     }
 
+    /**
+     * Set the width of a particular column. (This will make sense only for certain outout formats,
+     * it can be ignored otherwise.)
+     *
+     * @param int $col the affected column
+     * @param int $width the width of that column
+     */
     public function set_column_width($col, $width) {
         $this->worksheet->set_column($col, $col, $width);
     }
 
+    /**
+     * Send the output file via HTTP, as a downloadable file.
+     *
+     * @param string $filename the file name to send
+     */
     public function send($filename) {
         $this->workbook->send($filename);
         $this->workbook->close();
@@ -1058,9 +1634,14 @@ class scheduler_ods_canvas extends scheduler_canvas {
  */
 abstract class scheduler_cached_text_canvas extends scheduler_canvas {
 
+    /** @var mixed */
     protected $pages;
+    /** @var mixed */
     protected $curpage;
 
+    /**
+     * scheduler_cached_text_canvas constructor.
+     */
     public function __construct() {
 
         $this->formatheader = 'header';
@@ -1072,6 +1653,12 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
 
     }
 
+    /**
+     * get_col_count
+     *
+     * @param mixed $page
+     * @return int
+     */
     protected function get_col_count($page) {
         $maxcol = 0;
         foreach ($page->cells as $rownum => $row) {
@@ -1084,6 +1671,12 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
         return $maxcol + 1;
     }
 
+    /**
+     * get_row_count
+     *
+     * @param mixed $page
+     * @return int
+     */
     protected function get_row_count($page) {
         $maxrow = 0;
         foreach ($page->cells as $rownum => $row) {
@@ -1094,6 +1687,12 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
         return $maxrow + 1;
     }
 
+    /**
+     * compute_relative_widths
+     *
+     * @param mixed $page
+     * @return array
+     */
     protected function compute_relative_widths($page) {
         $cols = $this->get_col_count($page);
         $sum = 0;
@@ -1111,6 +1710,11 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
         return $relwidths;
     }
 
+    /**
+     * Start a new page (tab, etc.) with an optional title.
+     *
+     * @param mixed $title the title of the page
+     */
     public function start_page($title) {
         $onemptypage = $this->curpage &&  !$this->curpage->cells && !$this->curpage->mergers && !$this->curpage->title;
         if ($onemptypage) {
@@ -1127,20 +1731,49 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
         }
     }
 
-
+    /**
+     * Write a string into a certain position of the canvas.
+     *
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $str the string to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
+     */
     public function write_string($row, $col, $str, $format=null) {
         $this->curpage->cells[$row][$col] = $str;
         $this->curpage->formats[$row][$col] = $format;
     }
 
+    /**
+     * Write a number into a certain position of the canvas.
+     *
+     * @param mixed $row the row into which to write (starts with 0)
+     * @param mixed $col the column into which to write (starts with 0)
+     * @param mixed $num the number to write
+     * @param mixed $format the format to use (one of the $format... fields of this object), can be null
+     */
     public function write_number($row, $col, $num, $format=null) {
         $this->write_string($row, $col, $num, $format);
     }
 
+    /**
+     * Merge a range of cells in the same row.
+     *
+     * @param mixed $row the row in which to merge
+     * @param mixed $fromcol the first column to merge
+     * @param mixed $tocol the last column to merge
+     */
     public function merge_cells($row, $fromcol, $tocol) {
         $this->curpage->mergers[$row][$fromcol] = $tocol - $fromcol + 1;
     }
 
+    /**
+     * Set the width of a particular column. (This will make sense only for certain outout formats,
+     * it can be ignored otherwise.)
+     *
+     * @param int $col the affected column
+     * @param int $width the width of that column
+     */
     public function set_column_width($col, $width) {
         $this->curpage->columnwidths[$col] = $width;
     }
@@ -1156,6 +1789,13 @@ abstract class scheduler_cached_text_canvas extends scheduler_canvas {
  */
 class scheduler_html_canvas extends scheduler_cached_text_canvas {
 
+    /**
+     * as_html
+     *
+     * @param mixed $rowcutoff
+     * @param bool $usetitle
+     * @return string
+     */
     public function as_html($rowcutoff, $usetitle = true) {
         global $OUTPUT;
 
@@ -1223,6 +1863,11 @@ class scheduler_html_canvas extends scheduler_cached_text_canvas {
         return $o;
     }
 
+    /**
+     * Send the output file via HTTP, as a downloadable file.
+     *
+     * @param string $filename the file name to send
+     */
     public function send($filename) {
         global $OUTPUT, $PAGE;
         $PAGE->set_pagelayout('print');
@@ -1242,13 +1887,24 @@ class scheduler_html_canvas extends scheduler_cached_text_canvas {
  */
 class scheduler_csv_canvas extends scheduler_cached_text_canvas {
 
+    /** @var mixed */
     protected $delimiter;
 
+    /**
+     * scheduler_csv_canvas constructor.
+     *
+     * @param mixed $delimiter
+     */
     public function __construct($delimiter) {
         parent::__construct();
         $this->delimiter = $delimiter;
     }
 
+    /**
+     * Send the output file via HTTP, as a downloadable file.
+     *
+     * @param string $filename the file name to send
+     */
     public function send($filename) {
 
         $writer = new csv_export_writer($this->delimiter);
@@ -1300,13 +1956,24 @@ class scheduler_csv_canvas extends scheduler_cached_text_canvas {
  */
 class scheduler_pdf_canvas extends scheduler_cached_text_canvas {
 
+    /** @var mixed */
     protected $orientation;
 
+    /**
+     * scheduler_pdf_canvas constructor.
+     *
+     * @param mixed $orientation
+     */
     public function __construct($orientation) {
         parent::__construct();
         $this->orientation = $orientation;
     }
 
+    /**
+     * Send the output file via HTTP, as a downloadable file.
+     *
+     * @param string $filename the file name to send
+     */
     public function send($filename) {
 
         $doc = new pdf($this->orientation);
@@ -1414,11 +2081,12 @@ class scheduler_export {
      * @param string $mode output mode
      * @param int $userid id of the teacher to export for, 0 if slots for all teachers are exported
      * @param int $groupid the id of the group (of students) to export appointments for, 0 if none
-     * @param int $timerange whether to include past and/or future slots (0=all, 1=future, 2=past)
+     * @param mixed $timerange
      * @param bool $includeempty whether to include slots without appointments
      * @param bool $pageperteacher whether one page should be used for each teacher
      */
-    public function build(scheduler $scheduler, array $fields, $mode, $userid, $groupid, $timerange, $includeempty, $pageperteacher) {
+    public function build(scheduler $scheduler, array $fields, $mode, $userid, $groupid, $timerange, $includeempty,
+                          $pageperteacher) {
         if ($groupid) {
             $this->studfilter = array_keys(groups_get_members($groupid, 'u.id'));
         }
@@ -1509,7 +2177,8 @@ class scheduler_export {
      * @param bool $includeslotfields whether fields relating to slots, rather than appointments, should be included
      * @param string $multiple whether the row represents multiple values (appointments)
      */
-    protected function write_row($row, slot $slot, $appointment, array $fields, $includeslotfields = true, $multiple = false) {
+    protected function write_row($row, slot $slot, $appointment, array $fields, $includeslotfields = true,
+                                 $multiple = false) {
 
         $col = 0;
         foreach ($fields as $field) {
