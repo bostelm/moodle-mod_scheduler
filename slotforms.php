@@ -598,7 +598,7 @@ class scheduler_addsession_form extends scheduler_slotform_base {
         $starttime = $data['starthour'] * 60 + $data['startminute'];
         $endtime = $data['endhour'] * 60 + $data['endminute'];
         if ($starttime > $endtime) {
-            $errors['endtime'] = get_string('negativerange', 'scheduler');
+            $errors['timerange'] = get_string('negativerange', 'scheduler');
         }
 
         // First slot is in the past.
