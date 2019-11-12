@@ -293,11 +293,13 @@ class scheduler extends mvc_record_model {
     public function get_last_location($user) {
         global $DB;
 
-        $select = 'schedulerid = :schedulerid AND teacherid = :teacherid ORDER BY timemodified DESC LIMIT 1';
-        $params = array('schedulerid' => $this->data->id, 'teacherid' => $user->id);
-        $lastlocation = $DB->get_field('scheduler_slots', 'appointmentlocation', $params, IGNORE_MULTIPLE);
-        if (!$lastlocation) {
-            $lastlocation = '';
+        $conds = array('schedulerid' => $this->data->id, 'teacherid' => $user->id);
+        $recs = $DB->get_records('scheduler_slots', $conds, 'timemodified DESC', 'id,appointmentlocation', 0, 1);
+        $lastlocation = '';
+        if ($recs) {
+            foreach ($recs as $rec) {
+                $lastlocation = $rec->appointmentlocation;
+            }
         }
         return $lastlocation;
     }
