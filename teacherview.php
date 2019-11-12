@@ -138,7 +138,7 @@ $PAGE->set_url($viewurl);
 
 if ($action != 'view') {
     require_once($CFG->dirroot.'/mod/scheduler/slotforms.php');
-    include($CFG->dirroot.'/mod/scheduler/teacherview.controller.php');
+    require_once($CFG->dirroot.'/mod/scheduler/teacherview.controller.php');
 }
 
 /************************************ View : New single slot form ****************************************/

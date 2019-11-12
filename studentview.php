@@ -59,7 +59,7 @@ if ($scheduler->is_group_scheduling_enabled()) {
 }
 
 
-include($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
+require_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
 echo $output->header();
 
