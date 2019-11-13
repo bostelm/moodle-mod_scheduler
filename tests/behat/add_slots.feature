@@ -70,7 +70,7 @@ Feature: Teacher can add slots to a scheduler activity
     And I click on "Save changes" "button"
     And I should see "1 slot added"
 
-  @javascript @ttt3
+  @javascript
   Scenario: Teacher enters a slot and schedules 3 students
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
