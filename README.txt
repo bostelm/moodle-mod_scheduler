@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/33/en/Scheduler_module
+    http://docs.moodle.org/37/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 3.3 and above.
+This module is intended for Moodle 3.7 and above.
 
 
 === Authors ===
@@ -67,7 +67,7 @@ Basic support for the completion API (completion on grade)
 Feature changes:
 
 The permissions / capabilities on the teacher side have been altered.
-In particular, teachers not strictly need the capability 
+In particular, teachers now strictly need the capability 
 'canseeotherteachersbooking' (or 'manageallappointments') in order to see 
 the "All appointments" tab.
 There are new capabilities 'editallgrades', 'editallnotes', and 'editallattended'
