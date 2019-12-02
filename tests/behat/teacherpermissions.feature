@@ -1,4 +1,4 @@
-@wip @mod @mod_scheduler
+@mod @mod_scheduler
 Feature: Teachers can edit other teacher's appointments only by permission
   In order to edit another teacher's appointment
   As a teacher
@@ -148,8 +148,8 @@ Feature: Teachers can edit other teacher's appointments only by permission
   Scenario: Grade boxes can be edited if the teacher has permission 
     Given I log in as "admin"
     And I set the following system permissions of "Non-editing teacher" role:
-      | capability                    | permission |
-      | mod/scheduler:editallgrades   | Allow      |
+      | capability                  | permission |
+      | mod/scheduler:editallgrades | Allow      |
     And I log out
     
     When I log in as "neteacher1"
