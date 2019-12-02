@@ -2,7 +2,7 @@
 Feature: Teachers can edit other teacher's appointments only by permission
   In order to edit another teacher's appointment
   As a teacher
-  I must have the correct permissions. 
+  I must have the correct permissions.
 
   Background:
     Given the following "users" exist:
@@ -47,10 +47,10 @@ Feature: Teachers can edit other teacher's appointments only by permission
     And I add a slot 10 days ahead at 0500 in "Test scheduler" scheduler and I fill the form with:
       | Location     | Office ne2 |
       | studentid[0] | Student 3  |
-    And I log out    
+    And I log out
 
   @javascript
-  Scenario: Editing teachers edit all appointments, nonediting teachers only their own 
+  Scenario: Editing teachers edit all appointments, nonediting teachers only their own
     When I log in as "edteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -65,14 +65,14 @@ Feature: Teachers can edit other teacher's appointments only by permission
     When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
     Then the "Attended" "checkbox" should be enabled
     And "Notes for appointment (visible to student)" "field" should exist
-    And "Confidential notes (visible to teacher only)" "field" should exist   
+    And "Confidential notes (visible to teacher only)" "field" should exist
     And the "grade" "field" should be enabled
     When I set the following fields to these values:
     | Attended | 1 |
     And I click on "Save changes" "button"
     Then the field "Attended" matches value "1"
     And I log out
-    
+
     When I log in as "neteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -87,7 +87,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     When I click on "//a[text()='Student 2']" "xpath_element" in the "4:00 AM" "table_row"
     Then the "Attended" "checkbox" should be enabled
     And "Notes for appointment (visible to student)" "field" should exist
-    And "Confidential notes (visible to teacher only)" "field" should exist   
+    And "Confidential notes (visible to teacher only)" "field" should exist
     When I set the following fields to these values:
     | Attended | 1 |
     And I click on "Save changes" "button"
@@ -99,18 +99,18 @@ Feature: Teachers can edit other teacher's appointments only by permission
     When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
     Then the "Attended" "checkbox" should be disabled
     And "Notes for appointment (visible to student)" "field" should not exist
-    And "Confidential notes (visible to teacher only)" "field" should not exist   
-    And "grade" "field" should not exist    
+    And "Confidential notes (visible to teacher only)" "field" should not exist
+    And "grade" "field" should not exist
     And I log out
 
   @javascript
-  Scenario: Attended boxes can be edited if the teacher has permission 
+  Scenario: Attended boxes can be edited if the teacher has permission
     Given I log in as "admin"
     And I set the following system permissions of "Non-editing teacher" role:
       | capability                    | permission |
       | mod/scheduler:editallattended | Allow      |
     And I log out
-    
+
     When I log in as "neteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -128,7 +128,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     | Attended | 1 |
     And I click on "Save changes" "button"
     Then the field "Attended" matches value "1"
-    
+
     When I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
@@ -136,22 +136,22 @@ Feature: Teachers can edit other teacher's appointments only by permission
     When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
     Then the "Attended" "checkbox" should be enabled
     And "Notes for appointment (visible to student)" "field" should not exist
-    And "Confidential notes (visible to teacher only)" "field" should not exist   
-    And "grade" "field" should not exist    
+    And "Confidential notes (visible to teacher only)" "field" should not exist
+    And "grade" "field" should not exist
     When I set the following fields to these values:
     | Attended | 1 |
     And I click on "Save changes" "button"
     Then the field "Attended" matches value "1"
     And I log out
-    
+
   @javascript
-  Scenario: Grade boxes can be edited if the teacher has permission 
+  Scenario: Grade boxes can be edited if the teacher has permission
     Given I log in as "admin"
     And I set the following system permissions of "Non-editing teacher" role:
       | capability                  | permission |
       | mod/scheduler:editallgrades | Allow      |
     And I log out
-    
+
     When I log in as "neteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -169,7 +169,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     | Grade | 42 |
     And I click on "Save changes" "button"
     Then the field "Grade" matches value "42"
-    
+
     When I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
@@ -178,21 +178,21 @@ Feature: Teachers can edit other teacher's appointments only by permission
     Then the "grade" "field" should be enabled
     And the "Attended" "checkbox" should be disabled
     And "Notes for appointment (visible to student)" "field" should not exist
-    And "Confidential notes (visible to teacher only)" "field" should not exist   
+    And "Confidential notes (visible to teacher only)" "field" should not exist
     When I set the following fields to these values:
     | Grade | 33 |
     And I click on "Save changes" "button"
     Then the field "grade" matches value "33"
     And I log out
-    
+
   @javascript
-  Scenario: Comment boxes can be edited if the teacher has permission 
+  Scenario: Comment boxes can be edited if the teacher has permission
     Given I log in as "admin"
     And I set the following system permissions of "Non-editing teacher" role:
       | capability                 | permission |
       | mod/scheduler:editallnotes | Allow      |
     And I log out
-    
+
     When I log in as "neteacher1"
     And I am on "Course 1" course homepage
     And I follow "Test scheduler"
@@ -206,14 +206,14 @@ Feature: Teachers can edit other teacher's appointments only by permission
     And "seen[]" "checkbox" should not exist in the "5:00 AM" "table_row"
     When I click on "//a[text()='Student 2']" "xpath_element" in the "4:00 AM" "table_row"
     Then the "Notes for appointment (visible to student)" "field" should be enabled
-    And the "Confidential notes (visible to teacher only)" "field" should be enabled   
+    And the "Confidential notes (visible to teacher only)" "field" should be enabled
     When I set the following fields to these values:
     | Notes for appointment (visible to student)   | notes-vis |
     | Confidential notes (visible to teacher only) | notes-confid |
     And I click on "Save changes" "button"
     Then I should see "notes-vis"
     And I should see "notes-confid"
-    
+
     When I am on "Course 1" course homepage
     And I follow "Test scheduler"
     And I follow "Statistics"
@@ -222,7 +222,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     Then "grade" "field" should not exist
     And the "Attended" "checkbox" should be disabled
     And the "Notes for appointment (visible to student)" "field" should be enabled
-    And the "Confidential notes (visible to teacher only)" "field" should be enabled   
+    And the "Confidential notes (visible to teacher only)" "field" should be enabled
     When I set the following fields to these values:
     | Notes for appointment (visible to student)   | notes-vis-3 |
     | Confidential notes (visible to teacher only) | notes-confid-3 |
@@ -230,4 +230,3 @@ Feature: Teachers can edit other teacher's appointments only by permission
     Then I should see "notes-vis-3"
     And I should see "notes-confid-3"
     And I log out
-    
