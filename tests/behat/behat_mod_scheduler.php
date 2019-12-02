@@ -131,13 +131,13 @@ class behat_mod_scheduler extends behat_base {
 
         $home = $this->escape(get_string('sitehome'));
 
-        $this->execute('behat_data_generators::the_following_exist', array('users',
+        $this->execute('behat_data_generators::the_following_entities_exist', array('users',
                         new TableNode(array(
                             array('username', 'firstname', 'lastname', 'email'),
                             array('globalmanager1', 'GlobalManager', '1', 'globalmanager1@example.com')
                         )) ) );
 
-        $this->execute('behat_data_generators::the_following_exist', array('system role assigns',
+        $this->execute('behat_data_generators::the_following_entities_exist', array('system role assigns',
                         new TableNode(array(
                             array('user', 'role'),
                             array('globalmanager1', 'manager')

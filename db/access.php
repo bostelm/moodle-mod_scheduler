@@ -107,6 +107,36 @@ $capabilities = array(
         )
     ),
 
+    'mod/scheduler:editallattended' => array(
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'archetypes' => array(
+                    'editingteacher' => CAP_ALLOW,
+                    'coursecreator' => CAP_ALLOW,
+                    'manager' => CAP_ALLOW
+            )
+    ),
+
+    'mod/scheduler:editallgrades' => array(
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'archetypes' => array(
+                    'editingteacher' => CAP_ALLOW,
+                    'coursecreator' => CAP_ALLOW,
+                    'manager' => CAP_ALLOW
+            )
+    ),
+
+    'mod/scheduler:editallnotes' => array(
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'archetypes' => array(
+                    'editingteacher' => CAP_ALLOW,
+                    'coursecreator' => CAP_ALLOW,
+                    'manager' => CAP_ALLOW
+            )
+    ),
+
     'mod/scheduler:disengage' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

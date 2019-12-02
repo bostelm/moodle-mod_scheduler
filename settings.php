@@ -28,11 +28,6 @@ if ($ADMIN->fulltree) {
 
     require_once($CFG->dirroot.'/mod/scheduler/lib.php');
 
-    $settings->add(new admin_setting_configcheckbox('mod_scheduler/allteachersgrading',
-                     get_string('allteachersgrading', 'scheduler'),
-                     get_string('allteachersgrading_desc', 'scheduler'),
-                     0));
-
     $settings->add(new admin_setting_configcheckbox('mod_scheduler/showemailplain',
                      get_string('showemailplain', 'scheduler'),
                      get_string('showemailplain_desc', 'scheduler'),

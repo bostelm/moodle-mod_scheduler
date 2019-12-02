@@ -64,6 +64,18 @@ New features / improvements:
 
 Basic support for the completion API (completion on grade)
 
+Feature changes:
+
+The permissions / capabilities on the teacher side have been altered.
+In particular, teachers not strictly need the capability 
+'canseeotherteachersbooking' (or 'manageallappointments') in order to see 
+the "All appointments" tab.
+There are new capabilities 'editallgrades', 'editallnotes', and 'editallattended'
+which allow users without the 'manageallappointments' capability
+to edit the grades, the teacher notes, or the attended flag in all appointments 
+of all teachers, in the appointment screen only. 
+The configuration setting 'allteachersgrading' is no longer in use.  
+
 --- Version 3.5 ---
 
 Intended for Moodle 3.5 and later.

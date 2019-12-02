@@ -128,7 +128,7 @@ class scheduler_permissions extends permissions_manager {
      * @return bool
      */
     public function can_edit_grade(\mod_scheduler\model\appointment $app) {
-        if ($this->has_capability('manageallappointments')) {
+        if ($this->has_any_capability(['manageallappointments', 'editallgrades'])) {
             return true;
         } else if (get_config('mod_scheduler', 'allteachersgrading')) {
             return true;
@@ -144,7 +144,7 @@ class scheduler_permissions extends permissions_manager {
      * @return bool
      */
     public function can_edit_attended(\mod_scheduler\model\appointment $app) {
-        if ($this->has_capability('manageallappointments')) {
+        if ($this->has_any_capability(['manageallappointments', 'editallattended'])) {
             return true;
         } else {
             return $this->userid == $app->get_slot()->teacherid;
@@ -158,7 +158,7 @@ class scheduler_permissions extends permissions_manager {
      * @return bool
      */
     public function can_edit_notes(\mod_scheduler\model\appointment $app) {
-        if ($this->has_capability('manageallappointments')) {
+        if ($this->has_any_capability(['manageallappointments', 'editallnotes'])) {
             return true;
         } else {
             return $this->userid == $app->get_slot()->teacherid;

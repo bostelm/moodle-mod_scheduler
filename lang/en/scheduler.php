@@ -48,6 +48,9 @@ $string['scheduler:viewfullslots'] = 'See slots even if they are fully booked (i
 $string['scheduler:seeotherstudentsbooking'] = 'See other students booked on the slot';
 $string['scheduler:seeotherstudentsresults'] = 'See other slot student\'s results';
 $string['scheduler:seeoverviewoutsideactivity'] = 'Use the overview screen to see slots outside the current scheduler activity.';
+$string['scheduler:editallattended'] = 'Mark students in all appointments as attended / not attended.';
+$string['scheduler:editallgrades'] = 'Edit grades in all appointments.';
+$string['scheduler:editallnotes'] = 'Edit appointment notes in all appointments.';
 
 /* ***** Events ***** */
 $string['event_bookingformviewed'] = 'Scheduler booking form viewed';
