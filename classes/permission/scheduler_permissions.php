@@ -130,8 +130,6 @@ class scheduler_permissions extends permissions_manager {
     public function can_edit_grade(\mod_scheduler\model\appointment $app) {
         if ($this->has_any_capability(['manageallappointments', 'editallgrades'])) {
             return true;
-        } else if (get_config('mod_scheduler', 'allteachersgrading')) {
-            return true;
         } else {
             return $this->userid == $app->get_slot()->teacherid;
         }
