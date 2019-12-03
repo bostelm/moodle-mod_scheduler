@@ -58,7 +58,7 @@ With further contributions taken from:
 
 === Release notes ===
 
---- current changes in master ---
+--- Version 3.7 ---
 
 New features / improvements:
 
