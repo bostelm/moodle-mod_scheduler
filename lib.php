@@ -367,6 +367,8 @@ function scheduler_supports($feature) {
             return true;
         case FEATURE_MOD_INTRO:
             return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS:
             return false;
         case FEATURE_GRADE_HAS_GRADE:
@@ -757,3 +759,25 @@ function mod_scheduler_core_calendar_provide_event_action(calendar_event $event,
     );
 }
 
+/**
+ * Obtains the completion state.
+ *
+ * @param object $course The course.
+ * @param object $cm The course module.
+ * @param int $userid The user ID.
+ * @param bool $type The type of comparison (COMPLETION_AND or _OR), or the default return value.
+ */
+function scheduler_get_completion_state($course, $cm, $userid, $type) {
+    global $DB;
+    $result = $type;
+
+    $scheduler = scheduler::load_by_id($cm->instance);
+
+    // Check whether the user has been seen.
+    if ($scheduler->completion_requires_attended()) {
+        $hasattended = $scheduler->has_user_attended_any_slot();
+        $result = $type == COMPLETION_AND ? $result && $hasattended : $result || $hasattended;
+    }
+
+    return $result;
+}

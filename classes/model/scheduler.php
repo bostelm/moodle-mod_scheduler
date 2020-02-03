@@ -538,6 +538,39 @@ class scheduler extends mvc_record_model {
         return null;
     }
 
+    /**
+     * Whether attendance is required for completing this activity.
+     *
+     * @return bool
+     */
+    public function completion_requires_attended() {
+        return !empty($this->data->requiresattended);
+    }
+
+    /**
+     * Whether the user has attended any slot.
+     *
+     * @param int $userid The user ID.
+     * @return bool
+     */
+    public function has_user_attended_any_slot($userid) {
+        global $DB;
+
+        $sql = "SELECT 1
+                  FROM {scheduler_appointment} a
+                  JOIN {scheduler_slots} s
+                    ON a.slotid = s.id
+                 WHERE s.schedulerid = :id
+                   AND a.studentid = :userid
+                   AND a.attended = 1";
+
+        $params = [
+            'id' => $this->data->id,
+            'userid' => $userid
+        ];
+
+        return $DB->record_exists_sql($sql, $params);
+    }
 
     /* *********************** Loading lists of slots *********************** */
 

@@ -192,6 +192,32 @@ class mod_scheduler_mod_form extends moodleform_mod {
     }
 
     /**
+     * Add custom completion rules.
+     *
+     * @return array Of element names.
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $mform->addElement('checkbox', 'completionattended', get_string('completionattended', 'mod_scheduler'),
+            get_string('completionattended_desc', 'mod_scheduler'));
+        $mform->addHelpButton('completionattended', 'completionattended', 'mod_scheduler');
+
+        return ['completionattended'];
+    }
+
+
+    /**
+     * Whether any custom completion rule is enabled.
+     *
+     * @param array $data Form data.
+     * @return bool
+     */
+    public function completion_rule_enabled($data) {
+        return !empty($data['completionattended']);
+    }
+
+    /**
      * Allows module to modify data returned by get_moduleinfo_data() or prepare_new_moduleinfo_data() before calling set_data()
      * This method is also called in the bulk activity completion form.
      *

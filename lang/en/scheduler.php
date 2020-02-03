@@ -179,6 +179,9 @@ $string['contentformat_help'] = '<p>There are three basic choices for the export
     </dl>
     You can explore the effect of these options using the "Preview" button.</p>';
 $string['complete'] = 'Booked';
+$string['completionattended'] = 'Require attended';
+$string['completionattended_desc'] = 'Students must be marked as seen';
+$string['completionattended_help'] = 'When enabled, a student must be marked as having attended an appointment for this requirement to be met.';
 $string['confirmbooking'] = "Confirm booking";
 $string['confirmdelete-all'] = 'This will delete <b>all</b> slots in this scheduler. Deletion cannot be undone. Continue anyway?';
 $string['confirmdelete-mine'] = 'This will delete all your slots in this scheduler. Deletion cannot be undone. Continue anyway?';

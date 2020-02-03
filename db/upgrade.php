@@ -367,5 +367,21 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022120200, 'scheduler');
     }
 
+    if ($oldversion < 2023050800) {
+
+        // Define field completionattended to be added to scheduler.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('completionattended', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+
+        // Conditionally launch add field completionattended.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2023050800, 'scheduler');
+    }
+
     return true;
+
 }
