@@ -775,7 +775,7 @@ function scheduler_get_completion_state($course, $cm, $userid, $type) {
 
     // Check whether the user has been seen.
     if ($scheduler->completion_requires_attended()) {
-        $hasattended = $scheduler->has_user_attended_any_slot();
+        $hasattended = $scheduler->has_user_attended_any_slot($userid);
         $result = $type == COMPLETION_AND ? $result && $hasattended : $result || $hasattended;
     }
 

@@ -26,7 +26,10 @@ namespace mod_scheduler\model;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/grade/lib.php');
+
+use completion_info;
 
 /**
  * A class for representing a scheduler instance, as an MVC model.
@@ -544,7 +547,29 @@ class scheduler extends mvc_record_model {
      * @return bool
      */
     public function completion_requires_attended() {
-        return !empty($this->data->requiresattended);
+        return !empty($this->data->completionattended);
+    }
+
+    /**
+     * Update the completion state of a user, if needed.
+     *
+     * @param int $userid The user ID.
+     * @param bool $hasattended Whether the user just attended a slot.
+     * @return void
+     */
+    public function completion_update_has_attended($userid, $hasattended=false) {
+        if (!$this->completion_requires_attended()) {
+            return;
+        }
+
+        $course = $this->get_courserec();
+        $cm = $this->get_cm();
+        $completion = new completion_info($course);
+
+        if ($completion->is_enabled($cm)) {
+            $state = $hasattended ? COMPLETION_COMPLETE : COMPLETION_UNKNOWN;
+            $completion->update_state($cm, $state, $userid);
+        }
     }
 
     /**
