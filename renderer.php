@@ -570,6 +570,15 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                     $studicons .= $this->render($attachicon);
                 }
 
+                if ($editable && count($studentlist->students) > 1) {
+                    $studicons .= $this->action_icon(
+                        '#',
+                        new pix_icon('s/no', get_string('revoke', 'scheduler')),
+                        null,
+                        ['class' => 'action-icon revoke-student']
+                    );
+                }
+
                 if ($student->highlight) {
                     $class .= ' highlight';
                 }
@@ -578,7 +587,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 if ($studentlist->showgrades && $student->grade) {
                     $grade = $this->format_grade($studentlist->scheduler, $student->grade, true);
                 }
-                $o .= html_writer::div($checkbox . $picture . ' ' . $name . $studicons . ' ' . $grade, $class);
+                $o .= html_writer::div($checkbox . $picture . ' ' . $name . $studicons . ' ' . $grade, $class, [
+                    'data-appointmentid' => $student->entryid
+                ]);
             }
 
             if ($editable) {
@@ -711,6 +722,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $this->page->requires->yui_module('moodle-mod_scheduler-saveseen',
                         'M.mod_scheduler.saveseen.init', array($slotman->scheduler->cmid) );
+        $this->page->requires->js_call_amd('mod_scheduler/revoke', 'init', ['#slotmanager', $slotman->scheduler->cmid]);
 
         $o = '';
 
