@@ -84,6 +84,8 @@ if ($isteacher) {
         include($CFG->dirroot.'/mod/scheduler/export.php');
     } else if ($action == 'datelist') {
         include($CFG->dirroot.'/mod/scheduler/datelist.php');
+    } else if ($action == 'import') {
+        include($CFG->dirroot.'/mod/scheduler/import.php');
     } else {
         include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }

@@ -368,6 +368,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $level1[] = $this->teacherview_tab($baseurl, 'datelist', 'datelist');
         $level1[] = $statstab;
         $level1[] = $this->teacherview_tab($baseurl, 'export', 'export');
+        $level1[] = $this->teacherview_tab($baseurl, 'import', 'import');
 
         return $this->tabtree($level1, $selected, $inactive);
     }

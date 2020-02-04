@@ -151,6 +151,7 @@ $string['canbook1appointment'] = 'You can book one more appointment in this sche
 $string['canbooknappointments'] = 'You can book {$a} more appointments in this scheduler.';
 $string['canbooknofurtherappointments'] = 'You cannot book further appointments in this scheduler.';
 $string['canbookunlimitedappointments'] = 'You can book any number of appointments in this scheduler.';
+$string['cannotscheduleslotforothers'] = 'You cannot schedule appointments for other staff members.';
 $string['chooseexisting'] = 'Choose existing';
 $string['choosingslotstart'] = 'Choosing the start time';
 $string['comments'] = 'Comments';
@@ -192,10 +193,14 @@ $string['confirmdelete-unused'] = 'This will delete all unused slots in this sch
 $string['confirmrevoke'] = 'Revoke all appointments in the current slot?';
 $string['conflictingslots'] = 'The slot on {$a} cannot be created due to conflicting slots:';
 $string['copytomyself'] = 'Send a copy to myself';
+$string['couldnotresolveteacher'] = 'Could not resolve the teacher to an existing user account.';
 $string['course'] = 'Course';
 $string['createexport'] = 'Create export file';
+$string['csvfile'] = 'CSV file';
 $string['csvformat'] = 'CSV';
 $string['csvfieldseparator'] = 'Field separator for CSV';
+$string['csvline'] = 'Line';
+$string['csvmissingcolumns'] = 'The following columns are missing: {$a}.';
 $string['cumulatedduration'] = 'Summed duration of appointments';
 $string['datatoinclude'] = 'Data to include';
 $string['datatoinclude_help'] = 'Select the fields that should be included in the export. Each of these will appear in one column of the output file.';
@@ -224,6 +229,7 @@ $string['emailreminder'] = 'Email a reminder';
 $string['emailreminderondate'] = 'Email a reminder on';
 $string['end'] = 'End';
 $string['enddate'] = 'Repeat time slots until';
+$string['errors'] = 'Errors';
 $string['excelformat'] = 'Excel';
 $string['exclusive'] = 'Exclusive';
 $string['exclusivity'] = 'Exclusivity';
@@ -303,8 +309,31 @@ $string['ignoreconflicts_link'] = 'mod/scheduler/conflict';
 $string['includeemptyslots'] = 'Include empty slots';
 $string['includeslotsfor'] = 'Include slots for';
 $string['incourse'] = ' in course ';
+$string['invalidorpastdate'] = 'The date could not be parsed, or is in the past.';
+$string['invalidteacher'] = 'Invalid teacher provided, they are not a teacher.';
 $string['mixindivgroup'] = 'Mix individual and group bookings';
 $string['mixindivgroup_desc'] = 'Where group scheduling is enabled, allow individual bookings as well.';
+$string['import'] = 'Import';
+$string['importslots'] = 'Import slots';
+$string['importslots_help'] = '
+Slots can be imported from a CSV file, containing the following __mandatory__ columns:
+
+- `date`: The date at which the slot starts
+- `time`: The time of the day at which the slots starts
+- `duration`: The duration of the slots, in minutes
+
+The following columns are also supported:
+
+- `maxstudents`: The maximum number of students in the slot. Use `1` for exclusive, or `0` for unlimited.
+- `location`: The location of the appointment.
+- `teacher`: The username of the Moodle account of the teacher. An empty value defaults to the current user.
+- `displayfrom`: The date from which the slot will be visible.
+- `comment`: Notes to be attached to the slot. The Markdown format is supported.
+
+The dates can be expressed in either of these formats: `MM/DD/YYYY`, `YYYY-MM-DD` or `DD-MM-YYYY`. The time can be expressed in 12h or 24h form: `2:00pm` or `14:00`.
+';
+$string['importslotsintro'] = 'Please provide a CSV matching the required format, an example file can be downloaded [here]({$a->exampleurl}).';
+$string['importallvalidslots'] = 'Import all valid slots';
 $string['introduction'] = 'Introduction';
 $string['isnonexclusive'] = 'Non-exclusive';
 $string['landscape'] = 'Landscape';
@@ -362,6 +391,8 @@ $string['notesrequired'] = 'You must enter text into this field before booking t
 $string['notifications'] = 'Notifications';
 $string['notseen'] = 'Not seen';
 $string['now'] = 'Now';
+$string['nslotsimported'] = '{$a} slot(s) imported';
+$string['nslotswitherror'] = '{$a} slot(s) with error';
 $string['occurrences'] = 'Occurrences';
 $string['odsformat'] = 'ODS';
 $string['on'] = 'on';
@@ -391,6 +422,7 @@ $string['registeredlbl'] = 'Student appointed';
 $string['reminder'] = 'Reminder';
 $string['requireupload'] = 'File upload required';
 $string['resetslots'] = 'Delete scheduler slots';
+$string['results'] = 'Results';
 $string['resetappointments'] = 'Delete appointments and grades';
 $string['revealteachernotes'] = 'Reveal teacher notes in privacy exports';
 $string['revealteachernotes_desc'] = 'If this option is selected, then confidential teacher notes (which are normally not visible to students)

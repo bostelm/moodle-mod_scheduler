@@ -93,6 +93,15 @@ class scheduler_permissions extends permissions_manager {
     }
 
     /**
+     * Whether the user can schedule a slot for another user.
+     *
+     * @return bool
+     */
+    public function can_schedule_slot_to_other_teachers() {
+        return $this->has_capability('canscheduletootherteachers');
+    }
+
+    /**
      * can_see_all_slots
      *
      * @return bool

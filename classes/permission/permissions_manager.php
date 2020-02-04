@@ -99,6 +99,15 @@ abstract class permissions_manager {
     }
 
     /**
+     * Get the user ID.
+     *
+     * @return int
+     */
+    public function get_userid() {
+        return $this->userid;
+    }
+
+    /**
      * ensure
      *
      * @param mixed $condition
