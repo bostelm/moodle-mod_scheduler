@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use \mod_scheduler\model\scheduler;
 
+$tsort = optional_param('tsort', null, PARAM_ALPHA);
+$tdir = optional_param('tdir', null, PARAM_INT);
+
 /**
  * Print a selection box of existing slots to be scheduler in
  *
@@ -130,6 +133,13 @@ $baseurl = new moodle_url('/mod/scheduler/view.php', array(
         'subpage' => $subpage,
         'offset' => $offset
 ));
+
+if ($tsort !== null) {
+    $baseurl->param('tsort', $tsort);
+}
+if ($tdir !== null) {
+    $baseurl->param('tdir', $tdir);
+}
 
 // The URL that is used for jumping back to the view (e.g., after an action is performed).
 $viewurl = new moodle_url($baseurl, array('what' => 'view'));
@@ -422,7 +432,6 @@ if ($groupmode) {
     }
 }
 
-
 if ($subpage == 'allappointments') {
     $teacherid = 0;
     $slotgroup = $currentgroup;
@@ -431,12 +440,48 @@ if ($subpage == 'allappointments') {
     $slotgroup = 0;
     $subpage = 'myappointments';
 }
-$sqlcount = $scheduler->count_slots_for_teacher($teacherid, $slotgroup);
 
-$pagesize = 25;
+$qb = $scheduler->get_slots_query_builder();
+$qb->set_teacherid($teacherid);
+$qb->set_groupid($slotgroup);
+
+// Organise order by.
+if (empty($tsort)) {
+    $tsort = 'starttime';
+    $tdir = 1;
+    $qb->add_order_by('teacherid');
+    $qb->add_order_by('duration');
+    $qb->add_order_by('starttime');
+} else {
+    $tdir = $tdir !== -1 ? 1 : -1;
+    if (!in_array($tsort, ['starttime', 'location', 'teacher'])) {
+        $tsort = 'starttime';
+    }
+    $dir = $tdir === -1 ? SORT_DESC : SORT_ASC;
+    if ($tsort === 'starttime') {
+        $qb->add_order_by('duration', $dir);
+        $qb->add_order_by('starttime', $dir);
+    } else if ($tsort === 'location') {
+        $qb->add_order_by('duration');
+        $qb->add_order_by('starttime');
+        $qb->add_order_by('appointmentlocation', $dir);
+    } else if ($tsort === 'teacher') {
+        $qb->add_order_by('duration');
+        $qb->add_order_by('starttime');
+        $qb->add_order_by_teacher($dir);
+    }
+    unset($dir);
+}
+
+$sqlcount = $scheduler->count_slots_from_query_builder($qb);
+
+$pagesize = 5;
 if ($offset == -1) {
+    // When the user lands on the page, navigate to the most relevant page first.
     if ($sqlcount > $pagesize) {
-        $offsetcount = $scheduler->count_slots_for_teacher($teacherid, $slotgroup, true);
+        $qbpast = $qb->clone();
+        $qbpast->set_timerange(mod_scheduler\slots_query_builder::TIMERANGE_PAST);
+        $offsetcount = $scheduler->count_slots_from_query_builder($qbpast);
         $offset = floor($offsetcount / $pagesize);
     } else {
         $offset = 0;
@@ -446,7 +491,8 @@ if ($offset * $pagesize >= $sqlcount && $sqlcount > 0) {
     $offset = floor(($sqlcount - 1) / $pagesize);
 }
 
-$slots = $scheduler->get_slots_for_teacher($teacherid, $slotgroup, $offset * $pagesize, $pagesize);
+$qb->set_limit($pagesize, $offset * $pagesize);
+$slots = $scheduler->get_slots_from_query_builder($qb);
 
 echo $output->heading(get_string('slots', 'scheduler'));
 
@@ -501,6 +547,8 @@ if ($slots) {
 
     $slotman = new scheduler_slot_manager($scheduler, $actionurl);
     $slotman->showteacher = ($subpage == 'allappointments');
+    $slotman->sortcolumn = $tsort;
+    $slotman->sortdir = $tdir;
 
     foreach ($slots as $slot) {
 

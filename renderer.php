@@ -110,6 +110,24 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     protected $scalecache = array();
 
     /**
+     * Get the sort URL for a column.
+     *
+     * @param scheduler_slot_manager $slotman The manager.
+     * @param string $column The column.
+     * @return moodle_url
+     */
+    public function get_slot_manager_sort_url(scheduler_slot_manager $slotman, $column) {
+        $params = [
+            'offset' => -1,
+            'tsort' => $column
+        ];
+        if ($slotman->sortcolumn === $column && !empty($slotman->sortdir)) {
+            $params['tdir'] = $slotman->sortdir > 0 ? -1 : 1;
+        }
+        return new moodle_url($slotman->actionurl, $params);
+    }
+
+    /**
      * Get a list of levels in a grading scale.
      *
      * @param int $scaleid id number of the scale
@@ -726,12 +744,32 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         $o = '';
 
+        $ascicon = $this->pix_icon('t/sort_asc', get_string('asc'));
+        $descicon = $this->pix_icon('t/sort_desc', get_string('desc'));
+
+        $headerdate = get_string('date', 'scheduler');
+        $headerlocation = get_string('location', 'scheduler');
+        $headerteacher = s($slotman->scheduler->get_teacher_name());
+        if ($slotman->sortable) {
+            $url = $this->get_slot_manager_sort_url($slotman, 'starttime');
+            $icon = $slotman->sortcolumn === 'starttime' ? $slotman->sortdir < 0 ? $descicon : $ascicon : '';
+            $headerdate = html_writer::link($url, $headerdate) . $icon;
+
+            $url = $this->get_slot_manager_sort_url($slotman, 'location');
+            $icon = $slotman->sortcolumn === 'location' ? $slotman->sortdir < 0 ? $descicon : $ascicon : '';
+            $headerlocation = html_writer::link($url, $headerlocation) . $icon;
+
+            $url = $this->get_slot_manager_sort_url($slotman, 'teacher');
+            $icon = $slotman->sortcolumn === 'teacher' ? $slotman->sortdir < 0 ? $descicon : $ascicon : '';
+            $headerteacher = html_writer::link($url, $headerteacher) . $icon;
+        }
+
         $table = new html_table();
-        $table->head  = array('', get_string('date', 'scheduler'), get_string('start', 'scheduler'),
-                        get_string('end', 'scheduler'), get_string('location', 'scheduler'), get_string('students', 'scheduler') );
+        $table->head  = array('', $headerdate, get_string('start', 'scheduler'),
+                        get_string('end', 'scheduler'), $headerlocation, get_string('students', 'scheduler') );
         $table->align = array ('center', 'left', 'left', 'left', 'left', 'left');
         if ($slotman->showteacher) {
-            $table->head[] = s($slotman->scheduler->get_teacher_name());
+            $table->head[] = $headerteacher;
             $table->align[] = 'left';
         }
         $table->head[] = get_string('action', 'scheduler');

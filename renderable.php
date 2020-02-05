@@ -389,6 +389,15 @@ class scheduler_slot_manager implements renderable {
      */
     public $showteacher = true;
 
+    /** @var bool Whether we can sort slots. */
+    public $sortable = true;
+
+    /** @var string The column we're sorting on. */
+    public $sortcolumn = null;
+
+    /** @var int The direction we're sorting on. */
+    public $sortdir = null;
+
     /**
      * Add a slot to the list.
      *

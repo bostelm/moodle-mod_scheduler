@@ -30,6 +30,7 @@ require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/grade/lib.php');
 
 use completion_info;
+use mod_scheduler\slots_query_builder;
 
 /**
  * A class for representing a scheduler instance, as an MVC model.
@@ -608,9 +609,11 @@ class scheduler extends mvc_record_model {
      * @param mixed $limitfrom query limit from here
      * @param mixed $limitnum max number od records to fetch
      * @param string $orderby ORDER BY fields
+     * @param string $joins The joins.
      * @return slot[]
      */
-    protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='') {
+    protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='', $joins = '') {
+
         global $DB;
         $select = 'SELECT s.* FROM {scheduler_slots} s';
 
@@ -631,7 +634,7 @@ class scheduler extends mvc_record_model {
             $order = "ORDER BY s.id";
         }
 
-        $sql = "$select $where $having $order";
+        $sql = "$select $joins $where $having $order";
 
         $slotdata = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
         $slots = array();
@@ -648,9 +651,10 @@ class scheduler extends mvc_record_model {
      *
      * @param string $wherecond WHERE condition
      * @param array $params parameters for DB query
+     * @param string $joins The joins.
      * @return int
      */
-    protected function count_slots($wherecond, array $params) {
+    protected function count_slots($wherecond, array $params, $joins = '') {
         global $DB;
         $select = 'SELECT COUNT(*) FROM {scheduler_slots} s';
 
@@ -660,11 +664,21 @@ class scheduler extends mvc_record_model {
         }
         $params['schedulerid'] = $this->data->id;
 
-        $sql = "$select $where";
+        $sql = "$select $joins $where";
 
         return $DB->count_records_sql($sql, $params);
     }
 
+    /**
+     * Count slots using a query builder.
+     *
+     * @param slots_query_builder $qb The query builder.
+     * @return slot[]
+     */
+    public function count_slots_from_query_builder(slots_query_builder $qb) {
+        list($where, $params) = $qb->get_where();
+        return $this->count_slots($where, $params, $qb->get_joins());
+    }
 
     /**
      * Subquery that counts appointments in the current slot.
@@ -739,6 +753,15 @@ class scheduler extends mvc_record_model {
      */
     public function get_slot_count() {
         return $this->slots->get_child_count();
+    }
+
+    /**
+     * Get a new instance of a slot query builder.
+     *
+     * @return slots_query_builder
+     */
+    public function get_slots_query_builder() {
+        return new slots_query_builder('s.');
     }
 
     /**
@@ -960,6 +983,17 @@ class scheduler extends mvc_record_model {
         return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC, s.duration ASC, s.teacherid');
     }
 
+    /**
+     * Fetch slots using a query builder.
+     *
+     * @param slots_query_builder $qb The query builder.
+     * @return slot[]
+     */
+    public function get_slots_from_query_builder(slots_query_builder $qb) {
+        list($where, $params) = $qb->get_where();
+        list($limitnum, $limitfrom) = $qb->get_limit();
+        return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, $qb->get_order_by(), $qb->get_joins());
+    }
 
     /* ************** End of slot retrieveal routines ******************** */
 
