@@ -115,6 +115,7 @@ $string['allappointments'] = 'All appointments';
 $string['allononepage'] = 'All slots on one page';
 $string['allowgroup'] = 'Exclusive slot - click to change';
 $string['alreadyappointed'] = 'Cannot make the appointment. The slot is already fully booked.';
+$string['applyfilters'] = 'Apply filters';
 $string['appointfor'] = 'Make appointment for';
 $string['appointforgroup'] = 'Make appointments for: {$a}';
 $string['appointingstudent'] = 'Appointment for slot';
@@ -154,6 +155,7 @@ $string['canbookunlimitedappointments'] = 'You can book any number of appointmen
 $string['cannotscheduleslotforothers'] = 'You cannot schedule appointments for other staff members.';
 $string['chooseexisting'] = 'Choose existing';
 $string['choosingslotstart'] = 'Choosing the start time';
+$string['clearfilters'] = 'Clear filters';
 $string['comments'] = 'Comments';
 $string['conflictlocal'] = '{$a->datetime} ({$a->duration} minutes) in this scheduler';
 $string['conflictremote'] = '{$a->datetime} ({$a->duration} minutes) in course {$a->courseshortname}, scheduler {$a->schedulername}';
@@ -276,6 +278,10 @@ $string['fileformat_help'] = 'The following file formats are available:
                 which can be printed using the browser\'s print feature;</li>
           <li>PDF documents. You can choose between landscape and portrait orientation.</li>
      </ul>';
+$string['filterdatetimeafter'] = 'After';
+$string['filterdatetimeat'] = 'At';
+$string['filterdatetimebefore'] = 'Before';
+$string['filterdatetimeon'] = 'On';
 $string['finalgrade'] = 'Final grade';
 $string['firstslotavailable'] = 'The first slot will be open on: {$a}';
 $string['forbidgroup'] = 'Group slot - click to change';
@@ -473,6 +479,10 @@ $string['slotwarning'] = '<strong>Warning:</strong> Moving this slot to the sele
 $string['staffbreakdown'] = 'By {$a}';
 $string['staffrolename'] = 'Role name of the teacher';
 $string['start'] = 'Start';
+$string['filterstarttime'] = 'Start time';
+$string['filterstarttime_help'] = 'Filter slots based on their starting date.
+
+Note that the "On" operator is the only one that ignores the time of the day, using this operator will select all slots occurring on a particular day.';
 $string['startpast'] = 'You can\'t start an empty appointment slot in the past';
 $string['statistics'] = 'Statistics';
 $string['student'] = 'Student';

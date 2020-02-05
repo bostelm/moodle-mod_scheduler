@@ -48,6 +48,15 @@ class slots_query_builder {
     /** Past slots. */
     const TIMERANGE_PAST = 2;
 
+    /** On a specific date, discarding the time. */
+    const OPERATOR_ON = 0;
+    /** Before the date and time. */
+    const OPERATOR_BEFORE = 1;
+    /** After the date and time. */
+    const OPERATOR_AFTER = 2;
+    /** At the exact date and time. */
+    const OPERATOR_AT = 3;
+
     /** @var int|null The group ID. */
     protected $groupid = 0;
     /** @var sql_join An array of joins. */
@@ -58,12 +67,16 @@ class slots_query_builder {
     protected $limitnum = 0;
     /** @var array[] Array of column names and direction. */
     protected $orderby = [];
+    /** @var mixed[] A list of parameters. */
+    protected $params = [];
     /** @var string The slot table prefix. */
     protected $prefix = '';
     /** @var int|null The teacher ID. */
     protected $teacherid = 0;
     /** @var int Timerange constant. */
     protected $timerange = self::TIMERANGE_ALL;
+    /** @var string[] A list where conditions. */
+    protected $wheres = [];
 
     /**
      * Constructor.
@@ -112,7 +125,70 @@ class slots_query_builder {
         $clone->orderby = $this->orderby;
         $clone->teacherid = $this->teacherid;
         $clone->timerange = $this->timerange;
+        $clone->params = $this->params;
+        $clone->wheres = $this->wheres;
         return $clone;
+    }
+
+    /**
+     * Filter by location.
+     *
+     * @param string $query The string to match.
+     * @return void
+     */
+    public function filter_location($query) {
+        global $DB;
+        if (empty($query)) {
+            unset($this->wheres['filterlocation']);
+            unset($this->params['filterlocation']);
+            return;
+        }
+        $this->wheres['filterlocation'] = $DB->sql_like($this->prefix . 'appointmentlocation', ':filterlocation', false);
+        $this->params['filterlocation'] = '%' . $DB->sql_like_escape($query) . '%';
+    }
+
+    /**
+     * Filter by starttime.
+     *
+     * @param string $timestamp The timestamp.
+     * @param int $operator The operator constant.
+     * @return void
+     */
+    public function filter_starttime($timestamp, $operator = self::OPERATOR_ON) {
+        $timestamp = (int) $timestamp;
+        if (empty($timestamp)) {
+            unset($this->wheres['filterstarttime']);
+            unset($this->params['filterstarttime']);
+            unset($this->params['filterstarttimeend']);
+            return;
+        }
+
+        $sql = '1=1';
+        $params = ['filterstarttime' => $timestamp];
+
+        switch ($operator) {
+            case self::OPERATOR_AT:
+                $sql = "{$this->prefix}starttime = :filterstarttime";
+                break;
+            case self::OPERATOR_AFTER:
+                $sql = "{$this->prefix}starttime > :filterstarttime";
+                break;
+            case self::OPERATOR_BEFORE:
+                $sql = "{$this->prefix}starttime < :filterstarttime";
+                break;
+            case self::OPERATOR_ON:
+            default:
+                $sql = "{$this->prefix}starttime > :filterstarttime AND {$this->prefix}starttime < :filterstarttimeend";
+                $startofday = usergetmidnight($timestamp);
+                $params = [
+                    'filterstarttime' => $startofday,
+                    'filterstarttimeend' => $startofday + DAYSECS
+                ];
+                break;
+        }
+
+        $this->wheres['filterstarttime'] = $sql;
+        $this->params = array_merge($this->params, $params);
     }
 
     /**
@@ -155,8 +231,8 @@ class slots_query_builder {
      * @return string
      */
     public function get_where() {
-        $wheres = [];
-        $params = [];
+        $wheres = $this->wheres;
+        $params = $this->params;
 
         if ($this->teacherid) {
             $wheres[] = "{$this->prefix}teacherid = :paramtid";

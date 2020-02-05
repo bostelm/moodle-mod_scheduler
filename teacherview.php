@@ -28,6 +28,10 @@ use \mod_scheduler\model\scheduler;
 
 $tsort = optional_param('tsort', null, PARAM_ALPHA);
 $tdir = optional_param('tdir', null, PARAM_INT);
+$tfstarttime = optional_param('tfstarttime', null, PARAM_INT);
+$tfstarttimeop = optional_param('tfstarttimeop', null, PARAM_INT);
+$tflocation = optional_param('tflocation', null, PARAM_RAW);
+$tfteacherid = optional_param('tfteacherid', null, PARAM_INT);
 
 /**
  * Print a selection box of existing slots to be scheduler in
@@ -134,11 +138,42 @@ $baseurl = new moodle_url('/mod/scheduler/view.php', array(
         'offset' => $offset
 ));
 
+// Save the sorting in the URL of the page.
 if ($tsort !== null) {
     $baseurl->param('tsort', $tsort);
 }
 if ($tdir !== null) {
     $baseurl->param('tdir', $tdir);
+}
+
+// Collect the filters received.
+$filters = array_filter([
+    'tfstarttime' => $tfstarttime,
+    'tflocation' => $tflocation,
+    'tfteacherid' => $tfteacherid,
+]);
+$hasfilters = !empty($filters);
+if (!empty($tfstarttime)) {
+    $filters['tfstarttimeop'] = $tfstarttimeop;
+}
+
+// Display and process the filter form.
+$filterform = new mod_scheduler\output\slots_filter_form($baseurl, ['scheduler' => $scheduler,
+    'hasfilters' => $hasfilters, 'showteacher' => $subpage === 'allappointments']);
+$filterform->set_data($filters);
+if ($data = $filterform->get_data()) {
+    foreach ($data as $key => $value) {
+        $baseurl->param($key, $value);
+    }
+    $baseurl->param('offset', 0); // Force the first page.
+    redirect($baseurl); // Redirect to keep everything in URL.
+} else if ($filterform->is_cancelled()) {
+    redirect($baseurl);
+}
+
+// Save filters in the URL.
+foreach ($filters as $key => $value) {
+    $baseurl->param($key, $value);
 }
 
 // The URL that is used for jumping back to the view (e.g., after an action is performed).
@@ -393,7 +428,6 @@ if ($action == 'sendmessage') {
 
 /****************** Standard view ***********************************************/
 
-
 // Trigger view event.
 \mod_scheduler\event\appointment_list_viewed::create_from_scheduler($scheduler)->trigger();
 
@@ -473,9 +507,22 @@ if (empty($tsort)) {
     unset($dir);
 }
 
+// Organise filters.
+if (!empty($filters)) {
+    if (!empty($filters['tflocation'])) {
+        $qb->filter_location($filters['tflocation']);
+    }
+    if (!empty($filters['tfteacherid']) && $permissions->can_see_all_slots() && $subpage === 'allappointments') {
+        $qb->set_teacherid($filters['tfteacherid']);
+    }
+    if (!empty($filters['tfstarttime'])) {
+        $qb->filter_starttime($filters['tfstarttime'], $filters['tfstarttimeop']);
+    }
+}
+
 $sqlcount = $scheduler->count_slots_from_query_builder($qb);
 
-$pagesize = 5;
+$pagesize = 25;
 if ($offset == -1) {
     // When the user lands on the page, navigate to the most relevant page first.
     if ($sqlcount > $pagesize) {
@@ -495,6 +542,9 @@ $qb->set_limit($pagesize, $offset * $pagesize);
 $slots = $scheduler->get_slots_from_query_builder($qb);
 
 echo $output->heading(get_string('slots', 'scheduler'));
+
+// Print filter form.
+$filterform->display();
 
 // Print instructions and button for creating slots.
 $key = ($slots) ? 'addslot' : 'welcomenewteacher';
