@@ -122,6 +122,13 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addElement('select', 'usenotes', get_string('usenotes', 'scheduler'), $noteoptions);
         $mform->setDefault('usenotes', '1');
 
+        $mform->addElement('selectyesno', 'canwatch', get_string('allowwatching', 'scheduler'));
+        $mform->addHelpButton('canwatch', 'allowwatching', 'scheduler');
+        // Disable canwatch when we cannot group bookings is enforced.
+        if (!get_config('mod_scheduler', 'mixindivgroup')) {
+            $mform->disabledIf('canwatch', 'bookingrouping', 'neq', '-1');
+        }
+
         // Grade settings.
         $this->standard_grading_coursemodule_elements();
 
@@ -243,6 +250,18 @@ class mod_scheduler_mod_form extends moodleform_mod {
                 $type = 'scale';
             }
             $defaultvalues['grade[modgrade_type]'] = $type;
+        }
+    }
+
+    /**
+     * Post processing.
+     *
+     * @param stdClass $data passed by reference
+     */
+    public function data_postprocessing($data) {
+        // Force watching to be disabled when it would not be working.
+        if (!get_config('mod_scheduler', 'mixindivgroup') && !empty($data->groupbookings)) {
+            $data->canwatch = 0;
         }
     }
 

@@ -32,6 +32,7 @@
         <FIELD NAME="usecaptcha" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether a CAPTCHA is used when students make a booking"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completionattended" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether the activity completion requires students to have attended appointments."/>
+        <FIELD NAME="canwatch" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether watching is enabled for this scheduler"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for scheduler"/>
@@ -82,6 +83,21 @@
       <INDEXES>
         <INDEX NAME="slotid" UNIQUE="false" FIELDS="slotid" COMMENT="By slot id"/>
         <INDEX NAME="studentid" UNIQUE="false" FIELDS="studentid" COMMENT="By student id"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="scheduler_watcher" COMMENT="List of slots being watched by users">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="slotid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="notified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The timestamp at which the user was notified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="slotuseridx" UNIQUE="true" FIELDS="slotid, userid"/>
+        <INDEX NAME="notifiedidx" UNIQUE="false" FIELDS="notified"/>
       </INDEXES>
     </TABLE>
   </TABLES>

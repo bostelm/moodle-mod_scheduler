@@ -288,6 +288,15 @@ class scheduler extends mvc_record_model {
     }
 
     /**
+     * Whether this scheduler supports watching.
+     *
+     * @return bool
+     */
+    public function is_watching_enabled() {
+        return (bool) $this->data->canwatch && $this->is_individual_scheduling_enabled();
+    }
+
+    /**
      * get the last location of a certain teacher in this scheduler
      *
      * @param \stdClass $user

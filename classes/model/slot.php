@@ -37,6 +37,9 @@ class slot extends mvc_child_record_model {
      */
     protected $appointments;
 
+    /** @var mvc_child_list The list of watchers. */
+    protected $watchers;
+
     /**
      * get_table
      *
@@ -59,6 +62,7 @@ class slot extends mvc_child_record_model {
         $this->data->schedulerid = $scheduler->get_id();
         $this->appointments = new mvc_child_list($this, 'scheduler_appointment', 'slotid',
                                                  new appointment_factory($this));
+        $this->watchers = new mvc_child_list($this, 'scheduler_watcher', 'slotid', new watcher_factory($this));
     }
 
     /**
@@ -194,6 +198,99 @@ class slot extends mvc_child_record_model {
         return (boolean) !($this->data->exclusivity == 1);
     }
 
+    /**
+     * Add a watcher.
+     *
+     * @param int $userid The user ID.
+     * @return watcher|null The watcher that was added.
+     */
+    public function add_watcher($userid) {
+        if ($this->is_watched_by_student($userid)) {
+            return;
+        }
+        $watcher = $this->watchers->create_child();
+        $watcher->userid = $userid;
+        $this->watchers->save_children();
+        return $watcher;
+    }
+
+    /**
+     * Get the watchers.
+     *
+     * @return watcher[]
+     */
+    public function get_watchers() {
+        return $this->watchers->get_children();
+    }
+
+    /**
+     * Remove a watcher.
+     *
+     * @param int $userid The user ID.
+     * @return watcher|null The watcher that was removed.
+     */
+    public function remove_watcher($userid) {
+        $watcher = null;
+        foreach ($this->get_watchers() as $watcher) {
+            if ($watcher->userid == $userid) {
+                break;
+            }
+            $watcher = null;
+        }
+
+        if ($watcher) {
+            $this->watchers->remove_child($watcher);
+            $this->watchers->save_children();
+        }
+
+        return $watcher;
+    }
+
+    /**
+     * Whether this slot can be watched.
+     *
+     * @return bool
+     */
+    public function is_watchable() {
+        return $this->is_in_bookable_period()
+            && $this->count_remaining_appointments() === 0;
+    }
+
+    /**
+     * Whether this slot can be watched by a student.
+     *
+     * Note that this does not check permissions, only whether the slot is in
+     * in a state that permits the given use to watch it. This also does not
+     * permform any check regarding the scheduler's settings.
+     *
+     * To check whether a student can watch a slot, you should:
+     *
+     * - Check that {@link scheduler::is_watching_enabled}
+     * - Check that they have the permission to mod/scheduler:watchslots
+     * - Check that the slots is watching (this method)
+     *
+     * @param int $studentid The student ID.
+     * @return bool
+     */
+    public function is_watchable_by_student($userid) {
+        return $this->is_watchable() && !$this->is_booked_by_student($userid);
+    }
+
+    /**
+     * Whether the slot is watched by a student.
+     *
+     * @param int $userid The student ID.
+     * @return bool
+     */
+    public function is_watched_by_student($userid) {
+        $watchers = $this->get_watchers();
+        foreach ($watchers as $watcher) {
+            if ($watcher->userid == $userid) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Count the number of appointments in this slot

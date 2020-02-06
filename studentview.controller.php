@@ -192,6 +192,46 @@ if ($action == 'bookslot') {
     scheduler_book_slot($scheduler, $slotid, $USER->id, $appointgroup, null, null, $returnurl);
 }
 
+/************************************************ Watching slots ************************************************/
+
+if ($action == 'watchslot') {
+    require_sesskey();
+    require_capability('mod/scheduler:watchslots', $context);
+
+    if (!$scheduler->is_watching_enabled()) {
+        throw new moodle_exception('error');
+    }
+
+    $slotid = required_param('slotid', PARAM_INT);
+    $slot = $scheduler->get_slot($slotid);
+    if (!$slot) {
+        throw new moodle_exception('error');
+    } else if (!$slot->is_watchable_by_student($USER->id)) {
+        throw new moodle_exception('nopermissions');
+    }
+
+    $watcher = $slot->add_watcher($USER->id);
+    \mod_scheduler\event\slot_watched::create_from_watcher($watcher)->trigger();
+    redirect($returnurl);
+}
+
+if ($action == 'unwatchslot') {
+    require_sesskey();
+    require_capability('mod/scheduler:watchslots', $context);
+    $slotid = required_param('slotid', PARAM_INT);
+
+    $slot = $scheduler->get_slot($slotid);
+    if (!$slot) {
+        throw new moodle_exception('error');
+    }
+
+    $watcher = $slot->remove_watcher($USER->id);
+    if ($watcher) {
+        \mod_scheduler\event\slot_unwatched::create_from_watcher($watcher)->trigger();
+    }
+    redirect($returnurl);
+}
+
 /******************************************** Show details of booking *******************************************/
 
 if ($action == 'viewbooking') {

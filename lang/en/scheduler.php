@@ -51,6 +51,7 @@ $string['scheduler:seeoverviewoutsideactivity'] = 'Use the overview screen to se
 $string['scheduler:editallattended'] = 'Mark students in all appointments as attended / not attended.';
 $string['scheduler:editallgrades'] = 'Edit grades in all appointments.';
 $string['scheduler:editallnotes'] = 'Edit appointment notes in all appointments.';
+$string['scheduler:watchslots'] = 'Watch slots';
 
 /* ***** Events ***** */
 $string['event_bookingformviewed'] = 'Scheduler booking form viewed';
@@ -59,11 +60,14 @@ $string['event_bookingremoved'] = 'Scheduler booking removed';
 $string['event_appointmentlistviewed'] = 'Scheduler appointment list viewed';
 $string['event_slotadded'] = 'Scheduler slot added';
 $string['event_slotdeleted'] = 'Scheduler slot deleted';
+$string['event_slotunwatched'] = 'Scheduler slot unwatched';
+$string['event_slotwatched'] = 'Scheduler slot watched';
 
 /* ***** Message types ***** */
 $string['messageprovider:invitation'] = 'Invitation to book a slot';
 $string['messageprovider:bookingnotification'] = 'Notification when a booking is made or cancelled';
 $string['messageprovider:reminder'] = 'Reminder of an upcoming appointment';
+$string['messageprovider:watchedslotopenedup'] = 'Notification when an appointment becomes available in a watched slot.';
 
 /* ***** Search areas ***** */
 $string['search:activity'] = 'Scheduler - activity information';
@@ -99,6 +103,10 @@ $string['privacy:metadata:filepurpose'] = 'File used in notes for the slot or ap
 
 $string['onedaybefore'] = '1 day before slot';
 $string['oneweekbefore'] = '1 week before slot';
+$string['allowwatching'] = 'Allow watching';
+$string['allowwatching_help'] = 'When watching is allowed, students can watch slots that are full to be notified when an appointment becomes available. However note that watching is not possible when the activity enforces booking in groups.
+
+This option can only work by displaying full slots to students, it will therefore ignore the students\' permission to view full slots, and always assume that they can view them.';
 $string['areaappointmentnote'] = 'Files in appointment notes';
 $string['areaslotnote'] = 'Files in slot notes';
 $string['areateachernote'] = 'Files in confidential notes';
@@ -513,6 +521,7 @@ $string['tuesday'] = 'Tuesday';
 $string['unattended'] = 'Unattended';
 $string['unlimited'] = 'Unlimited';
 $string['unregisteredlbl'] = 'Unappointed students';
+$string['unwatchslot'] = 'Unwatch slot';
 $string['upcomingslots'] = 'Upcoming slots';
 $string['updategrades'] = 'Update grades';
 $string['updatesingleslot'] = '';
@@ -539,10 +548,12 @@ $string['usenotesboth'] = 'Both types of notes';
 $string['usestudentnotes'] = 'Let students enter a message';
 $string['usestudentnotes_help'] = 'If enabled, the booking screen will contain a text box in which students can enter a message. Use the "booking instructions" above to instruct students what information they should supply.';
 $string['viewbooking'] = 'See details';
+$string['watchslotsintro'] = 'To be notified when a fully booked slot becomes available, click the "Watch slot" button for that corresponding slot.';
 $string['wednesday'] = 'Wednesday';
 $string['welcomebackstudent'] = 'You can book additional slots by clicking on the corresponding "Book slot" button below.';
 $string['welcomenewstudent'] = 'The table below shows all available slots for an appointment. Make your choice by clicking on the corresponding "Book slot" button. If you need to make a change later you can revisit this page.';
 $string['welcomenewteacher'] = 'Please click on the button below to add appointment slots.';
+$string['watchslot'] = 'Watch slot';
 $string['what'] = 'What?';
 $string['whathappened'] = 'What happened?';
 $string['whatresulted'] = 'What resulted?';
