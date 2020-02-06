@@ -114,6 +114,13 @@ class mod_scheduler_generator extends testing_module_generator {
                         $appointmentid = $DB->insert_record('scheduler_appointment', $appointment);
                     }
                 }
+
+                if (isset($options['slotwatchers'][$slotkey])) {
+                    $userids = (array) $options['slotwatchers'][$slotkey];
+                    foreach ($userids as $userid) {
+                        $DB->insert_record('scheduler_watcher', (object) ['userid' => $userid, 'slotid' => $slotid]);
+                    }
+                }
             }
         }
 

@@ -97,11 +97,13 @@ class privacy_test extends provider_testcase {
 
         $this->student1 = $this->getDataGenerator()->create_user();
         $this->student2 = $this->getDataGenerator()->create_user();
-        $this->allstudents = [$this->student1->id, $this->student2->id];
+        $this->student3 = $this->getDataGenerator()->create_user();
+        $this->allstudents = [$this->student1->id, $this->student2->id, $this->student3->id];
 
         $options = array();
         $options['slottimes'] = array();
         $options['slotstudents'] = array();
+        $options['slotwatchers'] = [];
         for ($c = 0; $c < 4; $c++) {
             $options['slottimes'][$c] = time() + ($c + 1) * DAYSECS;
             $stud = $this->getDataGenerator()->create_user()->id;
@@ -114,6 +116,8 @@ class privacy_test extends provider_testcase {
                                         $this->student1->id,
                                         $this->student2->id
                                       );
+        $options['slotwatchers'][4] = [$this->student1->id];
+        $options['slotwatchers'][0] = [$this->student3->id];
 
         $scheduler = $this->getDataGenerator()->create_module('scheduler', array('course' => $course->id), $options);
         $coursemodule = $DB->get_record('course_modules', array('id' => $scheduler->cmid));
@@ -157,6 +161,10 @@ class privacy_test extends provider_testcase {
         // Get contexts for the first user.
         $contextids = provider::get_contexts_for_userid($this->student1->id)->get_contextids();
         $this->assertEquals([$this->context->id], $contextids, '', 0.0, 10, true);
+
+        // Get contexts for the watcher user.
+        $contextids = provider::get_contexts_for_userid($this->student3->id)->get_contextids();
+        $this->assertEquals([$this->context->id], $contextids);
     }
 
     /**
@@ -219,10 +227,12 @@ class privacy_test extends provider_testcase {
      * @covers \mod_scheduler\privacy\provider::delete_data_for_all_users_in_context
      */
     public function test_delete_data_for_all_users_in_context() {
+        global $DB;
         provider::delete_data_for_all_users_in_context($this->context);
 
         foreach ($this->allstudents as $u) {
             $this->assert_appointment_status($this->schedulerid, $u, false);
+            $this->assertFalse($DB->record_exists('scheduler_watcher', ['userid' => $u]));
         }
     }
 
@@ -232,12 +242,15 @@ class privacy_test extends provider_testcase {
      * @covers \mod_scheduler\privacy\provider::delete_data_for_user
      */
     public function test_delete_data_for_user() {
+        global $DB;
         $appctx = new approved_contextlist($this->student1, 'mod_scheduler', [$this->context->id]);
         provider::delete_data_for_user($appctx);
 
         $this->assert_appointment_status($this->schedulerid, $this->student1->id, false);
         $this->assert_appointment_status($this->schedulerid, $this->student2->id, true);
 
+        $this->assertFalse($DB->record_exists('scheduler_watcher', ['userid' => $this->student1->id]));
+        $this->assertTrue($DB->record_exists('scheduler_watcher', ['userid' => $this->student3->id]));
     }
 
     /**
@@ -246,6 +259,7 @@ class privacy_test extends provider_testcase {
      * @covers \mod_scheduler\privacy\provider::delete_data_for_users
      */
     public function test_delete_data_for_users() {
+        global $DB;
         $component = 'mod_scheduler';
 
         $approveduserids = [$this->student1->id, $this->student2->id];
@@ -254,5 +268,8 @@ class privacy_test extends provider_testcase {
 
         $this->assert_appointment_status($this->schedulerid, $this->student1->id, false);
         $this->assert_appointment_status($this->schedulerid, $this->student2->id, false);
+
+        $this->assertFalse($DB->record_exists('scheduler_watcher', ['userid' => $this->student1->id]));
+        $this->assertTrue($DB->record_exists('scheduler_watcher', ['userid' => $this->student3->id]));
     }
 }

@@ -91,6 +91,15 @@ class provider implements
             'privacy:metadata:scheduler_appointment'
         );
 
+        $collection->add_database_table(
+            'scheduler_watcher',
+            [
+                'userid' => 'privacy:metadata:scheduler_watcher:userid',
+                'slotid' => 'privacy:metadata:scheduler_watcher:slotid',
+            ],
+            'privacy:metadata:scheduler_watcher'
+        );
+
         // Subsystems used.
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
 
@@ -130,13 +139,16 @@ class provider implements
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {scheduler} s ON s.id = cm.instance
             INNER JOIN {scheduler_slots} t ON t.schedulerid = s.id
-            INNER JOIN {scheduler_appointment} a ON a.slotid = t.id
-                 WHERE a.studentid = :userid";
+             LEFT JOIN {scheduler_appointment} a ON a.slotid = t.id AND a.studentid = :userid1
+             LEFT JOIN {scheduler_watcher} w ON w.slotid = t.id AND w.userid = :userid2
+                 WHERE a.id IS NOT NULL
+                    OR w.id IS NOT NULL";
 
         $params = [
                 'modname'       => 'scheduler',
                 'contextlevel'  => CONTEXT_MODULE,
-                'userid'        => $userid
+                'userid1'       => $userid,
+                'userid2'       => $userid
         ];
 
         $contextlist->add_from_sql($sql, $params);
@@ -188,6 +200,20 @@ class provider implements
 
         $userlist->add_from_sql('studentid', $sql, $params);
 
+        // Fetch watchers.
+        $sql = "SELECT w.userid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {scheduler} s ON s.id = cm.instance
+            INNER JOIN {scheduler_slots} t ON t.schedulerid = s.id
+            INNER JOIN {scheduler_watcher} w ON w.slotid = t.id
+                 WHERE cm.id = :cmid";
+        $params = [
+            'modname' => 'scheduler',
+            'cmid'=> $context->instanceid
+        ];
+        $userlist->add_from_sql('userid', $sql, $params);
+
         return $userlist;
     }
 
@@ -232,8 +258,6 @@ class provider implements
             return;
         }
 
-        self::$renderer = new \mod_scheduler_renderer();
-
         $user = $contextlist->get_user();
 
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
@@ -244,18 +268,21 @@ class provider implements
                 a.studentid, a.attended, a.grade,
                 a.appointmentnote, a.appointmentnoteformat,
                 a.teachernote, a.teachernoteformat,
-                a.studentnote, a.studentnoteformat
+                a.studentnote, a.studentnoteformat,
+                w.id AS iswatcher
                 FROM {context} ctx
                 JOIN {course_modules} cm ON cm.id = ctx.instanceid
                 JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                 JOIN {scheduler} s ON s.id = cm.instance
                 JOIN {scheduler_slots} t ON t.schedulerid = s.id
-                JOIN {scheduler_appointment} a ON a.slotid = t.id
+                LEFT JOIN {scheduler_appointment} a ON a.slotid = t.id AND a.studentid =:userid2
+                LEFT JOIN {scheduler_watcher} w ON w.slotid = t.id AND w.userid = :userid3
                 WHERE ctx.id {$contextsql} AND ctx.contextlevel = :contextlevel
-                AND t.teacherid = :userid1 OR a.studentid = :userid2
+                  AND t.teacherid = :userid1
+                   OR (a.id IS NOT NULL OR w.id IS NOT NULL)
                 ORDER BY cm.id, t.id, a.id";
         $rs = $DB->get_recordset_sql($sql, $contextparams + ['contextlevel' => CONTEXT_MODULE,
-                'modname' => 'scheduler', 'userid1' => $user->id, 'userid2' => $user->id]);
+                'modname' => 'scheduler', 'userid1' => $user->id, 'userid2' => $user->id, 'userid3' => $user->id]);
 
         $context = null;
         $lastrow = null;
@@ -330,6 +357,7 @@ class provider implements
             'notes' => self::format_note($record->notes, $record->notesformat,
                                          'slotnote', $record->slotid, $context, $wrc, $slotarea),
             'exclusivity' => $record->exclusivity,
+            'watching_slot' => transform::yesno(!empty($record->iswatcher))
         ];
 
         // Data about the slot.
@@ -346,7 +374,7 @@ class provider implements
      * @param \stdClass $record
      */
     protected static function export_appointment($context, $scheduler, $user, $record) {
-        if (!$record) {
+        if (!$record || empty($record->appointmentid)) {
             return;
         }
         $wrc = writer::with_context($context);
@@ -358,7 +386,7 @@ class provider implements
         $data = [
                 'studentid' => transform::user($record->studentid),
                 'attended' => transform::yesno($record->attended),
-                'grade' => self::$renderer->format_grade($scheduler, $record->grade),
+                'grade' => self::get_renderer()->format_grade($scheduler, $record->grade),
                 'appointmentnote' => self::format_note($record->appointmentnote, $record->appointmentnoteformat,
                                          'appointmentnote', $record->appointmentid, $context, $wrc, $apparea),
                 'studentnote' => self::format_note($record->studentnote, $record->studentnoteformat,
@@ -432,6 +460,7 @@ class provider implements
                 foreach ($apps as $app) {
                     $app->delete();
                 }
+                $scheduler->delete_student_watchlist($user->id);
             }
         }
     }
@@ -456,8 +485,25 @@ class provider implements
                 foreach ($apps as $app) {
                     $app->delete();
                 }
+                $scheduler->delete_student_watchlist($userid);
             }
         }
     }
 
+    /**
+     * Get our renderer.
+     *
+     * We must include the file directly because autoloading does not work
+     * for classes placed at the root the plugin.
+     *
+     * @return \mod_scheduler_renderer
+     */
+    private static function get_renderer() {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/scheduler/renderer.php');
+        if (!isset(self::$renderer)) {
+            self::$renderer = new \mod_scheduler_renderer();
+        }
+        return self::$renderer;
+    }
 }

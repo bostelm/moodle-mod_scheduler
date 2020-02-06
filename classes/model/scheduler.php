@@ -148,6 +148,24 @@ class scheduler extends mvc_record_model {
     }
 
     /**
+     * Delete a student's watchlist.
+     *
+     * @param int $userid The user ID.
+     * @return void
+     */
+    public function delete_student_watchlist($userid) {
+        global $DB;
+        $sql = "DELETE FROM {scheduler_watcher}
+                      WHERE userid = :userid
+                        AND slotid IN (
+                         SELECT id
+                           FROM {scheduler_slots}
+                          WHERE schedulerid = :schedulerid)";
+        $params = ['schedulerid' => $this->data->id, 'userid' => $userid];
+        $DB->execute($sql, $params);
+    }
+
+    /**
      * Retrieve the course module id of this scheduler
      *
      * @return int
@@ -1335,9 +1353,9 @@ class scheduler extends mvc_record_model {
         global $DB;
         $sql = "DELETE FROM {scheduler_watcher}
                       WHERE slotid IN (
-                         SELECT s.id
-                           FROM {scheduler_slots} s
-                          WHERE s.starttime <= :starttime)";
+                         SELECT id
+                           FROM {scheduler_slots}
+                          WHERE starttime <= :starttime)";
         $params = ['starttime' => time() - DAYSECS];
         $DB->execute($sql, $params);
     }

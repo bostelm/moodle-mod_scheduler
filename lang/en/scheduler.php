@@ -96,6 +96,10 @@ $string['privacy:metadata:scheduler_appointment:teachernoteformat'] = "Format of
 $string['privacy:metadata:scheduler_appointment:studentnote'] = "Note by student";
 $string['privacy:metadata:scheduler_appointment:studentnoteformat'] = "Format of student note";
 
+$string['privacy:metadata:scheduler_watcher'] = "Represents a student watching a slot";
+$string['privacy:metadata:scheduler_watcher:userid'] = "Student who watching the slot";
+$string['privacy:metadata:scheduler_watcher:slotid'] = "The slot being watched";
+
 $string['privacy:metadata:filepurpose'] = 'File used in notes for the slot or appointment';
 
 

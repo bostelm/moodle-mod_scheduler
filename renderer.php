@@ -696,7 +696,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $rowdata[] = $this->render($button);
             } else if ($slot->canwatch) {
                 $what = $slot->iswatching ? 'unwatchslot' : 'watchslot';
-                $bookurl = new moodle_url($booker->actionurl, ['slotid' => $slot->slotid, 'what' => $what]);
+                $bookurl = new moodle_url($booker->actionurl, ['slotid' => $slot->slotid,
+                    'what' => $what,
+                ]);
                 $button = new single_button($bookurl, get_string($what, 'mod_scheduler'));
                 $rowdata[] = $this->render($button);
             } else {
