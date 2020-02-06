@@ -67,7 +67,7 @@ $string['event_slotwatched'] = 'Scheduler slot watched';
 $string['messageprovider:invitation'] = 'Invitation to book a slot';
 $string['messageprovider:bookingnotification'] = 'Notification when a booking is made or cancelled';
 $string['messageprovider:reminder'] = 'Reminder of an upcoming appointment';
-$string['messageprovider:watchedslotopenedup'] = 'Notification when an appointment becomes available in a watched slot.';
+$string['messageprovider:watchedslotopenedup'] = 'Notification when an appointment becomes available in a watched slot';
 
 /* ***** Search areas ***** */
 $string['search:activity'] = 'Scheduler - activity information';
@@ -431,6 +431,7 @@ $string['pdforientation'] = 'PDF page orientation';
 $string['portrait'] = 'Portrait';
 $string['preview'] = 'Preview';
 $string['previewlimited'] = '(Preview is limited to {$a} rows.)';
+$string['purgeobsoletewatchers'] = 'Purge obsolete watchers';
 $string['purgeunusedslots'] = 'Purge unused slots in the past';
 $string['recipients'] = 'Recipients';
 $string['registeredlbl'] = 'Student appointed';
@@ -661,6 +662,13 @@ on {$a->date} from {$a->time} to {$a->endtime}
 with {$a->attendant}.
 
 Location: {$a->location}';
+
+$string['email_slotopenedup_html'] = '<p>An appointment has become available for a slot on {$a->date} at {$a->time} with the {$a->staffrole} {$a->attendant}.</p>
+<p>This is regarding the activity titled &quot;<a href="{$a->scheduler_url}"><em>{$a->module}</em></a>&quot;, in the course &quot;<a href="{$a->course_url}"><em>{$a->course_short}: {$a->course}</em></a>&quot; on the website &quot;<a href="{$a->site_url}"><em>{$a->site}</em></a>&quot;.</p>';
+$string['email_slotopenedup_plain'] = 'An appointment has become available for a slot on {$a->date} at {$a->time} with the {$a->staffrole} {$a->attendant}.
+
+This is regarding the activity titled "{$a->module}", in the course "{$a->course_short}: {$a->course}" on the website "{$a->site}".';
+$string['email_slotopenedup_subject'] = '{$a->course_short}: A slot became available';
 
 $string['email_reminder_html'] = '<p>You have an upcoming appointment on <strong>{$a->date}</strong>
 from <strong>{$a->time}</strong> to <strong>{$a->endtime}</strong><br/>

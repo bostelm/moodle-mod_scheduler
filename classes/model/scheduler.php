@@ -1148,6 +1148,11 @@ class scheduler extends mvc_record_model {
     public function count_bookable_appointments($studentid, $includechangeable = true) {
         global $DB;
 
+        // Bail when bookings are unlimited.
+        if ($this->allows_unlimited_bookings()) {
+            return -1;
+        }
+
         // Find how many slots have already been booked.
         $sql = 'SELECT COUNT(*) FROM {scheduler_slots} s'
               .' JOIN {scheduler_appointment} a ON s.id = a.slotid'
@@ -1165,9 +1170,7 @@ class scheduler extends mvc_record_model {
         $booked = $DB->count_records_sql($sql, $params);
         $allowed = $this->maxbookings;
 
-        if ($allowed == 0) {
-            return -1;
-        } else if ($booked >= $allowed) {
+        if ($booked >= $allowed) {
             return 0;
         } else {
             return $allowed - $booked;
@@ -1321,6 +1324,22 @@ class scheduler extends mvc_record_model {
         // Delete the appointment.
         $slot->remove_appointment($appointment);
         $slot->save();
+    }
+
+    /**
+     * Free obsolete watchers.
+     *
+     * @return void
+     */
+    public static function free_obsolete_watchers() {
+        global $DB;
+        $sql = "DELETE FROM {scheduler_watcher}
+                      WHERE slotid IN (
+                         SELECT s.id
+                           FROM {scheduler_slots} s
+                          WHERE s.starttime <= :starttime)";
+        $params = ['starttime' => time() - DAYSECS];
+        $DB->execute($sql, $params);
     }
 
     /**

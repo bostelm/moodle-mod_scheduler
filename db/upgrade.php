@@ -391,7 +391,6 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('slotid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('notified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
         // Adding keys to table scheduler_watcher.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
@@ -433,21 +432,6 @@ function xmldb_scheduler_upgrade($oldversion=0) {
 
         // Scheduler savepoint reached.
         upgrade_mod_savepoint(true, 2023050805, 'scheduler');
-    }
-
-    if ($oldversion < 2023050806) {
-
-        // Define index notifiedidx (not unique) to be added to scheduler_watcher.
-        $table = new xmldb_table('scheduler_watcher');
-        $index = new xmldb_index('notifiedidx', XMLDB_INDEX_NOTUNIQUE, ['notified']);
-
-        // Conditionally launch add index notifiedidx.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-        // Scheduler savepoint reached.
-        upgrade_mod_savepoint(true, 2020020306, 'scheduler');
     }
 
     return true;

@@ -60,14 +60,6 @@ class watcher extends mvc_child_record_model {
     }
 
     /**
-     * save
-     */
-    public function save() {
-        $this->data->slotid = $this->get_parent()->get_id();
-        parent::save();
-    }
-
-    /**
      * Retrieve the slot associated with this appointment
      *
      * @return slot;
@@ -83,6 +75,41 @@ class watcher extends mvc_child_record_model {
      */
     public function get_scheduler() {
         return $this->get_parent()->get_parent();
+    }
+
+    /**
+     * Get the user.
+     *
+     * @return \stdClass
+     */
+    public function get_user() {
+        return \core_user::get_user($this->data->userid, '*', MUST_EXIST);
+    }
+
+    /**
+     * Notify.
+     *
+     * @param stdClass $teacher The teacher.
+     * @return void
+     */
+    public function notify() {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/scheduler/mailtemplatelib.php');
+
+        $teacher = $this->get_slot()->get_teacher();
+        $student = $this->get_user();
+        $course = $this->get_scheduler()->get_courserec();
+
+        \scheduler_messenger::send_slot_notification($this->get_slot(), 'watchedslotopenedup', 'slotopenedup',
+            $teacher, $student, $teacher, $student, $course);
+    }
+
+    /**
+     * Save.
+     */
+    public function save() {
+        $this->data->slotid = $this->get_parent()->get_id();
+        parent::save();
     }
 
 }

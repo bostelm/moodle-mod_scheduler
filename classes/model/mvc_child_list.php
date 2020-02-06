@@ -146,6 +146,16 @@ class mvc_child_list {
     }
 
     /**
+     * Return whether there are children.
+     *
+     * @return bool
+     */
+    public function has_children() {
+        $this->load();
+        return !empty($this->children);
+    }
+
+    /**
      * Count the children in this list.
      *
      * @return int
@@ -212,4 +222,23 @@ class mvc_child_list {
             $child->delete();
         }
     }
+
+    /**
+     * Get the number of children pending deletion.
+     *
+     * @return bool
+     */
+    public function get_children_pending_deletion_count() {
+        return count($this->childrenfordeletion);
+    }
+
+    /**
+     * Whether there are children pending deletion.
+     *
+     * @return bool
+     */
+    public function has_children_pending_deletion() {
+        return !empty($this->childrenfordeletion);
+    }
+
 }

@@ -74,6 +74,7 @@ class appointment extends mvc_child_record_model {
         // the future a user must have attended ALL of their appointments, then we would have to update the
         // completion state when the value is null, which would indicate a new appointment.
         $isattendedchanged = $this->initialisattended !== null && $this->initialisattended !== $this->is_attended();
+        $isnew = empty($this->data->id);
 
         $this->data->slotid = $this->get_parent()->get_id();
         parent::save();
@@ -81,6 +82,11 @@ class appointment extends mvc_child_record_model {
 
         $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $this->studentid);
+
+        // If we've just created the appointment, make sure the user is no longer a watcher.
+        if ($isnew) {
+            $this->get_slot()->remove_watcher($this->studentid);
+        }
 
         if ($isattendedchanged) {
             $this->get_scheduler()->completion_update_has_attended($this->studentid, $this->is_attended());
