@@ -63,13 +63,19 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
             'appointmentnote', 'appointmentnoteformat', 'teachernote', 'teachernoteformat',
             'studentnote', 'studentnoteformat', 'timecreated', 'timemodified'));
 
+        $watchers = new backup_nested_element('watchers');
+        $watcher = new backup_nested_element('watcher', ['id'], ['slotid', 'userid']);
+
         // Build the tree.
 
         $scheduler->add_child($slots);
         $slots->add_child($slot);
 
         $slot->add_child($appointments);
+        $slot->add_child($watchers);
+
         $appointments->add_child($appointment);
+        $watchers->add_child($watcher);
 
         // Define sources.
         $scheduler->set_source_table('scheduler', array('id' => backup::VAR_ACTIVITYID));
@@ -79,6 +85,7 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
         if ($userinfo) {
             $slot->set_source_table('scheduler_slots', array('schedulerid' => backup::VAR_PARENTID));
             $appointment->set_source_table('scheduler_appointment', array('slotid' => backup::VAR_PARENTID));
+            $watcher->set_source_table('scheduler_watcher', ['slotid' => backup::VAR_PARENTID]);
         }
 
         // Define id annotations.
@@ -87,6 +94,7 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
         if ($userinfo) {
             $slot->annotate_ids('user', 'teacherid');
             $appointment->annotate_ids('user', 'studentid');
+            $watcher->annotate_ids('user', 'userid');
         }
 
         // Define file annotations.

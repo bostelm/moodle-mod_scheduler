@@ -50,6 +50,7 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
             $appointment = new restore_path_element('scheduler_appointment',
                                                     '/activity/scheduler/slots/slot/appointments/appointment');
             $paths[] = $appointment;
+            $paths[] = new restore_path_element('scheduler_watcher', '/activity/scheduler/slots/slot/watchers/watcher');
         }
 
         // Return the paths wrapped into standard activity structure.
@@ -131,6 +132,23 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
 
         $newitemid = $DB->insert_record('scheduler_appointment', $data);
         $this->set_mapping('scheduler_appointment', $oldid, $newitemid, true);
+    }
+
+    /**
+     * Process watcher.
+     *
+     * @param stdClass $data
+     */
+    protected function process_scheduler_watcher($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->slotid = $this->get_new_parentid('scheduler_slot');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+
+        $newitemid = $DB->insert_record('scheduler_watcher', $data);
     }
 
     /**
