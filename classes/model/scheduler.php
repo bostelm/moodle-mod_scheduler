@@ -306,6 +306,24 @@ class scheduler extends mvc_record_model {
     }
 
     /**
+     * Whether students should upload at least one file.
+     *
+     * @return bool
+     */
+    public function is_studentfiles_required() {
+        return $this->uses_studentfiles() && $this->requireupload;
+    }
+
+    /**
+     * Whether students must provide notes.
+     *
+     * @return bool
+     */
+    public function is_studentnotes_required() {
+        return $this->uses_studentnotes() && $this->usestudentnotes;
+    }
+
+    /**
      * Whether this scheduler supports watching.
      *
      * @return bool

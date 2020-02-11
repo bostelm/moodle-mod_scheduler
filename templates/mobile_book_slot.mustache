@@ -1,0 +1,63 @@
+{{=<% %>=}}
+
+<div>
+
+    <ion-list>
+        <ion-item>
+            <h2><% slot.timeformatted.date %></h2>
+            <p><% slot.timeformatted.starttime %> - <% slot.timeformatted.endtime %></p>
+        </ion-item>
+
+        <%# scheduler.hasbookinginstructions %>
+        <ion-item text-wrap>
+            <h2><%# str %>bookinginstructions, mod_scheduler<%/ str %></h2>
+            <core-format-text text="<% scheduler.bookinginstructionsformatted %>" component="mod_scheduler"
+                componentId="<% cmid %>"></core-format-text>
+        </ion-item>
+        <%/ scheduler.hasbookinginstructions %>
+
+        <%# scheduler.isgroupbookingenabled %>
+        <ion-item>
+            <ion-label stacked id="mod-scheduler-book-slot-groupid">
+                <h2 [core-mark-required]="true"><%# str %>appointfor, mod_scheduler<%/ str %></h2>
+            </ion-label>
+            <ion-select interface="popover" name="groupid" [(ngModel)]="groupid"
+                    aria-labelledby="mod-scheduler-book-slot-groupid">
+                <%# scheduler.isindividualbookingenabled %>
+                    <ion-option value="0" selected><%# str %>myself, mod_scheduler<%/ str %></ion-option>
+                <%/ scheduler.isindividualbookingenabled %>
+                <%# groups %>
+                    <ion-option value="<% id %>"><% name %></ion-option>
+                <%/ groups %>
+            </ion-select>
+        </ion-item>
+        <%/ scheduler.isgroupbookingenabled %>
+
+        <%# scheduler.usesstudentnotes %>
+        <ion-item text-wrap>
+            <ion-label stacked>
+                <h2
+                    <%# isstudentnotesrequired %>[core-mark-required]="true"<%/ isstudentnotesrequired %>
+                    >
+                    <%# str %>yourstudentnote, mod_scheduler<%/ str %>
+                </h2>
+            </ion-label>
+            <ion-textarea rows="1" [(ngModel)]="studentnote" name="studentnote" core-auto-rows></ion-textarea>
+        </ion-item>
+        <%/ scheduler.usesstudentnotes %>
+
+        <ion-input type="hidden" [ngModel]="groupid" name="groupid"></ion-input>
+
+        <ion-item>
+            <button ion-button block
+                    core-site-plugins-call-ws
+                    name="mod_scheduler_book_slot"
+                    [params]="{cmid: <% cmid %>, slotid: <% slot.id %>, groupid: groupid, bookingdata: {studentnote: studentnote, studentnoteformat: 2}}"
+                    [preSets]="{getFromCache: 0, saveToCache: 0}"
+                    goBackOnSuccess="true">
+                <%# str %>confirmbooking, mod_scheduler<%/ str %>
+            </button>
+        </ion-item>
+
+    </ion-list>
+</div>

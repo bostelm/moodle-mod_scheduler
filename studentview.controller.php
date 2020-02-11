@@ -39,91 +39,12 @@ require_once($CFG->dirroot.'/mod/scheduler/mailtemplatelib.php');
  * @throws mixed moodle_exception
  */
 function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $formdata, $returnurl) {
-
-    global $DB, $COURSE, $output;
-
-    $slot = $scheduler->get_slot($slotid);
-    if (!$slot) {
-        throw new moodle_exception('error');
+    try {
+        mod_scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $formdata);
+    } catch (moodle_exception $e) {
+        \core\notification::error($e->getMessage());
     }
-
-    if (!$slot->is_in_bookable_period()) {
-        throw new moodle_exception('nopermissions');
-    }
-
-    $requiredcapacity = 1;
-    $userstobook = array($userid);
-    if ($groupid > 0) {
-        if (!$scheduler->is_group_scheduling_enabled()) {
-            throw new moodle_exception('error');
-        }
-        $groupmembers = $scheduler->get_available_students($groupid);
-        $requiredcapacity = count($groupmembers);
-        $userstobook = array_keys($groupmembers);
-    } else if ($groupid == 0) {
-        if (!$scheduler->is_individual_scheduling_enabled()) {
-            throw new moodle_exception('error');
-        }
-    } else {
-        // Group scheduling enabled but no group selected.
-        throw new moodle_exception('error');
-    }
-
-    $errormessage = '';
-
-    $bookinglimit = $scheduler->count_bookable_appointments($userid, false);
-    if ($bookinglimit == 0) {
-        $errormessage = get_string('selectedtoomany', 'scheduler', $bookinglimit);
-    } else {
-        // Validate our user ids.
-        $existingstudents = array();
-        foreach ($slot->get_appointments() as $app) {
-            $existingstudents[] = $app->studentid;
-        }
-        $userstobook = array_diff($userstobook, $existingstudents);
-
-        $remaining = $slot->count_remaining_appointments();
-        // If the slot is already overcrowded...
-        if ($remaining >= 0 && $remaining < $requiredcapacity) {
-            if ($requiredcapacity > 1) {
-                $errormessage = get_string('notenoughplaces', 'scheduler');
-            } else {
-                $errormessage = get_string('slot_is_just_in_use', 'scheduler');
-            }
-        }
-    }
-
-    if ($errormessage) {
-        \core\notification::error($errormessage);
-        redirect($returnurl);
-    }
-
-    // Create new appointment for each member of the group.
-    foreach ($userstobook as $studentid) {
-        $appointment = $slot->create_appointment();
-        $appointment->studentid = $studentid;
-        $appointment->attended = 0;
-        $appointment->timecreated = time();
-        $appointment->timemodified = time();
-        $appointment->save();
-
-        if (($studentid == $userid) && $mform) {
-            $mform->save_booking_data($formdata, $appointment);
-        }
-
-        \mod_scheduler\event\booking_added::create_from_slot($slot)->trigger();
-
-        // Notify the teacher.
-        if ($scheduler->allownotifications) {
-            $student = $DB->get_record('user', array('id' => $appointment->studentid), '*', MUST_EXIST);
-            $teacher = $DB->get_record('user', array('id' => $slot->teacherid), '*', MUST_EXIST);
-            scheduler_messenger::send_slot_notification($slot, 'bookingnotification', 'applied',
-                    $student, $teacher, $teacher, $student, $COURSE);
-        }
-    }
-    $slot->save();
     redirect($returnurl);
-
 }
 
 $returnurlparas = array('id' => $cm->id);

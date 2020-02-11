@@ -1,0 +1,38 @@
+{{=<% %>=}}
+
+<div>
+
+    <ion-list>
+        <%#hasprev%>
+            <ion-item>
+                <button ion-button clear block core-site-plugins-new-content method="student_bookable_slots" [args]="{cmid: <% cmid %>, page: <% prevpage %>}" samePage="true">
+                    <%# str %>previous<%/ str %>
+                </button>
+            </ion-item>
+        <%/hasprev%>
+        <%#slots%>
+            <button ion-item core-site-plugins-new-content method="slot" [args]="{cmid: <% cmid%>, id: <% id %>}">
+                <h2><% timeformatted.date %></h2>
+                <p><% timeformatted.starttime %> - <% timeformatted.endtime %></p>
+                <%^ isunlimited %>
+                    <%^ isfull %>
+                        <ion-note item-end><% ntaken %> / <% maxappointments %></ion-note>
+                    <%/ isfull %>
+                    <%# isfull %>
+                        <ion-note item-end><%# str %>complete, mod_scheduler<%/ str %></ion-note>
+                    <%/ isfull %>
+                <%/ isunlimited %>
+            </button>
+        <%/slots%>
+        <%#hasnext%>
+            <ion-item>
+                <button ion-button clear block core-site-plugins-new-content method="student_bookable_slots" [args]="{cmid: <% cmid %>, page: <% nextpage %>}" samePage="true">
+                    <%# str %>next<%/ str %>
+                </button>
+            </ion-item>
+        <%/hasnext%>
+    </ion-list>
+
+    <!-- Trigger event when the template is loaded. -->
+    <span core-site-plugins-call-ws-on-load name="mod_scheduler_booking_form_viewed" [params]="{cmid: <% cmid %>}" [preSets]="{getFromCache: 0, saveToCache: 0}"></span>
+</div>

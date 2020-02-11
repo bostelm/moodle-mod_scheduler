@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/filelib.php');
 require_once(dirname(__FILE__).'/customlib.php');
 
+use mod_scheduler\model\scheduler;
+
 
 /* Events related functions */
 
@@ -335,4 +337,115 @@ class scheduler_file_info extends file_info {
     public function get_parent() {
         return $this->browser->get_file_info($this->context);
     }
+}
+
+/**
+ * Get the upload options for student files.
+ *
+ * @param scheduler $scheduler The scheduler.
+ * @return array
+ */
+function mod_scheduler_get_student_upload_options(scheduler $scheduler) {
+    return ['subdirs' => 0, 'maxbytes' => $scheduler->uploadmaxsize, 'maxfiles' => $scheduler->uploadmaxfiles];
+}
+
+/**
+ * Book a slot.
+ *
+ * @param scheduler $scheduler The scheduler.
+ * @param int $slotid The slot ID.
+ * @param int $userid The user ID.
+ * @param int $groupid The group ID, or 0.
+ * @param mixed $formdata The form data from {@link scheduler_booking_form}.
+ * @throws mixed moodle_exception
+ */
+function mod_scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $formdata) {
+    global $DB;
+
+    $slot = $scheduler->get_slot($slotid);
+    if (!$slot) {
+        throw new moodle_exception('error');
+    }
+
+    if (!$slot->is_in_bookable_period()) {
+        throw new moodle_exception('nopermissions');
+    }
+
+    $requiredcapacity = 1;
+    $userstobook = array($userid);
+    if ($groupid > 0) {
+        if (!$scheduler->is_group_scheduling_enabled()) {
+            throw new moodle_exception('error');
+        }
+        $groupmembers = $scheduler->get_available_students($groupid);
+        $requiredcapacity = count($groupmembers);
+        $userstobook = array_keys($groupmembers);
+    } else if ($groupid == 0) {
+        if (!$scheduler->is_individual_scheduling_enabled()) {
+            throw new moodle_exception('error');
+        }
+    } else {
+        // Group scheduling enabled but no group selected.
+        throw new moodle_exception('error');
+    }
+
+    $errormessage = '';
+
+    $bookinglimit = $scheduler->count_bookable_appointments($userid, false);
+    if ($bookinglimit == 0) {
+        throw new moodle_exception('selectedtoomany', 'mod_scheduler', null, $bookinglimit);
+
+    } else {
+        // Validate our user ids.
+        $existingstudents = array();
+        foreach ($slot->get_appointments() as $app) {
+            $existingstudents[] = $app->studentid;
+        }
+        $userstobook = array_diff($userstobook, $existingstudents);
+
+        $remaining = $slot->count_remaining_appointments();
+        // If the slot is already overcrowded...
+        if ($remaining >= 0 && $remaining < $requiredcapacity) {
+            if ($requiredcapacity > 1) {
+                throw new moodle_exception('notenoughplaces', 'mod_scheduler');
+            } else {
+                throw new moodle_exception('slot_is_just_in_use', 'mod_scheduler');
+            }
+        }
+    }
+
+    // Create new appointment for each member of the group.
+    foreach ($userstobook as $studentid) {
+        $appointment = $slot->create_appointment();
+        $appointment->studentid = $studentid;
+        $appointment->attended = 0;
+        $appointment->timecreated = time();
+        $appointment->timemodified = time();
+        $appointment->save();
+
+        if ($studentid == $userid && $formdata) {
+            if ($scheduler->uses_studentnotes() && isset($formdata->studentnote_editor)) {
+                $editor = $formdata->studentnote_editor;
+                $appointment->studentnote = $editor['text'];
+                $appointment->studentnoteformat = $editor['format'];
+            }
+            if ($scheduler->uses_studentfiles() && !empty($formdata->studentfiles)) {
+                file_save_draft_area_files($formdata->studentfiles, $scheduler->context->id, 'mod_scheduler',
+                    'studentfiles', $appointment->id, mod_scheduler_get_student_upload_options($scheduler));
+            }
+            $appointment->save();
+        }
+
+        \mod_scheduler\event\booking_added::create_from_slot($slot)->trigger();
+
+        // Notify the teacher.
+        if ($scheduler->allownotifications) {
+            $student = $DB->get_record('user', array('id' => $appointment->studentid), '*', MUST_EXIST);
+            $teacher = $DB->get_record('user', array('id' => $slot->teacherid), '*', MUST_EXIST);
+            scheduler_messenger::send_slot_notification($slot, 'bookingnotification', 'applied',
+                    $student, $teacher, $teacher, $student, $scheduler->get_courserec());
+        }
+    }
+
+    $slot->save();
 }

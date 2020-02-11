@@ -70,7 +70,7 @@ class mod_scheduler_output_datetime_filter extends \MoodleQuickForm_group {
 
         $datetime = $this->createFormElement('date_time_selector', $this->getName() . '[dt]', '', [
             'optional' => true,
-            'defaulttime' => strtotime('midnight')
+            'defaulttime' => strtotime('0 min 0 sec')
         ]);
         $this->_elements[] = $datetime;
 

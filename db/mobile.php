@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of a 3rd party created module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,21 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for mod/scheduler
+ * Mobile support.
  *
  * @package    mod_scheduler
- * @copyright  2018 Henning Bostelmann and others (see README.txt)
+ * @copyright  2019 Royal College of Art
+ * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-/*
- * This is the development branch (master) of the scheduler module.
- */
-
-$plugin->component = 'mod_scheduler'; // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2023050813;      // The current module version (Date: YYYYMMDDXX).
-$plugin->release   = '4.x dev';       // Human-friendly version name.
-$plugin->requires  = 2022041900;      // Requires Moodle 4.0.
-$plugin->maturity  = MATURITY_ALPHA;  // Development release - not for production use.
+$addons = [
+    'mod_scheduler' => [
+        'handlers' => [
+            'coursescheduler' => [
+                'displaydata' => [
+                    'icon' => $CFG->wwwroot . '/mod/scheduler/pix/icon.gif',
+                    'class' => ''
+                ],
+                'delegate' => 'CoreCourseModuleDelegate',
+                'method' => 'landing_page',
+            ]
+        ],
+        'lang' => [
+            ['modulename', 'mod_scheduler']
+        ]
+    ],
+];

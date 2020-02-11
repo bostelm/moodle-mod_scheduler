@@ -26,11 +26,39 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'mod_scheduler_booking_form_viewed' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'booking_form_viewed',
+        'description' => 'Trigger the event reporting that booking for was viewed',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
+    ],
+    'mod_scheduler_book_slot' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'book_slot',
+        'description' => 'Book a slot',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
+    ],
     'mod_scheduler_revoke_appointment' => [
         'classname' => 'mod_scheduler\\external',
         'methodname' => 'revoke_appointment',
         'description' => 'Revoke an appointment',
         'type' => 'write',
         'ajax' => true,
+    ],
+    'mod_scheduler_watch_slot' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'watch_slot',
+        'description' => 'Watch a slot',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
+    ],
+    'mod_scheduler_unwatch_slot' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'unwatch_slot',
+        'description' => 'Unwatch a slot',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
     ]
 ];
