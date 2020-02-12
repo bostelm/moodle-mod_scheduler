@@ -259,7 +259,14 @@ class mobile {
                     'html' => $renderer->render_from_template('mod_scheduler/' . $template, $data)
                 ]
             ],
-            'javascript' => '',
+            // Due to the transitions back to this page (and hard caches), the user would not see
+            // the latest content when navigating back to a page they're coming from. This method
+            // ensures that the view refreshes the content prior to displaying it.
+            'javascript' => '
+                this.ionViewWillEnter = function() {
+                    this.refreshContent();
+                }
+            ',
             'otherdata' => '',
             'files' => [],
         ];
