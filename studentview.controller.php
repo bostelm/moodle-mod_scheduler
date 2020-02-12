@@ -209,7 +209,7 @@ if ($action == 'editbooking') {
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } else if ($formdata = $mform->get_data()) {
-        $mform->save_booking_data($formdata, $appointment);
+        mod_scheduler_save_booking_data($appointment, $formdata);
         redirect($returnurl);
     } else {
         echo $output->header();

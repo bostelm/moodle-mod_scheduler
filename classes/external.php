@@ -26,10 +26,11 @@
 namespace mod_scheduler;
 defined('MOODLE_INTERNAL') || die();
 
+use coding_exception;
 use core_user;
 use external_api;
 use external_function_parameters;
-use extenral_multiple_structure;
+use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use moodle_exception;
@@ -40,6 +41,7 @@ use mod_scheduler\model\slot;
 use mod_scheduler\permission\scheduler_permissions;
 use mod_scheduler_renderer as renderer;
 use scheduler_messenger;
+use stored_file;
 
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/mod/scheduler/mailtemplatelib.php');
@@ -53,6 +55,48 @@ require_once($CFG->dirroot . '/mod/scheduler/mailtemplatelib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class external extends external_api {
+
+    /**
+     * External function parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function appointment_list_viewed_parameters() {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT),
+        ]);
+    }
+
+    /**
+     * Trigger appointment list viewed event.
+     *
+     * @param int $cmid The cmid.
+     * @return null
+     */
+    public static function appointment_list_viewed($cmid) {
+        global $USER;
+
+        $params = self::validate_parameters(self::appointment_list_viewed_parameters(), ['cmid' => $cmid]);
+        $cmid = $params['cmid'];
+
+        $scheduler = scheduler::load_by_coursemodule_id($cmid);
+        self::validate_context($scheduler->get_context());
+        $permissions = new scheduler_permissions($scheduler->get_context(), $USER->id);
+
+        $permissions->ensure($permissions->is_teacher());
+        \mod_scheduler\event\appointment_list_viewed::create_from_scheduler($scheduler)->trigger();
+
+        return true;
+    }
+
+    /**
+     * External function return structure.
+     *
+     * @return external_value
+     */
+    public static function appointment_list_viewed_returns() {
+        return new external_value(PARAM_BOOL);
+    }
 
     /**
      * External function parameters.
@@ -84,7 +128,7 @@ class external extends external_api {
         $permissions->ensure($permissions->is_student());
         \mod_scheduler\event\booking_form_viewed::create_from_scheduler($scheduler)->trigger();
 
-        return null;
+        return true;
     }
 
     /**
@@ -93,7 +137,7 @@ class external extends external_api {
      * @return external_value
      */
     public static function booking_form_viewed_returns() {
-        return new external_value(null);
+        return new external_value(PARAM_BOOL);
     }
 
     /**
@@ -114,7 +158,7 @@ class external extends external_api {
     }
 
     /**
-     * Trigger booking form viewed event.
+     * Book a slot.
      *
      * @param int $cmid The cmid.
      * @param int $slotid The slot ID.
@@ -265,7 +309,7 @@ class external extends external_api {
             'canwatchslots' => new external_value(PARAM_BOOL, 'Whether the user can watch additional slots.'),
             'hasnextpage' => new external_value(PARAM_BOOL, 'Whether we can browse another page.'),
             'page' => new external_value(PARAM_INT, 'The current page number.'),
-            'slots' => new extenral_multiple_structure(static::slot_structure(), 'The slots'),
+            'slots' => new external_multiple_structure(static::slot_structure(), 'The slots'),
             'total' => new external_value(PARAM_INT, 'The total number of slots in the set.'),
         ]);
     }
@@ -333,52 +377,52 @@ class external extends external_api {
      *
      * @return external_function_parameters
      */
-    public static function watch_slot_parameters() {
+    public static function update_appointment_parameters() {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT),
-            'slotid' => new external_value(PARAM_INT),
+            'appid' => new external_value(PARAM_INT),
+            'attended' => new external_value(PARAM_BOOL),
+            'grade' => new external_value(PARAM_INT, 'The grade: -1 for no grades, null for no change.', VALUE_DEFAULT, null),
         ]);
     }
 
     /**
-     * Watch a slot.
+     * Update an appointment.
      *
      * @param int $cmid The cmid.
-     * @param int $slotid The slot ID..
-     * @return true
+     * @param int $appid The appointment ID.
+     * @param bool $attended Whether to mark as attended.
+     * @param int $grade The grade.
+     * @return array
      */
-    public static function watch_slot($cmid, $slotid) {
+    public static function update_appointment($cmid, $appid, $attended, $grade = null) {
         global $USER;
 
-        $params = self::validate_parameters(self::watch_slot_parameters(), ['cmid' => $cmid, 'slotid' => $slotid]);
+        $params = self::validate_parameters(self::update_appointment_parameters(), ['cmid' => $cmid, 'appid' => $appid,
+            'attended' => $attended, 'grade' => $grade]);
         $cmid = $params['cmid'];
-        $slotid = $params['slotid'];
+        $appid = $params['appid'];
+        $attended = $params['attended'];
+        $grade = $params['grade'];
 
         $scheduler = scheduler::load_by_coursemodule_id($cmid);
         $context = $scheduler->get_context();
         self::validate_context($context);
         $permissions = new scheduler_permissions($context, $USER->id);
 
-        $permissions->ensure($permissions->is_student());
-        require_capability('mod/scheduler:watchslots', $context);
+        list($slot, $app) = $scheduler->get_slot_appointment($appid);
+        $permissions->ensure($permissions->is_teacher());
+        $permissions->ensure($permissions->can_see_appointment($app));
 
-        if (!$scheduler->is_watching_enabled()) {
-            throw new moodle_exception('error');
+        if ($permissions->can_edit_attended($app)) {
+            $app->attended = $attended;
+        }
+        if ($permissions->can_edit_grade($app) && $grade !== null) {
+            $app->grade = $grade < 0 ? -1 : $grade;
         }
 
-        $slot = $scheduler->get_slot($slotid);
-        if (!$slot) {
-            throw new moodle_exception('error');
-        } else if (!$slot->is_watchable_by_student($USER->id)) {
-            throw new moodle_exception('nopermissions');
-        }
-
-        $watcher = $slot->add_watcher($USER->id);
-        if ($watcher) {
-            \mod_scheduler\event\slot_watched::create_from_watcher($watcher)->trigger();
-        }
-
-        return true;
+        $app->save();
+        return self::serialize_appointment($app);
     }
 
     /**
@@ -386,8 +430,8 @@ class external extends external_api {
      *
      * @return external_value
      */
-    public static function watch_slot_returns() {
-        return new external_value(PARAM_BOOL);
+    public static function update_appointment_returns() {
+        return static::appointment_structure();
     }
 
     /**
@@ -447,53 +491,156 @@ class external extends external_api {
     }
 
     /**
+     * External function parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function watch_slot_parameters() {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT),
+            'slotid' => new external_value(PARAM_INT),
+        ]);
+    }
+
+    /**
+     * Watch a slot.
+     *
+     * @param int $cmid The cmid.
+     * @param int $slotid The slot ID..
+     * @return true
+     */
+    public static function watch_slot($cmid, $slotid) {
+        global $USER;
+
+        $params = self::validate_parameters(self::watch_slot_parameters(), ['cmid' => $cmid, 'slotid' => $slotid]);
+        $cmid = $params['cmid'];
+        $slotid = $params['slotid'];
+
+        $scheduler = scheduler::load_by_coursemodule_id($cmid);
+        $context = $scheduler->get_context();
+        self::validate_context($context);
+        $permissions = new scheduler_permissions($context, $USER->id);
+
+        $permissions->ensure($permissions->is_student());
+        require_capability('mod/scheduler:watchslots', $context);
+
+        if (!$scheduler->is_watching_enabled()) {
+            throw new moodle_exception('error');
+        }
+
+        $slot = $scheduler->get_slot($slotid);
+        if (!$slot) {
+            throw new moodle_exception('error');
+        } else if (!$slot->is_watchable_by_student($USER->id)) {
+            throw new moodle_exception('nopermissions');
+        }
+
+        $watcher = $slot->add_watcher($USER->id);
+        if ($watcher) {
+            \mod_scheduler\event\slot_watched::create_from_watcher($watcher)->trigger();
+        }
+
+        return true;
+    }
+
+    /**
+     * External function return structure.
+     *
+     * @return external_value
+     */
+    public static function watch_slot_returns() {
+        return new external_value(PARAM_BOOL);
+    }
+
+    /**
      * Serialize an appointment.
      *
      * @param appointment $app The appointment.
      * @param bool $includeteachernote Whether to include the teacher's note.
      * @return array
      */
-    public static function serialize_appointment(appointment $app, $includeteachernote = false, $renderer = null) {
-        global $PAGE;
+    public static function serialize_appointment(appointment $app) {
+        global $PAGE, $USER;
 
         $context = $app->get_scheduler()->get_context();
-        $renderer = $renderer ?: $PAGE->get_renderer('mod_scheduler');
+        $permissions = new scheduler_permissions($context, $USER->id);
+        $renderer = $PAGE->get_renderer('mod_scheduler');
+
+        $weburl = new moodle_url('/mod/scheduler/view.php', [
+            'id' => $app->get_scheduler()->get_cmid(),
+            'what' => 'viewstudent',
+            'appointmentid' => $app->id
+        ]);
+
+        $studentfiles = [];
+        $studentnote = null;
+        $studentnoteformat = null;
+        $studentnoteformatted = null;
+
+        $appnote = null;
+        $appnoteformat = null;
+        $appnoteformatted = null;
 
         $teachernote = null;
         $teachernoteformat = null;
         $teachernoteformatted = null;
 
-        if ($includeteachernote) {
+        // Student note.
+        if ($permissions->can_see_appointment($app)) {
+            $appnote = $app->appointmentnote;
+            $appnoteformat = $app->appointmentnoteformat;
+            $appnoteformatted = external_format_text($app->appointmentnote, $app->appointmentnoteformat, $context->id,
+                'mod_scheduler', 'appointmentnote', $app->id)[0];
+
+            $studentnote = $app->studentnote;
+            $studentnoteformat = $app->studentnoteformat;
+            $studentnoteformatted = external_format_text($app->studentnote, $app->studentnoteformat, $context->id)[0];
+
+            $fs = get_file_storage();
+            $studentfiles = array_map(function($file) {
+                return static::serialize_file($file);
+            }, $fs->get_area_files($context->id, 'mod_scheduler', 'studentfiles', $app->id, 'filename', false));
+        }
+
+        // Teacher-only.
+        if ($permissions->is_teacher()) {
             $teachernote = $app->teachernote;
             $teachernoteformat = $app->teachernoteformat;
-            $teachernoteformatted = external_format_text($app->appointmentnote, $app->appointmentnoteformat, $context->id,
+            $teachernoteformatted = external_format_text($app->teachernote, $app->teachernoteformat, $context->id,
                 'mod_scheduler', 'teachernote', $app->id)[0];
         }
 
         return [
             'id' => $app->id,
 
-            'appointmentnote' => $app->appointmentnote,
-            'appointmentnoteformat' => $app->appointmentnoteformat,
-            'appointmentnoteformatted' => external_format_text($app->appointmentnote, $app->appointmentnoteformat, $context->id,
-                'mod_scheduler', 'appointmentnote', $app->id)[0],
-            'hasappointmentnote' => !static::is_empty($app->appointmentnote),
+            'appointmentnote' => $appnote,
+            'appointmentnoteformat' => $appnoteformat,
+            'appointmentnoteformatted' => $appnoteformatted,
+            'hasappointmentnote' => !static::is_empty($appnote),
 
             'gradeformatted' => $renderer->format_grade($app->get_scheduler(), $app->grade),
             'hasgrade' => $app->grade !== null,
             'isattended' => $app->attended,
 
-            'studentnote' => $app->studentnote,
-            'studentnoteformat' => $app->studentnoteformat,
-            'studentnoteformatted' => external_format_text($app->studentnote, $app->studentnoteformat, $context->id)[0],
-            'hasstudentnote' => !static::is_empty($app->studentnote),
+            'caneditattended' => $permissions->can_edit_attended($app),
+            'caneditgrade' => $permissions->can_edit_grade($app),
+            'caneditnotes' => $permissions->can_edit_notes($app),
+
+            'hasstudentdata' => !static::is_empty($studentnote) || !empty($studentfiles),
+            'studentfiles' => array_values($studentfiles),
+            'hasstudentfiles' => !empty($studentfiles),
+            'studentnote' => $studentnote,
+            'studentnoteformat' => $studentnoteformat,
+            'studentnoteformatted' => $studentnoteformatted,
+            'hasstudentnote' => !static::is_empty($studentnote),
 
             'teachernote' => $teachernote,
             'teachernoteformat' => $teachernoteformat,
             'teachernoteformatted' => $teachernoteformatted,
             'hasteachernote' => !static::is_empty($teachernote),
 
-            'student' => static::serialize_user($app->student)
+            'student' => static::serialize_user($app->student),
+            'weburl' => $weburl->out(false)
         ];
     }
 
@@ -515,6 +662,9 @@ class external extends external_api {
             'hasgrade' => new external_value(PARAM_BOOL),
             'isattended' => new external_value(PARAM_BOOL),
 
+            'hasstudentdata' => new external_value(PARAM_BOOL),
+            'studentfiles' => new external_multiple_structure(static::file_structure()),
+            'hasstudentfiles' => new external_value(PARAM_BOOL),
             'studentnote' => new external_value(PARAM_RAW, 'Notes by the student.'),
             'studentnoteformat' => new external_value(PARAM_INT),
             'studentnoteformatted' => new external_value(PARAM_RAW),
@@ -526,6 +676,52 @@ class external extends external_api {
             'hasteachernote' => new external_value(PARAM_BOOL),
 
             'student' => static::user_structure(),
+            'weburl' => new external_value(PARAM_URL),
+        ]);
+    }
+
+    /**
+     * Serialize a file.
+     *
+     * @param stored_file $file The file.
+     * @return array
+     */
+    public static function serialize_file(stored_file $file) {
+        if ($file->is_directory()) {
+            throw new coding_exception('Cannot serialize directories');
+        }
+        return [
+            'contextid' => $file->get_contextid(),
+            'component' => $file->get_component(),
+            'filearea' => $file->get_filearea(),
+            'itemid' => $file->get_itemid(),
+            'filepath' => $file->get_filepath(),
+            'filename' => $file->get_filename(),
+            'url' => moodle_url::make_webservice_pluginfile_url( $file->get_contextid(), $file->get_component(),
+                $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename()),
+            'timemodified' => $file->get_timemodified(),
+            'timecreated' => $file->get_timecreated(),
+            'filesize' => $file->get_filesize(),
+        ];
+    }
+
+    /**
+     * Serialized file structure.
+     *
+     * @return external_value
+     */
+    protected static function file_structure() {
+        return new external_single_structure([
+            'contextid' => new external_value(PARAM_INT),
+            'component' => new external_value(PARAM_COMPONENT),
+            'filearea' => new external_value(PARAM_AREA),
+            'itemid' => new external_value(PARAM_INT),
+            'filepath' => new external_value(PARAM_TEXT),
+            'filename' => new external_value(PARAM_TEXT),
+            'url' => new external_value(PARAM_TEXT),
+            'timemodified' => new external_value(PARAM_INT),
+            'timecreated' => new external_value(PARAM_INT, 'Time created', VALUE_OPTIONAL),
+            'filesize' => new external_value(PARAM_INT, 'File size', VALUE_OPTIONAL),
         ]);
     }
 
@@ -587,6 +783,7 @@ class external extends external_api {
         global $USER;
 
         $context = $slot->get_scheduler()->get_context();
+        $permissions = new scheduler_permissions($context, $USER->id);
         $nremaining = $slot->count_remaining_appointments();
 
         $canbookslots = has_capability('mod/scheduler:appoint', $context);
@@ -599,7 +796,12 @@ class external extends external_api {
 
         $appointments = array_map(function($app) {
             return static::serialize_appointment($app);
-        }, $slot->get_appointments(($canseeothers && $slot->is_groupslot()) ? null : [$USER->id]));
+        }, array_filter($slot->get_appointments(), function($app) use ($canseeothers, $permissions) {
+            if ($permissions->is_student() && $canseeothers) {
+                return true;
+            }
+            return $permissions->can_see_appointment($app);
+        }));
         $hasappointments = !empty($appointments);
 
         return [
@@ -662,7 +864,7 @@ class external extends external_api {
             'notesformatted' => new external_value(PARAM_HTML),
             'hasnotes' => new external_value(PARAM_BOOL),
 
-            'appointments' => new extenral_multiple_structure(
+            'appointments' => new external_multiple_structure(
                 static::appointment_structure()
             ),
             'hasappointments' => new external_value(PARAM_BOOL),

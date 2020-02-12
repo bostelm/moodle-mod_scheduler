@@ -26,6 +26,7 @@
 namespace mod_scheduler;
 defined('MOODLE_INTERNAL') || die();
 
+use coding_exception;
 use core\dml\sql_join;
 use mod_scheduler\model\scheduler;
 
@@ -56,6 +57,8 @@ class slots_query_builder {
     const OPERATOR_AFTER = 2;
     /** At the exact date and time. */
     const OPERATOR_AT = 3;
+    /** Between two times. */
+    const OPERATOR_BETWEEN = 4;
 
     /** @var int|null The group ID. */
     protected $groupid = 0;
@@ -152,10 +155,13 @@ class slots_query_builder {
      *
      * @param string $timestamp The timestamp.
      * @param int $operator The operator constant.
+     * @param int $timestampend The second timestamp when OPERATOR_BETWEEN.
      * @return void
      */
-    public function filter_starttime($timestamp, $operator = self::OPERATOR_ON) {
+    public function filter_starttime($timestamp, $operator = self::OPERATOR_ON, $timestampend = 0) {
         $timestamp = (int) $timestamp;
+        $timestampend = (int) $timestampend;
+
         if (empty($timestamp)) {
             unset($this->wheres['filterstarttime']);
             unset($this->params['filterstarttime']);
@@ -165,6 +171,13 @@ class slots_query_builder {
 
         $sql = '1=1';
         $params = ['filterstarttime' => $timestamp];
+
+        // Convert the operator ON to BETWEEN.
+        if ($operator === self::OPERATOR_ON) {
+            $operator = self::OPREATOR_BETWEEN;
+            $timestamp = usergetmidnight($timestamp);
+            $timestampend = $timestamp + DAYSECS;
+        }
 
         switch ($operator) {
             case self::OPERATOR_AT:
@@ -176,15 +189,15 @@ class slots_query_builder {
             case self::OPERATOR_BEFORE:
                 $sql = "{$this->prefix}starttime < :filterstarttime";
                 break;
-            case self::OPERATOR_ON:
-            default:
+            case self::OPERATOR_BETWEEN:
                 $sql = "{$this->prefix}starttime > :filterstarttime AND {$this->prefix}starttime < :filterstarttimeend";
-                $startofday = usergetmidnight($timestamp);
                 $params = [
-                    'filterstarttime' => $startofday,
-                    'filterstarttimeend' => $startofday + DAYSECS
+                    'filterstarttime' => $timestamp,
+                    'filterstarttimeend' => $timestampend
                 ];
                 break;
+            default:
+                throw new coding_exception('Unexpected operator');
         }
 
         $this->wheres['filterstarttime'] = $sql;

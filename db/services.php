@@ -26,6 +26,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'mod_scheduler_appointment_list_viewed' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'appointment_list_viewed',
+        'description' => 'Trigger the event reporting that list of appointment was viewed',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
+    ],
     'mod_scheduler_booking_form_viewed' => [
         'classname' => 'mod_scheduler\\external',
         'methodname' => 'booking_form_viewed',
@@ -47,6 +54,20 @@ $functions = [
         'type' => 'write',
         'ajax' => true,
     ],
+    'mod_scheduler_unwatch_slot' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'unwatch_slot',
+        'description' => 'Unwatch a slot',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
+    ],
+    'mod_scheduler_update_appointment' => [
+        'classname' => 'mod_scheduler\\external',
+        'methodname' => 'update_appointment',
+        'description' => 'Update an appointment',
+        'type' => 'write',
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
+    ],
     'mod_scheduler_watch_slot' => [
         'classname' => 'mod_scheduler\\external',
         'methodname' => 'watch_slot',
@@ -54,11 +75,4 @@ $functions = [
         'type' => 'write',
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
     ],
-    'mod_scheduler_unwatch_slot' => [
-        'classname' => 'mod_scheduler\\external',
-        'methodname' => 'unwatch_slot',
-        'description' => 'Unwatch a slot',
-        'type' => 'write',
-        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile']
-    ]
 ];

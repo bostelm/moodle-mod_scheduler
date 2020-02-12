@@ -424,16 +424,7 @@ function mod_scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $formda
         $appointment->save();
 
         if ($studentid == $userid && $formdata) {
-            if ($scheduler->uses_studentnotes() && isset($formdata->studentnote_editor)) {
-                $editor = $formdata->studentnote_editor;
-                $appointment->studentnote = $editor['text'];
-                $appointment->studentnoteformat = $editor['format'];
-            }
-            if ($scheduler->uses_studentfiles() && !empty($formdata->studentfiles)) {
-                file_save_draft_area_files($formdata->studentfiles, $scheduler->context->id, 'mod_scheduler',
-                    'studentfiles', $appointment->id, mod_scheduler_get_student_upload_options($scheduler));
-            }
-            $appointment->save();
+            mod_scheduler_save_booking_data($appointment, $formdata);
         }
 
         \mod_scheduler\event\booking_added::create_from_slot($slot)->trigger();
@@ -448,4 +439,28 @@ function mod_scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $formda
     }
 
     $slot->save();
+}
+
+/**
+ * Save the booking data.
+ *
+ * @param appointment $appointment The appointment.
+ * @param object $formdata The form data.
+ * @return void
+ */
+function mod_scheduler_save_booking_data($appointment, $formdata) {
+    $scheduler = $appointment->get_scheduler();
+
+    if ($scheduler->uses_studentnotes() && isset($formdata->studentnote_editor)) {
+        $editor = $formdata->studentnote_editor;
+        $appointment->studentnote = $editor['text'];
+        $appointment->studentnoteformat = $editor['format'];
+    }
+
+    if ($scheduler->uses_studentfiles() && !empty($formdata->studentfiles)) {
+        file_save_draft_area_files($formdata->studentfiles, $scheduler->context->id, 'mod_scheduler',
+            'studentfiles', $appointment->id, mod_scheduler_get_student_upload_options($scheduler));
+    }
+
+    $appointment->save();
 }
