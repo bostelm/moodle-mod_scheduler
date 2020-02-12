@@ -169,6 +169,7 @@ $string['canbooknofurtherappointments'] = 'You cannot book further appointments 
 $string['canbookunlimitedappointments'] = 'You can book any number of appointments in this scheduler.';
 $string['cannotscheduleslotforothers'] = 'You cannot schedule appointments for other staff members.';
 $string['chooseexisting'] = 'Choose existing';
+$string['choosegrouptobook'] = 'Please select a group to assign the booking to.';
 $string['choosingslotstart'] = 'Choosing the start time';
 $string['clearfilters'] = 'Clear filters';
 $string['comments'] = 'Comments';
@@ -558,6 +559,9 @@ $string['usestudentnotes'] = 'Let students enter a message';
 $string['usestudentnotes_help'] = 'If enabled, the booking screen will contain a text box in which students can enter a message. Use the "booking instructions" above to instruct students what information they should supply.';
 $string['viewbooking'] = 'See details';
 $string['viewmoreoptions'] = 'View more options';
+$string['visitwebtobook'] = 'Visit the website to book this slot';
+$string['visitwebtoeditcancel'] = 'Please <a href="{$a}" core-link>visit the website</a> if you wish to make changes to the booking.';
+$string['visitwebtouploadfiles'] = 'Please <a href="{$a}" core-link>visit the website</a> to attach files to your booking.';
 $string['watchslotsintro'] = 'To be notified when a fully booked slot becomes available, click the "Watch slot" button for that corresponding slot.';
 $string['wednesday'] = 'Wednesday';
 $string['welcomebackstudent'] = 'You can book additional slots by clicking on the corresponding "Book slot" button below.';

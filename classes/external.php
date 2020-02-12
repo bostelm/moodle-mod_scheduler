@@ -33,6 +33,7 @@ use extenral_multiple_structure;
 use external_single_structure;
 use external_value;
 use moodle_exception;
+use moodle_url;
 use mod_scheduler\model\appointment;
 use mod_scheduler\model\scheduler;
 use mod_scheduler\model\slot;
@@ -155,6 +156,10 @@ class external extends external_api {
             if ($scheduler->is_studentnotes_required() && static::is_empty($bookingdata->studentnote)) {
                 throw new moodle_exception('studentnotemissing', 'mod_scheduler');
             }
+        }
+
+        if (!$scheduler->is_individual_scheduling_enabled() && !$groupid) {
+            throw new moodle_exception('choosegrouptobook', 'mod_scheduler');
         }
 
         $formdata = (object) [];
@@ -533,6 +538,10 @@ class external extends external_api {
     public static function serialize_scheduler(scheduler $scheduler) {
         $context = $scheduler->get_context();
 
+        $weburl = new moodle_url('/mod/scheduler/view.php', [
+            'id' => $scheduler->get_cmid(),
+        ]);
+
         $data = (object) [
             'id' => $scheduler->get_id(),
             'courseid' => $scheduler->get_courseid(),
@@ -555,6 +564,8 @@ class external extends external_api {
             'usesbookingform' => $scheduler->uses_bookingform(),
             'usesgrades' => $scheduler->uses_grades(),
             'usesstudentnotes' => $scheduler->uses_studentnotes(),
+
+            'weburl' => $weburl->out(false)
         ];
 
         list($data->introformatted, $unused) = external_format_text($scheduler->intro, $scheduler->introformat,
@@ -586,6 +597,11 @@ class external extends external_api {
         $canwatchslot = $canwatchslots && $slot->is_watchable_by_student($USER->id);
         $iswatching = $canwatchslot && $slot->is_watched_by_student($USER->id);
 
+        $appointments = array_map(function($app) {
+            return static::serialize_appointment($app);
+        }, $slot->get_appointments(($canseeothers && $slot->is_groupslot()) ? null : [$USER->id]));
+        $hasappointments = !empty($appointments);
+
         return [
             'id' => $slot->id,
 
@@ -599,9 +615,9 @@ class external extends external_api {
                 'mod_scheduler', 'slotnote', $slot->id)[0],
             'hasnotes' => !static::is_empty($slot->notes),
 
-            'appointments' => array_map(function($app) {
-                return static::serialize_appointment($app);
-            }, $slot->get_appointments($canseeothers ? [$USER->id] : null)),
+            'appointments' => $appointments,
+            'hasappointments' => $hasappointments,
+
             'appointmentlocation' => $slot->appointmentlocation,
             'hasappointmentlocation' => !static::is_empty($slot->appointmentlocation),
 
@@ -610,6 +626,7 @@ class external extends external_api {
             'iswatching' => $iswatching,
 
             'isunlimited' => $slot->exclusivity == 0,
+            'iseditable' => $slot->is_in_bookable_period(),
             'isexclusive' => $slot->exclusivity == 1,
             'isgroupallowed' => !$slot->exclusivity || $slot->exclusivity >= 1,
             'isfull' => $nremaining == 0,
@@ -648,6 +665,8 @@ class external extends external_api {
             'appointments' => new extenral_multiple_structure(
                 static::appointment_structure()
             ),
+            'hasappointments' => new external_value(PARAM_BOOL),
+
             'appointmentlocation' => new external_value(PARAM_RAW),
             'hasappointmentlocation' => new external_value(PARAM_BOOL),
 
@@ -655,6 +674,7 @@ class external extends external_api {
             'canwatchslot' => new external_value(PARAM_BOOL),
             'iswatching' => new external_value(PARAM_BOOL),
             'isunlimited' => new external_value(PARAM_BOOL),
+            'iseditable' => new external_value(PARAM_BOOL),
             'isexclusive' => new external_value(PARAM_BOOL),
             'isgroupallowed' => new external_value(PARAM_BOOL),
             'isfull' => new external_value(PARAM_BOOL),

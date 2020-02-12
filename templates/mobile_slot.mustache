@@ -46,30 +46,44 @@
                 <%/ hasstudentnote %>
 
                 <%# scheduler.usesgrades %>
-                <ion-item>
-                    <h2><%# str %>grade, mod_scheduler<%/ str %></h2>
-                    <p><% gradeformatted %></p>
-                </ion-item>
+                    <ion-item>
+                        <h2><%# str %>grade, mod_scheduler<%/ str %></h2>
+                        <p><% gradeformatted %></p>
+                    </ion-item>
                 <%/ scheduler.usesgrades %>
+
+                <%# slot.hasappointments %>
+                    <ion-list-header no-margin>
+                        <%# str %>students, mod_scheduler<%/ str %>
+                    </ion-list-header>
+                    <%# slot.appointments %>
+                        <a ion-item core-user-link userId="<% student.id %>" courseId="<% courseid %>">
+                            <ion-avatar core-user-avatar profileUrl="<% student.profileimageurl %>" item-start></ion-avatar>
+                            <h2><% student.fullname %></h2>
+                        </a>
+                    <%/ slot.appointments %>
+                <%/ slot.hasappointments %>
+
+                <%# slot.iseditable %>
+                    <ion-item>
+                        <p><%# str %>visitwebtoeditcancel, mod_scheduler, <% scheduler.weburl %><%/ str %></p>
+                    </ion-item>
+                <%/ slot.iseditable %>
 
             <%/ appointment %>
 
             <%^ appointment %>
                 <%# slot.canbookslot %>
-                    <ion-item>
-                        <%# scheduler.usesbookingform %>
-                            <button ion-button outline block
-                                    core-site-plugins-new-content
-                                    method="book_slot"
-                                    [args]="{cmid: <% cmid %>, id: <% slot.id %>}"
-                                    title="<%# str %>bookslot, mod_scheduler<%/ str %>">
-                                <%# str %>bookslot, mod_scheduler<%/ str %>
-                            </button>
-                        <%/ scheduler.usesbookingform %>
-                        <%^ scheduler.usesbookingform %>
-                            <%# scheduler.isgroupbookingenabled %>
-                                <!-- When group booking is allowed, we always show the booking form so that
-                                    the user can select themselves (if allowed) or the relevant group. -->
+                    <%^ scheduler.isinappbookingsupported %>
+                        <ion-item>
+                            <a href="<% scheduler.weburl %>" ion-button core-link outline block autoLogin="yes" inApp="false">
+                                <%# str %>visitwebtobook, mod_scheduler<%/ str %>
+                            </a>
+                        </ion-item>
+                    <%/ scheduler.isinappbookingsupported %>
+                    <%# scheduler.isinappbookingsupported %>
+                        <ion-item>
+                            <%# scheduler.usesbookingform %>
                                 <button ion-button outline block
                                         core-site-plugins-new-content
                                         method="book_slot"
@@ -77,19 +91,32 @@
                                         title="<%# str %>bookslot, mod_scheduler<%/ str %>">
                                     <%# str %>bookslot, mod_scheduler<%/ str %>
                                 </button>
-                            <%/ scheduler.isgroupbookingenabled %>
-                            <%^ scheduler.isgroupbookingenabled %>
-                                <button ion-button outline block
-                                        core-site-plugins-call-ws
-                                        name="mod_scheduler_book_slot"
-                                        [params]="{cmid: <% cmid %>, slotid: <% slot.id %>}"
-                                        [preSets]="{getFromCache: 0, saveToCache: 0}"
-                                        refreshOnSuccess="true">
-                                    <%# str %>bookslot, mod_scheduler<%/ str %>
-                                </button>
-                            <%/ scheduler.isgroupbookingenabled %>
-                        <%/ scheduler.usesbookingform %>
-                    </ion-item>
+                            <%/ scheduler.usesbookingform %>
+                            <%^ scheduler.usesbookingform %>
+                                <%# scheduler.isgroupbookingenabled %>
+                                    <!-- When group booking is allowed, we always show the booking form so that
+                                        the user can select themselves (if allowed) or the relevant group. -->
+                                    <button ion-button outline block
+                                            core-site-plugins-new-content
+                                            method="book_slot"
+                                            [args]="{cmid: <% cmid %>, id: <% slot.id %>}"
+                                            title="<%# str %>bookslot, mod_scheduler<%/ str %>">
+                                        <%# str %>bookslot, mod_scheduler<%/ str %>
+                                    </button>
+                                <%/ scheduler.isgroupbookingenabled %>
+                                <%^ scheduler.isgroupbookingenabled %>
+                                    <button ion-button outline block
+                                            core-site-plugins-call-ws
+                                            name="mod_scheduler_book_slot"
+                                            [params]="{cmid: <% cmid %>, slotid: <% slot.id %>}"
+                                            [preSets]="{getFromCache: 0, saveToCache: 0}"
+                                            refreshOnSuccess="true">
+                                        <%# str %>bookslot, mod_scheduler<%/ str %>
+                                    </button>
+                                <%/ scheduler.isgroupbookingenabled %>
+                            <%/ scheduler.usesbookingform %>
+                        </ion-item>
+                    <%/ scheduler.isinappbookingsupported %>
                 <%/ slot.canbookslot %>
 
                 <%# slot.canwatchslot %>

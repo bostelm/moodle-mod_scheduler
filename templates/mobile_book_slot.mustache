@@ -46,6 +46,7 @@
         </ion-item>
         <%/ scheduler.usesstudentnotes %>
 
+        <!-- This is required to capture changes in the select -->
         <ion-input type="hidden" [ngModel]="groupid" name="groupid"></ion-input>
 
         <ion-item>
@@ -57,6 +58,10 @@
                     goBackOnSuccess="true">
                 <%# str %>confirmbooking, mod_scheduler<%/ str %>
             </button>
+        </ion-item>
+
+        <ion-item>
+            <p><%# str %>visitwebtouploadfiles, mod_scheduler, <% scheduler.weburl %><%/ str %></p>
         </ion-item>
 
     </ion-list>
