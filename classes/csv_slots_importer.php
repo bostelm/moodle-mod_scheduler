@@ -263,7 +263,7 @@ class csv_slots_importer implements \IteratorAggregate {
 
         } else {
             $cansetothers = $this->permissions->can_edit_all_slots() && $this->permissions->can_schedule_slot_to_other_teachers();
-            if (!$cansetothers && $data->teacher->id !== $this->permissions->get_userid()) {
+            if (!$cansetothers && $data->teacher->id != $this->permissions->get_userid()) {
                 $errors[] = get_string('cannotscheduleslotforothers', 'mod_scheduler');
             }
             if (!array_key_exists($data->teacher->id, $this->get_allowed_teachers())) {
