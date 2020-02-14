@@ -320,7 +320,7 @@ class scheduler extends mvc_record_model {
      * @return bool
      */
     public function is_studentnotes_required() {
-        return $this->uses_studentnotes() && $this->usestudentnotes;
+        return $this->uses_studentnotes() && $this->usestudentnotes == 2;
     }
 
     /**
