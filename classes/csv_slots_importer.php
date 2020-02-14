@@ -85,15 +85,15 @@ class csv_slots_importer implements \IteratorAggregate {
         try {
             $time = new DateTime($line['time']);
         } catch (\Exception $e) {
-            $date = new DateTime('@0');
+            $time = new DateTime('@0');
         }
         $duration = (int) $line['duration'];
 
         // Optional columns.
         $maxstudents = !empty($line['maxstudents']) ? (int) $line['maxstudents'] : 0;
-        $location = $line['location'] ?: null;
-        $teacher = $line['teacher'] ?: null;
-        $comment = $line['comment'] ?: null;
+        $location = !empty($line['location']) ? $line['location'] : null;
+        $teacher = !empty($line['teacher']) ? $line['teacher'] : null;
+        $comment = !empty($line['comment']) ? $line['comment'] : null;
         $displayfrom = !empty($line['displayfrom']) ? new DateTime($line['displayfrom']): new DateTime();
 
         // Massaging the data.
