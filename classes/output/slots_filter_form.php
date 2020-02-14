@@ -68,7 +68,7 @@ class slots_filter_form extends moodleform {
                 return fullname($user);
             }, $scheduler->get_teachers());
             core_collator::asort($teacheroptions);
-            $teacheroptions = array_merge([0 => get_string('choosedots')], $teacheroptions);
+            $teacheroptions = [0 => get_string('choosedots')] + $teacheroptions;
             $mform->addElement('select', 'tfteacherid', $scheduler->get_teacher_name(), $teacheroptions);
         }
 

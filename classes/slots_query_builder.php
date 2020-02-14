@@ -174,7 +174,7 @@ class slots_query_builder {
 
         // Convert the operator ON to BETWEEN.
         if ($operator === self::OPERATOR_ON) {
-            $operator = self::OPREATOR_BETWEEN;
+            $operator = self::OPERATOR_BETWEEN;
             $timestamp = usergetmidnight($timestamp);
             $timestampend = $timestamp + DAYSECS;
         }
