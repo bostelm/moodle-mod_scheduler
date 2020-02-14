@@ -387,6 +387,7 @@ $string['modeappointments'] = 'appointment(s)';
 $string['modeoneonly'] = 'in this scheduler';
 $string['modeoneatatime'] = 'at a time';
 $string['monday'] = 'Monday';
+$string['mostrecentslots'] = 'Most recent slots';
 $string['multiple'] = '(multiple)';
 $string['myappointments'] = 'My appointments';
 $string['myself'] = 'Myself';

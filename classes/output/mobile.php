@@ -425,15 +425,25 @@ class mobile {
         $upcomingslotsqb->add_order_by('starttime', SORT_ASC);
         $upcomingslotsqb->set_limit(7, 0);
 
-        $totalslots = $scheduler->count_slots_for_teacher($userid);
-        $slots = array_map('mod_scheduler\external::serialize_slot', array_merge(
+        $relevantslots = array_merge(
             array_reverse($scheduler->get_slots_from_query_builder($recentslotsqb)),
             $scheduler->get_slots_from_query_builder($upcomingslotsqb)
-        ));
+        );
+        $hasrelevantslots = !empty($relevantslots);
+        $slots = $relevantslots;
 
+        // If we don't have any relevant slots, fetch some of the most recent ones.
+        if (!$hasrelevantslots) {
+            $recentslotsqb->filter_starttime(time(), slots_query_builder::OPERATOR_BEFORE);
+            $recentslotsqb->set_limit(10, 0);
+            $slots = array_reverse($scheduler->get_slots_from_query_builder($recentslotsqb));
+        }
+
+        $totalslots = $scheduler->count_slots_for_teacher($userid);
         $data = array_merge(static::get_common_data($scheduler), [
+            'isrelevantslots' => $hasrelevantslots,
             'hasslots' => !empty($slots),
-            'slots' => $slots,
+            'slots' => array_map('mod_scheduler\external::serialize_slot', $slots),
             'hasmore' => count($slots) < $totalslots,
         ]);
 

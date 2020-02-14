@@ -4,7 +4,15 @@
 
 <div padding>
 
-    <h3><%# str %>recentandupcomingslots, mod_scheduler<%/ str %></h3>
+    <h3>
+        <%# isrelevantslots %>
+            <%# str %>recentandupcomingslots, mod_scheduler<%/ str %>
+        <%/ isrelevantslots %>
+        <%^ isrelevantslots %>
+            <%# str %>mostrecentslots, mod_scheduler<%/ str %>
+        <%/ isrelevantslots %>
+    </h3>
+
     <ion-list>
         <%^ hasslots %>
             <ion-item><p><%# str %>noappointments, mod_scheduler<%/ str %></p></ion-item>
