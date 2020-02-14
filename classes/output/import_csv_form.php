@@ -46,7 +46,7 @@ class import_csv_form extends moodleform {
     /**
      * Definition.
      */
-    function definition() {
+    public function definition() {
         $mform = $this->_form;
 
         $mform->addElement('header', 'settingsheader', get_string('csvfile', 'mod_scheduler'));

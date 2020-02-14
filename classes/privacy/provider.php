@@ -210,7 +210,7 @@ class provider implements
                  WHERE cm.id = :cmid";
         $params = [
             'modname' => 'scheduler',
-            'cmid'=> $context->instanceid
+            'cmid' => $context->instanceid
         ];
         $userlist->add_from_sql('userid', $sql, $params);
 

@@ -94,7 +94,7 @@ class csv_slots_importer implements \IteratorAggregate {
         $location = !empty($line['location']) ? $line['location'] : null;
         $teacher = !empty($line['teacher']) ? $line['teacher'] : null;
         $comment = !empty($line['comment']) ? $line['comment'] : null;
-        $displayfrom = !empty($line['displayfrom']) ? new DateTime($line['displayfrom']): new DateTime();
+        $displayfrom = !empty($line['displayfrom']) ? new DateTime($line['displayfrom']) : new DateTime();
 
         // Massaging the data.
         $date->setTime($time->format('H'), $time->format('i'), 0, 0);
@@ -270,7 +270,6 @@ class csv_slots_importer implements \IteratorAggregate {
                 $errors[] = get_string('invalidteacher', 'mod_scheduler');
             }
         }
-
 
         return $errors;
     }

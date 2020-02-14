@@ -49,7 +49,7 @@ class import_csv_options_form extends moodleform {
     /**
      * Definition.
      */
-    function definition() {
+    public function definition() {
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'iid');

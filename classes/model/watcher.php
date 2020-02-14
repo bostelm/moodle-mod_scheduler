@@ -89,7 +89,6 @@ class watcher extends mvc_child_record_model {
     /**
      * Notify.
      *
-     * @param stdClass $teacher The teacher.
      * @return void
      */
     public function notify() {

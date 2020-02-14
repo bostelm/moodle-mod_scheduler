@@ -603,7 +603,7 @@ class scheduler extends mvc_record_model {
      * @param bool $hasattended Whether the user just attended a slot.
      * @return void
      */
-    public function completion_update_has_attended($userid, $hasattended=false) {
+    public function completion_update_has_attended($userid, $hasattended = false) {
         if (!$this->completion_requires_attended()) {
             return;
         }

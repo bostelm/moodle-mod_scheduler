@@ -39,7 +39,7 @@ class slot_watched extends \core\event\base {
     /**
      * Create this event from a watcher.
      *
-     * @param \mod_scheduler\model\watcher $slot
+     * @param \mod_scheduler\model\watcher $watcher The watcher.
      * @return \core\event\base
      */
     public static function create_from_watcher(\mod_scheduler\model\watcher $watcher) {

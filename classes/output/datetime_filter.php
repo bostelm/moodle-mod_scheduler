@@ -84,15 +84,15 @@ class mod_scheduler_output_datetime_filter extends \MoodleQuickForm_group {
     /**
      * Export value.
      *
-     * @param  array $submitValues The values.
+     * @param  array $submitvalues The values.
      * @param  bool  $notused Not used.
      * @return array field name => value. The value is the time interval in seconds.
      */
-    function exportValue(&$submitValues, $notused = false) {
+    function exportValue(&$submitvalues, $notused = false) {
         // Get the values from all the child elements.
         $values = [];
         foreach ($this->_elements as $element) {
-            $thisexport = $element->exportValue($submitValues[$this->getName()], true);
+            $thisexport = $element->exportValue($submitvalues[$this->getName()], true);
             if ($thisexport !== null && !empty($thisexport[$this->getName()])) {
                 $values += $thisexport[$this->getName()];
             }

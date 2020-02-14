@@ -37,7 +37,7 @@ require_once($CFG->dirroot.'/mod/scheduler/lib.php');
  */
 class appointment extends mvc_child_record_model {
 
-    /** @var bool Initial is attended value, defaults to false as does the constructor. */
+    /** @var bool Initial 'isattended' value. */
     private $initialisattended = null;
 
     /**
@@ -70,7 +70,7 @@ class appointment extends mvc_child_record_model {
     public function save() {
         // Check whether the attended status has changed internally, if the value is still null, then we consider
         // that the attended status has not changed, as thus we do not trigger an update. This is especially useful
-        // when a new appointment is made, to reduce the cost of creating  a new appointment. However, if in
+        // when a new appointment is made, to reduce the cost of creating a new appointment. However, if in
         // the future a user must have attended ALL of their appointments, then we would have to update the
         // completion state when the value is null, which would indicate a new appointment.
         $isattendedchanged = $this->initialisattended !== null && $this->initialisattended !== $this->is_attended();

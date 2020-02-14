@@ -556,7 +556,6 @@ class external extends external_api {
      * Serialize an appointment.
      *
      * @param appointment $app The appointment.
-     * @param bool $includeteachernote Whether to include the teacher's note.
      * @return array
      */
     public static function serialize_appointment(appointment $app) {

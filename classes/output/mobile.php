@@ -464,9 +464,6 @@ class mobile {
      * Teacher slots.
      *
      * @param object $args The original arguments.
-     * @param renderer_base $renderer The renderer.
-     * @param scheduler $scheduler The scheduler.
-     * @param scheduler_permissions $permissions The permissions.
      * @return array
      */
     public static function teacher_slots($args) {
