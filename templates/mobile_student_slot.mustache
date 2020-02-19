@@ -14,7 +14,7 @@
         </ion-item>
 
         <%# slot.hasappointmentlocation %>
-        <ion-item>
+        <ion-item text-wrap>
             <h2><%# str %>location, mod_scheduler<%/ str %></h2>
             <p><% slot.appointmentlocation %></p>
         </ion-item>
@@ -65,7 +65,7 @@
             <%/ slot.isexclusive %>
 
             <%# slot.iseditable %>
-                <ion-item>
+                <ion-item text-wrap>
                     <p><%# str %>visitwebtoeditcancel, mod_scheduler, <% scheduler.weburl %><%/ str %></p>
                 </ion-item>
             <%/ slot.iseditable %>
@@ -75,7 +75,7 @@
         <%^ appointment %>
             <%# slot.canbookslot %>
                 <%^ scheduler.isinappbookingsupported %>
-                    <ion-item>
+                    <ion-item text-wrap>
                         <a href="<% scheduler.weburl %>" ion-button core-link outline block autoLogin="yes" inApp="false">
                             <%# str %>visitwebtobook, mod_scheduler<%/ str %>
                         </a>
