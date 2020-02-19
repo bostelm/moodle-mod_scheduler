@@ -363,7 +363,7 @@ class mobile {
             $msgkey = ($scheduler->schedulermode == 'oneonly') ? 'canbooksingleappointment' : 'canbook1appointment';
             $bookingmessage = get_string($msgkey, 'mod_scheduler');
         } else if ($nobookingsremaining > 1) {
-            $bookingmessage = get_string('canbooknappointments', 'mod_scheduler');
+            $bookingmessage = get_string('canbooknappointments', 'mod_scheduler', $nobookingsremaining);
         } else if ($nobookingsremaining < 0) {
             $bookingmessage = get_string('canbookunlimitedappointments', 'mod_scheduler');
         }
