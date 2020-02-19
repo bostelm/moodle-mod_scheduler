@@ -26,6 +26,17 @@
                     <button ion-item core-site-plugins-new-content method="slot" [args]="{cmid: <% cmid%>, id: <% id %>}">
                         <h2><% timeformatted.date %></h2>
                         <p><% timeformatted.starttime %> - <% timeformatted.endtime %></p>
+                        <%# isunlimited %>
+                            <ion-note item-end><% ntaken %></ion-note>
+                        <%/ isunlimited %>
+                        <%^ isunlimited %>
+                            <%^ isfull %>
+                                <ion-note item-end><% ntaken %> / <% maxappointments %></ion-note>
+                            <%/ isfull %>
+                            <%# isfull %>
+                                <ion-note item-end><%# str %>complete, mod_scheduler<%/ str %></ion-note>
+                            <%/ isfull %>
+                        <%/ isunlimited %>
                     </button>
                 <%/ slots %>
                 <%# hasmore %>

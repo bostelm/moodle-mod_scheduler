@@ -833,7 +833,7 @@ class external extends external_api {
             'isfull' => $nremaining == 0,
 
             'nremaining' => $nremaining,
-            'ntaken' => $slot->exclusivity > 0 ? $slot->exclusivity - $nremaining : 0,
+            'ntaken' => $slot->exclusivity > 0 ? $slot->exclusivity - $nremaining : $slot->get_appointment_count(),
             'maxappointments' => $slot->exclusivity,
 
             'teacher' => static::serialize_user($slot->teacher)
