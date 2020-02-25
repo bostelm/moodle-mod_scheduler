@@ -304,6 +304,7 @@ $string['forbidgroup'] = 'Group slot - click to change';
 $string['forcewhenoverlap'] = 'Force when overlap';
 $string['forcourses'] = 'Choose students in courses';
 $string['friday'] = 'Friday';
+$string['full'] = 'Full';
 $string['generalconfig'] = 'General configuration';
 $string['grade'] = 'Grade';
 $string['gradeingradebook'] = 'Grade in gradebook';
