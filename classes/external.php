@@ -279,8 +279,8 @@ class external extends external_api {
         if ($canbookslots) {
             $bookableslotsraw = array_values($scheduler->get_slots_available_to_student($userid, $canwatchslots));
             $totalbookableslots = count($bookableslotsraw);
-            $bookableslots = array_map(function($slot) use ($canbookslots, $canwatchslots, $canseeothers) {
-                return static::serialize_slot($slot, $canbookslots, $canwatchslots, $canseeothers);
+            $bookableslots = array_map(function($slot) {
+                return static::serialize_slot($slot);
             }, array_slice($bookableslotsraw, ($page - 1) * $perpage, $perpage));
         }
 
@@ -526,6 +526,8 @@ class external extends external_api {
 
         if (!$scheduler->is_watching_enabled()) {
             throw new moodle_exception('error');
+        } else if (!$scheduler->student_can_watch_more_slots($USER->id)) {
+            throw new moodle_exception('cannotwatchmoreslots');
         }
 
         $slot = $scheduler->get_slot($slotid);
@@ -786,12 +788,15 @@ class external extends external_api {
         $nremaining = $slot->count_remaining_appointments();
 
         $canbookslots = has_capability('mod/scheduler:appoint', $context);
-        $canwatchslots = has_capability('mod/scheduler:appoint', $context) && $slot->get_scheduler()->is_watching_enabled();
+        $canwatchslots = has_capability('mod/scheduler:appoint', $context)
+            && $slot->get_scheduler()->is_watching_enabled()
+            && $slot->get_scheduler()->student_can_watch_more_slots($USER->id);
         $canseeothers = has_capability('mod/scheduler:seeotherstudentsbooking', $context);
 
         $canbookslot = $canbookslots && $nremaining != 0 && $slot->is_in_bookable_period();
-        $canwatchslot = $canwatchslots && $slot->is_watchable_by_student($USER->id);
-        $iswatching = $canwatchslot && $slot->is_watched_by_student($USER->id);
+        $isslotwatchable = $slot->is_watchable_by_student($USER->id);
+        $iswatching = $isslotwatchable && $slot->is_watched_by_student($USER->id);
+        $canwatchslot = ($canwatchslots && $isslotwatchable) || $iswatching;
 
         $appointments = array_map(function($app) {
             return static::serialize_appointment($app);

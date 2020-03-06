@@ -324,12 +324,52 @@ class scheduler extends mvc_record_model {
     }
 
     /**
+     * The maximum number of slots a student can watch at a time.
+     *
+     * @return int Where 0 means unlimited.
+     */
+    public function get_maximum_slots_watched() {
+        $config = get_config('mod_scheduler');
+        return isset($config->maxslotswatched) ? (int) $config->maxslotswatched : 0;
+    }
+
+    /**
      * Whether this scheduler supports watching.
      *
      * @return bool
      */
     public function is_watching_enabled() {
         return (bool) $this->data->canwatch && $this->is_individual_scheduling_enabled();
+    }
+
+    /**
+     * Whether the student can watch more slots.
+     *
+     * @param int $studentid The student ID.
+     * @return bool
+     */
+    public function student_can_watch_more_slots($studentid) {
+        global $DB;
+
+        $max = $this->get_maximum_slots_watched();
+        if (!$max) {
+            return true;
+        }
+
+        $sql = "SELECT COUNT(w.id)
+                  FROM {scheduler_watcher} w
+                  JOIN {scheduler_slots} s
+                    ON s.id = w.slotid
+                 WHERE w.userid = :userid
+                   AND s.starttime > :cutofftime
+                   AND s.hideuntil < :nowhide";
+        $params = [
+            'userid' => $studentid,
+            'nowhide' => time(),
+            'cutofftime' => time() + $this->guardtime
+        ];
+
+        return $DB->count_records_sql($sql, $params) < $max;
     }
 
     /**

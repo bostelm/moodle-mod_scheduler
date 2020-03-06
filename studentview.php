@@ -167,6 +167,7 @@ if (count($upcomingslots) > 0) {
 $bookablecnt = $scheduler->count_bookable_appointments($USER->id, false);
 $canbookslots = $canbook && $bookablecnt != 0;
 $canwatchslots = $canwatch && $canbookslots && !$appointgroup;
+$canwatchmoreslots = $canwatchslots && $scheduler->student_can_watch_more_slots($USER->id);
 $bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, $canseefull || $canwatchslots));
 
 if (!$canseefull && $bookablecnt == 0) {
@@ -183,7 +184,6 @@ if (!$canseefull && $bookablecnt == 0) {
     // Show the booking form.
 
     $booker = new scheduler_slot_booker($scheduler, $USER->id, $actionurl, $bookablecnt);
-    $haswatchableslots = false;
 
     $pagesize = 25;
     $total = count($bookableslots);
@@ -223,9 +223,9 @@ if (!$canseefull && $bookablecnt == 0) {
             }
         }
 
-        $canwatchthisslot = $canwatchslots && $slot->is_watchable_by_student($USER->id);
-        $iswatching = $canwatchthisslot && $slot->is_watched_by_student($USER->id);
-        $haswatchableslots = $haswatchableslots || $canwatchthisslot;
+        $isslotwatchable = $slot->is_watchable_by_student($USER->id);
+        $iswatching = $isslotwatchable && $slot->is_watched_by_student($USER->id);
+        $canwatchthisslot = ($canwatchmoreslots && $isslotwatchable) || $iswatching;
         $booker->add_slot($slot, $canbookthisslot, false, $groupinfo, $others, $canwatchthisslot, $iswatching);
     }
 
@@ -259,7 +259,12 @@ if (!$canseefull && $bookablecnt == 0) {
     }
 
     if ($canwatchslots) {
-        echo html_writer::tag('p', get_string('watchslotsintro', 'mod_scheduler'));
+        $maxwatched = $scheduler->get_maximum_slots_watched();
+        if (!$maxwatched) {
+            echo html_writer::tag('p', get_string('watchslotsintro', 'mod_scheduler'));
+        } else {
+            echo html_writer::tag('p', get_string('watchslotsintromax', 'mod_scheduler', $maxwatched));
+        }
     }
 
 }
