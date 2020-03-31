@@ -251,7 +251,6 @@ switch ($action) {
         $slotid = required_param('slotid', PARAM_INT);
         $slot = $scheduler->get_slot($slotid);
         $seen = optional_param_array('seen', array(), PARAM_INT);
-
         if (is_array($seen)) {
             foreach ($slot->get_appointments() as $app) {
                 $permissions->ensure($permissions->can_edit_attended($app));
@@ -340,8 +339,7 @@ switch ($action) {
     case 'markasseennow':
         $permissions->ensure($permissions->can_edit_own_slots());
 
-        $slot = new stdClass();
-        $slot->schedulerid = $scheduler->id;
+        $slot = $scheduler->create_slot();
         $slot->teacherid = $USER->id;
         $slot->starttime = time();
         $slot->duration = $scheduler->defaultslotduration;
@@ -352,10 +350,8 @@ switch ($action) {
         $slot->appointmentlocation = '';
         $slot->emaildate = 0;
         $slot->timemodified = time();
-        $slotid = $DB->insert_record('scheduler_slots', $slot);
 
-        $appointment = new stdClass();
-        $appointment->slotid = $slotid;
+        $appointment = $slot->create_appointment();
         $appointment->studentid = required_param('studentid', PARAM_INT);
         $appointment->attended = 1;
         $appointment->appointmentnote = '';
@@ -364,9 +360,9 @@ switch ($action) {
         $appointment->teachernoteformat = FORMAT_HTML;
         $appointment->timecreated = time();
         $appointment->timemodified = time();
-        $DB->insert_record('scheduler_appointment', $appointment);
 
-        $slot = $scheduler->get_slot($slotid);
+        $slot->save();
+        $slot = $scheduler->get_slot($slot->id);
         \mod_scheduler\event\slot_added::create_from_slot($slot)->trigger();
 
         redirect($viewurl);

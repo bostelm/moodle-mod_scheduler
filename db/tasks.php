@@ -40,5 +40,13 @@ $tasks = array(
                 'day' => '*',
                 'dayofweek' => '*',
                 'month' => '*'
+            ),
+            array(
+                'classname' => 'mod_scheduler\task\purge_obsolete_watchers',
+                'minute' => 'R',
+                'hour' => 'R',
+                'day' => '*',
+                'dayofweek' => '*',
+                'month' => '*'
             )
 );

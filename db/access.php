@@ -186,7 +186,15 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
-    )
+    ),
+
+    'mod/scheduler:watchslots' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'student' => CAP_ALLOW,
+        ]
+    ),
 
 );
 

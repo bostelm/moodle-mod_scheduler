@@ -26,7 +26,11 @@ namespace mod_scheduler\model;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/grade/lib.php');
+
+use completion_info;
+use mod_scheduler\slots_query_builder;
 
 /**
  * A class for representing a scheduler instance, as an MVC model.
@@ -141,6 +145,24 @@ class scheduler extends mvc_record_model {
     public function delete_all_slots() {
         $this->slots->delete_children();
         scheduler_grade_item_update($this, 'reset');
+    }
+
+    /**
+     * Delete a student's watchlist.
+     *
+     * @param int $userid The user ID.
+     * @return void
+     */
+    public function delete_student_watchlist($userid) {
+        global $DB;
+        $sql = "DELETE FROM {scheduler_watcher}
+                      WHERE userid = :userid
+                        AND slotid IN (
+                         SELECT id
+                           FROM {scheduler_slots}
+                          WHERE schedulerid = :schedulerid)";
+        $params = ['schedulerid' => $this->data->id, 'userid' => $userid];
+        $DB->execute($sql, $params);
     }
 
     /**
@@ -281,6 +303,73 @@ class scheduler extends mvc_record_model {
         } else {
             return true;
         }
+    }
+
+    /**
+     * Whether students should upload at least one file.
+     *
+     * @return bool
+     */
+    public function is_studentfiles_required() {
+        return $this->uses_studentfiles() && $this->requireupload;
+    }
+
+    /**
+     * Whether students must provide notes.
+     *
+     * @return bool
+     */
+    public function is_studentnotes_required() {
+        return $this->uses_studentnotes() && $this->usestudentnotes == 2;
+    }
+
+    /**
+     * The maximum number of slots a student can watch at a time.
+     *
+     * @return int Where 0 means unlimited.
+     */
+    public function get_maximum_slots_watched() {
+        $config = get_config('mod_scheduler');
+        return isset($config->maxslotswatched) ? (int) $config->maxslotswatched : 0;
+    }
+
+    /**
+     * Whether this scheduler supports watching.
+     *
+     * @return bool
+     */
+    public function is_watching_enabled() {
+        return (bool) $this->data->canwatch && $this->is_individual_scheduling_enabled();
+    }
+
+    /**
+     * Whether the student can watch more slots.
+     *
+     * @param int $studentid The student ID.
+     * @return bool
+     */
+    public function student_can_watch_more_slots($studentid) {
+        global $DB;
+
+        $max = $this->get_maximum_slots_watched();
+        if (!$max) {
+            return true;
+        }
+
+        $sql = "SELECT COUNT(w.id)
+                  FROM {scheduler_watcher} w
+                  JOIN {scheduler_slots} s
+                    ON s.id = w.slotid
+                 WHERE w.userid = :userid
+                   AND s.starttime > :cutofftime
+                   AND s.hideuntil < :nowhide";
+        $params = [
+            'userid' => $studentid,
+            'nowhide' => time(),
+            'cutofftime' => time() + $this->guardtime
+        ];
+
+        return $DB->count_records_sql($sql, $params) < $max;
     }
 
     /**
@@ -538,6 +627,61 @@ class scheduler extends mvc_record_model {
         return null;
     }
 
+    /**
+     * Whether attendance is required for completing this activity.
+     *
+     * @return bool
+     */
+    public function completion_requires_attended() {
+        return !empty($this->data->completionattended);
+    }
+
+    /**
+     * Update the completion state of a user, if needed.
+     *
+     * @param int $userid The user ID.
+     * @param bool $hasattended Whether the user just attended a slot.
+     * @return void
+     */
+    public function completion_update_has_attended($userid, $hasattended = false) {
+        if (!$this->completion_requires_attended()) {
+            return;
+        }
+
+        $course = $this->get_courserec();
+        $cm = $this->get_cm();
+        $completion = new completion_info($course);
+
+        if ($completion->is_enabled($cm)) {
+            $state = $hasattended ? COMPLETION_COMPLETE : COMPLETION_UNKNOWN;
+            $completion->update_state($cm, $state, $userid);
+        }
+    }
+
+    /**
+     * Whether the user has attended any slot.
+     *
+     * @param int $userid The user ID.
+     * @return bool
+     */
+    public function has_user_attended_any_slot($userid) {
+        global $DB;
+
+        $sql = "SELECT 1
+                  FROM {scheduler_appointment} a
+                  JOIN {scheduler_slots} s
+                    ON a.slotid = s.id
+                 WHERE s.schedulerid = :id
+                   AND a.studentid = :userid
+                   AND a.attended = 1";
+
+        $params = [
+            'id' => $this->data->id,
+            'userid' => $userid
+        ];
+
+        return $DB->record_exists_sql($sql, $params);
+    }
 
     /* *********************** Loading lists of slots *********************** */
 
@@ -550,9 +694,11 @@ class scheduler extends mvc_record_model {
      * @param mixed $limitfrom query limit from here
      * @param mixed $limitnum max number od records to fetch
      * @param string $orderby ORDER BY fields
+     * @param string $joins The joins.
      * @return slot[]
      */
-    protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='') {
+    protected function fetch_slots($wherecond, $havingcond, array $params, $limitfrom='', $limitnum='', $orderby='', $joins = '') {
+
         global $DB;
         $select = 'SELECT s.* FROM {scheduler_slots} s';
 
@@ -573,7 +719,7 @@ class scheduler extends mvc_record_model {
             $order = "ORDER BY s.id";
         }
 
-        $sql = "$select $where $having $order";
+        $sql = "$select $joins $where $having $order";
 
         $slotdata = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
         $slots = array();
@@ -590,9 +736,10 @@ class scheduler extends mvc_record_model {
      *
      * @param string $wherecond WHERE condition
      * @param array $params parameters for DB query
+     * @param string $joins The joins.
      * @return int
      */
-    protected function count_slots($wherecond, array $params) {
+    protected function count_slots($wherecond, array $params, $joins = '') {
         global $DB;
         $select = 'SELECT COUNT(*) FROM {scheduler_slots} s';
 
@@ -602,11 +749,21 @@ class scheduler extends mvc_record_model {
         }
         $params['schedulerid'] = $this->data->id;
 
-        $sql = "$select $where";
+        $sql = "$select $joins $where";
 
         return $DB->count_records_sql($sql, $params);
     }
 
+    /**
+     * Count slots using a query builder.
+     *
+     * @param slots_query_builder $qb The query builder.
+     * @return slot[]
+     */
+    public function count_slots_from_query_builder(slots_query_builder $qb) {
+        list($where, $params) = $qb->get_where();
+        return $this->count_slots($where, $params, $qb->get_joins());
+    }
 
     /**
      * Subquery that counts appointments in the current slot.
@@ -681,6 +838,15 @@ class scheduler extends mvc_record_model {
      */
     public function get_slot_count() {
         return $this->slots->get_child_count();
+    }
+
+    /**
+     * Get a new instance of a slot query builder.
+     *
+     * @return slots_query_builder
+     */
+    public function get_slots_query_builder() {
+        return new slots_query_builder('s.');
     }
 
     /**
@@ -902,6 +1068,17 @@ class scheduler extends mvc_record_model {
         return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, 's.starttime ASC, s.duration ASC, s.teacherid');
     }
 
+    /**
+     * Fetch slots using a query builder.
+     *
+     * @param slots_query_builder $qb The query builder.
+     * @return slot[]
+     */
+    public function get_slots_from_query_builder(slots_query_builder $qb) {
+        list($where, $params) = $qb->get_where();
+        list($limitnum, $limitfrom) = $qb->get_limit();
+        return $this->fetch_slots($where, '', $params, $limitfrom, $limitnum, $qb->get_order_by(), $qb->get_joins());
+    }
 
     /* ************** End of slot retrieveal routines ******************** */
 
@@ -1047,6 +1224,11 @@ class scheduler extends mvc_record_model {
     public function count_bookable_appointments($studentid, $includechangeable = true) {
         global $DB;
 
+        // Bail when bookings are unlimited.
+        if ($this->allows_unlimited_bookings()) {
+            return -1;
+        }
+
         // Find how many slots have already been booked.
         $sql = 'SELECT COUNT(*) FROM {scheduler_slots} s'
               .' JOIN {scheduler_appointment} a ON s.id = a.slotid'
@@ -1064,9 +1246,7 @@ class scheduler extends mvc_record_model {
         $booked = $DB->count_records_sql($sql, $params);
         $allowed = $this->maxbookings;
 
-        if ($allowed == 0) {
-            return -1;
-        } else if ($booked >= $allowed) {
+        if ($booked >= $allowed) {
             return 0;
         } else {
             return $allowed - $booked;
@@ -1220,6 +1400,22 @@ class scheduler extends mvc_record_model {
         // Delete the appointment.
         $slot->remove_appointment($appointment);
         $slot->save();
+    }
+
+    /**
+     * Free obsolete watchers.
+     *
+     * @return void
+     */
+    public static function free_obsolete_watchers() {
+        global $DB;
+        $sql = "DELETE FROM {scheduler_watcher}
+                      WHERE slotid IN (
+                         SELECT id
+                           FROM {scheduler_slots}
+                          WHERE starttime <= :starttime)";
+        $params = ['starttime' => time() - DAYSECS];
+        $DB->execute($sql, $params);
     }
 
     /**

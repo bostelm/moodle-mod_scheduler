@@ -237,6 +237,20 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
 
     }
 
+    public function test_can_schedule_slots_to_other_teachers() {
+
+        // Editing teachers can schedule for others.
+        $p = new scheduler_permissions($this->context, $this->edteacher);
+        $this->assertTrue($p->can_schedule_slot_to_other_teachers());
+
+        // Admins and students cannot schedule for others.
+        $p = new scheduler_permissions($this->context, $this->nonedteacher);
+        $this->assertFalse($p->can_schedule_slot_to_other_teachers());
+        $p = new scheduler_permissions($this->context, $this->administ);
+        $this->assertFalse($p->can_schedule_slot_to_other_teachers());
+        $p = new scheduler_permissions($this->context, $this->students[1]);
+        $this->assertFalse($p->can_schedule_slot_to_other_teachers());
+    }
 
     public function test_can_see_all_slots() {
 

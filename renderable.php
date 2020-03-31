@@ -257,8 +257,11 @@ class scheduler_slot_booker implements renderable {
      * @param bool $bookedbyme whether the slot is already booked by the current student
      * @param string $groupinfo information about group slots
      * @param array $otherstudents other students in this slot
+     * @param bool $canwatch Whether the user can watch this slot
+     * @param bool $iswatching Whether the user is currently watching the slot.
      */
-    public function add_slot(slot $slotmodel, $canbook, $bookedbyme, $groupinfo, $otherstudents) {
+    public function add_slot(slot $slotmodel, $canbook, $bookedbyme, $groupinfo, $otherstudents,
+            $canwatch = false, $iswatching = false) {
         $slot = new stdClass();
         $slot->slotid = $slotmodel->id;
         $slot->starttime = $slotmodel->starttime;
@@ -271,6 +274,8 @@ class scheduler_slot_booker implements renderable {
         $slot->groupinfo = $groupinfo;
         $slot->teacher = $slotmodel->get_teacher();
         $slot->otherstudents = $otherstudents;
+        $slot->canwatch = $canwatch;
+        $slot->iswatching = $iswatching;
 
         $this->slots[] = $slot;
     }
@@ -388,6 +393,15 @@ class scheduler_slot_manager implements renderable {
      * @var bool should the teacher owning the slot be shown?
      */
     public $showteacher = true;
+
+    /** @var bool Whether we can sort slots. */
+    public $sortable = true;
+
+    /** @var string The column we're sorting on. */
+    public $sortcolumn = null;
+
+    /** @var int The direction we're sorting on. */
+    public $sortdir = null;
 
     /**
      * Add a slot to the list.

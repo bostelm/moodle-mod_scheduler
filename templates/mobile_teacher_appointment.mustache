@@ -1,0 +1,105 @@
+{{=<% %>=}}
+
+<div>
+    <ion-list>
+        <ion-item>
+            <h2><% slot.timeformatted.date %></h2>
+            <p><% slot.timeformatted.starttime %> - <% slot.timeformatted.endtime %></p>
+        </ion-item>
+
+        <a ion-item core-user-link userId="<% app.student.id %>" courseId="<% courseid %>">
+            <ion-avatar core-user-avatar profileUrl="<% app.student.profileimageurl %>" item-start></ion-avatar>
+            <h2><% app.student.fullname %></h2>
+        </a>
+
+        <%# app.hasstudentnote %>
+            <ion-item text-wrap>
+                <h2><%# str %>studentnote, mod_scheduler<%/ str %></h2>
+                <core-format-text text="<% app.studentnoteformatted %>" component="mod_scheduler" componentId="<% cmid %>"></core-format-text>
+            </ion-item>
+        <%/ app.hasstudentnote %>
+
+        <%# app.hasstudentfiles %>
+                <ion-item>
+                    <h2><%# str %>studentfiles, mod_scheduler<%/ str %></h2>
+                    <div no-lines>
+                        <%# app.studentfiles %>
+                        <core-file [file]="{fileurl: '<% fileurl %>', filename: '<% filename %>', timemodified: '<% timemodified %>', filesize: '<% filesize %>'}" component="mod_scheduler" componentId="<% cmid %>"></core-file>
+                        <%/ app.studentfiles %>
+                    </div>
+                </ion-item>
+        <%/ app.hasstudentfiles %>
+
+        <%# app.hasappointmentnote %>
+            <ion-item text-wrap>
+                <h2><%# str %>appointmentnote, mod_scheduler<%/ str %></h2>
+                <core-format-text text="<% app.appointmentnoteformatted %>" component="mod_scheduler" componentId="<% cmid %>"></core-format-text>
+            </ion-item>
+        <%/ app.hasappointmentnote %>
+
+        <%# app.hasteachernote %>
+            <ion-item text-wrap>
+                <h2><%# str %>teachernote, mod_scheduler<%/ str %></h2>
+                <core-format-text text="<% app.teachernoteformatted %>" component="mod_scheduler" componentId="<% cmid %>"></core-format-text>
+            </ion-item>
+        <%/ app.hasteachernote %>
+
+    </ion-list>
+
+    <ion-list>
+        <ion-item>
+            <ion-label stacked id="mod-scheduler-app-attended">
+                <h2><%# str %>attended, mod_scheduler<%/ str %></h2>
+            </ion-label>
+            <ion-checkbox
+                    name="attended"
+                    [(ngModel)]="CONTENT_OTHERDATA.attended"
+                    aria-labelledby="mod-scheduler-app-attended"
+                    value="1"
+                    <%^ app.caneditattended %>disabled="true"<%/ app.caneditattended %>
+                ></ion-checkbox>
+        </ion-item>
+
+        <%# scheduler.usesgrades %>
+        <ion-item>
+            <ion-label stacked id="mod-scheduler-app-grade">
+                <h2><%# str %>grade, mod_scheduler<%/ str %></h2>
+            </ion-label>
+            <ion-select
+                    interface="popover"
+                    name="grade"
+                    [(ngModel)]="CONTENT_OTHERDATA.grade"
+                    <%^ app.caneditgrade %>disabled="true"<%/ app.caneditgrade %>
+                    aria-labelledby="mod-scheduler-app-grade">
+                <%# gradeoptions %>
+                    <ion-option value="<% value %>"><% name %></ion-option>
+                <%/ gradeoptions %>
+            </ion-select>
+        </ion-item>
+        <%/ scheduler.usesgrades %>
+
+        <!-- This is required to capture changes in the select/checkbox -->
+        <ion-input type="hidden" [ngModel]="attended" name="attended"></ion-input>
+        <ion-input type="hidden" [ngModel]="grade" name="grade"></ion-input>
+
+        <%# caneditany %>
+            <ion-item>
+                <button ion-button block
+                        core-site-plugins-call-ws
+                        name="mod_scheduler_update_appointment"
+                        [params]="{cmid: <% cmid %>, appid: <% app.id %>, attended: CONTENT_OTHERDATA.attended, grade: CONTENT_OTHERDATA.grade}"
+                        [preSets]="{getFromCache: 0, saveToCache: 0}"
+                        goBackOnSuccess="true">
+                    <%# str %>savechanges, core<%/ str %>
+                </button>
+            </ion-item>
+        <%/ caneditany %>
+
+        <%# app.caneditnotes %>
+            <ion-item text-wrap>
+                <p><%# str %>visitwebtoaddnotes, mod_scheduler, <% app.weburl %><%/ str %></p>
+            </ion-item>
+        <%/ app.caneditnotes %>
+    </ion-list>
+
+</div>

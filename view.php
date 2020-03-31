@@ -71,9 +71,8 @@ $PAGE->set_heading($course->fullname);
 
 // Route to screen.
 
-$teachercaps = ['mod/scheduler:manage', 'mod/scheduler:manageallappointments', 'mod/scheduler:canseeotherteachersbooking'];
-$isteacher = has_any_capability($teachercaps, $context);
-$isstudent = has_capability('mod/scheduler:viewslots', $context);
+$isteacher = $permissions->is_teacher();
+$isstudent = $permissions->is_student();
 if ($isteacher) {
     // Teacher side.
     if ($action == 'viewstatistics') {
@@ -84,6 +83,8 @@ if ($isteacher) {
         include($CFG->dirroot.'/mod/scheduler/export.php');
     } else if ($action == 'datelist') {
         include($CFG->dirroot.'/mod/scheduler/datelist.php');
+    } else if ($action == 'import') {
+        include($CFG->dirroot.'/mod/scheduler/import.php');
     } else {
         include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }

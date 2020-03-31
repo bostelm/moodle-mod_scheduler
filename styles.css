@@ -10,6 +10,18 @@
     font-weight: bold;
 }
 
+.path-mod-scheduler div.otherstudent a + .icon,
+.path-mod-scheduler div.otherstudent a + .action-icon {
+    margin-left: .5rem;
+}
+
+.path-mod-scheduler div.otherstudent .revoke-student {
+    display: none;
+}
+.path-mod-scheduler.jsenabled div.otherstudent .revoke-student {
+    display: inline;
+}
+
 .path-mod-scheduler div.slotnotes {
     background-color: #e8e9ee;
     border: solid 1px #a7abbe;
