@@ -86,8 +86,8 @@ class scheduler extends mvc_record_model {
      * @return scheduler
      */
     public static function load_by_id($id) {
-        global $DB;
-        $cm = get_coursemodule_from_instance('scheduler', $id, 0, false, MUST_EXIST);
+        global $COURSE;
+        $cm = get_coursemodule_from_instance('scheduler', $id, $COURSE->id, false, MUST_EXIST);
         return self::load_from_record($id, $cm);
     }
 
