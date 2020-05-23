@@ -437,7 +437,7 @@ function scheduler_grade_item_update($scheduler, $grades=null) {
         $scheduler->courseid = $scheduler->course;
     }
     $moduleid = $DB->get_field('modules', 'id', array('name' => 'scheduler'));
-    $cmid = $DB->get_field('course_modules', 'id', array('module' => $moduleid, 'instance' => $scheduler->id));
+    $cmid = $DB->get_field('course_modules', 'id', array('course' => $scheduler->courseid, 'module' => $moduleid, 'instance' => $scheduler->id));
 
     if ($scheduler->scale == 0) {
         // Delete any grade item.
