@@ -98,7 +98,7 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
      * - There is one nonediting teacher, with default permissions, who is assigned to slot 2
      * - There is one "administrator", a user with a custom role that allows only viewing, but not editing, the slots.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
 
         $dg = $this->getDataGenerator();

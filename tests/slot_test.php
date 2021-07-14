@@ -74,7 +74,7 @@ class mod_scheduler_slot_testcase extends advanced_testcase {
      */
     protected $students;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
 
         $this->resetAfterTest(true);
