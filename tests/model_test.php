@@ -59,7 +59,7 @@ class mod_scheduler_model_testcase extends advanced_testcase {
      */
     protected $userid;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
 
         $this->resetAfterTest(true);
