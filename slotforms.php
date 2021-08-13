@@ -477,6 +477,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 } else {
                     $app = $slot->create_appointment();
                     $app->studentid = $data->studentid[$i];
+                    $app->timecreated = time();
                     $app->save();
                 }
                 $app->attended = isset($data->attended[$i]);
