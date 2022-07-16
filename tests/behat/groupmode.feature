@@ -48,43 +48,35 @@ Feature: Users can only see their own groups if the scheduler is in group mode
       | student4   | GB    |
       | student5   | GD    |
     And the following "activities" exist:
-      | activity  | name                    | intro | course | idnumber   | groupmode |
-      | scheduler | Test scheduler none     | n     | C1     | schedulern | 0         |
-      | scheduler | Test scheduler separate | n     | C1     | schedulers | 1         |
-      | scheduler | Test scheduler visible  | n     | C1     | schedulerv | 2         |
+      | activity  | name                    | intro | course | idnumber      | groupmode |
+      | scheduler | Test scheduler none     | n     | C1     | schedulerNone | 0         |
+      | scheduler | Test scheduler separate | n     | C1     | schedulerSep  | 1         |
+      | scheduler | Test scheduler visible  | n     | C1     | schedulerVis  | 2         |
     And the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
       | moodle/site:accessallgroups | Prevent    | teacher | Course       | C1        |
       | mod/scheduler:canseeotherteachersbooking | Allow | teacher | Course  | C1     |
     And I add the upcoming events block globally
     And I log in as "edteacher1"
-    And I am on "Course 1" course homepage
-    And I add 5 slots 10 days ahead in "Test scheduler none" scheduler and I fill the form with:
+    And I add 5 slots 10 days ahead in "schedulerNone" scheduler and I fill the form with:
       | Location  | Here |
-    And I am on "Course 1" course homepage
-    And I add 5 slots 11 days ahead in "Test scheduler visible" scheduler and I fill the form with:
+    And I add 5 slots 11 days ahead in "schedulerVis" scheduler and I fill the form with:
       | Location  | Here |
-    And I am on "Course 1" course homepage
-    And I add 5 slots 12 days ahead in "Test scheduler separate" scheduler and I fill the form with:
+    And I add 5 slots 12 days ahead in "schedulerSep" scheduler and I fill the form with:
       | Location  | Here |
     And I log out
     And I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I add 5 slots 10 days ahead in "Test scheduler none" scheduler and I fill the form with:
+    And I add 5 slots 10 days ahead in "schedulerNone" scheduler and I fill the form with:
       | Location  | There |
-    And I am on "Course 1" course homepage
-    And I add 5 slots 11 days ahead in "Test scheduler visible" scheduler and I fill the form with:
+    And I add 5 slots 11 days ahead in "schedulerVis" scheduler and I fill the form with:
       | Location  | There |
-    And I am on "Course 1" course homepage
-    And I add 5 slots 12 days ahead in "Test scheduler separate" scheduler and I fill the form with:
+    And I add 5 slots 12 days ahead in "schedulerSep" scheduler and I fill the form with:
       | Location  | There |
     And I log out
 
   @javascript
   Scenario: Editing teachers can see all slots and all groups
-    When I log in as "edteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+    When I am on the "schedulerNone" Activity page logged in as "edteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
@@ -94,8 +86,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should see "Student 5" in the "studentstoschedule" "table"
     And I should see "Student 6" in the "studentstoschedule" "table"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+    When I am on the "schedulerVis" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Visible groups"
@@ -117,8 +108,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+    When I am on the "schedulerSep" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Separate groups"
@@ -155,8 +145,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     # In the "My appointments" tab, the teacher should only see students to schedule from their groups,
     # i.e., groups A and B.
     # Students outside any group should not be visible.
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+    When I am on the "schedulerSep" Activity page
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "Group mode: Separate groups"
@@ -170,9 +159,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
   @javascript
   Scenario: Nonediting teachers can see groups only if allowed by the group mode
 
-    When I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+    When I am on the "schedulerNone" Activity page logged in as neteacher1
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "6 students still need to make an appointment"
@@ -180,8 +167,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+    When I am on the "schedulerVis" Activity page
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "2 students still need to make an appointment"
@@ -205,8 +191,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+    When I am on the "schedulerSep" Activity page
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "2 students still need to make an appointment"
@@ -234,8 +219,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     # In the "My appointments" tab, the teacher should only see students to schedule from their groups,
     # i.e., group B (and C).
     # Students in group 1 and outside any group should not be visible.
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+    When I am on the "schedulerSep" Activity page
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "Group mode: Separate groups"
@@ -250,23 +234,19 @@ Feature: Users can only see their own groups if the scheduler is in group mode
 
     # neteacher2 sees no students for scheduling in group mode, since he's not member of a group
 
-    When I log in as "neteacher2"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+    When I am on the "schedulerNone" Activity page logged in as neteacher2
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "6 students still need to make an appointment"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+    When I am on the "schedulerVis" Activity page
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "No students available for scheduling"
     And I should see "Group mode: Visible groups"
     And I should see "students cannot book appointments with you"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+    When I am on the "schedulerSep" Activity page
     And I follow "Statistics"
     And I follow "My appointments"
     Then I should see "No students available for scheduling"
@@ -276,58 +256,58 @@ Feature: Users can only see their own groups if the scheduler is in group mode
   @javascript
   Scenario: Students can see slots available to their own groups, or a slots if group mode is off
     When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+  
+    When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+    
+    When I am on the "schedulerVis" Activity page
     Then I should see "Editingteacher 1"
     And I should not see "Nonedteacher 1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+
+    When I am on the "schedulerSep" Activity page
     Then I should see "Editingteacher 1"
     And I should not see "Nonedteacher 1"
     And I log out
 
     When I log in as "student3"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+
+    When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+ 
+    When I am on the "schedulerVis" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+
+    When I am on the "schedulerSep" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
     And I log out
 
     When I log in as "student5"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+    
+    When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+    
+    When I am on the "schedulerVis" Activity page
     Then I should see "No slots are available"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+
+    When I am on the "schedulerSep" Activity page
     Then I should see "No slots are available"
     And I log out
 
     When I log in as "student6"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+    
+    When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler visible"
+
+    When I am on the "schedulerVis" Activity page
     Then I should see "No slots are available"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler separate"
+
+    When I am on the "schedulerSep" Activity page
     Then I should see "No slots are available"
     And I log out
 
@@ -335,17 +315,15 @@ Feature: Users can only see their own groups if the scheduler is in group mode
   Scenario: Students can see slots available to their own groups in forced group mode
     When I log in as "edteacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Edit settings" in current page administration
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the field "Group mode" to "Separate groups"
     And I set the field "Force group mode" to "Yes"
     And I press "Save and display"
-    Then I should see "Test scheduler none"
+    Then I should see "Course 1"
     And I log out
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler none"
+    When I am on the "schedulerNone" Activity page logged in as student1
     Then I should see "Editingteacher 1"
     And I should not see "Nonedteacher 1"
     And I log out

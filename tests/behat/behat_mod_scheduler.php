@@ -54,7 +54,7 @@ class behat_mod_scheduler extends behat_base {
         $mins  = $time - 100 * $hours;
         $startdate = time() + $daysahead * DAYSECS;
 
-        $this->execute('behat_general::click_link', $this->escape($activityname));
+        $this->execute('behat_navigation::i_am_on_page_instance', array($this->escape($activityname), 'Activity'));
         $this->execute('behat_general::i_click_on', array('Add slots', 'link'));
         $this->execute('behat_general::click_link', 'Add single slot');
 
@@ -96,7 +96,7 @@ class behat_mod_scheduler extends behat_base {
 
         $startdate = time() + $daysahead * DAYSECS;
 
-        $this->execute('behat_general::click_link', $this->escape($activityname));
+        $this->execute('behat_navigation::i_am_on_page_instance', array($this->escape($activityname), 'Activity'));
         $this->execute('behat_general::i_click_on', array('Add slots', 'link'));
         $this->execute('behat_general::click_link', 'Add repeated slots');
 
@@ -129,8 +129,6 @@ class behat_mod_scheduler extends behat_base {
      */
     public function i_add_the_upcoming_events_block_globally() {
 
-        $home = $this->escape(get_string('sitehome'));
-
         $this->execute('behat_data_generators::the_following_entities_exist', array('users',
                         new TableNode(array(
                             array('username', 'firstname', 'lastname', 'email'),
@@ -142,9 +140,10 @@ class behat_mod_scheduler extends behat_base {
                             array('user', 'role'),
                             array('globalmanager1', 'manager')
                         )) ) );
+                        
         $this->execute('behat_auth::i_log_in_as', 'globalmanager1');
-        $this->execute('behat_general::click_link', $home);
-        $this->execute('behat_navigation::i_navigate_to_in_current_page_administration', array('Turn editing on'));
+        $this->execute('behat_general::i_am_on_site_homepage');
+        $this->execute('behat_navigation::i_turn_editing_mode_on');
         $this->execute('behat_blocks::i_add_the_block', 'Upcoming events');
 
         $this->execute('behat_blocks::i_open_the_blocks_action_menu', 'Upcoming events');
@@ -170,10 +169,7 @@ class behat_mod_scheduler extends behat_base {
         $downarrowtarget = "(//span[contains(@class,'form-autocomplete-downarrow')])[$listnumber]";
         $this->execute('behat_general::i_click_on', [$downarrowtarget, 'xpath_element']);
 
-        $xpathtarget = "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|" . $item . "|')])[$listnumber]";
-
-        $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
-
-        $this->execute('behat_general::i_press_key_in_element', ['13', 'body', 'xpath_element']);
+         $xpathtarget = "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|" . $item . "|')])[$listnumber]"; 
+         $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
     }
 }

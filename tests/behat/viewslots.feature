@@ -28,42 +28,39 @@ Feature: Students viewing slots available for booking
       | activity  | name           | intro | course | idnumber   | groupmode | schedulermode | maxbookings | guardtime |
       | scheduler | Test scheduler | n     | C1     | scheduler1 | 0         | oneonly       | 1           | 172800    |
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
     # Slot 1 is available to only 1 student and is not yet booked
-    And I add a slot 5 days ahead at 0100 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0100 in "scheduler1" scheduler and I fill the form with:
       | exclusivity | 1 |
     # Slot 2 is available to only 1 student and is already booked
-    And I add a slot 5 days ahead at 0200 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0200 in "scheduler1" scheduler and I fill the form with:
       | exclusivity  | 1         |
       | studentid[0] | Student 3 |
     # Slot 3 is a group slot that is empty
-    And I add a slot 5 days ahead at 0300 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0300 in "scheduler1" scheduler and I fill the form with:
       | exclusivity | 3        |
     # Slot 4 is a group slot that is partially booked
-    And I add a slot 5 days ahead at 0400 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0400 in "scheduler1" scheduler and I fill the form with:
       | exclusivity  | 2         |
       | studentid[0] | Student 3 |
     # Slot 5 is an unlimited group slot that is empty
-    And I add a slot 5 days ahead at 0500 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0500 in "scheduler1" scheduler and I fill the form with:
       | exclusivityenable | 0         |
     # Slot 6 is an unlimited group slot that is partially booked
-    And I add a slot 5 days ahead at 0600 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0600 in "scheduler1" scheduler and I fill the form with:
       | exclusivityenable | 0         |
       | studentid[0]      | Student 3 |
     # Slot 7 is not yet available to students
-    And I add a slot 5 days ahead at 0700 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 5 days ahead at 0700 in "scheduler1" scheduler and I fill the form with:
       | hideuntil[year] | 2040 |
     # Slot 8 is no longer available since the it's too close in the future
-    And I add a slot 1 days ahead at 0800 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 1 days ahead at 0800 in "scheduler1" scheduler and I fill the form with:
       | appointmentlocation | My office |
     And I log out
 
   @javascript
   Scenario: A student can see only available upcoming slots (default setting)
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student1"
     Then "Book slot" "button" should exist in the "1:00 AM" "table_row"
     And I should not see "2:00 AM" in the "slotbookertable" "table"
     And "Book slot" "button" should exist in the "3:00 AM" "table_row"
@@ -82,9 +79,8 @@ Feature: Students viewing slots available for booking
 
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
     And I log out
-    And I log in as "student2"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+
+    When I am on the "scheduler1" Activity page logged in as "student2"
     Then "Book slot" "button" should exist in the "3:00 AM" "table_row"
     And I should not see "4:00 AM" in the "slotbookertable" "table"
     And I log out
@@ -97,9 +93,7 @@ Feature: Students viewing slots available for booking
       | mod/scheduler:viewslots     | Allow      | student | Course       | C1        |
       | mod/scheduler:viewfullslots | Allow      | student | Course       | C1        |
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student1"
     Then "Book slot" "button" should exist in the "1:00 AM" "table_row"
     And I should see "2:00 AM" in the "slotbookertable" "table"
     Then "Book slot" "button" should not exist in the "2:00 AM" "table_row"
@@ -121,9 +115,8 @@ Feature: Students viewing slots available for booking
 
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
     And I log out
-    And I log in as "student2"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    
+    When I am on the "scheduler1" Activity page logged in as "student2"
     Then "Book slot" "button" should exist in the "3:00 AM" "table_row"
     And I should see "4:00 AM" in the "slotbookertable" "table"
     And "Book slot" "button" should not exist in the "4:00 AM" "table_row"
@@ -137,9 +130,7 @@ Feature: Students viewing slots available for booking
       | mod/scheduler:viewslots     | Allow      | student | Course       | C1        |
       | mod/scheduler:viewfullslots | Allow      | student | Course       | C1        |
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student1"
     Then "Book slot" "button" should not exist
     And I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "2:00 AM" in the "slotbookertable" "table"
@@ -160,9 +151,7 @@ Feature: Students viewing slots available for booking
       | mod/scheduler:viewslots     | Allow      | student | Course       | C1        |
       | mod/scheduler:viewfullslots | Prevent    | student | Course       | C1        |
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student1"
     Then "Book slot" "button" should not exist
     And I should see "1:00 AM" in the "slotbookertable" "table"
     And I should not see "2:00 AM" in the "slotbookertable" "table"

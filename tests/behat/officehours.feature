@@ -34,8 +34,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
   @javascript
   Scenario: The teacher adds slots, and students book them
     When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I add 10 slots 5 days ahead in "Test scheduler" scheduler and I fill the form with:
+    And I add 10 slots 5 days ahead in "scheduler1" scheduler and I fill the form with:
       | Location | My office |
     Then I should see "10 slots have been added"
     And I should see "4 students still need to make an appointment"
@@ -45,9 +44,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I should see "Student 4" in the "studentstoschedule" "table"
     And I log out
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student1"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
     When I click on "Book slot" "button" in the "2:00 AM" "table_row"
@@ -55,9 +52,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I should see "Meeting with your Teacher, Teacher 1" in the "Upcoming events" "block"
     And I log out
 
-    When I log in as "student3"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student3"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should not see "2:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
@@ -66,9 +61,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I should see "Meeting with your Teacher, Teacher 1" in the "Upcoming events" "block"
     And I log out
 
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "teacher1"
     Then I should see "1:00 AM" in the "slotmanager" "table"
     And I should see "Student 1" in the "2:00 AM" "table_row"
     And I should see "Student 3" in the "5:00 AM" "table_row"
@@ -81,14 +74,12 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I should not see "Student 3" in the "studentstoschedule" "table"
     And I should see "Student 4" in the "studentstoschedule" "table"
     When I click on "seen[]" "checkbox" in the "2:00 AM" "table_row"
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page
     Then I should not see "Meeting with your Student, Student 1" in the "Upcoming events" "block"
     And I should see "Meeting with your Student, Student 3" in the "Upcoming events" "block"
     And I log out
 
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "student1"
     Then I should see "Attended slots"
     And "slotbookertable" "table" should not exist
     And I should not see "Cancel booking"

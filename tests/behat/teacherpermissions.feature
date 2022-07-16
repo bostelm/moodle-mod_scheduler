@@ -26,34 +26,29 @@ Feature: Teachers can edit other teacher's appointments only by permission
       | student3   | C1     | student        |
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   | groupmode | usenotes | grade |
-      | scheduler | Test scheduler | n     | C1     | schedulert | 0         | 3        | 100   |
+      | scheduler | Test scheduler | n     | C1     | scheduler1 | 0         | 3        | 100   |
     And the following "permission overrides" exist:
       | capability                               | permission | role    | contextlevel | reference |
       | mod/scheduler:canseeotherteachersbooking | Allow      | teacher | Course       | C1        |
     And I log in as "edteacher1"
-    And I am on "Course 1" course homepage
-    And I add a slot 10 days ahead at 0300 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 10 days ahead at 0300 in "scheduler1" scheduler and I fill the form with:
       | Location     | Office ed1 |
       | studentid[0] | Student 1  |
     And I log out
     And I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I add a slot 10 days ahead at 0400 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 10 days ahead at 0400 in "scheduler1" scheduler and I fill the form with:
       | Location     | Office ne1 |
       | studentid[0] | Student 2  |
     And I log out
     And I log in as "neteacher2"
-    And I am on "Course 1" course homepage
-    And I add a slot 10 days ahead at 0500 in "Test scheduler" scheduler and I fill the form with:
+    And I add a slot 10 days ahead at 0500 in "scheduler1" scheduler and I fill the form with:
       | Location     | Office ne2 |
       | studentid[0] | Student 3  |
     And I log out
 
   @javascript
   Scenario: Editing teachers edit all appointments, nonediting teachers only their own
-    When I log in as "edteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "edteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Student 1" in the "3:00 AM" "table_row"
@@ -73,9 +68,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     Then the field "Attended" matches value "1"
     And I log out
 
-    When I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "neteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Student 1" in the "3:00 AM" "table_row"
@@ -92,11 +85,11 @@ Feature: Teachers can edit other teacher's appointments only by permission
     | Attended | 1 |
     And I click on "Save changes" "button"
     Then the field "Attended" matches value "1"
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    
+    When I am on the "scheduler1" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
-    When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
+    And I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
     Then the "Attended" "checkbox" should be disabled
     And "Notes for appointment (visible to student)" "field" should not exist
     And "Confidential notes (visible to teacher only)" "field" should not exist
@@ -111,9 +104,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
       | mod/scheduler:editallattended | Allow      |
     And I log out
 
-    When I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "neteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Student 1" in the "3:00 AM" "table_row"
@@ -129,8 +120,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     And I click on "Save changes" "button"
     Then the field "Attended" matches value "1"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
     When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
@@ -152,9 +142,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
       | mod/scheduler:editallgrades | Allow      |
     And I log out
 
-    When I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "neteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Student 1" in the "3:00 AM" "table_row"
@@ -170,15 +158,15 @@ Feature: Teachers can edit other teacher's appointments only by permission
     And I click on "Save changes" "button"
     Then the field "Grade" matches value "42"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
-    When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
+    And I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
     Then the "grade" "field" should be enabled
     And the "Attended" "checkbox" should be disabled
     And "Notes for appointment (visible to student)" "field" should not exist
     And "Confidential notes (visible to teacher only)" "field" should not exist
+    
     When I set the following fields to these values:
     | Grade | 33 |
     And I click on "Save changes" "button"
@@ -193,9 +181,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
       | mod/scheduler:editallnotes | Allow      |
     And I log out
 
-    When I log in as "neteacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as "neteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Student 1" in the "3:00 AM" "table_row"
@@ -214,11 +200,10 @@ Feature: Teachers can edit other teacher's appointments only by permission
     Then I should see "notes-vis"
     And I should see "notes-confid"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
-    When I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
+    And I click on "//a[text()='Student 3']" "xpath_element" in the "5:00 AM" "table_row"
     Then "grade" "field" should not exist
     And the "Attended" "checkbox" should be disabled
     And the "Notes for appointment (visible to student)" "field" should be enabled

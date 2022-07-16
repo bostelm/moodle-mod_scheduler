@@ -39,17 +39,15 @@ Feature: As a teacher I need to see an accurate list of users to be scheduled
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   |
       | scheduler | Test scheduler | n     | C1     | scheduler1 |
-    And I log in as "teacher"
-    And I am on "Course 1" course homepage
 
   @javascript
   Scenario: A scheduler that is restricted to a single group
-    When I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as teacher
     Then I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 2" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
 
-    When I navigate to "Edit settings" in current page administration
+    When I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Group" "button" in the "Add restriction..." "dialogue"
@@ -61,12 +59,12 @@ Feature: As a teacher I need to see an accurate list of users to be scheduled
 
   @javascript
   Scenario: A scheduler that is restricted to a grouping
-    When I follow "Test scheduler"
+    When I am on the "scheduler1" Activity page logged in as teacher
     Then I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 2" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
 
-    When I navigate to "Edit settings" in current page administration
+    When I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Grouping" "button" in the "Add restriction..." "dialogue"
