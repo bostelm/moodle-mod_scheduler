@@ -112,7 +112,7 @@ $studselect = $ufields->get_sql('u1', true, 'student', 'studentid', false)->sele
 $teacherselect = $ufields->get_sql('u2', true, '', 'teacherid', false)->selects;
 
 $sql = "SELECT a.id AS id,
-               $studselect,". 
+               $studselect," .
                $DB->sql_fullname('u1.firstname', 'u1.lastname')." AS studentfullname,
                a.appointmentnote,
                a.appointmentnoteformat,

@@ -25,8 +25,6 @@
 
 namespace mod_scheduler\model;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A factory class for scheduler appointments.
  *

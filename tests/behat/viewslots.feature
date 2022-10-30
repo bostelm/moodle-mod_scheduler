@@ -115,7 +115,7 @@ Feature: Students viewing slots available for booking
 
     When I click on "Book slot" "button" in the "4:00 AM" "table_row"
     And I log out
-    
+
     When I am on the "scheduler1" Activity page logged in as "student2"
     Then "Book slot" "button" should exist in the "3:00 AM" "table_row"
     And I should see "4:00 AM" in the "slotbookertable" "table"

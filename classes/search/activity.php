@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\search;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Search area for mod_scheduler activities.
  *

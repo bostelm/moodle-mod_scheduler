@@ -24,10 +24,6 @@
 
 namespace mod_scheduler\model;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-
 /**
  * A class for representing a scheduler appointment.
  *

@@ -3,6 +3,7 @@ YUI.add('moodle-mod_scheduler-studentlist', function (Y, NAME) {
 // ESLint directives.
 /* eslint-disable camelcase */
 
+/* eslint-disable-next-line */
 var CSS = {
     EXPANDED: 'expanded',
     COLLAPSED: 'collapsed'

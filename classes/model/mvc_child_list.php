@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\model;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A list of child records.
  *
@@ -214,5 +212,4 @@ class mvc_child_list {
             $child->delete();
         }
     }
-
 }

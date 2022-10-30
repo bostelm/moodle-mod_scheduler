@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_scheduler slot deleted event.
  *

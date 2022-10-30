@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\model;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A generic MVC model (currently rather empty!).
  *

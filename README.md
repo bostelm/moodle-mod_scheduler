@@ -1,4 +1,12 @@
-Appointment Scheduler for Moodle
+moodle-mod_scheduler
+====================
+
+
+[![Latest Release](https://img.shields.io/github/v/release/bostelm/moodle-mod_scheduler?sort=semver&color=orange)](https://github.com/bostelm/moodle-mod_scheduler/releases)
+[![Moodle Plugin CI](https://github.com/bostelm/moodle-mod_scheduler/workflows/Moodle%20plugin%20CI/badge.svg?branch=master)](https://github.com/bostelm/moodle-mod_scheduler/actions?query=workflow%3A%22Moodle+plugin+CI%22+branch%3Amaster)
+
+Appointment 
+Scheduler for Moodle
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,7 +21,8 @@ GNU General Public License for more details:
 http://www.gnu.org/copyleft/gpl.html
 
 
-=== Description ===
+Description
+-----------
 
 The Scheduler module helps you to schedule appointments with your students. 
 Teachers specify time slots for meetings, students then choose one of them on Moodle.
@@ -21,24 +30,26 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/37/en/Scheduler_module
+    https://docs.moodle.org/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
 
-=== Installation instructions ===
+Installation instructions
+-------------------------
 
 Place the code of the module into the mod/scheduler directory of your Moodle
 directory root. That is, the present file should be located at:
 mod/scheduler/README.txt
 
 For further installation instructions please see:
-    http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
+    https://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
 This module is intended for Moodle 3.7 and above.
 
 
-=== Authors ===
+Authors
+-------
 
 Current maintainer:
  Henning Bostelmann, University of York <henning.bostelmann@york.ac.uk>
@@ -56,15 +67,16 @@ With further contributions taken from:
 * Various authors of the core Moodle code
 
 
-=== Release notes ===
+Release notes
+-------------
 
---- Version 3.7 ---
+### Version 3.7
 
-New features / improvements:
+#### New features / improvements:
 
 Basic support for the completion API (completion on grade)
 
-Feature changes:
+#### Feature changes:
 
 The permissions / capabilities on the teacher side have been altered.
 In particular, teachers now strictly need the capability 
@@ -76,20 +88,19 @@ to edit the grades, the teacher notes, or the attended flag in all appointments
 of all teachers, in the appointment screen only. 
 The configuration setting 'allteachersgrading' is no longer in use.  
 
---- Version 3.5 ---
+### Version 3.5
 
 Intended for Moodle 3.5 and later.
 
-New features / improvements:
+#### New features / improvements:
 
 Support for Moodle's Privacy API.
 
-
---- Version 3.3 ---
+### Version 3.3
 
 Intended for Moodle 3.3 and later.
 
-New features / improvements:
+#### New features / improvements:
 
 Optionally, before making an appointment, students now see a booking screen 
 in which they need to enter text, upload a file, and/or solve a captcha.
@@ -99,7 +110,7 @@ course fullname, and location fields.
 
 Export files can now include custom profile fields of students.
 
-Feature changes:
+#### Feature changes:
 
 For booking in groups, students now need to select explicitly which group
 they are booking for, or whether they want to make an individual booking.
@@ -111,17 +122,17 @@ moodle/site:viewuseridentity is now required.
 When allowing an "unlimited" number of appointments, students will no longer
 be included in reminder e-mails if they have booked at least one slot. 
 
-Refactoring / API changes:
+#### Refactoring / API changes:
 
 The function scheduler_get_user_fields() in customlib.php has changed 
 signature. If you have customized it in an earlier version, you will want 
 to edit your code.
 
---- Version 3.1 ---
+### Version 3.1
 
 Intended for Moodle 3.1 and later.
 
-New features / improvements:
+#### New features / improvements:
 
 An additional "confidential note" field is supplied for appointments;
 the contents can be read by teachers only.
@@ -131,7 +142,7 @@ Slot notes and appointment notes can now contain attachments.
 Students can now be allowed to see existing bookings of other students.
 See https://docs.moodle.org/31/en/Scheduler_Module_capabilities#Student_side
 
-Feature changes:
+#### Feature changes:
 
 Sending of invitations and reminders is no longer handled via a "mailto" link
 but rather via a webform, using Moodle's messaging system.
@@ -139,7 +150,7 @@ but rather via a webform, using Moodle's messaging system.
 The conflict detection feature (when creating new slots) has been reworked slightly.
 See https://docs.moodle.org/31/en/Scheduler:_Conflicts
 
-Refactoring / API changes:
+#### Refactoring / API changes:
 
 All email-related features now use the Messaging API.
 
@@ -148,11 +159,11 @@ the Scheduled Tasks API.
 
 The new Search API is supported for the activity description only.
 
---- Version 2.9 ---
+### Version 2.9
 
 Intended for Moodle 2.9 and later.
 
-New features / improvements:
+#### New features / improvements:
 
 The export screen now allows users to choose the format of the output file,
 as well as the data fields to include in the export. File format may
@@ -164,7 +175,7 @@ show up as such in the scheduler.
 Lists of students to be scheduled now take availability conditions
 (groups and groupings) into account.
 
-Feature changes:
+#### Feature changes:
 
 The handling of "group mode" in Scheduler has changed. The feature of "booking
 entire groups into a slot" is now controlled by a setting "Booking in groups" 
@@ -184,32 +195,32 @@ For using the Overview screen outside the current scheduler, e.g., for displayin
 all slots of a user across the site, users will now need extra permissions;
 see CONTRIB-5750 for details.
 
-Refactoring / API changes:
+#### Refactoring / API changes:
 
 Config settings have been migrated to the config_plugins table.
 
---- Version 2.7 ---
+### Version 2.7
 
 Intended for Moodle 2.7 and later. 
 
-New features:
+#### New features:
 
 Students can now be allowed to book several slots at a time.
 "Volatile slots" replaced with "guard time" - students cannot change their booking
 for slots closer than this time to the current time.
 
-Feature changes:
+#### Feature changes:
 
 "Notes" field will now be shown to students at booking time.
 
-Refactoring / API changes:
+#### Refactoring / API changes:
 
 Major refactoring of teacher view (slot list), student view (booking screen),
 teacher view of individual appointments, as well as of the backend.
 Security enhancements (sessionid parameter now used throughout).
 Adapted to changes in core API and to the new logging/event system (Event 2).
 
---- Version 2.5 ---
+### Version 2.5
 
 Intended for Moodle 2.5 and later. 
 
@@ -217,16 +228,17 @@ Module adapted to API changes Moodle core.
 "Add slot" and "Edit slot" forms refactored, now based on Moodle Forms.
 Language packs migrated to AMOS, removed from plugin codebase.
 
---- Version 2.3 ---
+### Version 2.3
 
 Intended for Moodle 2.3 and later; no major functional changes, but API adapted and minor enhancements.
 
---- Version 2.0 --- 
+### Version 2.0
 
 No major functional changes over 1.9; bug fixes and API migration only. Requires 1.9 for database upgrades.  
 
 
-=== Technical notes ===
+Technical notes
+---------------
 
 The code of this module is rather old, some of it still predates even Moodle 1.9.
 It has now largely, but not completely, been adapted to the new APIs.

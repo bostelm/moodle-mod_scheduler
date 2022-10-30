@@ -68,7 +68,7 @@ class send_reminders extends \core\task\scheduled_task {
             $slotm = $scheduler->get_slot($slot->id);
             $course = $scheduler->get_courserec();
 
-            // Mark as sent. (Do this first for safe fallback in case of an exception.)
+            // Mark as sent (Do this first for safe fallback in case of an exception).
             $slot->emaildate = -1;
             $DB->update_record('scheduler_slots', $slot);
 
@@ -82,5 +82,4 @@ class send_reminders extends \core\task\scheduled_task {
         }
         cron_setup_user();
     }
-
 }

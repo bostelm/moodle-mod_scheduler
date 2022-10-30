@@ -87,8 +87,8 @@ foreach ($schedulers as $scheduler) {
     // Show dimmed if the mod is hidden.
     $attr = $scheduler->visible ? null : array('class' => 'dimmed');
     $link = html_writer::link($url, $scheduler->name, $attr);
-    if ($scheduler->visible or has_capability('moodle/course:viewhiddenactivities', $coursecontext)) {
-        if ($course->format == 'weeks' or $course->format == 'topics') {
+    if ($scheduler->visible || has_capability('moodle/course:viewhiddenactivities', $coursecontext)) {
+        if ($course->format == 'weeks' || $course->format == 'topics') {
             $table->data[] = array ($scheduler->section, $link);
         } else {
             $table->data[] = array ($link);

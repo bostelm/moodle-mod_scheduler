@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_scheduler;
+
 defined('MOODLE_INTERNAL') || die();
 
 use \mod_scheduler\model\scheduler;
@@ -38,7 +40,7 @@ require_once($CFG->dirroot . '/mod/scheduler/locallib.php');
  * @copyright  2019 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_scheduler_permissions_testcase extends advanced_testcase {
+class permissions_test extends \advanced_testcase {
 
     /**
      * @var int Course_modules id used for testing
@@ -148,7 +150,11 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
         }
     }
 
-
+    /**
+     * Tests whether slots can be seen.
+     *
+     * @coversNothing
+     */
     public function test_teacher_can_see_slot() {
 
         // Editing teacher sees all slots.
@@ -177,6 +183,11 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Tests whether slots can be edited.
+     *
+     * @coversNothing
+     */
     public function test_can_edit_slot() {
 
         // Editing teacher can edit all slots.
@@ -205,6 +216,11 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Tests whether own slots can be edited.
+     *
+     * @coversNothing
+     */
     public function test_can_edit_own_slots() {
 
         // Both teachers can edit their own slots.
@@ -221,6 +237,11 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Tests whether slots can be edited.
+     *
+     * @coversNothing
+     */
     public function test_can_edit_all_slots() {
 
         // Editing teachers can edit all slots.
@@ -237,7 +258,11 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
 
     }
 
-
+    /**
+     * Tests whether appointments can be seen.
+     *
+     * @coversNothing
+     */
     public function test_can_see_all_slots() {
 
         // Editing teachers can see all slots.
@@ -258,7 +283,11 @@ class mod_scheduler_permissions_testcase extends advanced_testcase {
 
     }
 
-
+    /**
+     * Test whether appointments can be seen.
+     *
+     * @coversNothing
+     */
     public function test_can_see_appointment() {
 
         // Editing teacher can all appointments.
