@@ -326,14 +326,20 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      * @return string rendered module info
      */
     public function mod_intro($scheduler) {
-        $o = $this->heading(format_string($scheduler->name), 2);
+        global $CFG;
 
-        if (trim(strip_tags($scheduler->intro))) {
-            $o .= $this->box_start('mod_introbox');
-            $o .= format_module_intro('scheduler', $scheduler->get_data(), $scheduler->cmid);
-            $o .= $this->box_end();
+        if ($CFG->branch < 400) {
+            $o = $this->heading(format_string($scheduler->name), 2);
+
+            if (trim(strip_tags($scheduler->intro))) {
+                $o .= $this->box_start('mod_introbox');
+                $o .= format_module_intro('scheduler', $scheduler->get_data(), $scheduler->cmid);
+                $o .= $this->box_end();
+            }
+            return $o;
+        } else {
+            return '';
         }
-        return $o;
     }
 
     /**
