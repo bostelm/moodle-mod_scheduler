@@ -184,13 +184,35 @@ if ($action == 'updateslot') {
         $timeoptions = array('step' => 5, 'optional' => false);
     }
 
-    $actionurl = new moodle_url($baseurl, array('what' => 'updateslot', 'slotid' => $slotid));
+    $actionurl = new moodle_url($baseurl, array('what' => 'updateslot', 'slotid' => $slotid, 'sesskey' => sesskey()));
+
+    // Paging.
+    $appointmentsperpage = get_config('mod_scheduler', 'appointmentsperpage');
+
+    global $DB;
+    $appointments = $DB->count_records('scheduler_appointment', array('slotid' => $slotid));
+
+    $pagesize = $appointmentsperpage;
+    if ($offset == -1) {
+        if ($appointments > $pagesize) {
+            $offset = floor($appointments / $pagesize);
+        } else {
+            $offset = 0;
+        }
+    }
+    if ($offset * $pagesize >= $appointments && $appointments > 0) {
+        $offset = floor(($appointments - 1) / $pagesize);
+    }
 
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array(
             'slotid' => $slotid,
-            'timeoptions' => $timeoptions)
+            'scheduler' => $scheduler->id,
+            'timeoptions' => $timeoptions,
+            'repeats' => $appointmentsperpage,
+            'offset' => $offset)
         );
-    $data = $mform->prepare_formdata($slot);
+    $data = $mform->prepare_formdata($slot, $offset);
+
     $mform->set_data($data);
 
     if ($mform->is_cancelled()) {
@@ -204,7 +226,13 @@ if ($action == 'updateslot') {
     } else {
         echo $output->header();
         echo $output->heading(get_string('updatesingleslot', 'scheduler'));
+
         $mform->display();
+
+        if (!empty($appointmentsperpage)) {
+            echo $output->paging_bar($appointments, $offset, $appointmentsperpage, $actionurl, 'offset');
+        }
+
         echo $output->footer($course);
         die;
     }
@@ -637,7 +665,7 @@ if ($students === 0) {
 
             $groupcnt = 0;
             foreach ($groupsicanschedule as $group) {
-                $members = groups_get_members($group->id, 'u.*', 'u.lastname, u.firstname');
+                $members = groups_get_members($group->id, user_picture::fields('u'), 'u.lastname, u.firstname');
                 if (empty($members)) {
                     continue;
                 }
