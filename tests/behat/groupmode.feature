@@ -256,11 +256,11 @@ Feature: Users can only see their own groups if the scheduler is in group mode
   @javascript
   Scenario: Students can see slots available to their own groups, or a slots if group mode is off
     When I log in as "student1"
-  
+
     When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    
+
     When I am on the "schedulerVis" Activity page
     Then I should see "Editingteacher 1"
     And I should not see "Nonedteacher 1"
@@ -275,7 +275,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
- 
+
     When I am on the "schedulerVis" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
@@ -286,11 +286,11 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I log out
 
     When I log in as "student5"
-    
+
     When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"
-    
+
     When I am on the "schedulerVis" Activity page
     Then I should see "No slots are available"
 
@@ -299,7 +299,7 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I log out
 
     When I log in as "student6"
-    
+
     When I am on the "schedulerNone" Activity page
     Then I should see "Editingteacher 1"
     And I should see "Nonedteacher 1"

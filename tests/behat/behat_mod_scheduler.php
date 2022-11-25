@@ -140,7 +140,7 @@ class behat_mod_scheduler extends behat_base {
                             array('user', 'role'),
                             array('globalmanager1', 'manager')
                         )) ) );
-                        
+
         $this->execute('behat_auth::i_log_in_as', 'globalmanager1');
         $this->execute('behat_general::i_am_on_site_homepage');
         $this->execute('behat_navigation::i_turn_editing_mode_on');
@@ -169,7 +169,8 @@ class behat_mod_scheduler extends behat_base {
         $downarrowtarget = "(//span[contains(@class,'form-autocomplete-downarrow')])[$listnumber]";
         $this->execute('behat_general::i_click_on', [$downarrowtarget, 'xpath_element']);
 
-         $xpathtarget = "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|" . $item . "|')])[$listnumber]"; 
+         $xpathtarget = "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|" . $item .
+             "|')])[$listnumber]";
          $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
     }
 }

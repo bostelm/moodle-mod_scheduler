@@ -22,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Scheduler module PHPUnit data generator class
  *
@@ -90,7 +88,8 @@ class mod_scheduler_generator extends testing_module_generator {
                 $slot->schedulerid = $id;
                 $slot->starttime = $time;
                 $slot->duration = 10;
-                $slot->teacherid = isset($options['slotteachers'][$slotkey]) ? $options['slotteachers'][$slotkey] : 2; // Admin user as default.
+                $slot->teacherid = isset($options['slotteachers'][$slotkey]) ?
+                    $options['slotteachers'][$slotkey] : 2; // Admin user as default.
                 $slot->appointmentlocation = 'Test Loc';
                 $slot->timemodified = time();
                 $slot->notes = '';

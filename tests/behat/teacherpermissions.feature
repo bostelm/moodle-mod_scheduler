@@ -85,7 +85,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     | Attended | 1 |
     And I click on "Save changes" "button"
     Then the field "Attended" matches value "1"
-    
+
     When I am on the "scheduler1" Activity page
     And I follow "Statistics"
     And I follow "All appointments"
@@ -166,7 +166,7 @@ Feature: Teachers can edit other teacher's appointments only by permission
     And the "Attended" "checkbox" should be disabled
     And "Notes for appointment (visible to student)" "field" should not exist
     And "Confidential notes (visible to teacher only)" "field" should not exist
-    
+
     When I set the following fields to these values:
     | Grade | 33 |
     And I click on "Save changes" "button"

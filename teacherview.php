@@ -45,8 +45,8 @@ function scheduler_print_schedulebox(scheduler $scheduler, $studentid, $groupid 
         $startdatecnv = $output->userdate($slot->starttime);
         $starttimecnv = $output->usertime($slot->starttime);
 
-        $startdatestr = ($startdatemem != '' and $startdatemem == $startdatecnv) ? "-----------------" : $startdatecnv;
-        $starttimestr = ($starttimemem != '' and $starttimemem == $starttimecnv) ? '' : $starttimecnv;
+        $startdatestr = ($startdatemem != '' && $startdatemem == $startdatecnv) ? "-----------------" : $startdatecnv;
+        $starttimestr = ($starttimemem != '' && $starttimemem == $starttimecnv) ? '' : $starttimecnv;
 
         $startdatemem = $startdatecnv;
         $starttimemem = $starttimecnv;
@@ -148,7 +148,7 @@ if ($action == 'addslot') {
     $actionurl = new moodle_url($baseurl, array('what' => 'addslot'));
 
     if (!$scheduler->has_available_teachers()) {
-        print_error('needteachers', 'scheduler', viewurl);
+        throw new moodle_exception('needteachers', 'scheduler', viewurl);
     }
 
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee);
@@ -218,7 +218,7 @@ if ($action == 'addsession') {
     $actionurl = new moodle_url($baseurl, array('what' => 'addsession'));
 
     if (!$scheduler->has_available_teachers()) {
-        print_error('needteachers', 'scheduler', $viewurl);
+        throw new moodle_exception('needteachers', 'scheduler', $viewurl);
     }
 
     $mform = new scheduler_addsession_form($actionurl, $scheduler, $cm, $groupsicansee);

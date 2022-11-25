@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\model;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * An abstract factory class for loading records from the database.
  *
@@ -39,7 +37,7 @@ abstract class mvc_model_factory {
      *
      * @return mvc_model
      */
-    public abstract function create();
+    abstract public function create();
 
     /**
      * Create a new record by loading it from the database.

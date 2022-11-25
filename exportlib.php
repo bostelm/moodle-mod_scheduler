@@ -69,7 +69,7 @@ abstract class scheduler_export_field {
     /**
      * Retrieve the unique id (a string) for this field
      */
-    public abstract function get_id();
+    abstract public function get_id();
 
     /**
      * Retrieve the group that this field belongs to -
@@ -77,7 +77,7 @@ abstract class scheduler_export_field {
      *
      * @return string the group id as above
      */
-    public abstract function get_group();
+    abstract public function get_group();
 
     /**
      * Retrieve the header (in the sense of table header in the output)
@@ -149,7 +149,7 @@ abstract class scheduler_export_field {
      * @param mixed $appointment the appointment to evaluate (may be null for an empty slot)
      * @return string the value of this field for the given data
      */
-    public abstract function get_value(slot $slot, $appointment);
+    abstract public function get_value(slot $slot, $appointment);
 
     /**
      * Retrieve the value of this field as an array.
@@ -1328,7 +1328,7 @@ abstract class scheduler_canvas {
      *
      * @param mixed $title the title of the page
      */
-    public abstract function start_page($title);
+    abstract public function start_page($title);
 
     /**
      * Write a string into a certain position of the canvas.
@@ -1338,7 +1338,7 @@ abstract class scheduler_canvas {
      * @param mixed $str the string to write
      * @param mixed $format the format to use (one of the $format... fields of this object), can be null
      */
-    public abstract function write_string($row, $col, $str, $format);
+    abstract public function write_string($row, $col, $str, $format);
 
     /**
      * Write a number into a certain position of the canvas.
@@ -1348,7 +1348,7 @@ abstract class scheduler_canvas {
      * @param mixed $num the number to write
      * @param mixed $format the format to use (one of the $format... fields of this object), can be null
      */
-    public abstract function write_number($row, $col, $num, $format);
+    abstract public function write_number($row, $col, $num, $format);
 
     /**
      * Merge a range of cells in the same row.
@@ -1357,7 +1357,7 @@ abstract class scheduler_canvas {
      * @param mixed $fromcol the first column to merge
      * @param mixed $tocol the last column to merge
      */
-    public abstract function merge_cells($row, $fromcol, $tocol);
+    abstract public function merge_cells($row, $fromcol, $tocol);
 
     /**
      * Set the width of a particular column. (This will make sense only for certain outout formats,
@@ -1391,7 +1391,7 @@ abstract class scheduler_canvas {
      *
      * @param string $filename the file name to send
      */
-    public abstract function send($filename);
+    abstract public function send($filename);
 
 }
 

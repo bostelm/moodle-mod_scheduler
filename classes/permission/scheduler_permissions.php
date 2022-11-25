@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\permission;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The base class for controllers.
  *

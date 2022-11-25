@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Scheduled background task for sending automated appointment reminders
  *

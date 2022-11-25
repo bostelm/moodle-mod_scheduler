@@ -267,7 +267,7 @@ function scheduler_scale_used($cmid, $scaleid) {
 function scheduler_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if ($scaleid and $DB->record_exists('scheduler', array('scale' => -$scaleid))) {
+    if ($scaleid && $DB->record_exists('scheduler', array('scale' => -$scaleid))) {
         return true;
     } else {
         return false;
@@ -719,7 +719,7 @@ function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
     $fullpath = "/$context->id/mod_scheduler/$filearea/$entryid/$relativepath";
 
     $fs = get_file_storage();
-    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
         return false;
     }
 

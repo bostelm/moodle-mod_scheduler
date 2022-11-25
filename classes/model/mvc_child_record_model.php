@@ -24,8 +24,6 @@
 
 namespace mod_scheduler\model;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A model mirroring one datebase record which as a "parent-child" relationship to a record in another table.
  *

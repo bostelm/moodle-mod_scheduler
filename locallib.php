@@ -64,8 +64,8 @@ function scheduler_delete_calendar_events($slot) {
  *
  * @uses $CFG
  * @uses $USER
- * @param user $user A {@link $USER} object representing a user
- * @param course $course A {@link $COURSE} object representing a course
+ * @param user $user A {@see $USER} object representing a user
+ * @param course $course A {@see $COURSE} object representing a course
  * @param bool $messageselect whether to include a checkbox to select the user
  * @param bool $return whether the HTML fragment is to be returned as a string (otherwise printed)
  * @return string HTML fragment, if so selected
@@ -128,7 +128,7 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
     $output .= '<td class="content">';
     $output .= '<div class="username">'.fullname($user, has_capability('moodle/site:viewfullnames', $context)).'</div>';
     $output .= '<div class="info">';
-    if (!empty($user->role) and ($user->role <> $course->teacher)) {
+    if (!empty($user->role) && ($user->role <> $course->teacher)) {
         $output .= $string->role .': '. $user->role .'<br />';
     }
 
@@ -151,13 +151,13 @@ function scheduler_print_user($user, $course, $messageselect=false, $return=fals
         $output .= '<a href="'.$CFG->wwwroot.'/blog/index.php?userid='.$user->id.'">'.get_string('blogs', 'blog').'</a><br />';
     }
     // Link to notes.
-    if (!empty($CFG->enablenotes) and (has_capability('moodle/notes:manage', $context)
+    if (!empty($CFG->enablenotes) && (has_capability('moodle/notes:manage', $context)
             || has_capability('moodle/notes:view', $context))) {
         $output .= '<a href="'.$CFG->wwwroot.'/notes/index.php?course=' . $course->id. '&amp;user='.$user->id.'">'.
                     get_string('notes', 'notes').'</a><br />';
     }
 
-    if (has_capability('moodle/site:viewreports', $context) or
+    if (has_capability('moodle/site:viewreports', $context) ||
             has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
         $output .= '<a href="'. $CFG->wwwroot .'/course/user.php?id='. $course->id .'&amp;user='. $user->id .'">'.
                     $string->activity .'</a><br />';
