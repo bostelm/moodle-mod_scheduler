@@ -1043,7 +1043,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         if ($ai->showresult) {
             if ($ai->scheduler->uses_appointmentnotes() && $ai->appointment->appointmentnote) {
                 $row = new html_table_row();
-                $cell1 = new html_table_cell(get_string('appointmentnotes', 'scheduler'));
+                $cell1 = new html_table_cell(get_string('appointmentnote', 'scheduler'));
                 $note = $this->format_notes($ai->appointment->appointmentnote, $ai->appointment->appointmentnoteformat,
                                             $ai->scheduler->get_context(), 'appointmentnote', $ai->appointment->id);
                 $cell2 = new html_table_cell($note);
