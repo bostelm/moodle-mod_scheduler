@@ -320,23 +320,6 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
 
     /**
-     * Render the module introduction of a scheduler.
-     *
-     * @param scheduler $scheduler the scheduler in question
-     * @return string rendered module info
-     */
-    public function mod_intro($scheduler) {
-        $o = $this->heading(format_string($scheduler->name), 2);
-
-        if (trim(strip_tags($scheduler->intro))) {
-            $o .= $this->box_start('mod_introbox');
-            $o .= format_module_intro('scheduler', $scheduler->get_data(), $scheduler->cmid);
-            $o .= $this->box_end();
-        }
-        return $o;
-    }
-
-    /**
      * Construct a tab header in the teacher view.
      *
      * @param moodle_url $baseurl

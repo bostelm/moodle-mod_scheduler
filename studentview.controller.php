@@ -164,7 +164,6 @@ if ($action == 'bookingform') {
 
         echo $output->header();
         echo $output->heading(get_string('bookaslot', 'scheduler'));
-        echo $output->box(format_text($scheduler->intro, $scheduler->introformat));
 
         $info = scheduler_appointment_info::make_from_slot($slot, true, true, $groupinfo);
         echo $output->render($info);
@@ -210,7 +209,6 @@ if ($action == 'viewbooking') {
 
     echo $output->header();
     echo $output->heading(get_string('bookingdetails', 'scheduler'));
-    echo $output->mod_intro($scheduler);
     $info = scheduler_appointment_info::make_from_appointment($slot, $appointment);
     echo $output->render($info);
 

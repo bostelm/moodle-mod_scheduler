@@ -63,9 +63,6 @@ require_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
 echo $output->header();
 
-// Print intro.
-echo $output->mod_intro($scheduler);
-
 
 $showowngrades = $scheduler->uses_grades();
 // Print total grade (if any).

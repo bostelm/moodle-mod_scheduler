@@ -422,9 +422,6 @@ if ($groupmode) {
     }
 }
 
-// Print intro.
-echo $output->mod_intro($scheduler);
-
 
 if ($subpage == 'allappointments') {
     $teacherid = 0;
