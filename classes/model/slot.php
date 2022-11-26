@@ -332,10 +332,10 @@ class slot extends mvc_child_record_model {
     }
 
 
-    /* 
+    /*
      * The event code is SSstu (for a student event) or SSsup (for a teacher event).
      * then the id of the scheduler slot that it belongs to,
-     * in a colon delimited string. 
+     * in a colon delimited string.
      * This allows for slot ids of at most 14 digits.
      */
 

@@ -56,6 +56,9 @@ function scheduler_migrate_groupmode($sid) {
 
 /**
  * Migrate event type settings to new 4.1 conventions
+ *
+ * @param string $prefix The prefix
+ * @throws dml_exception
  */
 function scheduler_migrate_eventtype($prefix) {
     global $DB;
@@ -356,10 +359,10 @@ function xmldb_scheduler_upgrade($oldversion=0) {
     /* ******************* 4.1 upgrade line ********************** */
 
     if ($oldversion < 2022120200) {
-        // Migrate eventtype field in the events table to shorter format
+        // Migrate eventtype field in the events table to shorter format.
         scheduler_migrate_eventtype('SSstu');
         scheduler_migrate_eventtype('SSsup');
-    
+
         // Scheduler savepoint reached.
         upgrade_mod_savepoint(true, 2022120200, 'scheduler');
     }
