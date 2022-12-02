@@ -40,14 +40,8 @@ require_once(dirname(__FILE__).'/customlib.php');
 function scheduler_delete_calendar_events($slot) {
     global $DB;
 
-    $scheduler = $DB->get_record('scheduler', array('id' => $slot->schedulerid));
-
-    if (!$scheduler) {
-        return false;
-    }
-
-    $teachereventtype = "SSsup:{$slot->id}:{$scheduler->course}";
-    $studenteventtype = "SSstu:{$slot->id}:{$scheduler->course}";
+    $teachereventtype = "SSsup:{$slot->id}";
+    $studenteventtype = "SSstu:{$slot->id}";
 
     $teacherdeletionsuccess = $DB->delete_records('event', array('eventtype' => $teachereventtype));
     $studentdeletionsuccess = $DB->delete_records('event', array('eventtype' => $studenteventtype));

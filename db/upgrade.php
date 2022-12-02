@@ -55,6 +55,23 @@ function scheduler_migrate_groupmode($sid) {
 }
 
 /**
+ * Migrate event type settings to new 4.1 conventions
+ */
+function scheduler_migrate_eventtype($prefix) {
+    global $DB;
+    $rs = $DB->get_recordset_sql('SELECT * FROM {event} WHERE eventtype LIKE ?', ["$prefix:%"]);
+    foreach ($rs as $record) {
+        $parts = explode(':', $record->eventtype, 3);
+        if (count($parts) > 2) {
+            $record->eventtype = $parts[0].":".$parts[1];
+            $DB->update_record('event', $record);
+        }
+    }
+    $rs->close();
+}
+
+
+/**
  * This function does anything necessary to upgrade older versions to match current functionality.
  *
  * @param int $oldversion version number to be migrated from
@@ -335,5 +352,17 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         // Scheduler savepoint reached.
         upgrade_mod_savepoint(true, 2017040100, 'scheduler');
     }
+
+    /* ******************* 4.1 upgrade line ********************** */
+
+    if ($oldversion < 2022120200) {
+        // Migrate eventtype field in the events table to shorter format
+        scheduler_migrate_eventtype('SSstu');
+        scheduler_migrate_eventtype('SSsup');
+    
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2022120200, 'scheduler');
+    }
+
     return true;
 }
