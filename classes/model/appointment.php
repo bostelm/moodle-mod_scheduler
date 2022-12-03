@@ -24,6 +24,9 @@
 
 namespace mod_scheduler\model;
 
+// lib.php needed for grade functionality
+require_once($CFG->dirroot.'/mod/scheduler/lib.php');
+
 /**
  * A class for representing a scheduler appointment.
  *
