@@ -54,8 +54,8 @@ function scheduler_action_doaddsession($scheduler, $formdata, moodle_url $return
     if ($data->divide) {
         $slot->duration = $data->duration;
     } else {
-        $slot->duration = $data->endhour * 60 + $data->endminute - $data->starthour * 60 - $data->startminute;
-    };
+        $slot->duration = max(1, $data->endhour * 60 + $data->endminute - $data->starthour * 60 - $data->startminute);
+    }
     $slot->notes = '';
     $slot->notesformat = FORMAT_HTML;
     $slot->timemodified = time();

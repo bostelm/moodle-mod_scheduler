@@ -338,6 +338,7 @@ $string['myself'] = 'Myself';
 $string['name'] = 'Scheduler name';
 $string['needteachers'] = 'Slots cannot be added as this course has no teachers';
 $string['negativerange'] = 'Range is negative. This can\'t be.';
+$string['negativetimerange'] = 'End time must be later than start time.';
 $string['never'] = 'Never';
 $string['nfiles'] = '{$a} files';
 $string['noappointments'] = 'No appointments';

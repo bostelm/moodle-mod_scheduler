@@ -639,11 +639,11 @@ class scheduler_addsession_form extends scheduler_slotform_base {
             }
         }
 
-        // Time range is negative.
+        // Time range is not positive.
         $starttime = $data['starthour'] * 60 + $data['startminute'];
         $endtime = $data['endhour'] * 60 + $data['endminute'];
-        if ($starttime > $endtime) {
-            $errors['timerange'] = get_string('negativerange', 'scheduler');
+        if ($starttime >= $endtime) {
+            $errors['timerange'] = get_string('negativetimerange', 'scheduler');
         }
 
         // First slot is in the past.
