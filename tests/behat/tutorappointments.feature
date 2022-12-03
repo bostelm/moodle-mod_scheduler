@@ -59,7 +59,6 @@ Feature: Booking of appointments with individual tutors per group
       | scheduler | Tutor sessions | n     | C1     | scheduler1 | 1         | oneonly       | 0           |
     And I add the upcoming events block globally
 
-  @javascript
   Scenario: A tutor adds slots, and students book them
     When I log in as "tutor2"
     And I add 10 slots 5 days ahead in "scheduler1" scheduler and I fill the form with:
@@ -97,7 +96,6 @@ Feature: Booking of appointments with individual tutors per group
     And I should not see "students still need to make an appointment"
     And I log out
 
-  @javascript
   Scenario: Several tutors add slots, they can be seen only by relevant users
     When I log in as "coor1"
     And I add 10 slots 5 days ahead in "scheduler1" scheduler and I fill the form with:

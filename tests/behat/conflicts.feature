@@ -27,7 +27,6 @@ Feature: Teachers are warned about scheduling conflicts
       | scheduler | Test scheduler A | n     | C1     | schedulerA | 0         | oneonly       | 1           |
       | scheduler | Test scheduler B | n     | C1     | schedulerB | 0         | oneonly       | 1           |
 
-  @javascript
   Scenario: A teacher edits a single slot and is warned about conflicts
 
     Given I log in as "teacher1"
@@ -65,7 +64,6 @@ Feature: Teachers are warned about scheduling conflicts
     And "9:55 AM" "table_row" should exist
     And I log out
 
-  @javascript
   Scenario: A manager edits slots for several teachers, creating conflicts
 
     Given I log in as "manager1"
