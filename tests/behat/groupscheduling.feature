@@ -104,7 +104,6 @@ Feature: Entire groups can be booked into slots at once
     And I should not see "Group B1" in the "groupstoschedule" "table"
     And I should not see "Group B2" in the "groupstoschedule" "table"
 
-  @javascript
   Scenario: Students can book their entire group into a slot
     Given I am logged in as edteacher1
     And I add 8 slots 5 days ahead in "schedulerNone" scheduler and I fill the form with:
@@ -122,7 +121,7 @@ Feature: Entire groups can be booked into slots at once
     And the "appointgroup" select box should not contain "Group A2"
     And the "appointgroup" select box should not contain "Group B2"
 
-    When I set the field "appointgroup" to "Group A1"
+    When I select "Group A1" from the "appointgroup" singleselect
     And I click on "Book slot" "button" in the "8:00 AM" "table_row"
     Then I should see "8:00 AM" in the "Large office" "table_row"
     And I log out

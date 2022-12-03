@@ -74,7 +74,6 @@ Feature: Users can only see their own groups if the scheduler is in group mode
       | Location  | There |
     And I log out
 
-  @javascript
   Scenario: Editing teachers can see all slots and all groups
     When I am on the "schedulerNone" Activity page logged in as "edteacher1"
     And I follow "Statistics"
@@ -90,21 +89,21 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Visible groups"
-    And the "group" select box should contain "All participants"
-    And the "group" select box should contain "Group A"
-    And the "group" select box should contain "Group B"
-    And the "group" select box should contain "Group C"
-    And the "group" select box should contain "Group D"
-    When I set the field "group" to "All participants"
+    And the "Visible groups" select box should contain "All participants"
+    And the "Visible groups" select box should contain "Group A"
+    And the "Visible groups" select box should contain "Group B"
+    And the "Visible groups" select box should contain "Group C"
+    And the "Visible groups" select box should contain "Group D"
+    When I select "All participants" from the "Visible groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group A"
+    When I select "Group A" from the "Visible groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should not see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group B"
+    When I select "Group B" from the "Visible groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group C"
+    When I select "Group C" from the "Visible groups" singleselect
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
@@ -112,33 +111,33 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I follow "Statistics"
     And I follow "All appointments"
     Then I should see "Separate groups"
-    And the "group" select box should contain "All participants"
-    And the "group" select box should contain "Group A"
-    And the "group" select box should contain "Group B"
-    And the "group" select box should contain "Group C"
-    And the "group" select box should contain "Group D"
-    When I set the field "group" to "All participants"
+    And the "Separate groups" select box should contain "All participants"
+    And the "Separate groups" select box should contain "Group A"
+    And the "Separate groups" select box should contain "Group B"
+    And the "Separate groups" select box should contain "Group C"
+    And the "Separate groups" select box should contain "Group D"
+    When I select "All participants" from the "Separate groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
     And I should see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
     And I should see "Student 5" in the "studentstoschedule" "table"
     And I should see "Student 6" in the "studentstoschedule" "table"
-    When I set the field "group" to "Group A"
+    When I select "Group A" from the "Separate groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should not see "Nonedteacher 1" in the "slotmanager" "table"
     And I should see "Student 1" in the "studentstoschedule" "table"
     And I should not see "Student 3" in the "studentstoschedule" "table"
     And I should not see "Student 5" in the "studentstoschedule" "table"
     And I should not see "Student 6" in the "studentstoschedule" "table"
-    When I set the field "group" to "Group B"
+    When I select "Group B" from the "Separate groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
     And I should not see "Student 1" in the "studentstoschedule" "table"
     And I should see "Student 3" in the "studentstoschedule" "table"
     And I should not see "Student 5" in the "studentstoschedule" "table"
     And I should not see "Student 6" in the "studentstoschedule" "table"
-    When I set the field "group" to "Group C"
+    When I select "Group C" from the "Separate groups" singleselect
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
@@ -156,7 +155,6 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should not see "Student 6" in the "studentstoschedule" "table"
     And I log out
 
-  @javascript
   Scenario: Nonediting teachers can see groups only if allowed by the group mode
 
     When I am on the "schedulerNone" Activity page logged in as neteacher1
@@ -173,21 +171,21 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should see "2 students still need to make an appointment"
     When I follow "All appointments"
     Then I should see "Visible groups"
-    And the "group" select box should contain "All participants"
-    And the "group" select box should contain "Group A"
-    And the "group" select box should contain "Group B"
-    And the "group" select box should contain "Group C"
-    And the "group" select box should contain "Group D"
-    When I set the field "group" to "All participants"
+    And the "Visible groups" select box should contain "All participants"
+    And the "Visible groups" select box should contain "Group A"
+    And the "Visible groups" select box should contain "Group B"
+    And the "Visible groups" select box should contain "Group C"
+    And the "Visible groups" select box should contain "Group D"
+    When I select "All participants" from the "Visible groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group A"
+    When I select "Group A" from the "Visible groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should not see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group B"
+    When I select "Group B" from the "Visible groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group C"
+    When I select "Group C" from the "Visible groups" singleselect
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
@@ -197,19 +195,19 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should see "2 students still need to make an appointment"
     When I follow "All appointments"
     Then I should see "Separate groups"
-    And the "group" select box should not contain "All participants"
-    And the "group" select box should not contain "Group A"
-    And the "group" select box should contain "Group B"
-    And the "group" select box should contain "Group C"
-    And the "group" select box should not contain "Group D"
-    When I set the field "group" to "Group B"
+    And the "Separate groups" select box should not contain "All participants"
+    And the "Separate groups" select box should not contain "Group A"
+    And the "Separate groups" select box should contain "Group B"
+    And the "Separate groups" select box should contain "Group C"
+    And the "Separate groups" select box should not contain "Group D"
+    When I select "Group B" from the "Separate groups" singleselect
     Then I should see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
-    When I set the field "group" to "Group C"
+    When I select "Group C" from the "Separate groups" singleselect
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
-    When I set the field "group" to "Group B"
+    When I select "Group B" from the "Separate groups" singleselect
     And I click on "Edit" "link_or_button" in the "Nonedteacher 1" "table_row"
     Then I should see "Appointment 1"
     And "Student 1" "option" should not exist in the "studentid[0]" "field"
@@ -253,7 +251,6 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     And I should see "Group mode: Separate groups"
     And I should see "students cannot book appointments with you"
 
-  @javascript
   Scenario: Students can see slots available to their own groups, or a slots if group mode is off
     When I log in as "student1"
 
@@ -311,7 +308,6 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should see "No slots are available"
     And I log out
 
-  @javascript
   Scenario: Students can see slots available to their own groups in forced group mode
     When I log in as "edteacher1"
     And I am on "Course 1" course homepage

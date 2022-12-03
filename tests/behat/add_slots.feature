@@ -26,7 +26,6 @@ Feature: Teacher can add slots to a scheduler activity
       | activity  | name           | intro | course | idnumber   |
       | scheduler | Test scheduler | n     | C1     | scheduler1 |
 
-  @javascript
   Scenario: Teacher adds a single, empty slot to the scheduler
     When I am on the "scheduler1" Activity page logged in as teacher1
     And I click on "Add slots" "link"
@@ -40,7 +39,6 @@ Feature: Teacher can add slots to a scheduler activity
     Then I should see "1 slot added"
     And I should see "Friday, 1 April 2050"
 
-  @javascript
   Scenario: Teacher enters invalid values when adding a slot
     When I am on the "scheduler1" Activity page logged in as teacher1
     And I click on "Add slots" "link"
@@ -91,7 +89,6 @@ Feature: Teacher can add slots to a scheduler activity
     And I should see "Student 2"
     And I should see "Student 3"
 
-  @javascript
   Scenario: Teacher creates 10 slots at once
     When I log in as "teacher1"
     And I add 10 slots 5 days ahead in "scheduler1" scheduler and I fill the form with:
