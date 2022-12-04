@@ -119,4 +119,32 @@ class mod_scheduler_generator extends testing_module_generator {
 
         return $modinst;
     }
+
+    /**
+     * Create a scheduler slot, optionally with appointment for one student`.
+     *
+     * @param array $data
+     */
+    public function create_slot(array $data): void {
+
+        $scheduler = \mod_scheduler\model\scheduler::load_by_coursemodule_id($data['schedulerid']);
+
+        $slot = new \mod_scheduler\model\slot($scheduler);
+        $slot->teacherid = $data['teacherid'];
+        $slot->starttime = $data['starttime'];
+        $slot->duration = $data['duration'];
+        $slot->appointmentlocation = isset($data['location']) ? $data['location'] : '';
+        $slot->exclusivity = isset($data['exclusivity']) ? $data['exclusivity'] : 1;
+        $slot->hideuntil = isset($data['hideuntil']) ? $data['hideuntil'] : 0;
+
+        if (isset($data['studentid']) && $data['studentid'] > 0) {
+            $app = $slot->create_appointment();
+            $app->studentid = $data['studentid'];
+            $app->seen = isset($data['seen']) ? $data['seen'] : 0;
+            $app->grade = isset($data['grade']) ? $data['grade'] : -1;
+        }
+
+        $slot->save();
+    }
+
 }

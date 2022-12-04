@@ -40,7 +40,8 @@ class behat_mod_scheduler extends behat_base {
     /**
      * Adds a series of slots to the scheduler
      *
-     * @Given /^I add a slot (\d+) days ahead at (\d+) in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler and I fill the form with:$/
+     * @Given /^I add a slot (\d+) days ahead at (\d+) in "(?P<activityname_string>(?:[^"]|\\")*)" scheduler
+     * and I fill the form with:$/
      *
      * @param int $daysahead
      * @param int $time

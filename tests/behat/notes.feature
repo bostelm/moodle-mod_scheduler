@@ -21,12 +21,12 @@ Feature: Teachers can write notes on slots and appointments
     And the following "activities" exist:
       | activity  | name               | intro | course | idnumber   | usenotes |
       | scheduler | Test scheduler     | n     | C1     | scheduler1 | 3        |
-    And I log in as "edteacher1"
-    And I add 5 slots 10 days ahead in "scheduler1" scheduler and I fill the form with:
-      | Location  | Here |
-    And I log out
+    And the following "mod_scheduler > slots" exist:
+      | scheduler  | starttime        | duration | teacher     | location |
+      | scheduler1 | ##tomorrow 3am## | 45       | edteacher1  | Here     |
+      | scheduler1 | ##tomorrow 4am## | 45       | edteacher1  | Here     |
+      | scheduler1 | ##tomorrow 5am## | 45       | edteacher1  | Here     |
 
-  @javascript
   Scenario: Teachers can enter slot notes and appointment notes for others to see
     When I am on the "scheduler1" Activity page logged in as "edteacher1"
     And I follow "Statistics"
@@ -49,7 +49,7 @@ Feature: Teachers can write notes on slots and appointments
     When I am on the "scheduler1" Activity page logged in as "edteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
-    And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
+    And I click on "Student 1" "text" in the "4:00 AM" "table_row"
     Then I should see ", 4:00 AM" in the "Date and time" "table_row"
     And I should see "4:45 AM" in the "Date and time" "table_row"
     And I should see "Editingteacher 1" in the "Teacher" "table_row"
@@ -68,7 +68,6 @@ Feature: Teachers can write notes on slots and appointments
     And I should not see "note-confidential"
     And I log out
 
-  @javascript
   Scenario: Teachers see only the comments fields specified in the configuration
 
     When I am on the "scheduler1" Activity page logged in as "student1"
@@ -79,7 +78,7 @@ Feature: Teachers can write notes on slots and appointments
     When I am on the "scheduler1" Activity page logged in as "edteacher1"
     And I follow "Statistics"
     And I follow "All appointments"
-    And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
+    And I click on "Student 1" "text" in the "4:00 AM" "table_row"
     And I set the following fields to these values:
       | Notes for appointment (visible to student) | note-for-appointment |
       | Confidential notes (visible to teacher only) | note-confidential |
@@ -108,7 +107,7 @@ Feature: Teachers can write notes on slots and appointments
     And I navigate to "Settings" in current page administration
     And I set the field "Use notes for appointments" to "1"
     And I click on "Save and display" "button"
-    And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
+    And I click on "Student 1" "text" in the "4:00 AM" "table_row"
     Then I should see "Notes for appointment"
     And I should see "note-for-appointment"
     And I should not see "Confidential notes"
@@ -125,7 +124,7 @@ Feature: Teachers can write notes on slots and appointments
     And I navigate to "Settings" in current page administration
     And I set the field "Use notes for appointments" to "2"
     And I click on "Save and display" "button"
-    And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
+    And I click on "Student 1" "text" in the "4:00 AM" "table_row"
     Then I should not see "Notes for appointment"
     And I should not see "note-for-appointment"
     And I should see "Confidential notes"
@@ -142,7 +141,7 @@ Feature: Teachers can write notes on slots and appointments
     And I navigate to "Settings" in current page administration
     And I set the field "Use notes for appointments" to "3"
     And I click on "Save and display" "button"
-    And I click on "//a[text()='Student 1']" "xpath_element" in the "4:00 AM" "table_row"
+    And I click on "Student 1" "text" in the "4:00 AM" "table_row"
     Then I should see "Notes for appointment"
     And I should see "note-for-appointment"
     And I should see "Confidential notes"

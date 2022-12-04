@@ -27,37 +27,25 @@ Feature: Students viewing slots available for booking
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   | groupmode | schedulermode | maxbookings | guardtime |
       | scheduler | Test scheduler | n     | C1     | scheduler1 | 0         | oneonly       | 1           | 172800    |
-    And I log in as "teacher1"
+    And the following "mod_scheduler > slots" exist:
+      | scheduler  | starttime            | duration | teacher   | exclusivity | student  | hideuntil       |
     # Slot 1 is available to only 1 student and is not yet booked
-    And I add a slot 5 days ahead at 0100 in "scheduler1" scheduler and I fill the form with:
-      | exclusivity | 1 |
+      | scheduler1 | ##+5 days 1:00am##    | 45       | teacher1  | 1           |          |                 |
     # Slot 2 is available to only 1 student and is already booked
-    And I add a slot 5 days ahead at 0200 in "scheduler1" scheduler and I fill the form with:
-      | exclusivity  | 1         |
-      | studentid[0] | Student 3 |
+      | scheduler1 | ##+5 days 2:00am##    | 45       | teacher1  | 1           | student3 |                 |
     # Slot 3 is a group slot that is empty
-    And I add a slot 5 days ahead at 0300 in "scheduler1" scheduler and I fill the form with:
-      | exclusivity | 3        |
+      | scheduler1 | ##+5 days 3:00am##    | 45       | teacher1  | 3           |          |                 |
     # Slot 4 is a group slot that is partially booked
-    And I add a slot 5 days ahead at 0400 in "scheduler1" scheduler and I fill the form with:
-      | exclusivity  | 2         |
-      | studentid[0] | Student 3 |
+      | scheduler1 | ##+5 days 4:00am##    | 45       | teacher1  | 2           | student3 |                 |
     # Slot 5 is an unlimited group slot that is empty
-    And I add a slot 5 days ahead at 0500 in "scheduler1" scheduler and I fill the form with:
-      | exclusivityenable | 0         |
+      | scheduler1 | ##+5 days 5:00am##    | 45       | teacher1  | 0           |          |                 |
     # Slot 6 is an unlimited group slot that is partially booked
-    And I add a slot 5 days ahead at 0600 in "scheduler1" scheduler and I fill the form with:
-      | exclusivityenable | 0         |
-      | studentid[0]      | Student 3 |
+      | scheduler1 | ##+5 days 6:00am##    | 45       | teacher1  | 0           | student3 |                 |
     # Slot 7 is not yet available to students
-    And I add a slot 5 days ahead at 0700 in "scheduler1" scheduler and I fill the form with:
-      | hideuntil[year] | 2040 |
+      | scheduler1 | ##+5 days 7:00am##    | 45       | teacher1  | 0           |          | ##now +2years## |
     # Slot 8 is no longer available since the it's too close in the future
-    And I add a slot 1 days ahead at 0800 in "scheduler1" scheduler and I fill the form with:
-      | appointmentlocation | My office |
-    And I log out
+      | scheduler1 | ##tomorrow 8:00am##  | 45       | teacher1  | 0           |          |                 |
 
-  @javascript
   Scenario: A student can see only available upcoming slots (default setting)
 
     When I am on the "scheduler1" Activity page logged in as "student1"
@@ -85,7 +73,6 @@ Feature: Students viewing slots available for booking
     And I should not see "4:00 AM" in the "slotbookertable" "table"
     And I log out
 
-  @javascript
   Scenario: Students can view all slots, even full ones
     Given the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
@@ -122,7 +109,6 @@ Feature: Students viewing slots available for booking
     And "Book slot" "button" should not exist in the "4:00 AM" "table_row"
     And I log out
 
-  @javascript
   Scenario: Students can view all slots, but they cannot book any
     Given the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
@@ -143,7 +129,6 @@ Feature: Students viewing slots available for booking
 
     And I log out
 
-  @javascript
   Scenario: Students can view bookable slots, but they cannot book any
     Given the following "permission overrides" exist:
       | capability                  | permission | role    | contextlevel | reference |
