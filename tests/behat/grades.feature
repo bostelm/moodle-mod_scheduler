@@ -40,9 +40,9 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I log out
 
     When I am on the "scheduler1" Activity page logged in as "student1"
-    Then I should see "7/10" 
+    Then I should see "7/10"
 
-    When I am on the "C1" Course page 
+    When I am on the "C1" Course page
     And I follow "Grades" in the user menu
     And I follow "Course 1"
     Then I should see "7.00" in the "Test scheduler" "table_row"

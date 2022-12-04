@@ -129,7 +129,6 @@ Feature: Teachers are warned about scheduling conflicts
       | schedulerA | ##+5 days 2:25am## | 100      | teacher1  | My office |          |
       | schedulerA | ##+5 days 8:55am## | 10       | teacher1  | My office | student1 |
       | schedulerB | ##+5 days 6:05am## | 20       | teacher1  | My office |          |
-      
 
     When I log in as "teacher1"
     And I add 10 slots 5 days ahead in "schedulerA" scheduler and I fill the form with:
