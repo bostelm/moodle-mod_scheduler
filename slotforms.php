@@ -254,20 +254,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         $options = [
             'ajax' => 'mod_scheduler/studentid',
-            'valuehtmlcallback' => function($value) {
-                global $OUTPUT;
-
-                $userfieldsapi = \core_user\fields::for_name();
-                $allusernames = $userfieldsapi->get_sql('', false, '', '', false)->selects;
-                $fields = 'id, ' . $allusernames;
-                $user = \core_user::get_user($value, $fields);
-                $useroptiondata = [
-                    'fullname' => fullname($user)
-                ];
-
-                return $OUTPUT->render_from_template('mod_scheduler/studentid', $useroptiondata);
-            }
-
+            'valuehtmlcallback' => 'student_autocomplete_callback'
         ];
 
         if (!empty($this->_customdata['scheduler'])) {
