@@ -229,7 +229,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $this->add_base_fields();
 
         // Display slot from this date.
-        $mform->addElement('date_selector', 'hideuntil', get_string('displayfrom', 'scheduler'));
+        $mform->addElement('date_time_selector', 'hideuntil', get_string('displayfrom', 'scheduler'));
         $mform->setDefault('hideuntil', time());
 
         // Send e-mail reminder?
