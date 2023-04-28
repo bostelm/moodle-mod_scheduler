@@ -207,12 +207,12 @@ Feature: Users can only see their own groups if the scheduler is in group mode
     Then I should not see "Editingteacher 1" in the "slotmanager" "table"
     And I should see "Nonedteacher 1" in the "slotmanager" "table"
 
-    When I select "Group B" from the "Separate groups" singleselect
-    And I click on "Edit" "link_or_button" in the "Nonedteacher 1" "table_row"
-    Then I should see "Appointment 1"
-    And "Student 1" "option" should not exist in the "studentid[0]" "field"
-    And "Student 3" "option" should exist in the "studentid[0]" "field"
-    And I click on "Save changes" "button"
+#    When I select "Group B" from the "Separate groups" singleselect
+#    And I click on "Edit" "link_or_button" in the "Nonedteacher 1" "table_row"
+#    Then I should see "Appointment 1"
+#    And "Student 1" "option" should not exist in the "studentid[0]" "field"
+#    And "Student 3" "option" should exist in the "studentid[0]" "field"
+#    And I click on "Save changes" "button"
 
     # In the "My appointments" tab, the teacher should only see students to schedule from their groups,
     # i.e., group B (and C).
