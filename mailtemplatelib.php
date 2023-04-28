@@ -73,7 +73,7 @@ class scheduler_messenger {
     public static function compile_mail_template($template, $format, $parameters, $module = 'scheduler', $lang = null) {
         $params = array ();
         foreach ($parameters as $key => $value) {
-            $params [strtolower($key)] = $value;
+            $params[strtolower($key)] = $value;
         }
         $mailstr = get_string_manager()->get_string("email_{$template}_{$format}", $module, $params, $lang);
         return $mailstr;
@@ -175,10 +175,10 @@ class scheduler_messenger {
             $vars['SCHEDULER_URL'] = $CFG->wwwroot.'/mod/scheduler/view.php?id='.$scheduler->cmid;
         }
         if ($slot) {
-            $vars ['DATE']     = userdate($slot->starttime, get_string('strftimedate'), $tz);
-            $vars ['TIME']     = userdate($slot->starttime, get_string('strftimetime'), $tz);
-            $vars ['ENDTIME']  = userdate($slot->endtime, get_string('strftimetime'), $tz);
-            $vars ['LOCATION'] = format_string($slot->appointmentlocation);
+            $vars['DATE']     = userdate($slot->starttime, get_string('strftimedate'), $tz);
+            $vars['TIME']     = userdate($slot->starttime, get_string('strftimetime'), $tz);
+            $vars['ENDTIME']  = userdate($slot->endtime, get_string('strftimetime'), $tz);
+            $vars['LOCATION'] = format_string($slot->appointmentlocation);
         }
         if ($teacher) {
             $vars['ATTENDANT']     = fullname($teacher);
