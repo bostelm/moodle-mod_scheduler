@@ -37,6 +37,12 @@ class slot extends mvc_child_record_model {
      */
     protected $appointments;
 
+    /** @var stdClass Teacher cache. */
+    protected $teacher;
+
+    /** @var mvc_child_list The list of watchers. */
+    protected $watchers;
+
     /**
      * get_table
      *
@@ -59,6 +65,7 @@ class slot extends mvc_child_record_model {
         $this->data->schedulerid = $scheduler->get_id();
         $this->appointments = new mvc_child_list($this, 'scheduler_appointment', 'slotid',
                                                  new appointment_factory($this));
+        $this->watchers = new mvc_child_list($this, 'scheduler_watcher', 'slotid', new watcher_factory($this));
     }
 
     /**
@@ -74,13 +81,33 @@ class slot extends mvc_child_record_model {
     }
 
     /**
-     * Save any changes to the database
+     * Save any changes to the database.
      */
     public function save() {
         $this->data->schedulerid = $this->get_parent()->get_id();
+
+        // Compute whether children were removed while the slot was full,
+        // and thus whether we should be notifying the watchers.
+        $notifywatchers = false;
+        if ($this->get_scheduler()->is_watching_enabled()
+                && $this->is_watchable()
+                && $this->data->exclusivity > 0
+                && $this->appointments->has_children_pending_deletion()) {
+
+            $deadcount = $this->appointments->get_children_pending_deletion_count();
+            $alivecount = count($this->appointments->get_children()); // We purposely don't use get_child_count.
+            $wasfull = $deadcount + $alivecount >= $this->data->exclusivity;
+            $notifywatchers = $wasfull && $alivecount < $this->data->exclusivity;
+        }
+
         parent::save();
         $this->appointments->save_children();
         $this->update_calendar();
+
+        // Notify the watchers.
+        if ($notifywatchers) {
+            $this->notify_watchers();
+        }
     }
 
     /**
@@ -156,11 +183,14 @@ class slot extends mvc_child_record_model {
      */
     public function get_teacher() {
         global $DB;
-        if ($this->data->teacherid) {
-            return $DB->get_record('user', array('id' => $this->data->teacherid), '*', MUST_EXIST);
-        } else {
-            return new \stdClass();
+        if (!isset($this->teacher) || (is_object($this->teacher) && $this->teacher->id != $this->data->teacherid)) {
+            $teacher = new \stdClass();
+            if ($this->data->teacherid) {
+                $teacher = $DB->get_record('user', array('id' => $this->data->teacherid), '*', MUST_EXIST);
+            }
+            $this->teacher = $teacher;
         }
+        return $this->teacher;
     }
 
     /**
@@ -194,6 +224,122 @@ class slot extends mvc_child_record_model {
         return (boolean) !($this->data->exclusivity == 1);
     }
 
+    /**
+     * Add a watcher.
+     *
+     * @param int $userid The user ID.
+     * @return watcher|null The watcher that was added.
+     */
+    public function add_watcher($userid) {
+        if ($this->is_watched_by_student($userid)) {
+            return;
+        }
+        $watcher = $this->watchers->create_child();
+        $watcher->userid = $userid;
+        $this->watchers->save_children();
+        return $watcher;
+    }
+
+    /**
+     * Get the watchers.
+     *
+     * @return watcher[]
+     */
+    public function get_watchers() {
+        return $this->watchers->get_children();
+    }
+
+    /**
+     * Notify the watchers.
+     *
+     * This does not perform any checks to see if there are availabilities in this
+     * slot, it is assumed that these checks were performed before. This checks that
+     * the watcher can book more appointments before notifying them.
+     *
+     * @return void
+     */
+    public function notify_watchers() {
+        global $CFG;
+        if (!$this->watchers->has_children()) {
+            return;
+        }
+        foreach ($this->watchers->get_children() as $watcher) {
+            if ($this->get_scheduler()->count_bookable_appointments($watcher->userid, false) === 0) {
+                continue;
+            }
+            $watcher->notify();
+        }
+    }
+
+    /**
+     * Remove a watcher.
+     *
+     * @param int $userid The user ID.
+     * @return watcher|null The watcher that was removed.
+     */
+    public function remove_watcher($userid) {
+        $watcher = null;
+        foreach ($this->get_watchers() as $watcher) {
+            if ($watcher->userid == $userid) {
+                break;
+            }
+            $watcher = null;
+        }
+
+        if ($watcher) {
+            $this->watchers->remove_child($watcher);
+            $this->watchers->save_children();
+        }
+
+        return $watcher;
+    }
+
+    /**
+     * Whether this slot can be watched.
+     *
+     * This only checks that the slot is setup in a way that allows
+     * for it to ever be watchable. It does not check whether we should be
+     * expecting new watchers in this current state, e.g. it does not
+     * check whether all appointments have been booked.
+     *
+     * @return bool
+     */
+    public function is_watchable() {
+        return $this->scheduler->is_watching_enabled() && $this->is_in_bookable_period();
+    }
+
+    /**
+     * Whether this slot can be watched by a student.
+     *
+     * Note that this does not check the permissions of the given user.
+     * However it does check whether the slot is fully booked, as it is
+     * a requirement, but also that the student does not already have a
+     * booking in this slot.
+     *
+     * @param int $userid The student ID.
+     * @return bool
+     */
+    public function is_watchable_by_student($userid) {
+        return $this->is_watchable()
+            && $this->count_remaining_appointments() === 0
+            && !$this->is_booked_by_student($userid);
+    }
+
+    /**
+     * Whether the slot is watched by a student.
+     *
+     * @param int $userid The student ID.
+     * @return bool
+     */
+    public function is_watched_by_student($userid) {
+        $watchers = $this->get_watchers();
+        foreach ($watchers as $watcher) {
+            if ($watcher->userid == $userid) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Count the number of appointments in this slot
@@ -317,6 +463,7 @@ class slot extends mvc_child_record_model {
      */
     public function delete() {
         $this->appointments->delete_children();
+        $this->watchers->delete_children();
         $this->clear_calendar();
         $fs = get_file_storage();
         $fs->delete_area_files($this->get_scheduler()->get_context()->id, 'mod_scheduler', 'slotnote', $this->get_id());

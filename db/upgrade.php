@@ -367,5 +367,73 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022120200, 'scheduler');
     }
 
+    if ($oldversion < 2023050800) {
+
+        // Define field completionattended to be added to scheduler.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('completionattended', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+
+        // Conditionally launch add field completionattended.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2023050800, 'scheduler');
+    }
+
+    if ($oldversion < 2023050803) {
+
+        // Define table scheduler_watcher to be created.
+        $table = new xmldb_table('scheduler_watcher');
+
+        // Adding fields to table scheduler_watcher.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('slotid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table scheduler_watcher.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for scheduler_watcher.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2023050803, 'scheduler');
+    }
+
+    if ($oldversion < 2023050804) {
+
+        // Define field canwatch to be added to scheduler.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('canwatch', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'completionattended');
+
+        // Conditionally launch add field canwatch.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2023050804, 'scheduler');
+    }
+
+    if ($oldversion < 2023050805) {
+
+        // Define index slotuseridx (unique) to be added to scheduler_watcher.
+        $table = new xmldb_table('scheduler_watcher');
+        $index = new xmldb_index('slotuseridx', XMLDB_INDEX_UNIQUE, ['slotid', 'userid']);
+
+        // Conditionally launch add index slotuseridx.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2023050805, 'scheduler');
+    }
+
     return true;
+
 }

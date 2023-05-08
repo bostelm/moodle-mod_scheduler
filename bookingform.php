@@ -74,9 +74,7 @@ class scheduler_booking_form extends moodleform {
                                    'context' => $scheduler->get_context(),
                                    'collapsed' => true);
 
-        $this->uploadoptions = array('subdirs' => 0,
-                                     'maxbytes' => $scheduler->uploadmaxsize,
-                                     'maxfiles' => $scheduler->uploadmaxfiles);
+        $this->uploadoptions = mod_scheduler_get_student_upload_options($scheduler);
 
         // Text field for student-supplied data.
         if ($scheduler->uses_studentnotes()) {
@@ -157,24 +155,4 @@ class scheduler_booking_form extends moodleform {
         return $newdata;
     }
 
-    /**
-     * save_booking_data
-     *
-     * @param stdClass $formdata
-     * @param appointment $appointment
-     */
-    public function save_booking_data(stdClass $formdata, appointment $appointment) {
-        $scheduler = $appointment->get_scheduler();
-        if ($scheduler->uses_studentnotes() && isset($formdata->studentnote_editor)) {
-            $editor = $formdata->studentnote_editor;
-            $appointment->studentnote = $editor['text'];
-            $appointment->studentnoteformat = $editor['format'];
-        }
-        if ($scheduler->uses_studentfiles()) {
-            file_save_draft_area_files($formdata->studentfiles, $scheduler->context->id,
-                                       'mod_scheduler', 'studentfiles', $appointment->id,
-                                       $this->uploadoptions);
-        }
-        $appointment->save();
-    }
 }

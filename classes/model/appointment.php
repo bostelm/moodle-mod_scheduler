@@ -37,6 +37,9 @@ require_once($CFG->dirroot.'/mod/scheduler/lib.php');
  */
 class appointment extends mvc_child_record_model {
 
+    /** @var bool Initial 'isattended' value. */
+    private $initialisattended = null;
+
     /**
      * get_table
      *
@@ -65,10 +68,29 @@ class appointment extends mvc_child_record_model {
      * save
      */
     public function save() {
+        // Check whether the attended status has changed internally, if the value is still null, then we consider
+        // that the attended status has not changed, as thus we do not trigger an update. This is especially useful
+        // when a new appointment is made, to reduce the cost of creating a new appointment. However, if in
+        // the future a user must have attended ALL of their appointments, then we would have to update the
+        // completion state when the value is null, which would indicate a new appointment.
+        $isattendedchanged = $this->initialisattended !== null && $this->initialisattended !== $this->is_attended();
+        $isnew = empty($this->data->id);
+
         $this->data->slotid = $this->get_parent()->get_id();
         parent::save();
+        $this->initialisattended = $this->is_attended();
+
         $scheddata = $this->get_scheduler()->get_data();
         scheduler_update_grades($scheddata, $this->studentid);
+
+        // If we've just created the appointment, make sure the user is no longer a watcher.
+        if ($isnew) {
+            $this->get_slot()->remove_watcher($this->studentid);
+        }
+
+        if ($isattendedchanged) {
+            $this->get_scheduler()->completion_update_has_attended($this->studentid, $this->is_attended());
+        }
     }
 
     /**
@@ -87,6 +109,7 @@ class appointment extends mvc_child_record_model {
         $fs->delete_area_files($cid, 'mod_scheduler', 'teachernote', $this->get_id());
         $fs->delete_area_files($cid, 'mod_scheduler', 'studentnote', $this->get_id());
 
+        $this->get_scheduler()->completion_update_has_attended($this->studentid);
     }
 
     /**
@@ -151,4 +174,22 @@ class appointment extends mvc_child_record_model {
         return count($files);
     }
 
+    /**
+     * Set attended.
+     *
+     * This method is protected as it currently is only meant to be used from
+     * the {@see mvc_record_model::__set} method.
+     *
+     * We use this method to observe whether the value has changed and decide
+     * whether to inform the scheduler that it should be updating the completion
+     * state of the student.
+     *
+     * @param bool $value The value.
+     */
+    protected function set_attended($value) {
+        if ($this->initialisattended === null) {
+            $this->initialisattended = $this->is_attended();
+        }
+        $this->data->attended = $value;
+    }
 }

@@ -38,4 +38,12 @@ $messageproviders = array (
     'reminder' => array(
     ),
 
+    // Message sent when an appointment opened up in a slot being watched.
+    'watchedslotopenedup' => [
+        'defaults' => [
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED
+        ]
+    ]
+
 );

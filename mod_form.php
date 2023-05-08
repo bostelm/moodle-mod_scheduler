@@ -122,6 +122,13 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addElement('select', 'usenotes', get_string('usenotes', 'scheduler'), $noteoptions);
         $mform->setDefault('usenotes', '1');
 
+        $mform->addElement('selectyesno', 'canwatch', get_string('allowwatching', 'scheduler'));
+        $mform->addHelpButton('canwatch', 'allowwatching', 'scheduler');
+        // Disable canwatch when we cannot group bookings is enforced.
+        if (!get_config('mod_scheduler', 'mixindivgroup')) {
+            $mform->disabledIf('canwatch', 'bookingrouping', 'neq', '-1');
+        }
+
         // Grade settings.
         $this->standard_grading_coursemodule_elements();
 
@@ -192,6 +199,32 @@ class mod_scheduler_mod_form extends moodleform_mod {
     }
 
     /**
+     * Add custom completion rules.
+     *
+     * @return array Of element names.
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $mform->addElement('checkbox', 'completionattended', get_string('completionattended', 'mod_scheduler'),
+            get_string('completionattended_desc', 'mod_scheduler'));
+        $mform->addHelpButton('completionattended', 'completionattended', 'mod_scheduler');
+
+        return ['completionattended'];
+    }
+
+
+    /**
+     * Whether any custom completion rule is enabled.
+     *
+     * @param array $data Form data.
+     * @return bool
+     */
+    public function completion_rule_enabled($data) {
+        return !empty($data['completionattended']);
+    }
+
+    /**
      * Allows module to modify data returned by get_moduleinfo_data() or prepare_new_moduleinfo_data() before calling set_data()
      * This method is also called in the bulk activity completion form.
      *
@@ -217,6 +250,18 @@ class mod_scheduler_mod_form extends moodleform_mod {
                 $type = 'scale';
             }
             $defaultvalues['grade[modgrade_type]'] = $type;
+        }
+    }
+
+    /**
+     * Post processing.
+     *
+     * @param stdClass $data passed by reference
+     */
+    public function data_postprocessing($data) {
+        // Force watching to be disabled when it would not be working.
+        if (!get_config('mod_scheduler', 'mixindivgroup') && !empty($data->groupbookings)) {
+            $data->canwatch = 0;
         }
     }
 

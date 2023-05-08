@@ -259,6 +259,26 @@ class permissions_test extends \advanced_testcase {
     }
 
     /**
+     * Tests whether appointments can be scheduled for other teachers.
+     *
+     * @coversNothing
+     */
+    public function test_can_schedule_slots_to_other_teachers() {
+
+        // Editing teachers can schedule for others.
+        $p = new scheduler_permissions($this->context, $this->edteacher);
+        $this->assertTrue($p->can_schedule_slot_to_other_teachers());
+
+        // Admins and students cannot schedule for others.
+        $p = new scheduler_permissions($this->context, $this->nonedteacher);
+        $this->assertFalse($p->can_schedule_slot_to_other_teachers());
+        $p = new scheduler_permissions($this->context, $this->administ);
+        $this->assertFalse($p->can_schedule_slot_to_other_teachers());
+        $p = new scheduler_permissions($this->context, $this->students[1]);
+        $this->assertFalse($p->can_schedule_slot_to_other_teachers());
+    }
+
+    /**
      * Tests whether appointments can be seen.
      *
      * @coversNothing

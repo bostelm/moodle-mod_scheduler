@@ -93,6 +93,15 @@ class scheduler_permissions extends permissions_manager {
     }
 
     /**
+     * Whether the user can schedule a slot for another user.
+     *
+     * @return bool
+     */
+    public function can_schedule_slot_to_other_teachers() {
+        return $this->has_capability('canscheduletootherteachers');
+    }
+
+    /**
      * can_see_all_slots
      *
      * @return bool
@@ -159,6 +168,34 @@ class scheduler_permissions extends permissions_manager {
         } else {
             return $this->userid == $app->get_slot()->teacherid;
         }
+    }
+
+    /**
+     * Whether the user appears to be a teacher based on their permissions.
+     *
+     * This check is only based on the permissions assigned within the scheduler
+     * activity and will not perform checks based on roles assigned in the course.
+     *
+     * @return bool
+     */
+    public function is_teacher() {
+        $caps = ['manage', 'manageallappointments', 'canseeotherteachersbooking'];
+        return $this->has_any_capability($caps);
+    }
+
+    /**
+     * Whether the user appears to be a student based on their permissions.
+     *
+     * This check is only based on the permissions assigned within the scheduler
+     * activity and will not perform checks based on roles assigned in the course.
+     *
+     * For our purpose, a user cannot be both a teacher and student, therefore
+     * the teacher role will take precedence over the student one.
+     *
+     * @return bool
+     */
+    public function is_student() {
+        return !$this->is_teacher() && $this->has_capability('viewslots');
     }
 
 }

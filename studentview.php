@@ -44,6 +44,7 @@ $actionurl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 require_capability('mod/scheduler:viewslots', $context);
 $canbook = has_capability('mod/scheduler:appoint', $context);
 $canseefull = has_capability('mod/scheduler:viewfullslots', $context);
+$canwatch = has_capability('mod/scheduler:watchslots', $context);
 
 if ($scheduler->is_group_scheduling_enabled()) {
     $mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $scheduler->bookingrouping, 'g.id, g.name');
@@ -58,6 +59,9 @@ if ($scheduler->is_group_scheduling_enabled()) {
     $appointgroup = 0;
 }
 
+if (!$scheduler->is_watching_enabled()) {
+    $canwatch = false;
+}
 
 require_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
@@ -161,7 +165,10 @@ if (count($upcomingslots) > 0) {
 }
 
 $bookablecnt = $scheduler->count_bookable_appointments($USER->id, false);
-$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, $canseefull));
+$canbookslots = $canbook && $bookablecnt != 0;
+$canwatchslots = $canwatch && $canbookslots && !$appointgroup;
+$canwatchmoreslots = $canwatchslots && $scheduler->student_can_watch_more_slots($USER->id);
+$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, $canseefull || $canwatchslots));
 
 if (!$canseefull && $bookablecnt == 0) {
     echo html_writer::div(get_string('canbooknofurtherappointments', 'scheduler'), 'studentbookingmessage');
@@ -188,7 +195,7 @@ if (!$canseefull && $bookablecnt == 0) {
 
     for ($idx = $start; $idx < $end; $idx++) {
         $slot = $bookableslots[$idx];
-        $canbookthisslot = $canbook && ($bookablecnt != 0);
+        $canbookthisslot = $canbookslots;
 
         if (has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $others = new scheduler_student_list($scheduler, false);
@@ -211,12 +218,15 @@ if (!$canseefull && $bookablecnt == 0) {
             if ($remaining > 0) {
                 $groupinfo = get_string('limited', 'scheduler', $remaining.'/'.$slot->exclusivity);
             } else { // Group info should not be visible to students.
-                $groupinfo = get_string('complete', 'scheduler');
+                $groupinfo = get_string('full', 'scheduler');
                 $canbookthisslot = false;
             }
         }
 
-        $booker->add_slot($slot, $canbookthisslot, false, $groupinfo, $others);
+        $isslotwatchable = $slot->is_watchable_by_student($USER->id);
+        $iswatching = $isslotwatchable && $slot->is_watched_by_student($USER->id);
+        $canwatchthisslot = ($canwatchmoreslots && $isslotwatchable) || $iswatching;
+        $booker->add_slot($slot, $canbookthisslot, false, $groupinfo, $others, $canwatchthisslot, $iswatching);
     }
 
 
@@ -246,6 +256,15 @@ if (!$canseefull && $bookablecnt == 0) {
     echo $output->render($booker);
     if ($total > $pagesize) {
         echo $output->paging_bar($total, $offset, $pagesize, $actionurl, 'offset');
+    }
+
+    if ($canwatchslots) {
+        $maxwatched = $scheduler->get_maximum_slots_watched();
+        if (!$maxwatched) {
+            echo html_writer::tag('p', get_string('watchslotsintro', 'mod_scheduler'));
+        } else {
+            echo html_writer::tag('p', get_string('watchslotsintromax', 'mod_scheduler', $maxwatched));
+        }
     }
 
 }

@@ -1,0 +1,75 @@
+{{=<% %>=}}
+
+<style rel="text/css">
+</style>
+
+<core-course-module-description description="<% scheduler.intro %>" component="mod_scheduler" componentId="<% cmid %>"></core-course-module-description>
+
+<div padding class="mod_scheduler-student-view">
+
+    <%# haspastslots %>
+        <h3><%# str %>attendedslots, mod_scheduler<%/ str %></h3>
+        <ion-list>
+            <%#pastslots%>
+                <button ion-item core-site-plugins-new-content method="slot" [args]="{cmid: <% cmid%>, id: <% id %>}">
+                    <h2><% timeformatted.date %></h2>
+                    <p><% timeformatted.starttime %> - <% timeformatted.endtime %></p>
+                </button>
+            <%/pastslots%>
+        </ion-list>
+    <%/ haspastslots %>
+
+    <%# hasupcomingslots %>
+        <h3><%# str %>upcomingslots, mod_scheduler<%/ str %></h3>
+        <ion-list>
+            <%#upcomingslots%>
+                <button ion-item core-site-plugins-new-content method="slot" [args]="{cmid: <% cmid%>, id: <% id %>}">
+                    <h2><% timeformatted.date %></h2>
+                    <p><% timeformatted.starttime %> - <% timeformatted.endtime %></p>
+                </button>
+            <%/upcomingslots%>
+        </ion-list>
+    <%/ hasupcomingslots %>
+
+    <%^ hasbookableslots %>
+        <%# nobookingmessage %>
+            <p><% . %></p>
+        <%/ nobookingmessage %>
+    <%/ hasbookableslots %>
+
+    <%# hasbookableslots %>
+        <h3><%# str %>availableslots, mod_scheduler<%/ str %></h3>
+        <%# bookingmessage %>
+            <p><% . %></p>
+        <%/ bookingmessage %>
+        <ion-list>
+            <%#bookableslots%>
+                <button ion-item core-site-plugins-new-content method="slot" [args]="{cmid: <% cmid%>, id: <% id %>}">
+                    <h2><% timeformatted.date %></h2>
+                    <p>
+                        <% timeformatted.starttime %> - <% timeformatted.endtime %>
+                        <!--<%# hasappointmentlocation %> @ <% appointmentlocation %> <%/ hasappointmentlocation %> -->
+                    </p>
+                    <%^ isunlimited %>
+                        <%^ isfull %>
+                            <ion-note item-end><% ntaken %> / <% maxappointments %></ion-note>
+                        <%/ isfull %>
+                        <%# isfull %>
+                            <ion-note item-end><%# str %>full, mod_scheduler<%/ str %></ion-note>
+                        <%/ isfull %>
+                    <%/ isunlimited %>
+                </button>
+            <%/bookableslots%>
+            <%#hasmorebookableslots%>
+                <ion-item>
+                    <button ion-button clear block core-site-plugins-new-content method="student_bookable_slots" [args]="{cmid: <% cmid %>, page: 0}" title="<%# str %>availableslots, mod_scheduler<%/ str %>">
+                        <%# str %>viewmoreoptions, mod_scheduler<%/ str %>
+                    </button>
+                </ion-item>
+            <%/hasmorebookableslots%>
+        </ion-list>
+    <%/ hasbookableslots %>
+
+    <!-- Trigger event when the template is loaded. -->
+    <span core-site-plugins-call-ws-on-load name="mod_scheduler_booking_form_viewed" [params]="{cmid: <% cmid %>}" [preSets]="{getFromCache: 0, saveToCache: 0}"></span>
+</div>

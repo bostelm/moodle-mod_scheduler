@@ -51,6 +51,7 @@ $string['scheduler:seeoverviewoutsideactivity'] = 'Use the overview screen to se
 $string['scheduler:editallattended'] = 'Mark students in all appointments as attended / not attended.';
 $string['scheduler:editallgrades'] = 'Edit grades in all appointments.';
 $string['scheduler:editallnotes'] = 'Edit appointment notes in all appointments.';
+$string['scheduler:watchslots'] = 'Watch slots';
 
 /* ***** Events ***** */
 $string['event_bookingformviewed'] = 'Scheduler booking form viewed';
@@ -59,11 +60,14 @@ $string['event_bookingremoved'] = 'Scheduler booking removed';
 $string['event_appointmentlistviewed'] = 'Scheduler appointment list viewed';
 $string['event_slotadded'] = 'Scheduler slot added';
 $string['event_slotdeleted'] = 'Scheduler slot deleted';
+$string['event_slotunwatched'] = 'Scheduler slot unwatched';
+$string['event_slotwatched'] = 'Scheduler slot watched';
 
 /* ***** Message types ***** */
 $string['messageprovider:invitation'] = 'Invitation to book a slot';
 $string['messageprovider:bookingnotification'] = 'Notification when a booking is made or cancelled';
 $string['messageprovider:reminder'] = 'Reminder of an upcoming appointment';
+$string['messageprovider:watchedslotopenedup'] = 'Notification when an appointment becomes available in a watched slot';
 
 /* ***** Search areas ***** */
 $string['search:activity'] = 'Scheduler - activity information';
@@ -92,6 +96,10 @@ $string['privacy:metadata:scheduler_appointment:teachernoteformat'] = "Format of
 $string['privacy:metadata:scheduler_appointment:studentnote'] = "Note by student";
 $string['privacy:metadata:scheduler_appointment:studentnoteformat'] = "Format of student note";
 
+$string['privacy:metadata:scheduler_watcher'] = "Represents a student watching a slot";
+$string['privacy:metadata:scheduler_watcher:userid'] = "Student who watching the slot";
+$string['privacy:metadata:scheduler_watcher:slotid'] = "The slot being watched";
+
 $string['privacy:metadata:filepurpose'] = 'File used in notes for the slot or appointment';
 
 
@@ -99,6 +107,10 @@ $string['privacy:metadata:filepurpose'] = 'File used in notes for the slot or ap
 
 $string['onedaybefore'] = '1 day before slot';
 $string['oneweekbefore'] = '1 week before slot';
+$string['allowwatching'] = 'Allow watching';
+$string['allowwatching_help'] = 'When watching is allowed, students can watch slots that are full to be notified when an appointment becomes available. However note that watching is not possible when the activity enforces booking in groups.
+
+This option can only work by displaying full slots to students, it will therefore ignore the students\' permission to view full slots, and always assume that they can view them.';
 $string['areaappointmentnote'] = 'Files in appointment notes';
 $string['areaslotnote'] = 'Files in slot notes';
 $string['areateachernote'] = 'Files in confidential notes';
@@ -114,7 +126,9 @@ $string['addstudenttogroup'] = 'Add this student to appointment group';
 $string['allappointments'] = 'All appointments';
 $string['allononepage'] = 'All slots on one page';
 $string['allowgroup'] = 'Exclusive slot - click to change';
+$string['alreadybookedbyyou'] = 'This slot has already been booked for you.';
 $string['alreadyappointed'] = 'Cannot make the appointment. The slot is already fully booked.';
+$string['applyfilters'] = 'Apply filters';
 $string['appointfor'] = 'Make appointment for';
 $string['appointforgroup'] = 'Make appointments for: {$a}';
 $string['appointingstudent'] = 'Appointment for slot';
@@ -122,6 +136,7 @@ $string['appointingstudentinnew'] = 'Appointment for new slot';
 $string['appointment'] = 'Appointment';
 $string['appointmentno'] = 'Appointment {$a}';
 $string['appointmentnote'] = 'Notes for appointment (visible to student)';
+$string['appointmentnotes'] = 'Appointment notes';
 $string['appointments'] = 'Appointments';
 $string['appointmentsgrouped'] = 'Appointments grouped by slot';
 $string['appointsolo'] = 'just me';
@@ -139,6 +154,7 @@ $string['availableslotsowned'] = 'Owned';
 $string['bookingformoptions'] = 'Booking form and student-supplied data';
 $string['bookinginstructions'] = 'Booking instructions';
 $string['bookinginstructions_help'] = 'This text will be displayed to students before they make a booking. It can, for example, instruct students how to fill out the optional message field or which files to upload.';
+$string['bookingnotsupported'] = 'Booking not supported, please use the online version.';
 $string['bookslot'] = 'Book slot';
 $string['bookaslot'] = 'Book a slot';
 $string['bookingdetails'] = 'Booking details';
@@ -151,8 +167,12 @@ $string['canbook1appointment'] = 'You can book one more appointment in this sche
 $string['canbooknappointments'] = 'You can book {$a} more appointments in this scheduler.';
 $string['canbooknofurtherappointments'] = 'You cannot book further appointments in this scheduler.';
 $string['canbookunlimitedappointments'] = 'You can book any number of appointments in this scheduler.';
+$string['cannotscheduleslotforothers'] = 'You cannot schedule appointments for other staff members.';
+$string['cannotwatchmoreslots'] = 'You cannot watch more slots at this time.';
 $string['chooseexisting'] = 'Choose existing';
+$string['choosegrouptobook'] = 'Please select a group to assign the booking to.';
 $string['choosingslotstart'] = 'Choosing the start time';
+$string['clearfilters'] = 'Clear filters';
 $string['comments'] = 'Comments';
 $string['conflictlocal'] = '{$a->datetime} ({$a->duration} minutes) in this scheduler';
 $string['conflictremote'] = '{$a->datetime} ({$a->duration} minutes) in course {$a->courseshortname}, scheduler {$a->schedulername}';
@@ -179,6 +199,9 @@ $string['contentformat_help'] = '<p>There are three basic choices for the export
     </dl>
     You can explore the effect of these options using the "Preview" button.</p>';
 $string['complete'] = 'Booked';
+$string['completionattended'] = 'Require attended';
+$string['completionattended_desc'] = 'Students must be marked as seen';
+$string['completionattended_help'] = 'When enabled, a student must be marked as having attended an appointment for this requirement to be met.';
 $string['confirmbooking'] = "Confirm booking";
 $string['confirmdelete-all'] = 'This will delete <b>all</b> slots in this scheduler. Deletion cannot be undone. Continue anyway?';
 $string['confirmdelete-mine'] = 'This will delete all your slots in this scheduler. Deletion cannot be undone. Continue anyway?';
@@ -187,12 +210,17 @@ $string['confirmdelete-selected'] = 'This will delete the selected slots. Deleti
 $string['confirmdelete-one'] = 'Delete slot?';
 $string['confirmdelete-unused'] = 'This will delete all unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
 $string['confirmrevoke'] = 'Revoke all appointments in the current slot?';
+$string['confirmsinglerevoke'] = 'Would you like to revoke this appointment?';
 $string['conflictingslots'] = 'The slot on {$a} cannot be created due to conflicting slots:';
 $string['copytomyself'] = 'Send a copy to myself';
+$string['couldnotresolveteacher'] = 'Could not resolve the teacher to an existing user account.';
 $string['course'] = 'Course';
 $string['createexport'] = 'Create export file';
+$string['csvfile'] = 'CSV file';
 $string['csvformat'] = 'CSV';
 $string['csvfieldseparator'] = 'Field separator for CSV';
+$string['csvline'] = 'Line';
+$string['csvmissingcolumns'] = 'The following columns are missing: {$a}.';
 $string['cumulatedduration'] = 'Summed duration of appointments';
 $string['datatoinclude'] = 'Data to include';
 $string['datatoinclude_help'] = 'Select the fields that should be included in the export. Each of these will appear in one column of the output file.';
@@ -221,6 +249,7 @@ $string['emailreminder'] = 'Email a reminder';
 $string['emailreminderondate'] = 'Email a reminder on';
 $string['end'] = 'End';
 $string['enddate'] = 'Repeat time slots until';
+$string['errors'] = 'Errors';
 $string['excelformat'] = 'Excel';
 $string['exclusive'] = 'Exclusive';
 $string['exclusivity'] = 'Exclusivity';
@@ -266,12 +295,17 @@ $string['fileformat_help'] = 'The following file formats are available:
                 which can be printed using the browser\'s print feature;</li>
           <li>PDF documents. You can choose between landscape and portrait orientation.</li>
      </ul>';
+$string['filterdatetimeafter'] = 'After';
+$string['filterdatetimeat'] = 'At';
+$string['filterdatetimebefore'] = 'Before';
+$string['filterdatetimeon'] = 'On';
 $string['finalgrade'] = 'Final grade';
 $string['firstslotavailable'] = 'The first slot will be open on: {$a}';
 $string['forbidgroup'] = 'Group slot - click to change';
 $string['forcewhenoverlap'] = 'Force when overlap';
 $string['forcourses'] = 'Choose students in courses';
 $string['friday'] = 'Friday';
+$string['full'] = 'Full';
 $string['generalconfig'] = 'General configuration';
 $string['grade'] = 'Grade';
 $string['gradeingradebook'] = 'Grade in gradebook';
@@ -300,8 +334,31 @@ $string['ignoreconflicts_link'] = 'mod/scheduler/conflict';
 $string['includeemptyslots'] = 'Include empty slots';
 $string['includeslotsfor'] = 'Include slots for';
 $string['incourse'] = ' in course ';
+$string['invalidorpastdate'] = 'The date could not be parsed, or is in the past.';
+$string['invalidteacher'] = 'Invalid teacher provided, they are not a teacher.';
 $string['mixindivgroup'] = 'Mix individual and group bookings';
 $string['mixindivgroup_desc'] = 'Where group scheduling is enabled, allow individual bookings as well.';
+$string['import'] = 'Import';
+$string['importslots'] = 'Import slots';
+$string['importslots_help'] = '
+Slots can be imported from a CSV file, containing the following __mandatory__ columns:
+
+- date: The date at which the slot starts
+- time: The time of the day at which the slots starts
+- duration: The duration of the slots, in minutes
+
+The following columns are also supported:
+
+- maxstudents: The maximum number of students in the slot. Use 1 for exclusive, or 0 for unlimited.
+- location: The location of the appointment.
+- teacher: The username of the Moodle account of the teacher. An empty value defaults to the current user.
+- displayfrom: The date from which the slot will be visible.
+- comment: Notes to be attached to the slot. The Markdown format is supported.
+
+The dates can be expressed in either of these formats: MM/DD/YYYY, YYYY-MM-DD or DD-MM-YYYY. The time can be expressed in 12h or 24h form: 2:00pm or 14:00.
+';
+$string['importslotsintro'] = 'Please provide a CSV matching the required format, an example file can be downloaded [here]({$a->exampleurl}).';
+$string['importallvalidslots'] = 'Import all valid slots';
 $string['introduction'] = 'Introduction';
 $string['isnonexclusive'] = 'Non-exclusive';
 $string['landscape'] = 'Landscape';
@@ -311,6 +368,8 @@ $string['location'] = 'Location';
 $string['markseen'] = 'After you have had an appointment with a student please mark them as "Seen" by clicking the checkbox near to their user picture above.';
 $string['markasseennow'] = 'Mark as seen now';
 $string['maxgrade'] = 'Take the highest grade';
+$string['maxslotswatched'] = 'Maximum number of slots watched';
+$string['maxslotswatched_desc'] = 'The maximum number of slots a student can watch per scheduler activity. When set to 0, students can watch an unlimited number of slots.';
 $string['maxstudentsperslot'] = 'Maximum number of students per slot';
 $string['maxstudentsperslot_desc'] = 'Group slots / non-exclusive slots can have at most this number of students. Note that in addition, the setting "unlimited" can always be chosen for a slot.';
 $string['maxstudentlistsize'] = 'Maximum length of student list';
@@ -332,6 +391,7 @@ $string['modeappointments'] = 'appointment(s)';
 $string['modeoneonly'] = 'in this scheduler';
 $string['modeoneatatime'] = 'at a time';
 $string['monday'] = 'Monday';
+$string['mostrecentslots'] = 'Most recent slots';
 $string['multiple'] = '(multiple)';
 $string['myappointments'] = 'My appointments';
 $string['myself'] = 'Myself';
@@ -342,6 +402,7 @@ $string['negativetimerange'] = 'End time must be later than start time.';
 $string['never'] = 'Never';
 $string['nfiles'] = '{$a} files';
 $string['noappointments'] = 'No appointments';
+$string['noappointmentsyet'] = 'You do not have any appointments in this scheduler yet.';
 $string['noexistingstudents'] = 'No students available for scheduling';
 $string['nogroups'] = 'No group available for scheduling.';
 $string['noresults'] = 'No results. ';
@@ -359,6 +420,8 @@ $string['notesrequired'] = 'You must enter text into this field before booking t
 $string['notifications'] = 'Notifications';
 $string['notseen'] = 'Not seen';
 $string['now'] = 'Now';
+$string['nslotsimported'] = '{$a} slot(s) imported';
+$string['nslotswitherror'] = '{$a} slot(s) with error';
 $string['occurrences'] = 'Occurrences';
 $string['odsformat'] = 'ODS';
 $string['on'] = 'on';
@@ -382,12 +445,15 @@ $string['pdforientation'] = 'PDF page orientation';
 $string['portrait'] = 'Portrait';
 $string['preview'] = 'Preview';
 $string['previewlimited'] = '(Preview is limited to {$a} rows.)';
+$string['purgeobsoletewatchers'] = 'Purge obsolete watchers';
 $string['purgeunusedslots'] = 'Purge unused slots in the past';
+$string['recentandupcomingslots'] = 'Recent and upcoming slots';
 $string['recipients'] = 'Recipients';
 $string['registeredlbl'] = 'Student appointed';
 $string['reminder'] = 'Reminder';
 $string['requireupload'] = 'File upload required';
 $string['resetslots'] = 'Delete scheduler slots';
+$string['results'] = 'Results';
 $string['resetappointments'] = 'Delete appointments and grades';
 $string['revealteachernotes'] = 'Reveal teacher notes in privacy exports';
 $string['revealteachernotes_desc'] = 'If this option is selected, then confidential teacher notes (which are normally not visible to students)
@@ -437,6 +503,10 @@ $string['slotwarning'] = '<strong>Warning:</strong> Moving this slot to the sele
 $string['staffbreakdown'] = 'By {$a}';
 $string['staffrolename'] = 'Role name of the teacher';
 $string['start'] = 'Start';
+$string['filterstarttime'] = 'Start time';
+$string['filterstarttime_help'] = 'Filter slots based on their starting date.
+
+Note that the "On" operator is the only one that ignores the time of the day, using this operator will select all slots occurring on a particular day.';
 $string['startpast'] = 'You can\'t start an empty appointment slot in the past';
 $string['statistics'] = 'Statistics';
 $string['student'] = 'Student';
@@ -446,6 +516,7 @@ $string['studentdetails'] = 'Student details';
 $string['studentfiles'] = 'Uploaded files';
 $string['studentmultiselect'] = 'Each student can be selected only once in this slot';
 $string['studentnote'] = 'Message by student';
+$string['studentnotemissing'] = 'The message from the student is missing.';
 $string['students'] = 'Students';
 $string['studentprovided'] = 'Student provided: {$a}';
 $string['sunday'] = 'Sunday';
@@ -467,6 +538,7 @@ $string['tuesday'] = 'Tuesday';
 $string['unattended'] = 'Unattended';
 $string['unlimited'] = 'Unlimited';
 $string['unregisteredlbl'] = 'Unappointed students';
+$string['unwatchslot'] = 'Unwatch slot';
 $string['upcomingslots'] = 'Upcoming slots';
 $string['updategrades'] = 'Update grades';
 $string['updatesingleslot'] = '';
@@ -493,10 +565,18 @@ $string['usenotesboth'] = 'Both types of notes';
 $string['usestudentnotes'] = 'Let students enter a message';
 $string['usestudentnotes_help'] = 'If enabled, the booking screen will contain a text box in which students can enter a message. Use the "booking instructions" above to instruct students what information they should supply.';
 $string['viewbooking'] = 'See details';
+$string['viewmoreoptions'] = 'View more options';
+$string['visitwebtoaddnotes'] = 'Please <a href="{$a}" core-link>visit the website</a> to add notes.';
+$string['visitwebtobook'] = 'Visit the website to book this slot';
+$string['visitwebtoeditcancel'] = 'Please <a href="{$a}" core-link>visit the website</a> if you wish to make changes to the booking.';
+$string['visitwebtouploadfiles'] = 'Please <a href="{$a}" core-link>visit the website</a> to attach files to your booking.';
+$string['watchslotsintro'] = 'To be notified when a fully booked slot becomes available, click the "Watch slot" button for that corresponding slot.';
+$string['watchslotsintromax'] = 'To be notified when a fully booked slot becomes available, click the "Watch slot" button for that corresponding slot. Note that you cannot watch more than {$a} slot(s) at any given time.';
 $string['wednesday'] = 'Wednesday';
 $string['welcomebackstudent'] = 'You can book additional slots by clicking on the corresponding "Book slot" button below.';
 $string['welcomenewstudent'] = 'The table below shows all available slots for an appointment. Make your choice by clicking on the corresponding "Book slot" button. If you need to make a change later you can revisit this page.';
 $string['welcomenewteacher'] = 'Please click on the button below to add appointment slots.';
+$string['watchslot'] = 'Watch slot';
 $string['what'] = 'What?';
 $string['whathappened'] = 'What happened?';
 $string['whatresulted'] = 'What resulted?';
@@ -604,6 +684,13 @@ on {$a->date} from {$a->time} to {$a->endtime}
 with {$a->attendant}.
 
 Location: {$a->location}';
+
+$string['email_slotopenedup_html'] = '<p>An appointment has become available for a slot on {$a->date} at {$a->time} with the {$a->staffrole} {$a->attendant}.</p>
+<p>This is regarding the activity titled &quot;<a href="{$a->scheduler_url}"><em>{$a->module}</em></a>&quot;, in the course &quot;<a href="{$a->course_url}"><em>{$a->course_short}: {$a->course}</em></a>&quot; on the website &quot;<a href="{$a->site_url}"><em>{$a->site}</em></a>&quot;.</p>';
+$string['email_slotopenedup_plain'] = 'An appointment has become available for a slot on {$a->date} at {$a->time} with the {$a->staffrole} {$a->attendant}.
+
+This is regarding the activity titled "{$a->module}", in the course "{$a->course_short}: {$a->course}" on the website "{$a->site}".';
+$string['email_slotopenedup_subject'] = '{$a->course_short}: A slot became available';
 
 $string['email_reminder_html'] = '<p>You have an upcoming appointment on <strong>{$a->date}</strong>
 from <strong>{$a->time}</strong> to <strong>{$a->endtime}</strong><br/>
