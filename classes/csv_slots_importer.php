@@ -24,7 +24,6 @@
  */
 
 namespace mod_scheduler;
-defined('MOODLE_INTERNAL') || die();
 
 use core_user;
 use csv_import_reader;
@@ -33,6 +32,7 @@ use mod_scheduler\local\iterator\csv_reader_iterator;
 use mod_scheduler\local\iterator\map_iterator;
 use mod_scheduler\model\scheduler;
 use mod_scheduler\permission\scheduler_permissions;
+use Traversable;
 
 /**
  * Slots importer from CSV.
@@ -130,7 +130,7 @@ class csv_slots_importer implements \IteratorAggregate {
      *
      * @return \Iterator
      */
-    public function getIterator() {
+    public function getIterator(): Traversable { // @codingStandardsIgnoreLine
         return new map_iterator(
             new csv_reader_iterator($this->cir),
             function($line, $lineno) {
@@ -142,7 +142,7 @@ class csv_slots_importer implements \IteratorAggregate {
     /**
      * Make a slot from a processed line.
      *
-     * @param object $info Result from {@link self::process_line}.
+     * @param object $info Result from {@see self::process_line}.
      * @return slot
      */
     public function make_slot_from_processed_line($info) {
@@ -243,7 +243,7 @@ class csv_slots_importer implements \IteratorAggregate {
     /**
      * Validates the slot data.
      *
-     * @param object $data Data from {@link self::convert_line}.
+     * @param object $data Data from {@see self::convert_line}.
      * @return string[]
      */
     protected function validate_data($data) {

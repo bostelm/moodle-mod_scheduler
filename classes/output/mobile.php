@@ -24,10 +24,8 @@
  */
 
 namespace mod_scheduler\output;
-defined('MOODLE_INTERNAL') || die();
 
 use moodle_exception;
-use mod_scheduler_renderer as renderer;
 use mod_scheduler\external;
 use mod_scheduler\slots_query_builder;
 use mod_scheduler\model\scheduler;

@@ -24,7 +24,6 @@
  */
 
 namespace mod_scheduler\local\iterator;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Iterator map.
@@ -52,24 +51,47 @@ class map_iterator implements \Iterator {
         $this->callback = $callback;
     }
 
+    #[\ReturnTypeWillChange]
+    /**
+     * Current.
+     *
+     * @return mixed
+     */
     public function current() {
         $cb = $this->callback;
         return $cb($this->iterator->current(), $this->iterator->key());
     }
 
+    #[\ReturnTypeWillChange]
+    /**
+     * Key.
+     *
+     * @return mixed
+     */
     public function key() {
         return $this->iterator->key();
     }
 
-    public function next() {
+    /**
+     * Next.
+     */
+    public function next(): void {
         $this->iterator->next();
     }
 
-    public function rewind() {
+    /**
+     * Rewing.
+     */
+    public function rewind(): void {
         $this->iterator->rewind();
     }
 
-    public function valid() {
+    /**
+     * Valid.
+     *
+     * @return bool
+     */
+    public function valid(): bool {
         return $this->iterator->valid();
     }
 

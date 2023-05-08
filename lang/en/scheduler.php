@@ -343,19 +343,19 @@ $string['importslots'] = 'Import slots';
 $string['importslots_help'] = '
 Slots can be imported from a CSV file, containing the following __mandatory__ columns:
 
-- `date`: The date at which the slot starts
-- `time`: The time of the day at which the slots starts
-- `duration`: The duration of the slots, in minutes
+- date: The date at which the slot starts
+- time: The time of the day at which the slots starts
+- duration: The duration of the slots, in minutes
 
 The following columns are also supported:
 
-- `maxstudents`: The maximum number of students in the slot. Use `1` for exclusive, or `0` for unlimited.
-- `location`: The location of the appointment.
-- `teacher`: The username of the Moodle account of the teacher. An empty value defaults to the current user.
-- `displayfrom`: The date from which the slot will be visible.
-- `comment`: Notes to be attached to the slot. The Markdown format is supported.
+- maxstudents: The maximum number of students in the slot. Use 1 for exclusive, or 0 for unlimited.
+- location: The location of the appointment.
+- teacher: The username of the Moodle account of the teacher. An empty value defaults to the current user.
+- displayfrom: The date from which the slot will be visible.
+- comment: Notes to be attached to the slot. The Markdown format is supported.
 
-The dates can be expressed in either of these formats: `MM/DD/YYYY`, `YYYY-MM-DD` or `DD-MM-YYYY`. The time can be expressed in 12h or 24h form: `2:00pm` or `14:00`.
+The dates can be expressed in either of these formats: MM/DD/YYYY, YYYY-MM-DD or DD-MM-YYYY. The time can be expressed in 12h or 24h form: 2:00pm or 14:00.
 ';
 $string['importslotsintro'] = 'Please provide a CSV matching the required format, an example file can be downloaded [here]({$a->exampleurl}).';
 $string['importallvalidslots'] = 'Import all valid slots';

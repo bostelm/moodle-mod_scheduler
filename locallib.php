@@ -356,7 +356,7 @@ function mod_scheduler_get_student_upload_options(scheduler $scheduler) {
  * @param int $slotid The slot ID.
  * @param int $userid The user ID.
  * @param int $groupid The group ID, or 0.
- * @param mixed $formdata The form data from {@link scheduler_booking_form}.
+ * @param mixed $formdata The form data from {@see scheduler_booking_form}.
  * @throws mixed moodle_exception
  */
 function mod_scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $formdata) {

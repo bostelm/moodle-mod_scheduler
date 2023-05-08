@@ -24,7 +24,6 @@
  */
 
 namespace mod_scheduler\local\iterator;
-defined('MOODLE_INTERNAL') || die();
 
 use csv_import_reader;
 
@@ -56,6 +55,7 @@ class csv_reader_iterator implements \Iterator {
         $this->cir = $cir;
     }
 
+    #[\ReturnTypeWillChange]
     /**
      * Return current value.
      *
@@ -81,6 +81,7 @@ class csv_reader_iterator implements \Iterator {
         }
     }
 
+    #[\ReturnTypeWillChange]
     /**
      * Return the line number.
      *
@@ -97,7 +98,7 @@ class csv_reader_iterator implements \Iterator {
      *
      * @return void
      */
-    public function next() {
+    public function next(): void {
         $this->ensure_initialised();
         $this->pos++;
         $this->current = $this->cir->next();
@@ -108,7 +109,7 @@ class csv_reader_iterator implements \Iterator {
      *
      * @return void
      */
-    public function rewind() {
+    public function rewind(): void {
         $this->pos = 0;
         $this->initialised = false;
         $this->current = null;
@@ -120,7 +121,7 @@ class csv_reader_iterator implements \Iterator {
      *
      * @return bool
      */
-    public function valid() {
+    public function valid(): bool {
         return $this->current !== false;
     }
 }

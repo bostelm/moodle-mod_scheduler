@@ -38,7 +38,7 @@ $PAGE->set_docs_path('mod/scheduler/import');
 // Check permissions and whether we have teachers.
 $permissions->ensure($permissions->can_edit_own_slots());
 if (!$scheduler->has_available_teachers()) {
-    print_error('needteachers', 'scheduler', $returnurl);
+    throw new moodle_exception('needteachers', 'scheduler', $returnurl);
 }
 
 // While we don't yet have a valid file.
@@ -64,7 +64,7 @@ if (empty($iid)) {
         if (!empty($errors)) {
             $errorkey = array_keys($errors)[0];
             $error = reset($errors);
-            print_error($errorkey, '', $baseurl, $error);
+            throw new moodle_exception($errorkey, 'core_error', $baseurl, $error);
         }
 
         $table = new flexible_table('import-slot-preview');
@@ -141,7 +141,7 @@ if (empty($iid)) {
         if (!empty($errors)) {
             $errorkey = array_keys($errors)[0];
             $error = reset($errors);
-            print_error($errorkey, '', $baseurl, $error);
+            throw new moodle_exception($errorkey, 'core_error', $baseurl, $error);
         }
 
         $imported = 0;

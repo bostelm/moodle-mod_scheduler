@@ -24,7 +24,6 @@
  */
 
 namespace mod_scheduler\task;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Purge obsolete watchers.

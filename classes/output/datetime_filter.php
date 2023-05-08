@@ -57,7 +57,7 @@ class mod_scheduler_output_datetime_filter extends \MoodleQuickForm_group {
      *
      * @return void
      */
-    public function _createElements() {
+    public function _createElements() { // @codingStandardsIgnoreLine
         $this->_elements = [];
 
         $operator = $this->createFormElement('select', $this->getName() . '[op]', '', [
@@ -88,7 +88,7 @@ class mod_scheduler_output_datetime_filter extends \MoodleQuickForm_group {
      * @param  bool  $notused Not used.
      * @return array field name => value. The value is the time interval in seconds.
      */
-    function exportValue(&$submitvalues, $notused = false) {
+    public function exportValue(&$submitvalues, $notused = false) { // @codingStandardsIgnoreLine
         // Get the values from all the child elements.
         $values = [];
         foreach ($this->_elements as $element) {

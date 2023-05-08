@@ -178,7 +178,7 @@ class appointment extends mvc_child_record_model {
      * Set attended.
      *
      * This method is protected as it currently is only meant to be used from
-     * the {@link mvc_record_model::__set} method.
+     * the {@see mvc_record_model::__set} method.
      *
      * We use this method to observe whether the value has changed and decide
      * whether to inform the scheduler that it should be updating the completion

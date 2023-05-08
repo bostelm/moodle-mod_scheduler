@@ -24,7 +24,6 @@
  */
 
 namespace mod_scheduler\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Slot watched.
