@@ -25,11 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 /*
- * This is the development branch (master) of the scheduler module.
+ * This is the 4.0 branch of the scheduler module, intended for Moodle 4.0 and later.
  */
 
 $plugin->component = 'mod_scheduler'; // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2023052400;      // The current module version (Date: YYYYMMDDXX).
-$plugin->release   = '4.x dev';       // Human-friendly version name.
+$plugin->version   = 2023052300;      // The current module version (Date: YYYYMMDDXX).
+$plugin->release   = '4.0.0';       // Human-friendly version name.
 $plugin->requires  = 2022041900;      // Requires Moodle 4.0.
-$plugin->maturity  = MATURITY_ALPHA;  // Development release - not for production use.
+$plugin->maturity  = MATURITY_STABLE;  // Stable version.

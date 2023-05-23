@@ -70,6 +70,13 @@ With further contributions taken from:
 Release notes
 -------------
 
+### Version 4.0
+
+Intended for Moodle 4.0 and later. 
+
+This release has no major new features, but only adaptions to API changes
+in Moodle 4.x, along with bugfixes.
+
 ### Version 3.7
 
 #### New features / improvements:
