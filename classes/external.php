@@ -80,18 +80,25 @@ class external extends external_api {
         $query = $params['query'];
         $scheduler = $params['scheduler'];
         $groupids = $params['groupids'];
+        if (empty($groupids)) {
+            $groupids = 0;
+        }
 
         $scheduler = scheduler::load_by_id($scheduler);
-        $availablestudents = $scheduler->get_available_students();
+        $availablestudents = $scheduler->get_available_students($groupids);
 
         $students = [];
         $i = 0;
+        $maxstudents = 100;
         foreach ($availablestudents as $id => $student) {
             $fullname = fullname($student);
 
-            if (mb_strpos($fullname, $query) !== false) {
+            if (empty($query) || mb_stripos($fullname, $query) !== false) {
                 $students[] = ['id' => $id, 'fullname' => fullname($student)];
                 $i++;
+                if ($i >= $maxstudents) {
+                    return $students;
+                }
             }
         }
 
