@@ -399,6 +399,7 @@ $string['return'] = 'Back to course';
 $string['revoke'] = 'Revoke the appointment';
 $string['saturday'] = 'Saturday';
 $string['save'] = 'Save';
+$string['savechangesandcontinueediting'] = 'Save changes and continue editing';
 $string['savechoice'] = 'Save my choice';
 $string['saveseen'] = 'Save seen';
 $string['schedule'] = 'Schedule';

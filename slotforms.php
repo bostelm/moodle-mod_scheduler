@@ -215,6 +215,14 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         if (isset($this->_customdata['offset'])) {
             $offset = $this->_customdata['offset'];
         }
+        $lastpage = null;
+        if (isset($this->_customdata['lastpage'])) {
+            $lastpage = $this->_customdata['lastpage'];
+        }
+        $pagingbar = null;
+        if (isset($this->_customdata['pagingbar'])) {
+            $pagingbar = $this->_customdata['pagingbar'];
+        }
 
         // Start date/time of the slot.
         $mform->addElement('date_time_selector', 'starttime', get_string('date', 'scheduler'), $timeoptions);
@@ -248,6 +256,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         // Appointments.
 
+        if (!empty($pagingbar)) {
+            $mform->addElement('html', $pagingbar);
+        }
+
         $repeatarray = array();
         $grouparray = array();
         $repeatarray[] = $mform->createElement('header', 'appointhead', get_string('appointmentno', 'scheduler', '{number}'));
@@ -260,6 +272,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         if (!empty($this->_customdata['scheduler'])) {
             $options['scheduler'] = $this->_customdata['scheduler'];
         }
+        if (!empty($this->_customdata['groupids'])) {
+            $options['groupids'] = $this->usergroups;
+        }
+
         $grouparray[] = $mform->createElement('autocomplete', 'studentid', '', [], $options);
 
         $grouparray[] = $mform->createElement('hidden', 'appointid', 0);
@@ -300,6 +316,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
             $repeatno = 1;
         }
 
+        // Add hidden for number of appointments on this page. Then use disabledif on hidden value with calculation.
+        $mform->addElement('hidden', 'repeatno', $repeatno);
+        $mform->setType('repeatno', PARAM_INT);
+
         $repeateloptions = array();
         $repeateloptions['appointid']['type'] = PARAM_INT;
         $repeateloptions['studentid']['disabledif'] = array('appointid', 'neq', 0);
@@ -315,8 +335,17 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                         'appointment_repeats', 'appointment_add', 1, get_string('addappointment', 'scheduler'));
 
         $appointmentsperpage = get_config('mod_scheduler', 'appointmentsperpage');
-        // Fix appointment numbers affected by paging here. repeat_elements doesn't support paging.
 
+        if (!empty($appointmentsperpage)) {
+            if (!$lastpage) {
+                $this->_form->disabledIf('appointment_add', 'repeatno', 'eq', $appointmentsperpage);
+            }
+            if (!empty($pagingbar)) {
+                $mform->addElement('html', $pagingbar);
+            }
+        }
+
+        // Fix appointment numbers affected by paging here. repeat_elements doesn't support paging.
         $number = $offset * $appointmentsperpage;
         foreach ($this->_form->_elements as $element) {
             if (is_a($element, 'HTML_QuickForm_header')) {
@@ -324,7 +353,15 @@ class scheduler_editslot_form extends scheduler_slotform_base {
                 $number++;
             }
         }
-        $this->add_action_buttons();
+
+        $buttonarray = [];
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
+        $buttonarray[] = &$mform->createElement('submit', 'savechangesandcontinueediting',
+            get_string('savechangesandcontinueediting', 'mod_scheduler'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
+        $mform->closeHeaderBefore('buttonar');
+
     }
 
     /**
