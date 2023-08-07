@@ -75,11 +75,11 @@ class send_reminders extends \core\task\scheduled_task {
             // Send reminder to all students in the slot.
             foreach ($slotm->get_appointments() as $appointment) {
                 $student = $DB->get_record('user', array('id' => $appointment->studentid));
-                cron_setup_user($student, $course);
+                \core\cron::setup_user();
                 \scheduler_messenger::send_slot_notification($slotm,
                         'reminder', 'reminder', $teacher, $student, $teacher, $student, $course);
             }
         }
-        cron_setup_user();
+        \core\cron::setup_user();
     }
 }
