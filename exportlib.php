@@ -659,7 +659,8 @@ class scheduler_profile_field extends scheduler_export_field {
      * @return string the value of this field for the given data
      */
     public function get_value(slot $slot, $appointment) {
-        if (!$appointment instanceof appointment || $appointment->studentid == 0) {
+        if (!$appointment instanceof appointment || $appointment->studentid == 0
+        || !context_user::instance($appointment->studentid, IGNORE_MISSING)) {
             return '';
         }
         $this->field->set_userid($appointment->studentid);
