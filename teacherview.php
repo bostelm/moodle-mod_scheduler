@@ -148,7 +148,7 @@ if ($action == 'addslot') {
     $actionurl = new moodle_url($baseurl, array('what' => 'addslot'));
 
     if (!$scheduler->has_available_teachers()) {
-        throw new moodle_exception('needteachers', 'scheduler', viewurl);
+        throw new moodle_exception('needteachers', 'scheduler', $viewurl);
     }
 
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee);
