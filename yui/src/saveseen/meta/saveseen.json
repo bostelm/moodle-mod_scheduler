@@ -1,7 +1,0 @@
-{
-    "moodle-mod_scheduler-saveseen": {
-        "requires": [
-            "base", "node", "event"
-        ]
-    }
-}

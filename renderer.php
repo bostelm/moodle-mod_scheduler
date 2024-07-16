@@ -519,9 +519,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
         $toggleid = html_writer::random_id('toggle');
 
         if ($studentlist->expandable && count($studentlist->students) > 0) {
-            $this->page->requires->yui_module('moodle-mod_scheduler-studentlist',
-                            'M.mod_scheduler.studentlist.init',
-                            array($toggleid, (boolean) $studentlist->expanded) );
+            $this->page->requires->js_call_amd('mod_scheduler/studentlist', 'init', [$toggleid, (boolean) $studentlist->expanded]);
             $imgclass = 'studentlist-togglebutton';
             $alttext = get_string('showparticipants', 'scheduler');
             $o .= $this->output->pix_icon('t/switch', $alttext, 'moodle',
@@ -708,8 +706,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      */
     public function render_scheduler_slot_manager(scheduler_slot_manager $slotman) {
 
-        $this->page->requires->yui_module('moodle-mod_scheduler-saveseen',
-                        'M.mod_scheduler.saveseen.init', array($slotman->scheduler->cmid) );
+        $this->page->requires->js_call_amd('mod_scheduler/saveseen', 'init', [$slotman->scheduler->cmid] );
 
         $o = '';
 
