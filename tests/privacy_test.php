@@ -87,6 +87,11 @@ class privacy_test extends provider_testcase {
      */
     protected $allstudents;
 
+    /**
+     * @var array all appointment ids involved in the scheduler
+     */
+    protected $appointmentids;
+
     protected function setUp(): void {
         global $DB, $CFG;
 

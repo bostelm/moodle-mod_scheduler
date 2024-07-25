@@ -62,6 +62,11 @@ class scheduler_test extends \advanced_testcase {
      */
     protected $slotid;
 
+    /**
+     * @var array all appointment ids involved in the scheduler
+     */
+    protected $appointmentids;
+
     protected function setUp(): void {
         global $DB, $CFG;
 
