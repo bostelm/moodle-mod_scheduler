@@ -230,7 +230,7 @@ class mod_scheduler_mod_form extends moodleform_mod {
         global $DB;
 
         $editor = $data->bookinginstructions_editor;
-        if ($editor) {
+        if ($editor && array_key_exists('text', $editor)) {
             $data->bookinginstructions = file_save_draft_area_files($editor['itemid'], $context->id,
                                             'mod_scheduler', 'bookinginstructions', 0,
                                             $this->editoroptions, $editor['text']);
