@@ -402,8 +402,9 @@ class slot extends mvc_child_record_model {
         $courseid = $scheduler->get_courseid();
 
         $baseevent = new \stdClass();
-        $baseevent->description = "$schedulername<br/><br/>$schedulerdescription";
-        $baseevent->format = 1;
+        $baseevent->description = "$schedulername<br/><br/>"
+                                     .format_module_intro('scheduler', $scheduler, $scheduler->get_cmid(), false);
+        $baseevent->format = FORMAT_HTML;
         $baseevent->modulename = 'scheduler';
         $baseevent->courseid = 0;
         $baseevent->instance = $this->get_parent_id();
