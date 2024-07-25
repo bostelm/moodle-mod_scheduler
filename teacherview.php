@@ -468,8 +468,7 @@ if ($slots) {
     $delbuttons = array();
 
     $delselectedurl = new moodle_url($actionurl, array('what' => 'deleteslots'));
-    $PAGE->requires->yui_module('moodle-mod_scheduler-delselected', 'M.mod_scheduler.delselected.init',
-                                array($delselectedurl->out(false)) );
+    $PAGE->requires->js_call_amd('mod_scheduler/delselected', 'init', [$delselectedurl->out(false)]);
     $delselected = $commandbar->action_link($delselectedurl, 'deleteselection', 't/delete',
                                             'confirmdelete-selected', 'delselected');
     $delselected->formid = 'delselected';

@@ -1,7 +1,0 @@
-{
-    "moodle-mod_scheduler-studentlist": {
-        "requires": [
-            "base", "node", "event", "io"
-        ]
-    }
-}

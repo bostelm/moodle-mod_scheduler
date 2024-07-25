@@ -1,7 +1,0 @@
-{
-    "moodle-mod_scheduler-delselected": {
-        "requires": [
-            "base", "node", "event"
-        ]
-    }
-}
