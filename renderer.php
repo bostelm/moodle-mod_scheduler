@@ -137,9 +137,10 @@ class mod_scheduler_renderer extends plugin_renderer_base {
      * @param string $grade the grade to be displayed
      * @param bool $short formats the grade in short form (result empty if grading is
      * not used, or no grade is available; parantheses are put around the grade if it is present)
+     * @param int $decimals number of decimals to use for formatting/rounding, 0 by default
      * @return string the formatted grade
      */
-    public function format_grade($subject, $grade, $short = false) {
+    public function format_grade($subject, $grade, $short = false, $decimals = 0) {
         if ($subject instanceof scheduler) {
             $scaleid = $subject->scale;
         } else {
@@ -153,15 +154,16 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $result = get_string('nograde');
             }
         } else {
-            $grade = (int) $grade;
             if ($scaleid > 0) {
                 // Numeric grade.
+                $grade = round($grade, $decimals);
                 $result .= $grade;
                 if (strlen($grade) > 0) {
                     $result .= '/' . $scaleid;
                 }
             } else {
                 // Grade on scale.
+                $grade = round($grade);
                 if ($grade > 0) {
                     $levels = $this->get_scale_levels(-$scaleid);
                     if (array_key_exists($grade, $levels)) {
@@ -883,11 +885,11 @@ class mod_scheduler_renderer extends plugin_renderer_base {
 
         if ($gradeinfo->showtotalgrade) {
             $items[] = array('gradingstrategy', $this->format_grading_strategy($gradeinfo->scheduler->gradingstrategy));
-            $items[] = array('totalgrade', $this->format_grade($gradeinfo->scheduler, $gradeinfo->totalgrade));
+            $items[] = array('totalgrade', $this->format_grade($gradeinfo->scheduler, $gradeinfo->totalgrade, false, 2));
         }
 
         if (!is_null($gradeinfo->gbgrade)) {
-            $gbgradeinfo = $this->format_grade($gradeinfo->scheduler, $gradeinfo->gbgrade->grade);
+            $gbgradestr = $gradeinfo->gbgrade->str_grade;
             $attributes = array();
             if ($gradeinfo->gbgrade->hidden) {
                 $attributes[] = get_string('hidden', 'grades');
@@ -899,9 +901,9 @@ class mod_scheduler_renderer extends plugin_renderer_base {
                 $attributes[] = get_string('overridden', 'grades');
             }
             if (count($attributes) > 0) {
-                $gbgradeinfo .= ' ('.implode(', ', $attributes) .')';
+                $gbgradestr .= ' ('.implode(', ', $attributes) .')';
             }
-            $items[] = array('gradeingradebook', $gbgradeinfo);
+            $items[] = array('gradeingradebook', $gbgradestr);
         }
 
         $o = html_writer::start_div('totalgrade');
