@@ -348,7 +348,30 @@ class scheduler_command_bar implements renderable {
             $confirmaction = new confirm_action(get_string($confirmkey, 'scheduler'));
         }
         $act = new action_link($url, $title, $confirmaction, $attributes, $pix);
-        $act->primary = false;
+        return $act;
+    }
+
+    /**
+     * Creates an action menu link with an optional confirmation dialogue attached.
+     *
+     * @param moodle_url $url URL of the action
+     * @param string $titlekey key of the link title
+     * @param string $iconkey key of the icon to display
+     * @param string|null $confirmkey key for the confirmation text
+     * @param string|null $id id attribute of the new link
+     * @return action_menu_link the new action link
+     */
+    public function action_menu_link(moodle_url $url, $titlekey, $iconkey, $confirmkey = null, $id = null) {
+        $title = get_string($titlekey, 'scheduler');
+        $pix = new pix_icon($iconkey, $title, 'moodle', array('class' => 'iconsmall', 'title' => ''));
+        $attributes = array();
+        if ($id) {
+            $attributes['id'] = $id;
+        }
+        $act = new action_menu_link($url, $pix, $title, false, $attributes);
+        if ($confirmkey) {
+            $act->add_action(new confirm_action(get_string($confirmkey, 'scheduler')));
+        }
         return $act;
     }
 

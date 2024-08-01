@@ -679,6 +679,29 @@ class mod_scheduler_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders an action menu component. Enhanced to allow confirmation dialogues in action menu items.
+     *
+     * @param action_menu $menu
+     * @return string HTML
+     */
+    public function render_action_menu(action_menu $menu) {
+
+        // We don't want the class icon there!
+        foreach ($menu->get_secondary_actions() as $action) {
+            if ($action instanceof \action_menu_link && $action->has_class('icon')) {
+                $action->attributes['class'] = preg_replace('/(^|\s+)icon(\s+|$)/i', '', $action->attributes['class']);
+            }
+        }
+
+        if ($menu->is_empty()) {
+            return '';
+        }
+        $context = $menu->export_for_template($this);
+
+        return $this->render_from_template('mod_scheduler/action_menu', $context);
+    }
+
+    /**
      * Render a command bar.
      *
      * @param scheduler_command_bar $commandbar
