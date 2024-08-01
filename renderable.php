@@ -348,7 +348,6 @@ class scheduler_command_bar implements renderable {
             $confirmaction = new confirm_action(get_string($confirmkey, 'scheduler'));
         }
         $act = new action_link($url, $title, $confirmaction, $attributes, $pix);
-        $act->primary = false;
         return $act;
     }
 
