@@ -34,7 +34,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I set the following fields to these values:
       | Grade | 7 |
     And I click on "Save" "button"
-    Then I should see "7/10" in the "div.totalgrade" "css_element"
+    Then I should see "7.00" in the "div.totalgrade" "css_element"
     And I am on the "scheduler1" Activity page
     And I should see "7/10" in the "5:00 AM" "table_row"
     And I log out
@@ -58,7 +58,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I set the following fields to these values:
       | Grade | 3 |
     And I click on "Save" "button"
-    Then I should see "3/10" in the "div.totalgrade" "css_element"
+    Then I should see "3.00" in the "div.totalgrade" "css_element"
     And I log out
 
     When I am on the "C1" Course page logged in as "student2"
@@ -72,14 +72,18 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I set the following fields to these values:
       | Grade | 6 |
     And I click on "Save" "button"
-    Then I should see "6/10" in the "div.totalgrade" "css_element"
+    Then I should see "6.00" in the "div.totalgrade" "css_element"
+    And I click on "All appointments of this student" "text"
+    And I should see "Take the highest grade" in the "div.totalgrade" "css_element"
+    And I should see "6/10" in the "div.totalgrade" "css_element"
+    And I should see "6.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page
     And I click on "Student 2" "text" in the "4:00 AM" "table_row"
     And I set the following fields to these values:
       | Grade | 4 |
     And I click on "Save" "button"
-    And I should see "6/10" in the "div.totalgrade" "css_element"
+    And I should see "6.00" in the "div.totalgrade" "css_element"
     And I log out
 
     When I am on the "C1" Course page logged in as "student2"
@@ -93,7 +97,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I set the following fields to these values:
       | Grade | 2 |
     And I click on "Save" "button"
-    And I should see "4/10" in the "div.totalgrade" "css_element"
+    And I should see "4.00" in the "div.totalgrade" "css_element"
     And I log out
     And I am on the "C1" Course page logged in as "student2"
     And I follow "Grades" in the user menu
@@ -106,7 +110,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I set the following fields to these values:
       | Grade | 8 |
     And I click on "Save" "button"
-    And I should see "8/10" in the "div.totalgrade" "css_element"
+    And I should see "8.00" in the "div.totalgrade" "css_element"
     And I log out
     And I am on the "C1" Course page logged in as "student2"
     And I follow "Grades" in the user menu
@@ -124,18 +128,18 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I set the following fields to these values:
       | Grade | 3 |
     And I click on "Save" "button"
-    And I should see "3/10" in the "div.totalgrade" "css_element"
+    And I should see "3.00" in the "div.totalgrade" "css_element"
     And I am on the "scheduler1" Activity page
     And I click on "Student 2" "text" in the "4:00 AM" "table_row"
     And I set the following fields to these values:
       | Grade | 9 |
     And I click on "Save" "button"
-    And I should see "9/10" in the "div.totalgrade" "css_element"
+    And I should see "9.00" in the "div.totalgrade" "css_element"
     And I am on the "scheduler1" Activity page
     And I click on "Student 2" "text" in the "6:00 AM" "table_row"
     And I set the following fields to these values:
       | Grade | 4 |
-    And I should see "9/10" in the "div.totalgrade" "css_element"
+    And I should see "9.00" in the "div.totalgrade" "css_element"
     And I click on "Save" "button"
     And I log out
     And I am on the "C1" Course page logged in as "student2"
@@ -168,7 +172,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I click on "Save" "button"
     Then I should see "5/10" in the "3:00 AM" "table_row"
     And I click on "Student 2" "text" in the "3:00 AM" "table_row"
-    And I should see "5/10" in the "div.totalgrade" "css_element"
+    And I should see "5.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page logged in as "teacher1"
     And I click on "Edit" "icon" in the "4:00 AM" "table_row"
@@ -178,7 +182,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     Then I should see "5/10" in the "3:00 AM" "table_row"
     And I should see "7/10" in the "4:00 AM" "table_row"
     And I click on "Student 2" "text" in the "3:00 AM" "table_row"
-    And I should see "7/10" in the "div.totalgrade" "css_element"
+    And I should see "7.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page logged in as "teacher1"
     And I click on "Edit" "icon" in the "4:00 AM" "table_row"
@@ -188,7 +192,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     Then I should see "5/10" in the "3:00 AM" "table_row"
     And I should see "2/10" in the "4:00 AM" "table_row"
     And I click on "Student 2" "text" in the "3:00 AM" "table_row"
-    And I should see "5/10" in the "div.totalgrade" "css_element"
+    And I should see "5.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page logged in as "teacher1"
     And I click on "Edit" "icon" in the "3:00 AM" "table_row"
@@ -198,4 +202,4 @@ Feature: Teachers can grade student appointments with totals automatically compu
     Then I should not see "/10" in the "3:00 AM" "table_row"
     But I should see "2/10" in the "4:00 AM" "table_row"
     And I click on "Student 2" "text" in the "3:00 AM" "table_row"
-    And I should see "2/10" in the "div.totalgrade" "css_element"
+    And I should see "2.00" in the "div.totalgrade" "css_element"
