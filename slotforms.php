@@ -211,6 +211,18 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         if (isset($this->_customdata['timeoptions'])) {
             $timeoptions = $this->_customdata['timeoptions'];
         }
+        $offset = null;
+        if (isset($this->_customdata['offset'])) {
+            $offset = $this->_customdata['offset'];
+        }
+        $lastpage = null;
+        if (isset($this->_customdata['lastpage'])) {
+            $lastpage = $this->_customdata['lastpage'];
+        }
+        $pagingbar = null;
+        if (isset($this->_customdata['pagingbar'])) {
+            $pagingbar = $this->_customdata['pagingbar'];
+        }
 
         // Start date/time of the slot.
         $mform->addElement('date_time_selector', 'starttime', get_string('date', 'scheduler'), $timeoptions);
@@ -244,19 +256,28 @@ class scheduler_editslot_form extends scheduler_slotform_base {
 
         // Appointments.
 
+        if (!empty($pagingbar)) {
+            $mform->addElement('html', $pagingbar);
+        }
+
         $repeatarray = array();
         $grouparray = array();
-        $repeatarray[] = $mform->createElement('header', 'appointhead', get_string('appointmentno', 'scheduler', '{no}'));
+        $repeatarray[] = $mform->createElement('header', 'appointhead', get_string('appointmentno', 'scheduler', '{number}'));
 
-        // Choose student.
-        $students = $this->scheduler->get_available_students($this->usergroups);
-        $studentchoices = array();
-        if ($students) {
-            foreach ($students as $astudent) {
-                $studentchoices[$astudent->id] = fullname($astudent);
-            }
+        $options = [
+            'ajax' => 'mod_scheduler/studentid',
+            'valuehtmlcallback' => 'student_autocomplete_callback'
+        ];
+
+        if (!empty($this->_customdata['scheduler'])) {
+            $options['scheduler'] = $this->_customdata['scheduler'];
         }
-        $grouparray[] = $mform->createElement('searchableselector', 'studentid', '', $studentchoices);
+        if (!empty($this->_customdata['groupids'])) {
+            $options['groupids'] = $this->usergroups;
+        }
+
+        $grouparray[] = $mform->createElement('autocomplete', 'studentid', '', [], $options);
+
         $grouparray[] = $mform->createElement('hidden', 'appointid', 0);
 
         // Seen tickbox.
@@ -295,6 +316,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
             $repeatno = 1;
         }
 
+        // Add hidden for number of appointments on this page. Then use disabledif on hidden value with calculation.
+        $mform->addElement('hidden', 'repeatno', $repeatno);
+        $mform->setType('repeatno', PARAM_INT);
+
         $repeateloptions = array();
         $repeateloptions['appointid']['type'] = PARAM_INT;
         $repeateloptions['studentid']['disabledif'] = array('appointid', 'neq', 0);
@@ -309,7 +334,33 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $this->repeat_elements($repeatarray, $repeatno, $repeateloptions,
                         'appointment_repeats', 'appointment_add', 1, get_string('addappointment', 'scheduler'));
 
-        $this->add_action_buttons();
+        $appointmentsperpage = get_config('mod_scheduler', 'appointmentsperpage');
+
+        if (!empty($appointmentsperpage)) {
+            if (!$lastpage) {
+                $this->_form->disabledIf('appointment_add', 'repeatno', 'eq', $appointmentsperpage);
+            }
+            if (!empty($pagingbar)) {
+                $mform->addElement('html', $pagingbar);
+            }
+        }
+
+        // Fix appointment numbers affected by paging here. repeat_elements doesn't support paging.
+        $number = $offset * $appointmentsperpage;
+        foreach ($this->_form->_elements as $element) {
+            if (is_a($element, 'HTML_QuickForm_header')) {
+                $element->setValue(str_replace('{number}', ($number + 1), $element->_text));
+                $number++;
+            }
+        }
+
+        $buttonarray = [];
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
+        $buttonarray[] = &$mform->createElement('submit', 'savechangesandcontinueediting',
+            get_string('savechangesandcontinueediting', 'mod_scheduler'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
+        $mform->closeHeaderBefore('buttonar');
 
     }
 
@@ -382,7 +433,7 @@ class scheduler_editslot_form extends scheduler_slotform_base {
      * @param slot $slot
      * @return stdClass form data
      */
-    public function prepare_formdata(slot $slot) {
+    public function prepare_formdata(slot $slot, $offset = 0) {
 
         $context = $slot->get_scheduler()->get_context();
 
@@ -400,7 +451,33 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         }
 
         $i = 0;
-        foreach ($slot->get_appointments() as $appointment) {
+        $slots = $slot->get_appointments();
+
+        $start = 0;
+        $end = count($slots);
+        $appointmentsperpage = get_config('mod_scheduler', 'appointmentsperpage');
+        if (!empty($appointmentsperpage)) {
+            $start = $offset * $appointmentsperpage;
+            $end = $start + $appointmentsperpage;
+        }
+
+        $counter = 0;
+        foreach ($slots as $appointment) {
+
+            // Appointments on forms page need to be indexed from zero, even when paging.
+            // Use $i for indexing appointments that will be repeated on form.
+            // When $i > $appointmentsperpage, break from loop.
+            if ($i >= $appointmentsperpage) {
+                break;
+            }
+
+            // Use counter to loop through appointments.
+            if ($counter < $start || $counter >= $end) {
+                $counter++;
+                continue;
+            }
+            $counter++;
+
             $data->appointid[$i] = $appointment->id;
             $data->studentid[$i] = $appointment->studentid;
             $data->attended[$i] = $appointment->attended;

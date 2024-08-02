@@ -184,19 +184,62 @@ if ($action == 'updateslot') {
         $timeoptions = array('step' => 5, 'optional' => false);
     }
 
-    $actionurl = new moodle_url($baseurl, array('what' => 'updateslot', 'slotid' => $slotid));
+    $actionurl = new moodle_url($baseurl, array('what' => 'updateslot', 'slotid' => $slotid, 'sesskey' => sesskey()));
 
-    $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array(
-            'slotid' => $slotid,
-            'timeoptions' => $timeoptions)
-        );
-    $data = $mform->prepare_formdata($slot);
+    // Paging.
+    $appointmentsperpage = get_config('mod_scheduler', 'appointmentsperpage');
+
+    $pagingbar = null;
+    $lastpage = false;
+    if (!empty($appointmentsperpage)) {
+
+        global $DB;
+        $appointments = $DB->count_records('scheduler_appointment', array('slotid' => $slotid));
+
+        $pagesize = $appointmentsperpage;
+        $repeats = $appointmentsperpage;
+        if ($offset == -1) {
+            if ($appointments > $pagesize) {
+                $offset = floor($appointments / $pagesize);
+            } else {
+                $offset = 0;
+            }
+        }
+        if ($offset * $pagesize >= $appointments && $appointments > 0) {
+            $offset = floor(($appointments - 1) / $pagesize);
+        }
+
+        if ($appointments - $offset * $pagesize <= $pagesize) {
+            $repeats = $appointments - $offset * $pagesize;
+            $lastpage = true;
+        }
+
+        global $output;
+        $pagingbar = $output->paging_bar($appointments, $offset, $appointmentsperpage, $actionurl, 'offset');
+    }
+
+    $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, [
+        'slotid' => $slotid,
+        'scheduler' => $scheduler->id,
+        'timeoptions' => $timeoptions,
+        'repeats' => $repeats,
+        'offset' => $offset,
+        'lastpage' => $lastpage,
+        'pagingbar' => $pagingbar
+    ]);
+    $data = $mform->prepare_formdata($slot, $offset);
+
     $mform->set_data($data);
 
     if ($mform->is_cancelled()) {
         redirect($viewurl);
     } else if ($formdata = $mform->get_data()) {
         $mform->save_slot($slotid, $formdata);
+
+        if (isset($formdata->savechangesandcontinueediting)) {
+            $viewurl = $actionurl;
+        }
+
         redirect($viewurl,
                  get_string('slotupdated', 'scheduler'),
                  0,
@@ -204,7 +247,9 @@ if ($action == 'updateslot') {
     } else {
         echo $output->header();
         echo $output->heading(get_string('updatesingleslot', 'scheduler'));
+
         $mform->display();
+
         echo $output->footer($course);
         die;
     }
@@ -637,7 +682,8 @@ if ($students === 0) {
 
             $groupcnt = 0;
             foreach ($groupsicanschedule as $group) {
-                $members = groups_get_members($group->id, 'u.*', 'u.lastname, u.firstname');
+                $members = groups_get_members($group->id,
+                    implode(',', \core_user\fields::get_picture_fields()), 'lastname, firstname');
                 if (empty($members)) {
                     continue;
                 }
