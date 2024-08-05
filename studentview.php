@@ -78,9 +78,8 @@ if ($showowngrades) {
             $grademsg = html_writer::tag('p',
                             get_string('overriddennotice', 'grades'),  array('class' => 'overriddennotice')
                         );
-        } else {
-            $grademsg = get_string('yourtotalgrade', 'scheduler', $output->format_grade($scheduler, $totalgrade));
         }
+        $grademsg .= get_string('yourtotalgrade', 'scheduler', $gradebookinfo->str_grade);
         echo html_writer::div($grademsg, 'totalgrade');
     }
 }
