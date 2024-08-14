@@ -78,6 +78,18 @@ function scheduler_add_instance($data, $mform = null) {
     return $data->id;
 }
 
+function scheduler_student_autocomplete_callback($value) {
+    global $OUTPUT;
+
+    $fields = 'id ' .  \core_user\fields::for_name()->get_sql()->selects;
+    $user = \core_user::get_user($value, $fields);
+    $useroptiondata = [
+        'fullname' => fullname($user)
+    ];
+
+    return $OUTPUT->render_from_template('mod_scheduler/studentid', $useroptiondata);
+}
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod.html) this function

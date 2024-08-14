@@ -170,8 +170,8 @@ class behat_mod_scheduler extends behat_base {
         $downarrowtarget = "(//span[contains(@class,'form-autocomplete-downarrow')])[$listnumber]";
         $this->execute('behat_general::i_click_on', [$downarrowtarget, 'xpath_element']);
 
-         $xpathtarget = "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|" .
-             $item . "|')])[$listnumber]";
-         $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
+        $xpathtarget = "(//descendant::ul[@class='form-autocomplete-suggestions'][$listnumber]//"
+                       ."*[contains(concat('|', string(.), '|'),'|$item|')])";
+        $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
     }
 }

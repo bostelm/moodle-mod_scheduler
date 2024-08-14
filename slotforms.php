@@ -249,14 +249,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $repeatarray[] = $mform->createElement('header', 'appointhead', get_string('appointmentno', 'scheduler', '{no}'));
 
         // Choose student.
-        $students = $this->scheduler->get_available_students($this->usergroups);
-        $studentchoices = array();
-        if ($students) {
-            foreach ($students as $astudent) {
-                $studentchoices[$astudent->id] = fullname($astudent);
-            }
-        }
-        $grouparray[] = $mform->createElement('searchableselector', 'studentid', '', $studentchoices);
+        $options = [
+                'ajax' => 'mod_scheduler/studentid',
+                'valuehtmlcallback' => 'scheduler_student_autocomplete_callback',
+                'scheduler' => $this->scheduler->id
+        ];
+        $grouparray[] = $mform->createElement('autocomplete', 'studentid', '', [], $options);
         $grouparray[] = $mform->createElement('hidden', 'appointid', 0);
 
         // Seen tickbox.

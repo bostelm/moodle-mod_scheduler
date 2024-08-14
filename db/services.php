@@ -15,21 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for mod/scheduler
+ * Mod Scheduler webservice definitions
  *
  * @package    mod_scheduler
- * @copyright  2018 Henning Bostelmann and others (see README.txt)
+ * @copyright  2022 University of Glasgow
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-/*
- * This is the development branch (master) of the scheduler module.
- */
+$functions = array(
 
-$plugin->component = 'mod_scheduler'; // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2024080103;      // The current module version (Date: YYYYMMDDXX).
-$plugin->release   = '4.x dev';       // Human-friendly version name.
-$plugin->requires  = 2023100905;      // Requires Moodle 4.3.
-$plugin->maturity  = MATURITY_ALPHA;  // Development release - not for production use.
+    'mod_scheduler_studentid' => array(
+        'classname'   => 'mod_scheduler\external',
+        'methodname'  => 'studentid',
+        'description' => 'Retrieve the list of potential studentids.',
+        'type'        => 'read',
+        'ajax'          => true,
+        'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+);
