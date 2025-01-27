@@ -688,7 +688,7 @@ class scheduler_appointment_info implements renderable {
         $info->appointment = $appointment;
         $info->scheduler = $slot->get_scheduler();
         $info->showslotinfo = true;
-        $info->showboookinginfo = true;
+        $info->showbookinginfo = true;
         $info->showstudentdata = $info->scheduler->uses_studentdata();
         $info->showresult   = true;
         $info->onstudentside = $onstudentside;
@@ -711,7 +711,7 @@ class scheduler_appointment_info implements renderable {
         $info->appointment = $appointment;
         $info->scheduler = $slot->get_scheduler();
         $info->showslotinfo = true;
-        $info->showboookinginfo = false;
+        $info->showbookinginfo = false;
         $info->showstudentdata = $info->scheduler->uses_studentdata();
         $info->showresult   = false;
         $info->onstudentside = false;
