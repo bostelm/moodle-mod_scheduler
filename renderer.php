@@ -840,7 +840,10 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             if ($slot->editable && $slot->isappointed) {
                 $url = new moodle_url($slotman->actionurl, array('what' => 'revokeall', 'slotid' => $slot->slotid));
                 $confirmrevoke = new confirm_action(get_string('confirmrevoke', 'scheduler'));
-                $actions .= $this->action_icon($url, new pix_icon('s/no', get_string('revoke', 'scheduler')), $confirmrevoke);
+                $actions .= $this->action_icon($url,
+                    new \pix_icon('t/no', get_string('revoke', 'scheduler'), 'mod_scheduler'),
+                    $confirmrevoke
+                );
             }
 
             if ($slot->exclusivity > 1) {

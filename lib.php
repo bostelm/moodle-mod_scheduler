@@ -769,3 +769,13 @@ function mod_scheduler_core_calendar_provide_event_action(calendar_event $event,
     );
 }
 
+/**
+ * Get icon mapping for font-awesome.
+ *
+ * @return  array
+ */
+function mod_scheduler_get_fontawesome_icon_map() {
+    return [
+        'mod_scheduler:t/no' => 'fa-thumbs-down',
+    ];
+}
