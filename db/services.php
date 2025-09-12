@@ -34,4 +34,13 @@ $functions = array(
         'ajax'          => true,
         'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
+
+    'mod_scheduler_delete_image' => array(
+        'classname'   => 'mod_scheduler\external\delete_image',
+        'classpath'   => 'mod/scheduler/classes/external/delete_image',
+        'methodname'  => 'execute',
+        'description' => 'Delete a given image.',
+        'type'        => 'write',
+        'ajax'          => true,
+    ),
 );

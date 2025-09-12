@@ -155,11 +155,17 @@ function scheduler_action_dosendmessage($scheduler, $formdata, $returnurl) {
 
     $data = (object) $formdata;
 
+    $draftitemid = file_get_submitted_draft_itemid('body');
+    // TODO: link file to notifications instead of course module?
+    $rawmessage = file_save_draft_area_files($draftitemid, $scheduler->context->id,
+                                                  'mod_scheduler', 'message', $scheduler->cm->id,
+                                                  array('subdirs'=>false, 'maxfiles' => -1), $data->body['text']);
+    $rawmessage = file_rewrite_pluginfile_urls($rawmessage, 'pluginfile.php', $scheduler->context->id, 'mod_scheduler', 'message', $scheduler->cm->id);
+
     $recipients = $data->recipient;
     if ($data->copytomyself) {
         $recipients[$USER->id] = 1;
     }
-    $rawmessage = $data->body['text'];
     $format = $data->body['format'];
     $textmessage = format_text_email($rawmessage, $format);
     $htmlmessage = null;

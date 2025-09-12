@@ -92,7 +92,7 @@ class scheduler_message_form extends moodleform {
         }
 
         $bodyedit = $mform->addElement('editor', 'body', get_string('messagebody', 'scheduler'),
-                                       array('rows' => 15, 'columns' => 60), array('collapsed' => true));
+                                       array('rows' => 15, 'columns' => 60), array('collapsed' => true,'maxfiles' => EDITOR_UNLIMITED_FILES));
         $mform->setType('body', PARAM_RAW); // Must be PARAM_RAW for rich text editor content.
         if (isset($this->_customdata['body'])) {
             $bodyedit->setValue(array('text' => $this->_customdata['body']));

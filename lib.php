@@ -719,6 +719,8 @@ function scheduler_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
 
             $permissions->ensure($permissions->can_see_appointment($app));
 
+        } else if ($filearea === 'message') {
+            // TODO.
         } else {
             // Unknown file area.
             return false;
