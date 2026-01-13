@@ -166,7 +166,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I expand all fieldsets
     And I set the field "Grading strategy" to "Take the highest grade"
     And I press "Save and display"
-    And I click on "Edit" "icon" in the "3:00 AM" "table_row"
+    And I click on "Edit" "link" in the "3:00 AM" "table_row"
     And I set the following fields to these values:
       | grade[0] | 5 |
     And I click on "Save" "button"
@@ -175,7 +175,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I should see "5.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page logged in as "teacher1"
-    And I click on "Edit" "icon" in the "4:00 AM" "table_row"
+    And I click on "Edit" "link" in the "4:00 AM" "table_row"
     And I set the following fields to these values:
       | grade[0] | 7 |
     And I click on "Save" "button"
@@ -185,7 +185,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I should see "7.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page logged in as "teacher1"
-    And I click on "Edit" "icon" in the "4:00 AM" "table_row"
+    And I click on "Edit" "link" in the "4:00 AM" "table_row"
     And I set the following fields to these values:
       | grade[0] | 2 |
     And I click on "Save" "button"
@@ -195,7 +195,7 @@ Feature: Teachers can grade student appointments with totals automatically compu
     And I should see "5.00" in the "div.totalgrade" "css_element"
 
     When I am on the "scheduler1" Activity page logged in as "teacher1"
-    And I click on "Edit" "icon" in the "3:00 AM" "table_row"
+    And I click on "Edit" "link" in the "3:00 AM" "table_row"
     And I set the following fields to these values:
       | grade[0] | No grade |
     And I click on "Save" "button"
