@@ -367,5 +367,22 @@ function xmldb_scheduler_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022120200, 'scheduler');
     }
 
+    /* ******************* New upgrade line ********************** */
+    
+    if ($oldversion < 2026040300) {
+
+        // Define field bulkbook to be added to scheduler.
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field('bulkbook', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'schedulermode');
+
+        // Conditionally launch add field bulkbook.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Scheduler savepoint reached.
+        upgrade_mod_savepoint(true, 2026040300, 'scheduler');
+    }
+
     return true;
 }

@@ -192,6 +192,67 @@ if ($action == 'bookslot') {
     scheduler_book_slot($scheduler, $slotid, $USER->id, $appointgroup, null, null, $returnurl);
 }
 
+/************************************************ Book all slots  ************************************************/
+
+if ($action == 'bookallslots') {
+
+    require_sesskey();
+    require_capability('mod/scheduler:appoint', $context);
+
+    // Reject this request if the user is required to go through a booking form.
+    if ($scheduler->uses_bookingform()) {
+        throw new moodle_exception('error');
+    }
+
+    if (!$scheduler->bulkbook) {
+        throw new moodle_exception('nopermissions');
+    }
+
+    $bookableslots = $scheduler->get_slots_available_to_student($USER->id, false);
+    $bookedcount = 0;
+    foreach ($bookableslots as $slot) {
+        if (!$slot->is_in_bookable_period()) {
+            continue;
+        }
+        $remaining = $slot->count_remaining_appointments();
+        if ($remaining >= 0 && $remaining < 1) {
+            continue;
+        }
+        // Check the student is not already booked in this slot.
+        $existingapp = $slot->get_student_appointment($USER->id);
+        if ($existingapp) {
+            continue;
+        }
+
+        // Create new appointment.
+        $appointment = $slot->create_appointment();
+        $appointment->studentid = $USER->id;
+        $appointment->attended = 0;
+        $appointment->timecreated = time();
+        $appointment->timemodified = time();
+        $appointment->save();
+
+        \mod_scheduler\event\booking_added::create_from_slot($slot)->trigger();
+
+        // Notify the teacher.
+        if ($scheduler->allownotifications) {
+            $student = $DB->get_record('user', array('id' => $USER->id), '*', MUST_EXIST);
+            $teacher = $DB->get_record('user', array('id' => $slot->teacherid), '*', MUST_EXIST);
+            scheduler_messenger::send_slot_notification($slot, 'bookingnotification', 'applied',
+                    $student, $teacher, $teacher, $student, $COURSE);
+        }
+        $slot->save();
+        $bookedcount++;
+    }
+
+    if ($bookedcount > 0) {
+        \core\notification::success(get_string('slotsadded', 'scheduler', $bookedcount));
+    } else {
+        \core\notification::warning(get_string('noslotsavailable', 'scheduler'));
+    }
+    redirect($returnurl);
+}
+
 /******************************************** Show details of booking *******************************************/
 
 if ($action == 'viewbooking') {

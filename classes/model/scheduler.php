@@ -1047,6 +1047,11 @@ class scheduler extends mvc_record_model {
     public function count_bookable_appointments($studentid, $includechangeable = true) {
         global $DB;
 
+        // Note: cannot use empty() here on the model if we use magic __get. But using $this->data is a stdClass, so property_exists is safest.
+        if (property_exists($this->data, 'bulkbook') && $this->data->bulkbook) {
+            return -1;
+        }
+
         // Find how many slots have already been booked.
         $sql = 'SELECT COUNT(*) FROM {scheduler_slots} s'
               .' JOIN {scheduler_appointment} a ON s.id = a.slotid'

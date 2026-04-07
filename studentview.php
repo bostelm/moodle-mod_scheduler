@@ -185,9 +185,14 @@ if (!$canseefull && $bookablecnt == 0) {
         $end = $total;
     }
 
+    // When bulk booking is enabled, hide individual "Book slot" buttons.
+    // Note: cannot use empty() here as the model uses __get magic without __isset.
+    $bulkbookenabled = (bool)$scheduler->bulkbook;
+
     for ($idx = $start; $idx < $end; $idx++) {
         $slot = $bookableslots[$idx];
-        $canbookthisslot = $canbook && ($bookablecnt != 0);
+        // Disable individual booking buttons when bulk booking is on.
+        $canbookthisslot = $bulkbookenabled ? false : ($canbook && ($bookablecnt != 0));
 
         if (has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $others = new scheduler_student_list($scheduler, false);
@@ -236,8 +241,16 @@ if (!$canseefull && $bookablecnt == 0) {
 
     echo $output->heading(get_string('availableslots', 'scheduler'), 3);
     if ($canbook) {
-        echo html_writer::div($bookingmsg1, 'studentbookingmessage');
-        echo html_writer::div($bookingmsg2, 'studentbookingmessage');
+        if ($bulkbookenabled) {
+            $bulkbookurl = new moodle_url($actionurl, array('what' => 'bookallslots', 'sesskey' => sesskey()));
+            echo html_writer::start_div('bulkbook-container', array('style' => 'background:#f0f7ff; border:1px solid #0073aa; border-radius:8px; padding:15px; margin-bottom:15px; text-align:center;'));
+            echo html_writer::tag('p', get_string('bulkbook_message', 'scheduler'), array('style' => 'margin:0 0 10px 0; font-size:1.1em;'));
+            echo $output->single_button($bulkbookurl, get_string('bookallslots', 'scheduler'), 'post', array('class' => 'btn-lg'));
+            echo html_writer::end_div();
+        } else {
+            echo html_writer::div($bookingmsg1, 'studentbookingmessage');
+            echo html_writer::div($bookingmsg2, 'studentbookingmessage');
+        }
     }
     if ($total > $pagesize) {
         echo $output->paging_bar($total, $offset, $pagesize, $actionurl, 'offset');

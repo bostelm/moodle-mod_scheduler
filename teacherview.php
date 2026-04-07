@@ -471,7 +471,7 @@ if ($slots) {
     $PAGE->requires->js_call_amd('mod_scheduler/delselected', 'init', [$delselectedurl->out(false)]);
     $delselected = $commandbar->action_menu_link($delselectedurl, 'deleteselection', 't/delete',
                                                 'confirmdelete-selected', 'delselected');
-    $delselected->formid = 'delselected';
+    $delselected->attributes['formid'] = 'delselected';
     $delbuttons[] = $delselected;
 
     if ($permissions->can_edit_all_slots() && $subpage == 'allappointments') {

@@ -69,6 +69,10 @@ class mod_scheduler_mod_form extends moodleform_mod {
         $mform->addRule('staffrolename', get_string('error'), 'maxlength', 255);
         $mform->addHelpButton('staffrolename', 'staffrolename', 'scheduler');
 
+        $mform->addElement('selectyesno', 'bulkbook', get_string('bulkbook', 'scheduler'));
+        $mform->addHelpButton('bulkbook', 'bulkbook', 'scheduler');
+        $mform->setDefault('bulkbook', 0);
+
         $modegroup = array();
         $modegroup[] = $mform->createElement('static', 'modeintro', '', get_string('modeintro', 'scheduler'));
 
@@ -89,6 +93,7 @@ class mod_scheduler_mod_form extends moodleform_mod {
 
         $mform->addGroup($modegroup, 'modegrp', get_string('mode', 'scheduler'), ' ', false);
         $mform->addHelpButton('modegrp', 'appointmentmode', 'scheduler');
+        $mform->disabledIf('modegrp', 'bulkbook', 'eq', 1);
 
         if (get_config('mod_scheduler', 'groupscheduling')) {
             $selopt = array(

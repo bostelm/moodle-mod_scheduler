@@ -515,6 +515,11 @@ $string['yourslotnotes'] = 'Comments on the meeting';
 $string['yourstudentnote'] = 'Your message';
 $string['yourtotalgrade'] = 'Your total grade in this activity is <strong>{$a}</strong>.';
 
+$string['bulkbook'] = 'Enable bulk booking';
+$string['bulkbook_help'] = 'If enabled, students can book all available slots at once with a single click. The mode (appointment limit) setting will be disabled when this option is active.';
+$string['bookallslots'] = 'Book all available slots';
+$string['bulkbook_message'] = 'Bulk booking is enabled. You can book all available slots at once by clicking the button below.';
+
 
 /* ***********  Help strings from here on ************ */
 

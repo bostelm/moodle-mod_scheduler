@@ -12,6 +12,7 @@
         <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="schedulermode" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="bulkbook" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether students can book all available slots at once"/>
         <FIELD NAME="maxbookings" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Maximum number of bookings for each student (depends on scheduler mode)"/>
         <FIELD NAME="guardtime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="reuseguardtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="legacy"/>
