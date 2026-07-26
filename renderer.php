@@ -301,7 +301,7 @@ class mod_scheduler_renderer extends plugin_renderer_base
                         'appointmentid' => $appointmentid,
         ];
         $url = new moodle_url('/mod/scheduler/view.php', $paras);
-        return html_writer::link($url, fullname($user));
+        return html_writer::link($url, fullname($user), ['class' => 'align-middle']);
     }
 
     /**
@@ -416,6 +416,7 @@ class mod_scheduler_renderer extends plugin_renderer_base
      */
     public function render_scheduler_slot_table(scheduler_slot_table $slottable) {
         $table = new html_table();
+        $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
 
         if ($slottable->showslot) {
             $table->head  = [get_string('date', 'scheduler')];
@@ -610,7 +611,7 @@ class mod_scheduler_renderer extends plugin_renderer_base
                             $student->entryid,
                             $student->checked,
                             '',
-                            ['class' => 'studentselect']
+                            ['class' => 'studentselect form-check-input align-middle mt-0']
                         );
                     } else {
                         $img = $student->checked ? 'ticked' : 'unticked';
@@ -645,13 +646,16 @@ class mod_scheduler_renderer extends plugin_renderer_base
                     $class .= ' highlight';
                 }
 
-                $picture = $this->user_picture($student->user, ['courseid' => $studentlist->scheduler->courseid]);
+                $picture = $this->user_picture(
+                    $student->user,
+                    ['courseid' => $studentlist->scheduler->courseid, 'class' => 'userpicture ms-1']
+                );
                 $grade = '';
                 if ($studentlist->showgrades && $student->grade) {
                     $grade = $this->format_grade($studentlist->scheduler, $student->grade, true);
                 }
 
-                $o .= html_writer::div($checkbox . $picture . ' ' . $name . $studicons . ' ' . $grade, $class);
+                $o .= html_writer::div($checkbox . $picture . $name . $studicons . ' ' . $grade, $class);
             }
 
             if ($editable) {
@@ -678,6 +682,7 @@ class mod_scheduler_renderer extends plugin_renderer_base
     public function render_scheduler_slot_booker(scheduler_slot_booker $booker) {
 
         $table = new html_table();
+        $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
         $table->head  = [ get_string('date', 'scheduler'), get_string('start', 'scheduler'),
                         get_string('end', 'scheduler'), get_string('location', 'scheduler'),
                         get_string('comments', 'scheduler'), s($booker->scheduler->get_teacher_name()),
@@ -834,6 +839,7 @@ class mod_scheduler_renderer extends plugin_renderer_base
         $table->align[] = 'center';
 
         $table->id = 'slotmanager';
+        $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
         $table->data = [];
 
         $previousdate = '';
@@ -843,7 +849,13 @@ class mod_scheduler_renderer extends plugin_renderer_base
         foreach ($slotman->slots as $slot) {
             $rowdata = [];
 
-            $selectbox = html_writer::checkbox('selectedslot[]', $slot->slotid, false, '', ['class' => 'slotselect']);
+            $selectbox = html_writer::checkbox(
+                'selectedslot[]',
+                $slot->slotid,
+                false,
+                '',
+                ['class' => 'slotselect form-check-input mt-0']
+            );
             $rowdata[] = $slot->editable ? $selectbox : '';
 
             $startdate = $this->userdate($slot->starttime);
@@ -963,6 +975,7 @@ class mod_scheduler_renderer extends plugin_renderer_base
     public function render_scheduler_scheduling_list(scheduler_scheduling_list $list) {
 
         $mtable = new html_table();
+        $mtable->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
 
         $mtable->id = $list->id;
         $mtable->head = ['', get_string('name')];

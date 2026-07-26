@@ -121,17 +121,17 @@ switch ($subpage) {
         $allattendees = ($attendees) ? count($attendees) : 0;
 
         $str = '<h3>' . get_string('attendable', 'scheduler') . '</h3>';
-        $str .= '<strong>' . get_string('attendablelbl', 'scheduler') . '</strong>: ' . $allattendees . '<br/>';
+        $str .= '<p><strong>' . get_string('attendablelbl', 'scheduler') . '</strong>: ' . $allattendees . '</p>';
         $str .= '<h3>' . get_string('attended', 'scheduler') . '</h3>';
-        $str .= '<strong>' . get_string('attendedlbl', 'scheduler') . '</strong>: ' . $attended . '<br/><br/>';
+        $str .= '<p><strong>' . get_string('attendedlbl', 'scheduler') . '</strong>: ' . $attended . '</p>';
         $str .= '<h3>' . get_string('unattended', 'scheduler') . '</h3>';
-        $str .= '<strong>' . get_string('registeredlbl', 'scheduler') . '</strong>: ' . $registered . '<br/>';
+        $str .= '<p><strong>' . get_string('registeredlbl', 'scheduler') . '</strong>: ' . $registered . '<br/>';
         $str .= '<strong>' . get_string('unregisteredlbl', 'scheduler') . '</strong>: ' .
-                ($allattendees - $registered - $attended) . '<br/>';
+                ($allattendees - $registered - $attended) . '</p>';
         $str .= '<h3>' . get_string('availableslots', 'scheduler') . '</h3>';
-        $str .= '<strong>' . get_string('availableslotsowned', 'scheduler') . '</strong>: ' . $freeowned . '<br/>';
+        $str .= '<p><strong>' . get_string('availableslotsowned', 'scheduler') . '</strong>: ' . $freeowned . '<br/>';
         $str .= '<strong>' . get_string('availableslotsnotowned', 'scheduler') . '</strong>: ' . $freenotowned . '<br/>';
-        $str .= '<strong>' . get_string('availableslotsall', 'scheduler') . '</strong>: ' . ($freeowned + $freenotowned) . '<br/>';
+        $str .= '<strong>' . get_string('availableslotsall', 'scheduler') . '</strong>: ' . ($freeowned + $freenotowned) . '</p>';
 
         echo $OUTPUT->box($str);
 

@@ -36,6 +36,12 @@ div .path-mod-scheduler .appointmentnote {
     margin-right: auto;
 }
 
+.path-mod-scheduler #slotmanager td,
+.path-mod-scheduler #studentstoschedule td,
+.path-mod-scheduler #groupstoschedule td {
+    vertical-align: middle;
+}
+
 .path-mod-scheduler div.bookercontrols {
     text-align: center;
 }
@@ -96,11 +102,11 @@ div .path-mod-scheduler .appointmentnote {
 }
 
 
-body.path-mod-scheduler input.slotselect {
+body.path-mod-scheduler input.slotselect.form-check-input.mt-0 {
     display: none;
 }
-body.path-mod-scheduler.jsenabled input.slotselect {
-    display: inline;
+body.path-mod-scheduler.jsenabled input.slotselect.form-check-input.mt-0 {
+    display: block;
 }
 
 body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
@@ -119,13 +125,12 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
 }
 
 .path-mod-scheduler div.schedulelist.halfsize {
-    width: 46%;
+    width: 50%;
     display: inline-table;
     padding: 3px;
 }
 
 .path-mod-scheduler div.schedulelist.fullsize {
-    width: 96%;
     display: block;
     padding: 3px;
 }
