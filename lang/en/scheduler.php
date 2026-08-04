@@ -29,13 +29,23 @@
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';
-$string['modulename_help'] = 'The scheduler activity helps you in scheduling appointments with your students.
+$string['modulename_help'] = '###### Key features
+- Teachers can create time slots for face-to-face meetings
+- Students book available slots directly in Moodle
+- Supports individual and group scheduling
+- Flexible booking modes: "one only" or "one at a time."
+- Optional notifications and reminders for appointments
+- Teachers can record meeting outcomes and assign grades
+- Custom booking forms for messages, file uploads, and CAPTCHA
 
-Teachers specify time slots for meetings, students then choose one of them on Moodle.
-Teachers in turn can record the outcome of the meeting - and optionally a grade - within the scheduler.
-
-Group scheduling is supported; that is, each time slot can accommodate several students, and optionally it is possible to schedule appointments for entire groups at the same time.';
+###### Ways to use it
+- Schedule thesis or project supervision meetings
+- Organize regular student consultations or office hours
+- Plan group meetings for collaborative work
+- Manage open sessions with unlimited participants
+- Send reminders or invitations to students who haven’t booked yet';
 $string['modulename_link'] = 'mod/scheduler/view';
+$string['modulename_summary'] = 'Facilitates scheduling of face-to-face appointments between teachers and students with flexible booking options and group support.';
 $string['modulenameplural'] = 'Schedulers';
 
 /* ***** Capabilities ****** */
