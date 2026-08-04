@@ -1205,6 +1205,15 @@ class scheduler extends mvc_record_model
     }
 
     /**
+     * Get list of available groups (i.e., groups that can book slots)
+     *
+     * @return \stdClass[] array of moodle group records
+     */
+    public function get_available_groups() {
+        return groups_get_all_groups($this->courseid, 0, $this->cm->groupingid);
+    }
+
+    /**
      * Get a list of students that can still make an appointment.
      *
      * @param mixed $groups single group or array of groups - only return
@@ -1241,6 +1250,38 @@ class scheduler extends mvc_record_model
         return $schedstuds;
     }
 
+    /**
+     * Get a list of student groups that can still make an appointment.
+     *
+     * @return int|array of moodle group records; or int 0 if there are no groups in the course.
+     */
+    public function get_groups_for_scheduling() {
+        global $DB;
+        // Get all groups that can book slots.
+        $groups = $this->get_available_groups();
+
+        // Remove groups that already contain a student with an appointment.
+        $sql = "SELECT DISTINCT a.studentid
+          FROM {scheduler_appointment} a
+          JOIN {scheduler_slots} s ON a.slotid = s.id
+         WHERE s.schedulerid = :sid";
+        $studentrecs = $DB->get_records_sql($sql, ['sid' => $this->id]);
+        if ($studentrecs) {
+            foreach ($studentrecs as $r) {
+                $studentid = $r->studentid;
+                $studentgroups = groups_get_all_groups($this->courseid, $studentid, $this->cm->groupingid);
+                if ($studentgroups) {
+                    foreach ($studentgroups as $g) {
+                        $gid = (string)$g->id;
+                        if (isset($groups[$gid])) {
+                            unset($groups[$gid]);
+                        }
+                    }
+                }
+            }
+        }
+        return $groups;
+    }
 
     /**
      * Delete an appointment, and do whatever is needed
