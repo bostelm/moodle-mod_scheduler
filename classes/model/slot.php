@@ -395,9 +395,8 @@ class slot extends mvc_child_record_model
 
         $studentids = [];
         foreach ($myappointments as $appointment) {
-            if (!$appointment->is_attended()) {
-                $studentids[] = $appointment->studentid;
-            }
+            // Bookings remain calendar events after attendance is recorded.
+            $studentids[] = $appointment->studentid;
         }
 
         $teacher = $DB->get_record('user', ['id' => $this->teacherid]);
