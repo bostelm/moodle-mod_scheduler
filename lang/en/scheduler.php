@@ -30,7 +30,7 @@ $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';
 $string['modulename_help'] = '###### Key features
-- Teachers can create time slots for face-to-face meetings
+- Teachers can create time slots for appointments
 - Students book available slots directly in Moodle
 - Supports individual and group scheduling
 - Flexible booking modes: "one only" or "one at a time."
@@ -45,7 +45,7 @@ $string['modulename_help'] = '###### Key features
 - Manage open sessions with unlimited participants
 - Send reminders or invitations to students who haven’t booked yet';
 $string['modulename_link'] = 'mod/scheduler/view';
-$string['modulename_summary'] = 'Facilitates scheduling of face-to-face appointments between teachers and students with flexible booking options and group support.';
+$string['modulename_summary'] = 'Facilitates scheduling of appointments between teachers and students with flexible booking options and group support.';
 $string['modulenameplural'] = 'Schedulers';
 
 /* ***** Capabilities ****** */
