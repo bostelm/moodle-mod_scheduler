@@ -113,6 +113,10 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     display: none;
 }
 
+.path-mod-scheduler .studentlist  input.studentselect {
+    margin-inline-end: 0.5rem;
+}
+
 .path-mod-scheduler img.statictickbox {
     padding-right: 5px;
 }
