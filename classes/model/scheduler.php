@@ -1210,7 +1210,7 @@ class scheduler extends mvc_record_model
      * @return \stdClass[] array of moodle group records
      */
     public function get_available_groups() {
-        return groups_get_all_groups($this->courseid, 0, $this->cm->groupingid);
+        return groups_get_all_groups($this->courseid, 0, $this->bookingrouping);
     }
 
     /**
