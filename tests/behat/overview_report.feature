@@ -1,4 +1,4 @@
-@javascript @mod @mod_scheduler
+@javascript @mod @mod_scheduler @overview_report
 Feature: Testing overview integration in scheduler activity
   In order to summarize the scheduler activity
   As a user
@@ -80,3 +80,18 @@ Feature: Testing overview integration in scheduler activity
     And I should see "Name" in the "scheduler_overview_collapsible" "region"
     And I should see "Actions" in the "scheduler_overview_collapsible" "region"
     And I should see "Group test scheduler"
+
+  Scenario: Use the selected grouping in the activities overview
+    Given the site is running Moodle version 5.0 or higher
+    And the following config values are set as admin:
+      | groupscheduling | 1 | mod_scheduler |
+    And the following "activities" exist:
+      | activity  | name                 | intro | course | idnumber     | groupmode |
+      | scheduler | Group test scheduler | n     | C1     | schedulerVis | 0         |
+    And I am on the "schedulerVis" "scheduler activity editing" page logged in as "admin"
+    And I set the field "Booking in groups" to "Yes, in grouping Grouping 1"
+    And I press "Save and return to course"
+    When I am on the "C1" "course > activities > scheduler" page
+    Then I should see "Group test scheduler"
+    And I should see "1 of 1 groups"
+    And I should not see "2 of 2 groups"
