@@ -45,9 +45,6 @@ echo $OUTPUT->header();
 
 echo $output->teacherview_tabs($scheduler, $permissions, $taburl, $subpage);
 
-// Only the contents below the navigation tabs is narrowed.
-echo html_writer::start_div('scheduler-limited-content');
-
 // Find active group in case that group mode is in use.
 $currentgroupid = 0;
 $groupmode = groups_get_activity_groupmode($scheduler->cm);
@@ -305,8 +302,6 @@ switch ($subpage) {
 
 echo '<br/>';
 echo $OUTPUT->continue_button("$CFG->wwwroot/mod/scheduler/view.php?id=" . $cm->id);
-// Close the limited width div.
-echo html_writer::end_div();
 // Finish the page.
 echo $OUTPUT->footer($course);
 exit;

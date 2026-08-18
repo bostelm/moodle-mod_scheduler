@@ -223,10 +223,3 @@ body.path-mod-scheduler.jsenabled  input.studentselectsubmit {
     float: left;
     margin-left: 0.5em;
 }
-
-.path-mod-scheduler .scheduler-limited-content {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 1000px;
-    margin-inline: auto;
-}

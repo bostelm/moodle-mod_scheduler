@@ -75,9 +75,6 @@ if (!$data || $preview) {
     $taburl = new moodle_url('/mod/scheduler/view.php', ['id' => $scheduler->cmid, 'what' => 'export']);
     echo $output->teacherview_tabs($scheduler, $permissions, $taburl, 'export');
 
-    // Only the contents below the navigation tabs is narrowed.
-    echo html_writer::start_div('scheduler-limited-content');
-
     if ($groupmode) {
         groups_print_activity_menu($scheduler->cm, $taburl);
     }
@@ -107,9 +104,6 @@ if (!$data || $preview) {
         echo html_writer::div(get_string('previewlimited', 'scheduler', $limit), 'previewlimited');
     }
 
-    // Close the limited width div.
-    echo html_writer::end_div();
-    // Finish the page.
     echo $output->footer();
     exit();
 }
