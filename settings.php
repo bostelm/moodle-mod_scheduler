@@ -70,4 +70,11 @@ if ($ADMIN->fulltree) {
         get_string('revealteachernotes_desc', 'scheduler'),
         0
     ));
+
+    $settings->add(new admin_setting_configcheckbox(
+            'mod_scheduler/keepattendedincalendar',
+            get_string('keepattendedincalendar', 'scheduler'),
+            get_string('keepattendedincalendar_desc', 'scheduler'),
+            0
+    ));
 }
