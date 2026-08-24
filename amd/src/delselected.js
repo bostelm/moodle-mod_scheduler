@@ -26,7 +26,7 @@
  */
 export const SELECTORS = {
     DELACTION: 'div.commandbar a#delselected',
-    SELECTBOX: 'table#slotmanager input.slotselect',
+    SELECTBOX: 'table#slotmanager input.slotselect.form-check-input.mt-0',
 };
 
 /**
