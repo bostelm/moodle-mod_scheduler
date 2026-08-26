@@ -416,5 +416,42 @@ function xmldb_scheduler_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2022120200, 'scheduler');
     }
 
+    /* ******************* 5.2 upgrade line ********************** */
+
+    if ($oldversion < 2026082600) {
+        $table = new xmldb_table('scheduler');
+        $field = new xmldb_field(
+                'bookingstart',
+                XMLDB_TYPE_INTEGER,
+                '10',
+                XMLDB_NOTNULL,
+                null,
+                '0',
+                '0',
+                'usecaptcha'
+        );
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field(
+                'bookingend',
+                XMLDB_TYPE_INTEGER,
+                '10',
+                XMLDB_NOTNULL,
+                null,
+                '0',
+                '0',
+                'bookingstart'
+        );
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026082600, 'scheduler');
+    }
+
     return true;
 }
