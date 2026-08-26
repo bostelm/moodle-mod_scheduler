@@ -65,10 +65,9 @@ if (groups_get_activity_groupmode($cm) || !$permissions->can_see_all_slots()) {
 $subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
 if (
-        !($permissions->can_edit_all_slots()) ||
-        $action === 'export' ||
-        $action === 'viewstatistics' ||
-        $action === 'addsession'
+    $action === 'export' ||
+    $action === 'viewstatistics' ||
+    $action === 'addsession'
 ) {
     $PAGE->add_body_class('limitedwidth');
 }

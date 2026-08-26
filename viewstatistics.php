@@ -141,6 +141,7 @@ switch ($subpage) {
 
         if (!empty($attendees)) {
             $table = new html_table();
+            $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
             $table->head = [get_string('student', 'scheduler'), get_string('duration', 'scheduler')];
             $table->align = ['LEFT', 'CENTER'];
             $table->width = '70%';
@@ -193,6 +194,7 @@ switch ($subpage) {
         $sql .= " GROUP BY s.teacherid";
         if ($statrecords = $DB->get_records_sql($sql, $params)) {
             $table = new html_table();
+            $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
             $table->width = '70%';
             $table->head = [s($scheduler->get_teacher_name()), get_string('cumulatedduration', 'scheduler')];
             $table->align = ['LEFT', 'CENTER'];
@@ -230,6 +232,7 @@ switch ($subpage) {
         $sql .= " GROUP BY s.starttime ORDER BY groupsize DESC";
         if ($groupslots = $DB->get_records_sql($sql, $params)) {
             $table = new html_table();
+            $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
             $table->head = [get_string('duration', 'scheduler'), get_string('appointments', 'scheduler')];
             $table->align = ['LEFT', 'CENTER'];
             $table->width = '70%';
@@ -276,6 +279,7 @@ switch ($subpage) {
                   ORDER BY groupsize DESC";
         if ($groupslots = $DB->get_records_sql($sql, $params)) {
             $table = new html_table();
+            $table->attributes['class'] = 'table generaltable table-reboot table-hover table-striped';
             $table->head = [get_string('groupsize', 'scheduler'), get_string('occurrences', 'scheduler'),
                                    get_string('cumulatedduration', 'scheduler'), ];
             $table->align = ['LEFT', 'CENTER', 'CENTER'];
