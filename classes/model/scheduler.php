@@ -237,6 +237,33 @@ class scheduler extends mvc_record_model
     }
 
     /**
+     * Whether booking period has started.
+     *
+     * @return bool
+     */
+    public function has_booking_started(): bool {
+        return empty($this->bookingstart) || time() >= $this->bookingstart;
+    }
+
+    /**
+     * Whether booking period has ended.
+     *
+     * @return bool
+     */
+    public function has_booking_ended(): bool {
+        return !empty($this->bookingend) && time() > $this->bookingend;
+    }
+
+    /**
+     * Whether booking is currently open.
+     *
+     * @return bool
+     */
+    public function is_booking_open(): bool {
+        return $this->has_booking_started() && !$this->has_booking_ended();
+    }
+
+    /**
      * Retrieve the name for "teacher" in the context of this scheduler
      *
      * TODO: This involves part of the presentation, should it be here?

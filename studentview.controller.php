@@ -47,6 +47,10 @@ function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $fo
         throw new moodle_exception('error');
     }
 
+    if (!$scheduler->is_booking_open()) {
+        throw new moodle_exception('bookingnotopen', 'scheduler');
+    }
+
     if (!$slot->is_in_bookable_period()) {
         throw new moodle_exception('nopermissions');
     }
@@ -234,6 +238,10 @@ if ($action == 'editbooking') {
     require_sesskey();
     require_capability('mod/scheduler:appoint', $context);
 
+    if (!$scheduler->is_booking_open()) {
+        throw new moodle_exception('bookingnotopen', 'scheduler');
+    }
+
     if (!$scheduler->uses_studentdata()) {
         throw new moodle_exception('error');
     }
@@ -277,6 +285,10 @@ if ($action == 'editbooking') {
 if ($action == 'cancelbooking') {
     require_sesskey();
     require_capability('mod/scheduler:appoint', $context);
+
+    if ($scheduler->is_booking_open()) {
+        throw new moodle_exception('bookingnotopen', 'scheduler');
+    }
 
     // Get the request parameters.
     $slotid = required_param('slotid', PARAM_INT);
