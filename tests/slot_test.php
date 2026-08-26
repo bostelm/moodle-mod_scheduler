@@ -295,6 +295,45 @@ final class slot_test extends \advanced_testcase
     }
 
     /**
+     * Test that attended appointments are removed from calendars by default.
+     *
+     * @covers \mod_scheduler\model\scheduler::load_by_id
+     */
+    public function test_attended_appointments_are_removed_from_calendar_by_default(): void {
+
+        set_config('keepattendedincalendar', 0, 'mod_scheduler');
+
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
+
+        $appointment = $slot->get_appointment($this->appointmentids[0]);
+        $appointment->attended = 1;
+        $slot->save();
+
+        $this->assert_event_absent($this->students[0], $slot->starttime);
+    }
+
+    /**
+     * Test that attended appointments remain visible in calendars.
+     *
+     * @covers \mod_scheduler\model\scheduler::load_by_id
+     */
+    public function test_attended_appointments_keep_calendar_events(): void {
+
+        set_config('keepattendedincalendar', 1, 'mod_scheduler');
+
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+        $slot = slot::load_by_id($this->slotid, $scheduler);
+
+        $appointment = $slot->get_appointment($this->appointmentids[0]);
+        $appointment->attended = 1;
+        $slot->save();
+
+        $this->assert_event_exists($this->students[0], $slot->starttime, "Meeting with your Teacher");
+        $this->assert_event_exists($this->teacherid, $slot->starttime, "Meeting with your Students");
+    }
+
+    /**
      * Assert that a calendar event exists in the DB.
      *
      * @param int $userid user associated with event

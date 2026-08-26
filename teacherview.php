@@ -621,7 +621,7 @@ if ($students === 0) {
         $maildisplay .= ' &mdash; ';
         $maildisplay .= html_writer::link($reminderurl, get_string('sendreminder', 'scheduler'));
 
-        echo $output->box_start('maildisplay');
+        echo $output->box_start('maildisplay my-3');
         // Print number of students who still have to make an appointment.
         echo $output->heading(get_string('missingstudents', 'scheduler', count($reminderstudents)), 3);
         // Print e-mail addresses and mailto links.

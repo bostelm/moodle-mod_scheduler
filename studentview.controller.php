@@ -113,6 +113,11 @@ function scheduler_book_slot($scheduler, $slotid, $userid, $groupid, $mform, $fo
             $mform->save_booking_data($formdata, $appointment);
         }
 
+        // A newly created booking cannot already have been attended.
+        $appointment->attended = 0;
+        $appointment->timemodified = time();
+        $appointment->save();
+
         \mod_scheduler\event\booking_added::create_from_slot($slot)->trigger();
 
         // Notify the teacher.

@@ -393,9 +393,13 @@ class slot extends mvc_child_record_model
 
         $myappointments = $this->appointments->get_children();
 
+        $keepattendedincalendar = (bool) get_config('mod_scheduler', 'keepattendedincalendar');
+
         $studentids = [];
         foreach ($myappointments as $appointment) {
-            if (!$appointment->is_attended()) {
+            // Per default: Bookings remain calendar events after attendance is recorded.
+            // The admin can set the config to not keep attended appointments in the calendar.
+            if ($keepattendedincalendar || !$appointment->is_attended()) {
                 $studentids[] = $appointment->studentid;
             }
         }

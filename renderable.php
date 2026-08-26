@@ -668,11 +668,6 @@ class scheduler_appointment_info implements renderable
     public $showresult;
 
     /**
-     * @var bool whether to show booking info
-     */
-    public $showboookinginfo;
-
-    /**
      * Create appointment information for a new appointment in a slot.
      *
      * @param slot $slot the slot in question

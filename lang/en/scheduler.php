@@ -29,13 +29,23 @@
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';
-$string['modulename_help'] = 'The scheduler activity helps you in scheduling appointments with your students.
+$string['modulename_help'] = '###### Key features
+- Teachers can create time slots for appointments
+- Students book available slots directly in Moodle
+- Supports individual and group scheduling
+- Flexible booking modes: "one only" or "one at a time."
+- Optional notifications and reminders for appointments
+- Teachers can record meeting outcomes and assign grades
+- Custom booking forms for messages, file uploads, and CAPTCHA
 
-Teachers specify time slots for meetings, students then choose one of them on Moodle.
-Teachers in turn can record the outcome of the meeting - and optionally a grade - within the scheduler.
-
-Group scheduling is supported; that is, each time slot can accommodate several students, and optionally it is possible to schedule appointments for entire groups at the same time.';
+###### Ways to use it
+- Schedule thesis or project supervision meetings
+- Organize regular student consultations or office hours
+- Plan group meetings for collaborative work
+- Manage open sessions with unlimited participants
+- Send reminders or invitations to students who haven’t booked yet';
 $string['modulename_link'] = 'mod/scheduler/view';
+$string['modulename_summary'] = 'Facilitates scheduling of appointments between teachers and students with flexible booking options and group support.';
 $string['modulenameplural'] = 'Schedulers';
 
 /* ***** Capabilities ****** */
@@ -128,6 +138,9 @@ $string['appointmentno'] = 'Appointment {$a}';
 $string['appointmentnote'] = 'Notes for appointment (visible to student)';
 $string['appointments'] = 'Appointments';
 $string['appointmentsgrouped'] = 'Appointments grouped by slot';
+$string['appointmentstatus'] = 'Appointment status';
+$string['appointmentstatus_appointed'] = 'Appointment made';
+$string['appointmentstatus_unappointed'] = 'No appointment made';
 $string['appointsolo'] = 'just me';
 $string['appointsomeone'] = 'Add new appointment';
 $string['appointmentsummary'] = 'Appointment on {$a->startdate} from {$a->starttime} to {$a->endtime} with {$a->teacher}';
@@ -193,6 +206,7 @@ $string['confirmdelete-unused'] = 'This will delete all unused slots in this sch
 $string['confirmrevoke'] = 'Revoke all appointments in the current slot?';
 $string['conflictingslots'] = 'The slot on {$a} cannot be created due to conflicting slots:';
 $string['copytomyself'] = 'Send a copy to myself';
+$string['count_of_total_groups'] = '<strong>{$a->count}</strong> of {$a->total} groups';
 $string['course'] = 'Course';
 $string['createexport'] = 'Create export file';
 $string['csvformat'] = 'CSV';
@@ -304,6 +318,8 @@ $string['ignoreconflicts_link'] = 'mod/scheduler/conflict';
 $string['includeemptyslots'] = 'Include empty slots';
 $string['includeslotsfor'] = 'Include slots for';
 $string['incourse'] = ' in course ';
+$string['keepattendedincalendar'] = 'Keep attended appointments in calendar';
+$string['keepattendedincalendar_desc'] = 'If enabled, appointments remain visible in participants’ calendars after they have been marked as attended. If disabled, attended appointments are removed from the calendar.';
 $string['mixindivgroup'] = 'Mix individual and group bookings';
 $string['mixindivgroup_desc'] = 'Where group scheduling is enabled, allow individual bookings as well.';
 $string['introduction'] = 'Introduction';
@@ -340,6 +356,7 @@ $string['multiple'] = '(multiple)';
 $string['myappointments'] = 'My appointments';
 $string['myself'] = 'Myself';
 $string['name'] = 'Scheduler name';
+$string['needmakeappointment'] = 'Need to make an appointment';
 $string['needteachers'] = 'Slots cannot be added as this course has no teachers';
 $string['negativerange'] = 'Range is negative. This can\'t be.';
 $string['negativetimerange'] = 'End time must be later than start time.';
