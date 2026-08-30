@@ -286,7 +286,7 @@ if ($action == 'cancelbooking') {
     require_sesskey();
     require_capability('mod/scheduler:appoint', $context);
 
-    if ($scheduler->is_booking_open()) {
+    if (!$scheduler->is_booking_open()) {
         throw new moodle_exception('bookingnotopen', 'scheduler');
     }
 
