@@ -421,14 +421,14 @@ function xmldb_scheduler_upgrade($oldversion = 0) {
     if ($oldversion < 2026082600) {
         $table = new xmldb_table('scheduler');
         $field = new xmldb_field(
-                'bookingstart',
-                XMLDB_TYPE_INTEGER,
-                '10',
-                null,
-                XMLDB_NOTNULL,
-                null,
-                '0',
-                'usecaptcha'
+            'bookingstart',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'usecaptcha'
         );
 
         if (!$dbman->field_exists($table, $field)) {
@@ -436,14 +436,14 @@ function xmldb_scheduler_upgrade($oldversion = 0) {
         }
 
         $field = new xmldb_field(
-                'bookingend',
-                XMLDB_TYPE_INTEGER,
-                '10',
-                null,
-                XMLDB_NOTNULL,
-                null,
-                '0',
-                'bookingstart'
+            'bookingend',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'bookingstart'
         );
 
         if (!$dbman->field_exists($table, $field)) {

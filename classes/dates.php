@@ -28,6 +28,13 @@ namespace mod_scheduler;
 
 use core\activity_dates;
 
+/**
+ * Class for fetching the important dates in mod_scheduler.
+ *
+ * @package    mod_scheduler
+ * @copyright  2015 Henning Bostelmann and others (see README.txt)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class dates extends activity_dates {
     /**
      * Returns a list of important dates in mod_scheduler
@@ -35,7 +42,7 @@ class dates extends activity_dates {
      * @return array
      */
     protected function get_dates(): array {
-        $scheduler =\mod_scheduler\model\scheduler::load_by_id($this->cm->instance);
+        $scheduler = \mod_scheduler\model\scheduler::load_by_id($this->cm->instance);
         $dates = [];
         if (!empty($scheduler->bookingstart)) {
             $dates[] = (object) [
