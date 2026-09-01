@@ -424,9 +424,9 @@ function xmldb_scheduler_upgrade($oldversion = 0) {
                 'bookingstart',
                 XMLDB_TYPE_INTEGER,
                 '10',
+                null,
                 XMLDB_NOTNULL,
                 null,
-                '0',
                 '0',
                 'usecaptcha'
         );
@@ -439,9 +439,9 @@ function xmldb_scheduler_upgrade($oldversion = 0) {
                 'bookingend',
                 XMLDB_TYPE_INTEGER,
                 '10',
+                null,
                 XMLDB_NOTNULL,
                 null,
-                '0',
                 '0',
                 'bookingstart'
         );
