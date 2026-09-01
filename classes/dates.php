@@ -35,6 +35,7 @@ class dates extends activity_dates {
      * @return array
      */
     protected function get_dates(): array {
+        $scheduler =\mod_scheduler\model\scheduler::load_by_id($this->cm->instance);
         $dates = [];
         if (!empty($scheduler->bookingstart)) {
             $dates[] = (object) [

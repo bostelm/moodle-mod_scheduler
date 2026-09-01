@@ -156,6 +156,10 @@ if ($action == 'bookingform') {
     require_sesskey();
     require_capability('mod/scheduler:appoint', $context);
 
+    if (!$scheduler->is_booking_open()) {
+        throw new moodle_exception('bookingnotopen', 'scheduler');
+    }
+
     $slotid = required_param('slotid', PARAM_INT);
     $slot = $scheduler->get_slot($slotid);
 
