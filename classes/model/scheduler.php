@@ -242,7 +242,8 @@ class scheduler extends mvc_record_model
      * @return bool
      */
     public function has_booking_started(): bool {
-        return empty($this->bookingstart) || time() >= $this->bookingstart;
+        $bookingstart = $this->bookingstart;
+        return empty($bookingstart) || time() >= $bookingstart;
     }
 
     /**
@@ -251,7 +252,8 @@ class scheduler extends mvc_record_model
      * @return bool
      */
     public function has_booking_ended(): bool {
-        return !empty($this->bookingend) && time() > $this->bookingend;
+        $bookingend = $this->bookingend;
+        return !empty($bookingend) && time() > $bookingend;
     }
 
     /**
