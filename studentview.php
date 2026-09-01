@@ -43,7 +43,8 @@ $actionurl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 
 // General permissions check.
 require_capability('mod/scheduler:viewslots', $context);
-$canbook = has_capability('mod/scheduler:appoint', $context);
+$bookingisopen = $scheduler->is_booking_open();
+$canbook = has_capability('mod/scheduler:appoint', $context) && $bookingisopen;
 $canseefull = has_capability('mod/scheduler:viewfullslots', $context);
 
 if ($scheduler->is_group_scheduling_enabled()) {
@@ -110,6 +111,20 @@ if ($scheduler->is_group_scheduling_enabled()) {
     echo html_writer::div(get_string('appointforgroup', 'scheduler', $select), 'dropdownmenu');
 }
 
+if (!$scheduler->has_booking_started()) {
+    $message = get_string('bookingnotstarted', 'scheduler', userdate($scheduler->bookingstart));
+    echo $output->notification($message, \core\output\notification::NOTIFY_INFO);
+    echo $output->footer();
+    return;
+}
+
+if ($scheduler->has_booking_ended()) {
+    $message = get_string('bookingended', 'scheduler', userdate($scheduler->bookingend));
+    echo $output->notification($message, \core\output\notification::NOTIFY_INFO);
+    echo $output->footer();
+    return;
+}
+
 // Get past (attended) slots.
 
 $pastslots = $scheduler->get_attended_slots_for_student($USER->id);
@@ -159,7 +174,7 @@ if (count($upcomingslots) > 0) {
             $others = null;
         }
 
-        $cancancel = $slot->is_in_bookable_period();
+        $cancancel = $bookingisopen && $slot->is_in_bookable_period();
         $canedit = $cancancel && $scheduler->uses_studentdata();
         $canview = !$cancancel && $scheduler->uses_studentdata();
         if ($scheduler->is_group_scheduling_enabled()) {

@@ -61,6 +61,18 @@ class mod_scheduler_mod_form extends moodleform_mod
 
         $this->standard_intro_elements(get_string('introduction', 'scheduler'));
 
+        // Booking period.
+        $mform->addElement('header', 'bookingperiodhdr', get_string('bookingperiod', 'scheduler'));
+        $mform->addElement('date_time_selector', 'bookingstart', get_string('bookingstart', 'scheduler'), ['optional' => true]);
+        $mform->setType('bookingstart', PARAM_INT);
+        $mform->addHelpButton('bookingstart', 'bookingstart', 'scheduler');
+
+        $mform->addElement('date_time_selector', 'bookingend', get_string('bookingend', 'scheduler'), ['optional' => true]);
+        $mform->setType('bookingend', PARAM_INT);
+        $mform->addHelpButton('bookingend', 'bookingend', 'scheduler');
+
+        $mform->setExpanded('bookingperiodhdr');
+
         // Scheduler options.
         $mform->addElement('header', 'optionhdr', get_string('options', 'scheduler'));
         $mform->setExpanded('optionhdr');
@@ -260,5 +272,26 @@ class mod_scheduler_mod_form extends moodleform_mod
             $data->bookinginstructionsformat = $editor['format'];
             $DB->update_record('scheduler', $data);
         }
+    }
+
+    /**
+     * Validate form data.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array Validation errors
+     * @throws coding_exception
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if (
+            !empty($data['bookingstart']) &&
+            !empty($data['bookingend']) &&
+            $data['bookingstart'] >= $data['bookingend']
+        ) {
+            $errors['bookingend'] = get_string('bookingendbeforestart', 'scheduler');
+        }
+        return $errors;
     }
 }
