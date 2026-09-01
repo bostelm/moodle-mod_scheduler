@@ -565,4 +565,53 @@ final class scheduler_test extends \advanced_testcase
         $sid = $this->create_data_for_bookable_appointments('onetime', 1, 5 * DAYSECS, $studid, [2], []);
         $this->assert_bookable_appointments(0, 0, $sid, $studid);
     }
+
+    /**
+     * Test the booking period methods.
+     *
+     * @covers \mod_scheduler\model\scheduler::has_booking_started
+     * @covers \mod_scheduler\model\scheduler::has_booking_ended
+     * @covers \mod_scheduler\model\scheduler::is_booking_open
+     */
+    public function test_booking_period(): void {
+        global $DB;
+
+        // No booking restrictions.
+        $DB->set_field('scheduler', 'bookingstart', 0, ['id' => $this->schedulerid]);
+        $DB->set_field('scheduler', 'bookingend', 0, ['id' => $this->schedulerid]);
+
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+
+        $this->assertTrue($scheduler->has_booking_started());
+        $this->assertFalse($scheduler->has_booking_ended());
+        $this->assertTrue($scheduler->is_booking_open());
+
+        // Booking has not started yet.
+        $DB->set_field('scheduler', 'bookingstart', time() + DAYSECS, ['id' => $this->schedulerid]);
+
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+
+        $this->assertFalse($scheduler->has_booking_started());
+        $this->assertFalse($scheduler->has_booking_ended());
+        $this->assertFalse($scheduler->is_booking_open());
+
+        // Booking has started and is open.
+        $DB->set_field('scheduler', 'bookingstart', time() - DAYSECS, ['id' => $this->schedulerid]);
+        $DB->set_field('scheduler', 'bookingend', time() + DAYSECS, ['id' => $this->schedulerid]);
+
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+
+        $this->assertTrue($scheduler->has_booking_started());
+        $this->assertFalse($scheduler->has_booking_ended());
+        $this->assertTrue($scheduler->is_booking_open());
+
+        // Booking period has ended.
+        $DB->set_field('scheduler', 'bookingend', time() - DAYSECS, ['id' => $this->schedulerid]);
+
+        $scheduler = scheduler::load_by_id($this->schedulerid);
+
+        $this->assertTrue($scheduler->has_booking_started());
+        $this->assertTrue($scheduler->has_booking_ended());
+        $this->assertFalse($scheduler->is_booking_open());
+    }
 }
