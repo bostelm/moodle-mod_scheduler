@@ -277,9 +277,9 @@ class mod_scheduler_mod_form extends moodleform_mod
     /**
      * Validate form data.
      *
-     * @param $data
-     * @param $files
-     * @return array
+     * @param array $data
+     * @param array $files
+     * @return array Validation errors
      * @throws coding_exception
      */
     public function validation($data, $files) {
