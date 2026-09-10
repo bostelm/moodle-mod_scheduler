@@ -47,14 +47,14 @@ class backup_scheduler_activity_structure_step extends backup_activity_structure
             'scale', 'gradingstrategy', 'bookingrouping', 'usenotes',
             'usebookingform', 'bookinginstructions', 'bookinginstructionsformat',
             'usestudentnotes', 'requireupload', 'uploadmaxfiles', 'uploadmaxsize',
-            'usecaptcha', 'timemodified', ]);
+            'usecaptcha', 'timemodified', 'visibility', ]);
 
         $slots = new backup_nested_element('slots');
 
         $slot = new backup_nested_element('slot', ['id'], [
             'starttime', 'duration', 'teacherid', 'appointmentlocation',
             'timemodified', 'notes', 'notesformat', 'exclusivity',
-            'emaildate', 'hideuntil', ]);
+            'emaildate', 'hideuntil', 'visibility' ]);
 
         $appointments = new backup_nested_element('appointments');
 

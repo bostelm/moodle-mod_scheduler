@@ -119,6 +119,9 @@ if (count($pastslots) > 0) {
     foreach ($pastslots as $pastslot) {
         $appointment = $pastslot->get_student_appointment($USER->id);
 
+        $showothermembers = $pastslot->visibility == SCHEDULER_VISIBILITY_ALL ||
+                ($pastslot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
+
         if ($pastslot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
             $others = new scheduler_student_list($scheduler, true);
             foreach ($pastslot->get_appointments() as $otherapp) {
@@ -145,6 +148,9 @@ if (count($upcomingslots) > 0) {
     $slottable = new scheduler_slot_table($scheduler, $showowngrades || $scheduler->is_group_scheduling_enabled(), $actionurl);
     foreach ($upcomingslots as $slot) {
         $appointment = $slot->get_student_appointment($USER->id);
+
+        $showothermembers = $slot->visibility == SCHEDULER_VISIBILITY_ALL ||
+                ($slot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
 
         if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $showothergrades = has_capability('mod/scheduler:seeotherstudentsresults', $context);
