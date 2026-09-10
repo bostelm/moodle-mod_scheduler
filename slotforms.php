@@ -169,7 +169,6 @@ abstract class scheduler_slotform_base extends moodleform
     /**
      * Adds the member visibility field to the slot form.
      *
-     * @param $visibility
      * @return void
      * @throws coding_exception
      */
@@ -194,13 +193,11 @@ abstract class scheduler_slotform_base extends moodleform
      * @throws coding_exception
      */
     protected function get_visibilities(): array {
-
-        $visibilities = [];
-        $visibilities[SCHEDULER_VISIBILITY_ALL] = get_string('visibility_all', 'scheduler');
-        $visibilities[SCHEDULER_VISIBILITY_ANONYMOUS] = get_string('visibility_anonymous', 'scheduler');
-        $visibilities[SCHEDULER_VISIBILITY_SLOT] = get_string('visibility_slot', 'scheduler');
-
-        return $visibilities;
+        return [
+            SCHEDULER_VISIBILITY_ALL => get_string('visibility_all', 'scheduler'),
+            SCHEDULER_VISIBILITY_ANONYMOUS => get_string('visibility_anonymous', 'scheduler'),
+            SCHEDULER_VISIBILITY_SLOT => get_string('visibility_slot', 'scheduler'),
+        ];
     }
 
     /**

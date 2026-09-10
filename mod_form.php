@@ -279,13 +279,11 @@ class mod_scheduler_mod_form extends moodleform_mod
      *               and the values are localized strings for the visibility modes.
      * @throws coding_exception
      */
-    private function get_visibilities() {
-
-        $visibilities = [];
-        $visibilities[SCHEDULER_VISIBILITY_ALL] = get_string('visibility_all', 'scheduler');
-        $visibilities[SCHEDULER_VISIBILITY_ANONYMOUS] = get_string('visibility_anonymous', 'scheduler');
-        $visibilities[SCHEDULER_VISIBILITY_SLOT] = get_string('visibility_slot', 'scheduler');
-
-        return $visibilities;
+    private function get_visibilities(): array {
+        return [
+            SCHEDULER_VISIBILITY_ALL => get_string('visibility_all', 'scheduler'),
+            SCHEDULER_VISIBILITY_ANONYMOUS => get_string('visibility_anonymous', 'scheduler'),
+            SCHEDULER_VISIBILITY_SLOT => get_string('visibility_slot', 'scheduler'),
+        ];
     }
 }

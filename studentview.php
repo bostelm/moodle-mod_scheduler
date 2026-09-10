@@ -122,7 +122,7 @@ if (count($pastslots) > 0) {
         $showothermembers = $pastslot->visibility == SCHEDULER_VISIBILITY_ALL ||
                 ($pastslot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
 
-        if ($pastslot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
+        if ($pastslot->is_groupslot() && $showothermembers && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
             $others = new scheduler_student_list($scheduler, true);
             foreach ($pastslot->get_appointments() as $otherapp) {
                 $othermark = $scheduler->get_gradebook_info($otherapp->studentid);
@@ -152,7 +152,7 @@ if (count($upcomingslots) > 0) {
         $showothermembers = $slot->visibility == SCHEDULER_VISIBILITY_ALL ||
                 ($slot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
 
-        if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+        if ($slot->is_groupslot() && $showothermembers && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $showothergrades = has_capability('mod/scheduler:seeotherstudentsresults', $context);
             $others = new scheduler_student_list($scheduler);
             foreach ($slot->get_appointments() as $otherapp) {
@@ -206,7 +206,12 @@ if (!$canseefull && $bookablecnt == 0) {
         $slot = $bookableslots[$idx];
         $canbookthisslot = $canbook && ($bookablecnt != 0);
 
-        if (has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+        $appointment = $slot->get_student_appointment($USER->id);
+
+        $showothermembers = $slot->visibility == SCHEDULER_VISIBILITY_ALL ||
+                ($slot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
+
+        if ($showothermembers && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $others = new scheduler_student_list($scheduler, false);
             foreach ($slot->get_appointments() as $otherapp) {
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id);
