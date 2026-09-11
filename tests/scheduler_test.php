@@ -572,6 +572,7 @@ final class scheduler_test extends \advanced_testcase
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
+     * @coversNothing
      */
     public function test_slot_inherits_visibility_from_scheduler(): void {
         global $DB;
