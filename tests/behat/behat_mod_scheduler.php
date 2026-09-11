@@ -39,6 +39,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  */
 class behat_mod_scheduler extends behat_base
 {
+    // phpcs:disable Generic.Files.LineLength.TooLong
     /**
      * Adds a series of slots to the scheduler
      *
@@ -49,6 +50,7 @@ class behat_mod_scheduler extends behat_base
      * @param string $activityname
      * @param TableNode $fielddata
      */
+    // phpcs:enable Generic.Files.LineLength.TooLong
     public function i_add_a_slot_days_ahead_at_in_scheduler_and_i_fill_the_form_with(
         $daysahead,
         $time,

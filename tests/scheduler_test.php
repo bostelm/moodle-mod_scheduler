@@ -566,6 +566,13 @@ final class scheduler_test extends \advanced_testcase
         $this->assert_bookable_appointments(0, 0, $sid, $studid);
     }
 
+    /**
+     * Tests that a slot inherits the visibility from the scheduler when created.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public function test_slot_inherits_visibility_from_scheduler(): void {
         global $DB;
 
