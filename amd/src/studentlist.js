@@ -1,32 +1,50 @@
 
 export const CSS = {
     EXPANDED: 'expanded',
-    COLLAPSED: 'collapsed'
+    COLLAPSED: 'collapsed',
 };
 
 export const setState = (id, expanded) => {
-    var image = document.getElementById(id);
-    var content = document.getElementById('list' + id);
+    const toggle = document.getElementById(id);
+    const content = document.getElementById('list' + id);
+    if (!toggle || !content) {
+        return;
+    }
+    const image = toggle.querySelector('img');
     if (expanded) {
-        content.removeClass(CSS.COLLAPSED);
-        content.addClass(CSS.EXPANDED);
-        image.set('src', M.util.image_url('t/expanded'));
+        content.classList.remove(CSS.COLLAPSED);
+        content.classList.add(CSS.EXPANDED);
+        toggle.setAttribute('aria-expanded', 'true');
+        if (image) {
+            image.src = M.util.image_url('t/expanded');
+        }
     } else {
-        content.removeClass(CSS.EXPANDED);
-        content.addClass(CSS.COLLAPSED);
-        image.set('src', M.util.image_url('t/collapsed'));
+        content.classList.remove(CSS.EXPANDED);
+        content.classList.add(CSS.COLLAPSED);
+        toggle.setAttribute('aria-expanded', 'false');
+        if (image) {
+            image.src = M.util.image_url('t/collapsed');
+        }
     }
 };
 
 export const toggleState = (id) => {
-    var content = document.getElementById('list' + id);
-    var isVisible = content.hasClass(CSS.EXPANDED);
+    const content = document.getElementById('list' + id);
+    if (!content) {
+        return;
+    }
+    const isVisible = content.classList.contains(CSS.EXPANDED);
     setState(id, !isVisible);
 };
 
-export const init = (imageid, expanded) => {
-    setState(imageid, expanded);
-    document.getElementById(imageid).addEventListener('click', () => {
-        toggleState(imageid);
+export const init = (toggleid, expanded) => {
+    const toggle = document.getElementById(toggleid);
+    const content = document.getElementById('list' + toggleid);
+    if (!toggle || !content) {
+        return;
+    }
+    setState(toggleid, expanded);
+    toggle.addEventListener('click', () => {
+        toggleState(toggleid);
     });
 };

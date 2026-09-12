@@ -41,6 +41,11 @@ define('SCHEDULER_ALL', 2); // Used for setting conflict search scope.
 define('SCHEDULER_MEAN_GRADE', 0); // Used for grading strategy.
 define('SCHEDULER_MAX_GRADE', 1);  // Used for grading strategy.
 
+// Used for scheduler slot member visibility.
+define('SCHEDULER_VISIBILITY_ALL', 0);
+define('SCHEDULER_VISIBILITY_ANONYMOUS', 1);
+define('SCHEDULER_VISIBILITY_SLOT', 2);
+
 /**
  * Given an object containing all the necessary data,
  * will create a new instance and return the id number

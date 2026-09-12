@@ -73,6 +73,7 @@ class mod_scheduler_generator extends testing_module_generator
         self::set_default($record, 'defaultslotduration', 15);
         self::set_default($record, 'staffrolename', '');
         self::set_default($record, 'scale', 0);
+        self::set_default($record, 'visibility', SCHEDULER_VISIBILITY_SLOT);
         if (isset($options['idnumber'])) {
             $record->cmidnumber = $options['idnumber'];
         } else {
@@ -99,6 +100,7 @@ class mod_scheduler_generator extends testing_module_generator
                 $slot->exclusivity = isset($options['slotexclusivity'][$slotkey]) ? $options['slotexclusivity'][$slotkey] : 0;
                 $slot->emaildate = 0;
                 $slot->hideuntil = 0;
+                $slot->visibility = $options['slotvisibility'][$slotkey] ?? $record->visibility;
                 $slotid = $DB->insert_record('scheduler_slots', $slot);
 
                 if (isset($options['slotstudents'][$slotkey])) {
@@ -138,6 +140,7 @@ class mod_scheduler_generator extends testing_module_generator
         $slot->appointmentlocation = isset($data['location']) ? $data['location'] : '';
         $slot->exclusivity = isset($data['exclusivity']) ? $data['exclusivity'] : 1;
         $slot->hideuntil = isset($data['hideuntil']) ? $data['hideuntil'] : 0;
+        $slot->visibility = $data['visibility'] ?? $scheduler->visibility;
 
         if (isset($data['studentid']) && $data['studentid'] > 0) {
             $app = $slot->create_appointment();

@@ -125,6 +125,12 @@ class mod_scheduler_mod_form extends moodleform_mod
         $mform->addElement('select', 'usenotes', get_string('usenotes', 'scheduler'), $noteoptions);
         $mform->setDefault('usenotes', '1');
 
+        // Member visibility.
+        $mform->addElement('select', 'visibility', get_string('visibility', 'scheduler'), $this->get_visibilities());
+        $mform->setType('visibility', PARAM_INT);
+        $mform->setDefault('visibility', SCHEDULER_VISIBILITY_SLOT);
+        $mform->addHelpButton('visibility', 'visibility', 'scheduler');
+
         // Grade settings.
         $this->standard_grading_coursemodule_elements();
 
@@ -260,5 +266,24 @@ class mod_scheduler_mod_form extends moodleform_mod
             $data->bookinginstructionsformat = $editor['format'];
             $DB->update_record('scheduler', $data);
         }
+    }
+
+    /**
+     * Retrieves visibility options for the scheduler.
+     *
+     * This function returns an associative array of available visibility settings
+     * for the scheduler. The keys of the array are the visibility constants defined
+     * elsewhere, and the values are the respective language strings for those options.
+     *
+     * @return array An associative array where the keys are visibility constants
+     *               and the values are localized strings for the visibility modes.
+     * @throws coding_exception
+     */
+    private function get_visibilities(): array {
+        return [
+            SCHEDULER_VISIBILITY_ALL => get_string('visibility_all', 'scheduler'),
+            SCHEDULER_VISIBILITY_ANONYMOUS => get_string('visibility_anonymous', 'scheduler'),
+            SCHEDULER_VISIBILITY_SLOT => get_string('visibility_slot', 'scheduler'),
+        ];
     }
 }

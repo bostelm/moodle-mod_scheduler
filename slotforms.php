@@ -167,6 +167,40 @@ abstract class scheduler_slotform_base extends moodleform
     }
 
     /**
+     * Adds the member visibility field to the slot form.
+     *
+     * @return void
+     * @throws coding_exception
+     */
+    protected function add_visibility_field(): void {
+        $mform = $this->_form;
+
+        $mform->addElement('select', 'visibility', get_string('slotvisibility', 'scheduler'), $this->get_visibilities());
+        $mform->setType('visibility', PARAM_INT);
+        $mform->setDefault('visibility', $this->scheduler->visibility);
+        $mform->addHelpButton('visibility', 'slotvisibility', 'scheduler');
+    }
+
+    /**
+     * Retrieves visibility options for the scheduler.
+     *
+     * This function returns an associative array of available visibility settings
+     * for the scheduler. The keys of the array are the visibility constants defined
+     * elsewhere, and the values are the respective language strings for those options.
+     *
+     * @return array An associative array where the keys are visibility constants
+     *               and the values are localized strings for the visibility modes.
+     * @throws coding_exception
+     */
+    protected function get_visibilities(): array {
+        return [
+            SCHEDULER_VISIBILITY_ALL => get_string('visibility_all', 'scheduler'),
+            SCHEDULER_VISIBILITY_ANONYMOUS => get_string('visibility_anonymous', 'scheduler'),
+            SCHEDULER_VISIBILITY_SLOT => get_string('visibility_slot', 'scheduler'),
+        ];
+    }
+
+    /**
      * Form validation
      *
      * @param array $data array of ("fieldname"=>value) of submitted data
@@ -240,6 +274,9 @@ class scheduler_editslot_form extends scheduler_slotform_base
         // Display slot from this date.
         $mform->addElement('date_selector', 'hideuntil', get_string('displayfrom', 'scheduler'));
         $mform->setDefault('hideuntil', time());
+
+        // Member visibility.
+        $this->add_visibility_field();
 
         // Send e-mail reminder?
         $mform->addElement(
@@ -510,6 +547,7 @@ class scheduler_editslot_form extends scheduler_slotform_base
         $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
         $slot->teacherid = $data->teacherid;
         $slot->appointmentlocation = $data->appointmentlocation;
+        $slot->visibility = $data->visibility;
         $slot->hideuntil = $data->hideuntil;
         $slot->emaildate = $data->emaildate;
         $slot->timemodified = time();
@@ -697,6 +735,9 @@ class scheduler_addsession_form extends scheduler_slotform_base {
 
         $mform->addElement('select', 'hideuntilrel', get_string('displayfrom', 'scheduler'), $hideuntilsel);
         $mform->setDefault('hideuntilsel', 0);
+
+        // Member visibility.
+        $this->add_visibility_field();
 
         // E-mail reminder from.
         $remindersel = [];

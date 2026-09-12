@@ -581,13 +581,26 @@ class mod_scheduler_renderer extends plugin_renderer_base
 
         if ($studentlist->expandable && count($studentlist->students) > 0) {
             $this->page->requires->js_call_amd('mod_scheduler/studentlist', 'init', [$toggleid, (bool) $studentlist->expanded]);
-            $imgclass = 'studentlist-togglebutton';
             $alttext = get_string('showparticipants', 'scheduler');
-            $o .= $this->output->pix_icon(
-                't/switch',
-                $alttext,
-                'moodle',
-                ['id' => $toggleid, 'class' => $imgclass]
+            $toggleicon = $studentlist->expanded
+                    ? 't/expanded'
+                    : 't/collapsed';
+            $icon = $this->output->pix_icon(
+                    $toggleicon,
+                    $alttext,
+                    'moodle'
+            );
+            $o .= html_writer::tag(
+                    'button',
+                    $icon,
+                    [
+                            'id' => $toggleid,
+                            'type' => 'button',
+                            'class' => 'studentlist-togglebutton btn btn-link p-0',
+                            'aria-expanded' => $studentlist->expanded ? 'true' : 'false',
+                            'aria-controls' => 'list' . $toggleid,
+                            'title' => $alttext,
+                    ]
             );
         }
 

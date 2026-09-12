@@ -119,13 +119,18 @@ if (count($pastslots) > 0) {
     foreach ($pastslots as $pastslot) {
         $appointment = $pastslot->get_student_appointment($USER->id);
 
-        if ($pastslot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
+        $showothermembers = $pastslot->visibility == SCHEDULER_VISIBILITY_ALL ||
+                ($pastslot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
+
+        if ($pastslot->is_groupslot() && $showothermembers && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
             $others = new scheduler_student_list($scheduler, true);
             foreach ($pastslot->get_appointments() as $otherapp) {
                 $othermark = $scheduler->get_gradebook_info($otherapp->studentid);
                 $gradehidden = !is_null($othermark) && ($othermark->hidden <> 0);
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
+            $others->expandable = true;
+            $others->expanded = false;
         } else {
             $others = null;
         }
@@ -146,7 +151,10 @@ if (count($upcomingslots) > 0) {
     foreach ($upcomingslots as $slot) {
         $appointment = $slot->get_student_appointment($USER->id);
 
-        if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+        $showothermembers = $slot->visibility == SCHEDULER_VISIBILITY_ALL ||
+                ($slot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
+
+        if ($slot->is_groupslot() && $showothermembers && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $showothergrades = has_capability('mod/scheduler:seeotherstudentsresults', $context);
             $others = new scheduler_student_list($scheduler);
             foreach ($slot->get_appointments() as $otherapp) {
@@ -155,6 +163,8 @@ if (count($upcomingslots) > 0) {
                                (!$showothergrades && $otherapp->studentid <> $USER->id);
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
+            $others->expandable = true;
+            $others->expanded = false;
         } else {
             $others = null;
         }
@@ -200,7 +210,12 @@ if (!$canseefull && $bookablecnt == 0) {
         $slot = $bookableslots[$idx];
         $canbookthisslot = $canbook && ($bookablecnt != 0);
 
-        if (has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+        $appointment = $slot->get_student_appointment($USER->id);
+
+        $showothermembers = $slot->visibility == SCHEDULER_VISIBILITY_ALL ||
+                ($slot->visibility == SCHEDULER_VISIBILITY_SLOT && $appointment !== null);
+
+        if ($showothermembers && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $others = new scheduler_student_list($scheduler, false);
             foreach ($slot->get_appointments() as $otherapp) {
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id);

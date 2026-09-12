@@ -565,4 +565,32 @@ final class scheduler_test extends \advanced_testcase
         $sid = $this->create_data_for_bookable_appointments('onetime', 1, 5 * DAYSECS, $studid, [2], []);
         $this->assert_bookable_appointments(0, 0, $sid, $studid);
     }
+
+    /**
+     * Tests that a slot inherits the visibility from the scheduler when created.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @coversNothing
+     */
+    public function test_slot_inherits_visibility_from_scheduler(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_scheduler');
+        $scheduler = $generator->create_instance(['course' => $course->id, 'visibility' => SCHEDULER_VISIBILITY_ANONYMOUS]);
+        $teacher = $this->getDataGenerator()->create_user();
+        $generator->create_slot([
+            'schedulerid' => $scheduler->cmid,
+            'teacherid' => $teacher->id,
+            'starttime' => time() + DAYSECS,
+            'duration' => 30,
+        ]);
+
+        $slot = $DB->get_record('scheduler_slots', ['schedulerid' => $scheduler->id], '*', MUST_EXIST);
+
+        $this->assertEquals(SCHEDULER_VISIBILITY_ANONYMOUS, $slot->visibility);
+    }
 }
