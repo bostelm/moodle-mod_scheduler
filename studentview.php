@@ -129,6 +129,8 @@ if (count($pastslots) > 0) {
                 $gradehidden = !is_null($othermark) && ($othermark->hidden <> 0);
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
+            $others->expandable = true;
+            $others->expanded = false;
         } else {
             $others = null;
         }
@@ -161,6 +163,8 @@ if (count($upcomingslots) > 0) {
                                (!$showothergrades && $otherapp->studentid <> $USER->id);
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
+            $others->expandable = true;
+            $others->expanded = false;
         } else {
             $others = null;
         }
