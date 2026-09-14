@@ -53,7 +53,7 @@ class external extends external_api
         return new external_function_parameters([
             'query' => new external_value(PARAM_TEXT, 'The search query', VALUE_REQUIRED),
             'scheduler' => new external_value(PARAM_INT, 'The scheduler id', VALUE_REQUIRED),
-            'groupids' => new external_value(PARAM_INT, 'The group ids', VALUE_DEFAULT),
+            'groupids' => new external_value(PARAM_TEXT, 'The group ids', VALUE_DEFAULT, "0"),
         ]);
     }
 
@@ -62,15 +62,15 @@ class external extends external_api
      *
      * @since Moodle 3.5
      * @param string $query The search query.
-     * @param string $scheduler The scheduler id.
-     * @param string $groupids The group ids.
+     * @param int $scheduler The scheduler id.
+     * @param string $groupids The group ids. Either a comma seperated list of group ids or a single group id.
      * @return array
-     * @throws required_capability_exception
-     * @throws dml_exception
-     * @throws invalid_parameter_exception
-     * @throws restricted_context_exception
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \required_capability_exception
+     * @throws \restricted_context_exception
      */
-    public static function studentid($query, $scheduler, $groupids) {
+    public static function studentid(string $query, int $scheduler, string $groupids) {
         $params = external_api::validate_parameters(self::studentid_parameters(), [
             'query' => $query,
             'scheduler' => $scheduler,
@@ -81,7 +81,20 @@ class external extends external_api
         $groupids = $params['groupids'];
 
         $scheduler = scheduler::load_by_id($scheduler);
-        $availablestudents = $scheduler->get_available_students();
+
+        // Validate the context and check the required capability before proceeding.
+        $context = $scheduler->get_context();
+        self::validate_context($context);
+        require_capability('mod/scheduler:appoint', $context);
+
+        // Clean groupids parameter.
+        if (!is_int($groupids)) {
+            $groupids = array_map('intval', explode(',', $groupids));
+        }
+        $groupids = count($groupids) === 1 ? $groupids[0] : $groupids;
+
+        // Fetch students.
+        $availablestudents = $scheduler->get_available_students($groupids);
 
         $students = [];
         $i = 0;
