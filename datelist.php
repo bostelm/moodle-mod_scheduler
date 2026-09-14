@@ -238,24 +238,24 @@ if ($numrecords) {
             '/mod/scheduler/view.php',
             ['what' => 'viewstudent', 'a' => $row->schedulerid, 'appointmentid' => $row->id]
         );
-        $whodata = html_writer::link($whourl, $row->studentfullname);
+        $whodata = html_writer::link($whourl, s($row->studentfullname));
         $whatdata = $output->format_notes($row->notes, $row->notesformat, $context, 'slotnote', $row->sid);
         $gradedata = $row->scale == 0 ? '' : $output->format_grade($row->scale, $row->grade);
 
         $dataset = [
-                        $coursedata,
-                        $schedulerdata,
-                        $whendata,
-                        format_string($row->appointmentlocation),
-                        $whodata,
-                        $row->studentdepartment,
-                        $whatdata,
-                        $gradedata,
-                        $output->format_appointment_notes($scheduler, $row), ];
+            $coursedata,
+            $schedulerdata,
+            $whendata,
+            format_string($row->appointmentlocation),
+            $whodata,
+            s($row->studentdepartment),
+            $whatdata,
+            $gradedata,
+            $output->format_appointment_notes($scheduler, $row),
+        ];
         $table->add_data($dataset);
     }
-
-    $table->print_html();
+    $table->finish_html();
     echo $output->continue_button($returnurl);
 } else {
     notice(get_string('noresults', 'scheduler'), $returnurl);
